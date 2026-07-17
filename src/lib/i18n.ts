@@ -153,6 +153,11 @@ const EN = {
   'chat.empty.suggestion2': 'Help me write code',
   'chat.empty.suggestion3': 'Brainstorm ideas',
   'chat.empty.suggestion4': 'Summarize a document',
+  'chat.empty.beginSession': 'Begin a session',
+  'chat.empty.tagline': 'Agent chat · live tools · memory · full observability',
+  'chat.empty.suggestionAnalyze': 'Analyze workspace',
+  'chat.empty.suggestionSave': 'Save a preference',
+  'chat.empty.suggestionCreate': 'Create a file',
   'chat.empty.noSessions': 'No conversations yet',
   'chat.empty.noSessionsDesc': 'Start your first conversation to see it here.',
   // ── Chat — message list ──────────────────────────────────────────────
@@ -419,6 +424,11 @@ const FA: LocaleTranslations = {
   'chat.empty.suggestion2': 'کمک در نوشتن کد',
   'chat.empty.suggestion3': 'ایده‌پردازی',
   'chat.empty.suggestion4': 'خلاصه‌کردن یک سند',
+  'chat.empty.beginSession': 'نشست را آغاز کنید',
+  'chat.empty.tagline': 'گفتگوی عامل · ابزارهای زنده · حافظه · مشاهدهٔ کامل',
+  'chat.empty.suggestionAnalyze': 'تحلیل فضای کار',
+  'chat.empty.suggestionSave': 'ذخیرهٔ یک ترجیح',
+  'chat.empty.suggestionCreate': 'ایجاد یک فایل',
   'chat.empty.noSessions': 'هنوز گفتگویی وجود ندارد',
   'chat.empty.noSessionsDesc': 'برای دیدن گفتگوهایتان، نخستین گفتگو را آغاز کنید.',
   // ── Chat — message list ──────────────────────────────────────────────
