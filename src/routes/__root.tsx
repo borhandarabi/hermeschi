@@ -23,6 +23,7 @@ import { KeyboardShortcutsModal } from '@/components/keyboard-shortcuts-modal'
 import { UpdateCenterNotifier } from '@/components/update-center-notifier'
 import { applyInterfacePreferences, initializeSettingsAppearance, useSettings } from '@/hooks/use-settings'
 import { useApplyChatWidth } from '@/hooks/use-chat-settings'
+import { useLocaleDirection } from '@/hooks/use-locale-direction'
 import {
   ClaudeOnboarding,
   ONBOARDING_COMPLETE_EVENT,
@@ -284,6 +285,11 @@ export async function registerAppServiceWorker({
 function RootLayout() {
   const { settings } = useSettings()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  // Subscribe to locale changes so the document direction stays in
+  // sync with the user's selected language. The pre-hydration
+  // themeScript handles initial load; this hook handles in-app
+  // switches triggered by setLocale().
+  const { locale, dir } = useLocaleDirection()
   const isHermesWorldLandingRoute =
     pathname === '/hermes-world' ||
     pathname.startsWith('/hermes-world/') ||
@@ -296,6 +302,19 @@ function RootLayout() {
   const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null)
   const [mounted, setMounted] = useState(false)
   useApplyChatWidth()
+
+  // Reapply document.dir/lang whenever the locale changes. setLocale()
+  // already does this via applyDocumentDir(), but this is a safety net
+  // for cases where the locale was changed by a different code path
+  // (e.g. direct localStorage writes, or cross-tab sync via the
+  // `storage` event). It's idempotent so the redundancy is free.
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    const html = document.documentElement
+    if (html.dir !== dir) html.dir = dir
+    if (html.lang !== locale) html.lang = locale
+    if (html.dataset.dir !== dir) html.dataset.dir = dir
+  }, [locale, dir])
 
   useEffect(() => {
     applyInterfacePreferences(settings)
