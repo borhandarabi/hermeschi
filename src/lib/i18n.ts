@@ -220,7 +220,43 @@ export function isRtl(): boolean {
   return getDir(getLocale()) === 'rtl'
 }
 
-export function t(key: TranslationKey): string {
+/**
+ * Parameters that can be substituted into a translation string.
+ *
+ * Values may be strings or numbers. Numbers are stringified via
+ * `String(value)` (NOT `Intl.NumberFormat`) so callers control locale-
+ * aware digit rendering — most call sites want ASCII digits even under
+ * Persian, since mixed Latin/Persian numerals look inconsistent.
+ *
+ * Example:
+ *   t('chat.unreadCount', { count: 5 })
+ *   // EN: '{count} unread messages' → '5 unread messages'
+ *   // FA: '{count} پیام خوانده‌نشده' → '5 پیام خوانده‌نشده'
+ */
+export type TranslationParams = Record<string, string | number>
+
+/**
+ * Replace {placeholder} tokens in a translation string with the
+ * corresponding values from `params`. Tokens that have no matching
+ * key in `params` are left untouched so translators can include
+ * literal curly braces in copy if needed.
+ *
+ * This is intentionally a minimal interpolation engine — no conditionals,
+ * no pluralization, no ICU MessageFormat. Plurals are handled at the
+ * call site by choosing a different key based on the count (e.g.
+ * 'chat.unreadCount.one' vs 'chat.unreadCount.many'); this keeps the
+ * i18n module small and avoids pulling in a runtime dependency.
+ */
+function interpolate(template: string, params?: TranslationParams): string {
+  if (!params) return template
+  return template.replace(/\{(\w+)\}/g, (match, key: string) => {
+    const value = params[key]
+    return value === undefined || value === null ? match : String(value)
+  })
+}
+
+export function t(key: TranslationKey, params?: TranslationParams): string {
   const locale = getLocale()
-  return LOCALES[locale]?.[key] ?? LOCALES.en[key] ?? key
+  const raw = LOCALES[locale]?.[key] ?? LOCALES.en[key] ?? key
+  return interpolate(raw, params)
 }
