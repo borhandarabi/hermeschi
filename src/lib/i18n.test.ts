@@ -129,6 +129,38 @@ describe('i18n translation lookups', () => {
     expect(LOCALE_LABELS.en).toBe('English')
     expect(LOCALE_LABELS.fa).toBe('فارسی')
   })
+
+  it('returns Persian translations for chat.* keys', () => {
+    withLocale('fa', () => {
+      expect(t('chat.composer.placeholder')).toBe('پیام بنویسید…')
+      expect(t('chat.composer.send')).toBe('ارسال')
+      expect(t('chat.empty.title')).toBe('گفتگوی جدیدی را آغاز کنید')
+      expect(t('chat.sidebar.today')).toBe('امروز')
+      expect(t('chat.connection.connected')).toBe('متصل')
+      expect(t('chat.tool.read')).toBe('در حال خواندن فایل')
+    })
+  })
+
+  it('interpolates {count} placeholders in chat.* keys', () => {
+    withLocale('en', () => {
+      expect(t('chat.messageList.unreadCount', { count: 5 })).toBe('5 unread')
+      expect(t('chat.composer.tokenCount', { count: 1200 })).toBe('1200 tokens')
+      expect(t('chat.message.tokensUsed', { count: 42 })).toBe('42 tokens used')
+    })
+    withLocale('fa', () => {
+      expect(t('chat.messageList.unreadCount', { count: 3 })).toBe('3 خوانده‌نشده')
+      expect(t('chat.composer.tokenCount', { count: 1200 })).toBe('1200 توکن')
+    })
+  })
+
+  it('interpolates multiple placeholders in chat.contextBar.tokens', () => {
+    withLocale('en', () => {
+      expect(t('chat.contextBar.tokens', { count: 500, max: 8000 })).toBe('500 / 8000 tokens')
+    })
+    withLocale('fa', () => {
+      expect(t('chat.contextBar.tokens', { count: 500, max: 8000 })).toBe('500 / 8000 توکن')
+    })
+  })
 })
 
 describe('locale → direction coupling', () => {
