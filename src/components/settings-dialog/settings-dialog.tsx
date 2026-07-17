@@ -59,7 +59,8 @@ import {
 
 // ── Language ────────────────────────────────────────────────────────────
 
-import { LOCALE_LABELS,  getLocale, setLocale } from '@/lib/i18n'
+import { LOCALE_LABELS, setLocale, t } from '@/lib/i18n'
+import { useLocaleDirection } from '@/hooks/use-locale-direction'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -2440,21 +2441,25 @@ function DisplayContent() {
 }
 
 function LanguageContent() {
+  // Subscribe to locale changes so the <select> re-renders with the
+  // new value immediately after setLocale() fires, without needing a
+  // full page reload. The hook also drives the document.dir update
+  // through RootLayout's effect, so layout flips in the same paint.
+  const { locale } = useLocaleDirection()
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Language"
-        description="Choose the display language for the workspace UI."
+        title={t('settings.language')}
+        description={t('settings.languageDesc')}
       />
       <Row
-        label="Interface Language"
-        description="Translates navigation, labels, and buttons."
+        label={t('settings.language')}
+        description={t('settings.languageDesc')}
       >
         <select
-          value={getLocale()}
+          value={locale}
           onChange={(e) => {
             setLocale(e.target.value as LocaleId)
-            window.location.reload()
           }}
           className="h-9 w-full rounded-lg border border-primary-200 dark:border-neutral-700 bg-primary-50 dark:bg-neutral-800 px-3 text-sm text-primary-900 dark:text-neutral-100 outline-none md:max-w-xs"
         >
