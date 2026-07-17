@@ -36,6 +36,7 @@ import {
   useChatSettingsStore,
 } from '@/hooks/use-chat-settings'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 import { CHAT_SUBMIT_SELECTION_EVENT } from '@/screens/chat/chat-events'
 
 const WORDS_PER_TICK = 4
@@ -566,39 +567,80 @@ function fileNameFromPath(value: string): string {
   return parts[parts.length - 1] || normalized
 }
 
-const TOOL_DISPLAY_LABELS: Record<string, string> = {
-  browser_click: '🖱 Click Element',
-  browser_type: '⌨ Type Text',
-  browser_press: '⏎ Press Key',
-  browser_scroll: '↕ Scroll',
-  browser_back: '← Back',
-  browser_get_images: '🖼 Get Images',
-  browser_vision: '👁 Vision Capture',
-  browser_close: '✕ Close Browser',
-  execute_code: '🐍 Execute Code',
-  process: '⚙ Process',
-  'multi_tool_use.parallel': '⚡ Parallel Tools',
-  todo: '☑ Todo',
-  cronjob: '⏰ Cron Job',
-  delegate_task: '👥 Delegate Task',
-  mixture_of_agents: '🧠 Mixture of Agents',
-  session_search: '🔍 Search Sessions',
-  clarify: '❓ Clarify',
-  skill_manage: '📦 Manage Skill',
-  vision_analyze: '👁 Analyze Image',
-  image_generate: '🎨 Generate Image',
-  send_message: '💬 Send Message',
-  text_to_speech: '🔊 Text to Speech',
-  honcho_profile: '👤 Honcho Profile',
-  honcho_search: '🔎 Honcho Search',
-  honcho_context: '📋 Honcho Context',
-  ha_list_entities: '🏠 HA Entities',
-  ha_get_state: '🏠 HA State',
-  ha_list_services: '🏠 HA Services',
-  web_search: '🌐 Web Search',
-  web_extract: '📄 Web Extract',
-  browser_navigate: '🌐 Open Page',
-  browser_snapshot: '📸 Snapshot',
+// Maps lowercase tool names to i18n keys. The emoji prefix that used
+// to live inline in the label is now applied at render time (see
+// formatToolDisplayLabel) so the translation strings stay clean.
+const TOOL_DISPLAY_LABELS: Record<string, TranslationKey> = {
+  browser_click: 'chat.tool.label.click',
+  browser_type: 'chat.tool.label.type',
+  browser_press: 'chat.tool.label.press',
+  browser_scroll: 'chat.tool.label.scroll',
+  browser_back: 'chat.tool.label.back',
+  browser_get_images: 'chat.tool.label.getImages',
+  browser_vision: 'chat.tool.label.vision',
+  browser_close: 'chat.tool.label.closeBrowser',
+  execute_code: 'chat.tool.label.executeCode',
+  process: 'chat.tool.label.process',
+  'multi_tool_use.parallel': 'chat.tool.label.parallel',
+  todo: 'chat.tool.label.todo',
+  cronjob: 'chat.tool.label.cronjob',
+  delegate_task: 'chat.tool.label.delegate',
+  mixture_of_agents: 'chat.tool.label.mixture',
+  session_search: 'chat.tool.label.sessionSearch',
+  clarify: 'chat.tool.label.clarify',
+  skill_manage: 'chat.tool.label.skillManage',
+  vision_analyze: 'chat.tool.label.visionAnalyze',
+  image_generate: 'chat.tool.label.imageGenerate',
+  send_message: 'chat.tool.label.sendMessage',
+  text_to_speech: 'chat.tool.label.tts',
+  honcho_profile: 'chat.tool.label.honchoProfile',
+  honcho_search: 'chat.tool.label.honchoSearch',
+  honcho_context: 'chat.tool.label.honchoContext',
+  ha_list_entities: 'chat.tool.label.haEntities',
+  ha_get_state: 'chat.tool.label.haState',
+  ha_list_services: 'chat.tool.label.haServices',
+  web_search: 'chat.tool.label.webSearchShort',
+  web_extract: 'chat.tool.label.webExtract',
+  browser_navigate: 'chat.tool.label.openPage',
+  browser_snapshot: 'chat.tool.label.snapshot',
+}
+
+// Per-tool emoji prefix map (kept in code since emojis don't need
+// localization). Used to prepend an emoji to the translated label
+// for visual continuity with the previous design.
+const TOOL_EMOJI_PREFIX: Record<string, string> = {
+  browser_click: '🖱 ',
+  browser_type: '⌨ ',
+  browser_press: '⏎ ',
+  browser_scroll: '↕ ',
+  browser_back: '← ',
+  browser_get_images: '🖼 ',
+  browser_vision: '👁 ',
+  browser_close: '✕ ',
+  execute_code: '🐍 ',
+  process: '⚙ ',
+  'multi_tool_use.parallel': '⚡ ',
+  todo: '☑ ',
+  cronjob: '⏰ ',
+  delegate_task: '👥 ',
+  mixture_of_agents: '🧠 ',
+  session_search: '🔍 ',
+  clarify: '❓ ',
+  skill_manage: '📦 ',
+  vision_analyze: '👁 ',
+  image_generate: '🎨 ',
+  send_message: '💬 ',
+  text_to_speech: '🔊 ',
+  honcho_profile: '👤 ',
+  honcho_search: '🔎 ',
+  honcho_context: '📋 ',
+  ha_list_entities: '🏠 ',
+  ha_get_state: '🏠 ',
+  ha_list_services: '🏠 ',
+  web_search: '🌐 ',
+  web_extract: '📄 ',
+  browser_navigate: '🌐 ',
+  browser_snapshot: '📸 ',
 }
 
 function formatToolDisplayLabel(
@@ -607,17 +649,24 @@ function formatToolDisplayLabel(
 ): string {
   const normalizedName = name.trim()
   const lowerName = normalizedName.toLowerCase()
-  const mappedLabel = TOOL_DISPLAY_LABELS[lowerName]
-  if (mappedLabel) return mappedLabel
+  const mappedKey = TOOL_DISPLAY_LABELS[lowerName]
+  if (mappedKey) {
+    const emoji = TOOL_EMOJI_PREFIX[lowerName] ?? ''
+    return emoji + t(mappedKey)
+  }
 
   if (lowerName === 'read' || lowerName === 'read_file') {
     const filePath = readStringArg(args, 'file_path', 'path', 'target_file')
-    return filePath ? `read ${fileNameFromPath(filePath)}` : 'read file'
+    return filePath
+      ? t('chat.tool.template.read', { file: fileNameFromPath(filePath) })
+      : t('chat.tool.bare.read')
   }
 
   if (lowerName === 'edit' || lowerName === 'patch_file') {
     const filePath = readStringArg(args, 'file_path', 'path', 'target_file')
-    return filePath ? `edit ${fileNameFromPath(filePath)}` : 'edit file'
+    return filePath
+      ? t('chat.tool.template.edit', { file: fileNameFromPath(filePath) })
+      : t('chat.tool.bare.edit')
   }
 
   if (
@@ -626,31 +675,37 @@ function formatToolDisplayLabel(
     lowerName === 'create_file'
   ) {
     const filePath = readStringArg(args, 'file_path', 'path', 'target_file')
-    return filePath ? `write ${fileNameFromPath(filePath)}` : 'write file'
+    return filePath
+      ? t('chat.tool.template.write', { file: fileNameFromPath(filePath) })
+      : t('chat.tool.bare.write')
   }
 
   if (lowerName === 'search_files') {
     const pattern = readStringArg(args, 'pattern', 'query', 'regex')
-    return pattern ? `search "${pattern}"` : 'search files'
+    return pattern
+      ? t('chat.tool.template.search', { pattern })
+      : t('chat.tool.bare.search')
   }
 
   if (lowerName === 'browser' || lowerName === 'browser_navigate') {
     const action = readStringArg(args, 'action', 'url')
-    return action ? `browser ${action}` : 'browser'
+    return action ? t('chat.tool.template.browser', { action }) : t('chat.tool.bare.browser')
   }
 
   if (lowerName === 'terminal' || lowerName === 'exec') {
     const cmd = readStringArg(args, 'command', 'cmd')
     return cmd
-      ? `exec ${cmd.length > 30 ? cmd.slice(0, 27) + '…' : cmd}`
-      : 'exec'
+      ? t('chat.tool.template.exec', {
+          command: cmd.length > 30 ? cmd.slice(0, 27) + '…' : cmd,
+        })
+      : t('chat.tool.bare.exec')
   }
 
-  if (lowerName === 'memory_search') return 'memory search'
-  if (lowerName === 'save_memory') return 'save memory'
-  if (lowerName === 'memory_get') return 'memory get'
-  if (lowerName === 'web_fetch') return 'web fetch'
-  if (lowerName === 'skill_view') return 'view skill'
+  if (lowerName === 'memory_search') return t('chat.tool.bare.memorySearch')
+  if (lowerName === 'save_memory') return t('chat.tool.bare.saveMemory')
+  if (lowerName === 'memory_get') return t('chat.tool.bare.memoryGet')
+  if (lowerName === 'web_fetch') return t('chat.tool.bare.webFetch')
+  if (lowerName === 'skill_view') return t('chat.tool.bare.skillView')
 
   return lowerName.replace(/_/g, ' ')
 }
@@ -955,37 +1010,40 @@ const TOOL_EMOJI_ICONS: Record<string, string> = {
   speak: '🗣️',
 }
 
-const TOOL_VERBS: Record<string, string> = {
-  web_search: 'Searching',
-  search: 'Searching',
-  search_files: 'Searching',
-  terminal: 'Executing',
-  exec: 'Executing',
-  shell: 'Executing',
-  bash: 'Executing',
-  Read: 'Reading',
-  read: 'Reading',
-  read_file: 'Reading',
-  file_read: 'Reading',
-  Write: 'Writing',
-  write: 'Writing',
-  write_file: 'Writing',
-  file_write: 'Writing',
-  Edit: 'Writing',
-  edit: 'Writing',
-  memory: 'Remembering',
-  memory_search: 'Remembering',
-  memory_get: 'Remembering',
-  save_memory: 'Remembering',
-  browser: 'Browsing',
-  browser_navigate: 'Browsing',
-  navigate: 'Browsing',
-  image: 'Analyzing',
-  vision: 'Analyzing',
-  delegate: 'Delegating',
-  spawn: 'Delegating',
-  tts: 'Speaking',
-  speak: 'Speaking',
+// Maps tool names to progressive-verb i18n keys. Used by ToolCallPill
+// to show a localized "Reading..." / "Writing..." / "Searching..."
+// status while a tool is running.
+const TOOL_VERBS: Record<string, TranslationKey> = {
+  web_search: 'chat.tool.verb.searching',
+  search: 'chat.tool.verb.searching',
+  search_files: 'chat.tool.verb.searching',
+  terminal: 'chat.tool.verb.executing',
+  exec: 'chat.tool.verb.executing',
+  shell: 'chat.tool.verb.executing',
+  bash: 'chat.tool.verb.executing',
+  Read: 'chat.tool.verb.reading',
+  read: 'chat.tool.verb.reading',
+  read_file: 'chat.tool.verb.reading',
+  file_read: 'chat.tool.verb.reading',
+  Write: 'chat.tool.verb.writing',
+  write: 'chat.tool.verb.writing',
+  write_file: 'chat.tool.verb.writing',
+  file_write: 'chat.tool.verb.writing',
+  Edit: 'chat.tool.verb.writing',
+  edit: 'chat.tool.verb.writing',
+  memory: 'chat.tool.verb.remembering',
+  memory_search: 'chat.tool.verb.remembering',
+  memory_get: 'chat.tool.verb.remembering',
+  save_memory: 'chat.tool.verb.remembering',
+  browser: 'chat.tool.verb.browsing',
+  browser_navigate: 'chat.tool.verb.browsing',
+  navigate: 'chat.tool.verb.browsing',
+  image: 'chat.tool.verb.analyzing',
+  vision: 'chat.tool.verb.analyzing',
+  delegate: 'chat.tool.verb.delegating',
+  spawn: 'chat.tool.verb.delegating',
+  tts: 'chat.tool.verb.speaking',
+  speak: 'chat.tool.verb.speaking',
 }
 
 function useElapsedTime(active: boolean): string {
@@ -1059,24 +1117,25 @@ function ToolCallPill({ toolCall }: { toolCall: StreamToolCall }) {
                         toolCall.name.includes('spawn')
                       ? '🤖'
                       : '⚡')
-  const verb =
+  const verbKey: TranslationKey =
     TOOL_VERBS[toolCall.name] ??
     (toolCall.name.includes('search')
-      ? 'Searching'
+      ? 'chat.tool.verb.searching'
       : toolCall.name.includes('read') || toolCall.name.includes('Read')
-        ? 'Reading'
+        ? 'chat.tool.verb.reading'
         : toolCall.name.includes('write') ||
             toolCall.name.includes('Write') ||
             toolCall.name.includes('edit') ||
             toolCall.name.includes('Edit')
-          ? 'Writing'
+          ? 'chat.tool.verb.writing'
           : toolCall.name.includes('exec') || toolCall.name.includes('terminal')
-            ? 'Executing'
+            ? 'chat.tool.verb.executing'
             : toolCall.name.includes('memory')
-              ? 'Remembering'
+              ? 'chat.tool.verb.remembering'
               : toolCall.name.includes('browser')
-                ? 'Browsing'
-                : 'Working')
+                ? 'chat.tool.verb.browsing'
+                : 'chat.tool.verb.working')
+  const verb = t(verbKey)
   const displayName = formatToolDisplayLabel(
     toolCall.name,
     toolCall.args as Record<string, unknown> | undefined,
@@ -1708,20 +1767,21 @@ function InlineToolSectionItem({
     elapsed >= 60
       ? `${Math.floor(elapsed / 60)}m ${elapsed % 60}s`
       : `${elapsed}s`
-  const verb = toolSection.type.includes('search')
-    ? 'Searching'
+  const verbKey: TranslationKey = toolSection.type.includes('search')
+    ? 'chat.tool.verb.searching'
     : toolSection.type.includes('read') || toolSection.type.includes('Read')
-      ? 'Reading'
+      ? 'chat.tool.verb.reading'
       : toolSection.type.includes('write') ||
           toolSection.type.includes('Write') ||
           toolSection.type.includes('edit')
-        ? 'Writing'
+        ? 'chat.tool.verb.writing'
         : toolSection.type.includes('exec') ||
             toolSection.type.includes('terminal')
-          ? 'Executing'
+          ? 'chat.tool.verb.executing'
           : toolSection.type.includes('memory')
-            ? 'Remembering'
-            : 'Working'
+            ? 'chat.tool.verb.remembering'
+            : 'chat.tool.verb.working'
+  const verb = t(verbKey)
 
   const previewLabel = toolSection.preview || headerArgTruncated
   const hasInputData =
