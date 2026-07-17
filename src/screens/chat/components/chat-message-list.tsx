@@ -16,6 +16,7 @@ import { ScrollToBottomButton } from './scroll-to-bottom-button'
 import { ResearchCard } from './research-card'
 import type { ChatMessage } from '../types'
 import type { UseResearchCardResult } from '@/hooks/use-research-card'
+import { t } from '@/lib/i18n'
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -1671,14 +1672,17 @@ function ChatMessageListComponent({
                 type="text"
                 value={messageSearchValue}
                 onChange={(e) => setMessageSearchValue(e.target.value)}
-                placeholder="Search messages..."
+                placeholder={t('chat.messageList.searchPlaceholder')}
                 className="min-w-0 flex-1 rounded-md border border-primary-200 bg-primary-50 px-2.5 py-1.5 text-sm text-primary-900 outline-none placeholder:text-primary-400 focus:border-primary-400 focus:ring-1 focus:ring-primary-400"
               />
               {isMessageSearchActive && (
                 <span className="shrink-0 text-xs text-primary-500 dark:text-neutral-400">
                   {messageSearchMatches.length > 0
-                    ? `${activeSearchMatchIndex + 1} of ${messageSearchMatches.length}`
-                    : 'No matches'}
+                    ? t('chat.messageList.searchMatchOf', {
+                        current: activeSearchMatchIndex + 1,
+                        total: messageSearchMatches.length,
+                      })
+                    : t('chat.messageList.searchNoMatches')}
                 </span>
               )}
               <div className="flex shrink-0 items-center gap-0.5">
@@ -1687,7 +1691,7 @@ function ChatMessageListComponent({
                   onClick={jumpToPreviousMatch}
                   disabled={messageSearchMatches.length === 0}
                   className="rounded p-1 text-primary-500 dark:text-neutral-400 hover:bg-primary-200 dark:hover:bg-primary-800 hover:text-primary-700 dark:hover:text-neutral-200 disabled:opacity-30"
-                  aria-label="Previous match"
+                  aria-label={t('chat.messageList.searchPrevious')}
                 >
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                     <path
@@ -1704,7 +1708,7 @@ function ChatMessageListComponent({
                   onClick={jumpToNextMatch}
                   disabled={messageSearchMatches.length === 0}
                   className="rounded p-1 text-primary-500 dark:text-neutral-400 hover:bg-primary-200 dark:hover:bg-primary-800 hover:text-primary-700 dark:hover:text-neutral-200 disabled:opacity-30"
-                  aria-label="Next match"
+                  aria-label={t('chat.messageList.searchNext')}
                 >
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                     <path
@@ -1720,7 +1724,7 @@ function ChatMessageListComponent({
                   type="button"
                   onClick={closeMessageSearch}
                   className="rounded p-1 text-primary-500 dark:text-neutral-400 hover:bg-primary-200 dark:hover:bg-primary-800 hover:text-primary-700 dark:hover:text-neutral-200"
-                  aria-label="Close search"
+                  aria-label={t('chat.messageList.searchClose')}
                 >
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                     <path

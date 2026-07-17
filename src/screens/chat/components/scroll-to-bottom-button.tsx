@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 const MotionButton = motion.create(Button)
 
@@ -26,7 +27,7 @@ function ScrollToBottomButton({
           type="button"
           variant="ghost"
           size="icon-sm"
-          aria-label="Scroll to bottom"
+          aria-label={t('chat.messageList.scrollBottom')}
           className={cn(
             'pointer-events-auto relative rounded-full text-white shadow-lg transition-colors hover:opacity-90',
             className,
@@ -44,7 +45,7 @@ function ScrollToBottomButton({
         >
           <HugeiconsIcon icon={ArrowDown01Icon} size={20} strokeWidth={1.5} />
           {unreadCount > 0 ? (
-            <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-primary-900 px-1.5 text-xs font-medium tabular-nums text-primary-50">
+            <span className="absolute -end-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-primary-900 px-1.5 text-xs font-medium tabular-nums text-primary-50">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           ) : null}
