@@ -2,6 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { BrainIcon, CodeIcon, PuzzleIcon } from '@hugeicons/core-free-icons'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 type ProfileSummary = {
   name: string
@@ -10,26 +11,30 @@ type ProfileSummary = {
 }
 
 type SuggestionChip = {
-  label: string
+  /** i18n key used for the chip's visible label. */
+  labelKey: TranslationKey
   prompt: string
   icon: unknown
 }
 
+// Visible chip labels are translated via t(); the underlying `prompt`
+// stays in English because it's an instruction sent to the LLM, not
+// UI copy.
 const SUGGESTIONS: Array<SuggestionChip> = [
   {
-    label: 'Analyze workspace',
+    labelKey: 'chat.empty.suggestionAnalyze',
     prompt:
       'Analyze this workspace structure and give me 3 engineering risks. Use tools and keep it concise.',
     icon: CodeIcon,
   },
   {
-    label: 'Save a preference',
+    labelKey: 'chat.empty.suggestionSave',
     prompt:
       'Save this to memory exactly: "For demos, respond in 3 bullets max and put risk first." Then confirm saved.',
     icon: BrainIcon,
   },
   {
-    label: 'Create a file',
+    labelKey: 'chat.empty.suggestionCreate',
     prompt: 'Create demo-checklist.md with 5 launch checks for this app.',
     icon: PuzzleIcon,
   },
@@ -94,7 +99,7 @@ export function ChatEmptyState({
           className="editorial-display text-3xl"
           style={{ color: 'var(--theme-text)' }}
         >
-          Begin a session
+          {t('chat.empty.beginSession')}
         </h2>
 
         {activeProfile && (
@@ -107,7 +112,7 @@ export function ChatEmptyState({
         {!compact && (
           <>
             <p className="mt-3 text-sm" style={{ color: 'var(--theme-muted)' }}>
-              Agent chat · live tools · memory · full observability
+              {t('chat.empty.tagline')}
             </p>
           </>
         )}
@@ -116,7 +121,7 @@ export function ChatEmptyState({
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           {SUGGESTIONS.map((suggestion) => (
             <button
-              key={suggestion.label}
+              key={suggestion.labelKey}
               type="button"
               onClick={() => onSuggestionClick?.(suggestion.prompt)}
               className="flex cursor-pointer items-center gap-2 rounded-md px-3.5 py-2 text-xs font-medium transition-all"
@@ -140,7 +145,7 @@ export function ChatEmptyState({
                 strokeWidth={1.5}
                 style={{ color: 'var(--theme-accent)' }}
               />
-              {suggestion.label}
+              {t(suggestion.labelKey)}
             </button>
           ))}
         </div>

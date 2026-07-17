@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { openHamburgerMenu } from '@/components/mobile-hamburger-menu'
+import { t } from '@/lib/i18n'
 
 function toTitleCase(value: string): string {
   return value
@@ -253,7 +254,7 @@ function ChatHeaderComponent({
             type="button"
             onClick={openHamburgerMenu}
             className="shrink-0 flex items-center justify-center w-11 h-11 -ml-1 rounded-xl active:bg-white/10 transition-colors z-10"
-            aria-label="Open navigation menu"
+            aria-label={t('chat.sidebar.collapse')}
           >
             <svg
               width="20"
@@ -276,7 +277,7 @@ function ChatHeaderComponent({
             type="button"
             onClick={onOpenSessions}
             className="flex items-center gap-1 min-w-0 max-w-[55vw] px-3 py-1.5 rounded-full bg-primary-100/70 hover:bg-primary-200/80 dark:bg-neutral-700/80 dark:hover:bg-neutral-600/80 transition-colors"
-            aria-label="Switch session"
+            aria-label={t('chat.header.sessions')}
           >
             <span className="truncate text-[13px] font-medium text-primary-600 dark:text-primary-300">
               {mobileTitle === 'new' ? 'New Chat' : mobileTitle}
@@ -378,7 +379,7 @@ function ChatHeaderComponent({
                   type="button"
                   onClick={startTitleEdit}
                   className="text-xs text-primary-400 opacity-0 group-hover:opacity-100 hover:text-primary-600 transition-opacity shrink-0"
-                  title="Rename session"
+                  title={t('chat.header.renameSession')}
                 >
                   ✏️
                 </button>
