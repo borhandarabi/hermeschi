@@ -1,8 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=EB+Garamond:opsz,wght@8..120,400..800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=EB+Garamond:opsz,wght@8..120,400..800&family=JetBrains+Mono:wght@400;500&family=Vazirmatn:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 /* Tailwind v4 — enable dark: variant on .dark class (set by __root.tsx) */
 @variant dark (&:where(.dark, .dark *));
+
+/* Tailwind v4 — explicit rtl:/ltr: variants.
+   Tailwind v4 ships these built-in (they target [dir="rtl"] / [dir="ltr"]),
+   but declaring them explicitly makes the intent visible in the stylesheet
+   and gives contributors a single place to look when debugging direction
+   issues. The dir attribute is set by the themeScript in __root.tsx and
+   kept in sync by setLocale() → applyDocumentDir(). */
+@variant rtl (&:where([dir="rtl"], [dir="rtl"] *));
+@variant ltr (&:where([dir="ltr"], [dir="ltr"] *));
+
+/* ── Persian (RTL) font stack ──────────────────────────────────────────
+   When the active locale is Persian, swap the default sans-serif family
+   to Vazirmatn — a high-quality open-source Persian typeface that covers
+   all glyphs used in the FA translation table. Inter remains the
+   primary font for Latin characters; Vazirmatn only kicks in for the
+   Persian code range via the unicode-range descriptor, so English
+   mixed inside Persian text still renders in Inter.
+
+   We also bump the line-height slightly for Persian: the script's
+   taller ascenders/descenders need more vertical breathing room to
+   avoid clipping the diacritics. */
+:root {
+  --font-fa-sans: 'Vazirmatn', 'Inter', 'Tahoma', sans-serif;
+}
+html[lang='fa'] body,
+html[lang='fa'] button,
+html[lang='fa'] input,
+html[lang='fa'] textarea,
+html[lang='fa'] select {
+  font-family: var(--font-fa-sans);
+  line-height: 1.85;
+}
+/* Persian numerals stay Latin in technical/code contexts so users can
+   copy-paste identifiers without surprise. */
+html[lang='fa'] code,
+html[lang='fa'] pre,
+html[lang='fa'] kbd,
+html[lang='fa'] samp {
+  font-family: 'JetBrains Mono', 'Vazirmatn', monospace;
+  line-height: 1.6;
+}
 
 /* ── Custom color tokens ───────────────────────────────────────────────
    Tailwind v4 only generates utilities (bg-surface, text-ink,
