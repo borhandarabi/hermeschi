@@ -62,6 +62,7 @@ import {
 } from '@/hooks/use-search-modal'
 import { setLocalModelOverride } from '@/screens/chat/local-model-override'
 import { formatModelName } from '@/lib/format-model-name'
+import { t } from '@/lib/i18n'
 
 type ChatComposerAttachment = {
   id: string
@@ -2238,7 +2239,7 @@ function ChatComposerComponent({
                     )}
                     <button
                       type="button"
-                      aria-label="Remove attachment"
+                      aria-label={t('chat.composer.removeAttachment')}
                       onClick={(event) => {
                         event.preventDefault()
                         event.stopPropagation()
@@ -2272,7 +2273,7 @@ function ChatComposerComponent({
               {/* + button — opens bottom sheet actions menu */}
               <button
                 type="button"
-                aria-label="Actions"
+                aria-label={t('chat.composer.settings')}
                 disabled={disabled}
                 onClick={(event) => {
                   event.stopPropagation()
@@ -2313,7 +2314,7 @@ function ChatComposerComponent({
                   <button
                     type="button"
                     onClick={handleAbort}
-                    aria-label="Stop generation"
+                    aria-label={t('chat.composer.stop')}
                     className="size-9 rounded-full bg-red-500 flex items-center justify-center text-white transition-all duration-150"
                   >
                     <HugeiconsIcon icon={StopIcon} size={18} strokeWidth={2} />
@@ -2325,7 +2326,7 @@ function ChatComposerComponent({
                     type="button"
                     onClick={handleSubmit}
                     disabled={submitDisabled}
-                    aria-label="Send message"
+                    aria-label={t('chat.composer.send')}
                     className="size-9 rounded-full bg-accent-500 flex items-center justify-center text-white transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                   >
                     <HugeiconsIcon
@@ -2383,7 +2384,7 @@ function ChatComposerComponent({
                     type="button"
                     onClick={handleSubmit}
                     disabled={submitDisabled}
-                    aria-label="Send message"
+                    aria-label={t('chat.composer.send')}
                     className="size-9 rounded-full bg-accent-500 flex items-center justify-center text-white transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <HugeiconsIcon
@@ -2401,7 +2402,7 @@ function ChatComposerComponent({
                   <>
                     <button
                       type="button"
-                      aria-label="Close actions"
+                      aria-label={t('common.close')}
                       className="fixed inset-0 z-[199] bg-black/30"
                       onClick={() => {
                         setIsMobileActionsMenuOpen(false)
@@ -2411,7 +2412,7 @@ function ChatComposerComponent({
                     <div
                       className="fixed bottom-0 left-0 right-0 z-[200] rounded-t-2xl bg-white shadow-2xl pb-safe dark:bg-neutral-900 animate-in slide-in-from-bottom-10 duration-200"
                       role="dialog"
-                      aria-label="Actions"
+                      aria-label={t('chat.composer.settings')}
                       onClick={(event) => event.stopPropagation()}
                     >
                       <div className="mx-auto mt-3 mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-600" />
@@ -2522,14 +2523,14 @@ function ChatComposerComponent({
                   <>
                     <button
                       type="button"
-                      aria-label="Close model picker"
+                      aria-label={t('common.close')}
                       className="fixed inset-0 z-[209] bg-black/30"
                       onClick={() => setIsModelMenuOpen(false)}
                     />
                     <div
                       className="fixed bottom-0 left-0 right-0 z-[210] rounded-t-2xl bg-white shadow-2xl pb-safe dark:bg-neutral-900 animate-in slide-in-from-bottom-10 duration-200"
                       role="dialog"
-                      aria-label="Select model"
+                      aria-label={t('chat.composer.modelSwitch')}
                       onClick={(event) => event.stopPropagation()}
                     >
                       <div className="mx-auto mt-3 mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-600" />
@@ -2749,7 +2750,7 @@ function ChatComposerComponent({
                     size="icon-sm"
                     variant="ghost"
                     className="rounded-lg text-primary-500 hover:bg-primary-100 dark:hover:bg-primary-800 hover:text-primary-500"
-                    aria-label="Add attachment"
+                    aria-label={t('chat.composer.attach')}
                     disabled={disabled}
                     onClick={handleOpenAttachmentPicker}
                   >
@@ -2766,7 +2767,7 @@ function ChatComposerComponent({
                       size="icon-sm"
                       variant="ghost"
                       className="rounded-lg text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800 hover:text-red-600"
-                      aria-label="Clear draft"
+                      aria-label={t('chat.composer.clearContext')}
                       onClick={handleClearDraft}
                     >
                       <HugeiconsIcon
@@ -3128,7 +3129,7 @@ function ChatComposerComponent({
                       size="icon-sm"
                       variant="destructive"
                       className="rounded-md"
-                      aria-label="Stop generation"
+                      aria-label={t('chat.composer.stop')}
                     >
                       <HugeiconsIcon
                         icon={StopIcon}
@@ -3146,7 +3147,7 @@ function ChatComposerComponent({
                         disabled={submitDisabled}
                         size="icon-sm"
                         className="rounded-full"
-                        aria-label="Send message"
+                        aria-label={t('chat.composer.send')}
                       >
                         <HugeiconsIcon
                           icon={ArrowUp02Icon}
@@ -3170,7 +3171,7 @@ function ChatComposerComponent({
             className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => setPreviewImage(null)}
             role="dialog"
-            aria-label="Image preview"
+            aria-label={t('chat.composer.attachments')}
           >
             <button
               type="button"
@@ -3179,7 +3180,7 @@ function ChatComposerComponent({
                 e.stopPropagation()
                 setPreviewImage(null)
               }}
-              aria-label="Close preview"
+              aria-label={t('common.close')}
             >
               <HugeiconsIcon icon={Cancel01Icon} size={24} strokeWidth={2} />
             </button>
