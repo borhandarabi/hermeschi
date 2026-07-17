@@ -68,6 +68,36 @@ const themeScript = `
     root.setAttribute('data-theme', theme)
     root.style.setProperty('color-scheme', isDark ? 'dark' : 'light')
 
+    // ── Locale → direction + lang coupling ───────────────────────────
+    // Runs BEFORE React hydrates so the document is already in the
+    // right direction when first paint happens. Without this, switching
+    // to Persian would briefly render LTR and then flip on hydration,
+    // causing a visible flash and breaking first-paint layout assumptions.
+    //
+    // The set of RTL locales is duplicated here (instead of importing
+    // from @/lib/i18n) because this script runs in an inline <script>
+    // tag with no access to the module graph. Keep in sync with
+    // RTL_LOCALES in src/lib/i18n.ts.
+    try {
+      const RTL_LOCALES = ['fa']
+      const storedLocale = localStorage.getItem('hermes-workspace-locale')
+      const supportedLocales = ['en', 'fa']
+      const navigatorLang = (navigator && navigator.language) || ''
+      const navigatorLangShort = navigatorLang.split('-')[0]
+      let locale = 'en'
+      if (storedLocale && supportedLocales.indexOf(storedLocale) !== -1) {
+        locale = storedLocale
+      } else if (supportedLocales.indexOf(navigatorLang) !== -1) {
+        locale = navigatorLang
+      } else if (supportedLocales.indexOf(navigatorLangShort) !== -1) {
+        locale = navigatorLangShort
+      }
+      const dir = RTL_LOCALES.indexOf(locale) !== -1 ? 'rtl' : 'ltr'
+      root.setAttribute('dir', dir)
+      root.setAttribute('lang', locale)
+      root.setAttribute('data-dir', dir)
+    } catch {}
+
     // Demo mode
     try {
       if (new URLSearchParams(window.location.search).get('demo') === '1') {
@@ -393,7 +423,13 @@ function RootLayout() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
+      {/* `lang` and `dir` start as the LTR English defaults so SSR
+          output is valid HTML. The inline `themeScript` below rewrites
+          them from localStorage BEFORE hydration, so by the time React
+          takes over they already reflect the user's chosen locale.
+          `suppressHydrationWarning` acknowledges the deliberate
+          mismatch between SSR markup and post-bootstrap DOM. */}
       <head>
         {/* Content-Security-Policy is set as an HTTP response header in
             server-entry.js and vite.config.ts. Don't re-emit it as a `<meta>`
