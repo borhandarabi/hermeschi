@@ -138,7 +138,7 @@ function SessionItemComponent({
       }}
       className={cn(
         'group inline-flex items-center justify-between',
-        'w-full text-left pl-1.5 pr-0.5 h-14 rounded-lg transition-colors duration-0',
+        'w-full text-start ps-1.5 pe-0.5 h-14 rounded-lg transition-colors duration-0',
         'select-none',
         active
           ? 'bg-primary-200 text-primary-950'
@@ -173,7 +173,7 @@ function SessionItemComponent({
             event.stopPropagation()
           }}
           className={cn(
-            'ml-2 inline-flex size-7 items-center justify-center rounded-md text-primary-700',
+            'ms-2 inline-flex size-7 items-center justify-center rounded-md text-primary-700',
             'opacity-0 transition-opacity group-hover:opacity-100 hover:bg-primary-200 dark:hover:bg-primary-800',
             'aria-expanded:opacity-100 aria-expanded:bg-primary-200',
           )}

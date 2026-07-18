@@ -2648,7 +2648,7 @@ function ChatComposerComponent({
                                     e.stopPropagation()
                                     togglePin(entry.id)
                                   }}
-                                  className={`absolute right-3 rounded p-1 transition-opacity ${
+                                  className={`absolute end-3 rounded p-1 transition-opacity ${
                                     isPinned(entry.id)
                                       ? 'text-accent-500 opacity-80 hover:opacity-100'
                                       : 'text-neutral-400 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-accent-500'
@@ -2824,7 +2824,7 @@ function ChatComposerComponent({
                       <HugeiconsIcon icon={ArrowDown01Icon} size={11} />
                     </button>
                     {isControlsMenuOpen ? (
-                      <div className="absolute bottom-full left-0 z-[190] mb-2 w-[min(32rem,calc(100vw-2rem))] min-w-[18rem] overflow-visible rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
+                      <div className="absolute bottom-full start-0 z-[190] mb-2 w-[min(32rem,calc(100vw-2rem))] min-w-[18rem] overflow-visible rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
                         <div className="mb-2 px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                           Chat controls
                         </div>
@@ -2856,7 +2856,7 @@ function ChatComposerComponent({
                               <HugeiconsIcon icon={ArrowDown01Icon} size={11} />
                             </button>
                             {isProfileMenuOpen && (
-                              <div className="absolute bottom-full left-0 z-[200] mb-2 min-w-[14rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
+                              <div className="absolute bottom-full start-0 z-[200] mb-2 min-w-[14rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
                                 <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                                   Agent profile
                                 </div>
@@ -2918,7 +2918,7 @@ function ChatComposerComponent({
                               <HugeiconsIcon icon={ArrowDown01Icon} size={11} />
                             </button>
                             {isThinkingMenuOpen && (
-                              <div className="absolute bottom-full left-0 z-[200] mb-2 min-w-[10rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
+                              <div className="absolute bottom-full start-0 z-[200] mb-2 min-w-[10rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
                                 {([
                                   ['off', 'None'],
                                   ['low', 'Low'],
@@ -2964,7 +2964,7 @@ function ChatComposerComponent({
                             {isModelMenuOpen && (
                               <>
                                 <div className="fixed inset-0 z-[199]" onClick={() => setIsModelMenuOpen(false)} />
-                                <div className="absolute bottom-full left-0 mb-2 z-[200] w-[min(28rem,calc(100vw-2rem))] min-w-[18rem] origin-bottom-left overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                                <div className="absolute bottom-full start-0 mb-2 z-[200] w-[min(28rem,calc(100vw-2rem))] min-w-[18rem] origin-bottom-start overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900 animate-in fade-in slide-in-from-bottom-2 duration-150">
                                   <div className="max-h-[20rem] overflow-y-auto overflow-x-hidden p-1">
                                     {(() => {
                                       const allModels = modelsQuery.data?.models ?? []
@@ -3017,7 +3017,7 @@ function ChatComposerComponent({
                                                 e.stopPropagation()
                                                 togglePin(entry.id)
                                               }}
-                                              className={`absolute right-2 rounded p-1 transition-opacity ${
+                                              className={`absolute end-2 rounded p-1 transition-opacity ${
                                                 isPinned(entry.id)
                                                   ? 'text-accent-500 opacity-80 hover:opacity-100'
                                                   : 'text-neutral-400 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-accent-500'

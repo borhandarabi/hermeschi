@@ -385,7 +385,7 @@ function ChatHeaderComponent({
                 </button>
               )}
               {sessionPopoverOpen && (
-                <div className="absolute left-0 top-[calc(100%+6px)] z-50 w-80 overflow-hidden rounded-xl border border-[var(--theme-border)] shadow-2xl">
+                <div className="absolute start-0 top-[calc(100%+6px)] z-50 w-80 overflow-hidden rounded-xl border border-[var(--theme-border)] shadow-2xl">
                   <div
                     className="border-b px-3 py-2"
                     style={{

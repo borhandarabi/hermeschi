@@ -712,8 +712,12 @@ function ChatSidebarComponent({
 
   const asideProps = {
     className: cn(
-      'border-r h-full overflow-hidden flex flex-col theme-sidebar theme-border',
-      isMobile && 'fixed inset-y-0 left-0 z-50 shadow-2xl',
+      // RTL-aware: border-r becomes border-s (start) so the divider
+      // sits on the trailing edge in Persian. The mobile slide-in
+      // anchor uses start-0 so the sidebar slides in from the
+      // leading edge in either direction.
+      'border-s h-full overflow-hidden flex flex-col theme-sidebar theme-border',
+      isMobile && 'fixed inset-y-0 start-0 z-50 shadow-2xl',
       isMobile && isCollapsed && 'pointer-events-none',
     ),
   }
