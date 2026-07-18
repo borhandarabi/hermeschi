@@ -11,6 +11,7 @@ import {
   WifiOffIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import {
   useCrewStatus,
   getOnlineStatus,
@@ -38,28 +39,34 @@ function formatCost(n: number | null): string {
 }
 
 function formatRelativeTime(unixSeconds: number | null): string {
-  if (!unixSeconds) return 'Never'
+  if (!unixSeconds) return t('crew.never')
   const diffMs = Date.now() - unixSeconds * 1000
   const diffMins = Math.floor(diffMs / 60_000)
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffMins < 1) return t('crew.justNow')
+  if (diffMins < 60) return t('crew.minutesAgo', { count: diffMins })
   const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffHours < 24) return t('crew.hoursAgo', { count: diffHours })
   const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
+  return t('crew.daysAgo', { count: diffDays })
 }
 
 function formatUpdatedAgo(fetchedAt: number | null): string {
   if (!fetchedAt) return ''
   const diffSec = Math.floor((Date.now() - fetchedAt) / 1000)
-  if (diffSec < 5) return 'just now'
-  if (diffSec < 60) return `${diffSec}s ago`
-  return `${Math.floor(diffSec / 60)}m ago`
+  if (diffSec < 5) return t('crew.justNowLower')
+  if (diffSec < 60) return t('crew.secondsAgo', { count: diffSec })
+  return t('crew.minutesAgo', { count: Math.floor(diffSec / 60) })
 }
 
 // ── Status dot ──────────────────────────────────────────────────────
 
 function StatusDot({ status }: { status: CrewOnlineStatus }) {
+  const labelKey =
+    status === 'online'
+      ? 'crew.statusOnline'
+      : status === 'offline'
+        ? 'crew.statusOffline'
+        : 'crew.statusUnknown'
   return (
     <div className="flex items-center gap-1.5">
       <span
@@ -78,7 +85,7 @@ function StatusDot({ status }: { status: CrewOnlineStatus }) {
           status === 'unknown' && 'text-gray-500',
         )}
       >
-        {status}
+        {t(labelKey)}
       </span>
     </div>
   )
@@ -167,7 +174,7 @@ function AgentCard({ member }: { member: CrewMember }) {
                 )}
               />
               <span className="text-[10px] text-[var(--theme-muted)]">
-                Telegram: {telegramPlatform.state}
+                {t('crew.telegram', { state: telegramPlatform.state })}
               </span>
             </div>
           )}
@@ -176,7 +183,7 @@ function AgentCard({ member }: { member: CrewMember }) {
         {/* Last active */}
         <div>
           <p className="text-[11px] text-[var(--theme-muted)]">
-            Last active: <span className="text-[var(--theme-text)]">{formatRelativeTime(member.lastSessionAt)}</span>
+            {t('crew.lastActive')} <span className="text-[var(--theme-text)]">{formatRelativeTime(member.lastSessionAt)}</span>
           </p>
           {member.lastSessionTitle && (
             <p className="text-[11px] text-[var(--theme-muted)] italic truncate mt-0.5">
@@ -188,9 +195,9 @@ function AgentCard({ member }: { member: CrewMember }) {
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Sessions', value: formatNumber(member.sessionCount) },
-            { label: 'Messages', value: formatNumber(member.messageCount) },
-            { label: 'Tools',    value: formatNumber(member.toolCallCount) },
+            { label: t('crew.sessions'), value: formatNumber(member.sessionCount) },
+            { label: t('crew.messages'), value: formatNumber(member.messageCount) },
+            { label: t('crew.tools'),    value: formatNumber(member.toolCallCount) },
           ].map(({ label, value }) => (
             <div
               key={label}
@@ -205,20 +212,20 @@ function AgentCard({ member }: { member: CrewMember }) {
         {/* Tokens + cost */}
         <div className="flex justify-between text-[11px]">
           <span className="text-[var(--theme-muted)]">
-            Tokens: <span className="text-[var(--theme-text)]">{formatTokens(member.totalTokens)}</span>
+            {t('crew.tokens')} <span className="text-[var(--theme-text)]">{formatTokens(member.totalTokens)}</span>
           </span>
           <span className="text-[var(--theme-muted)]">
-            Est. cost: <span className="text-[var(--theme-text)]">{formatCost(member.estimatedCostUsd)}</span>
+            {t('crew.estCost')} <span className="text-[var(--theme-text)]">{formatCost(member.estimatedCostUsd)}</span>
           </span>
         </div>
 
         {/* Cron + tasks */}
         <div className="flex justify-between text-[11px]">
           <span className="text-[var(--theme-muted)]">
-            Crons: <span className="text-[var(--theme-text)]">{member.cronJobCount}</span>
+            {t('crew.crons')} <span className="text-[var(--theme-text)]">{member.cronJobCount}</span>
           </span>
           <span className="text-[var(--theme-muted)]">
-            Tasks: <span className="text-[var(--theme-text)]">{member.assignedTaskCount} assigned</span>
+            {t('crew.tasks')} <span className="text-[var(--theme-text)]">{t('crew.assignedCount', { count: member.assignedTaskCount })}</span>
           </span>
         </div>
 
@@ -233,7 +240,7 @@ function AgentCard({ member }: { member: CrewMember }) {
             className="flex items-center gap-1 text-[11px] text-[var(--theme-muted)] hover:text-[#B87333] hover:bg-[var(--theme-hover)] px-2 py-1 rounded transition-colors -ml-2"
           >
             <HugeiconsIcon icon={CheckListIcon} size={12} />
-            Tasks
+            {t('crew.viewTasks')}
           </button>
           <button
             type="button"
@@ -241,7 +248,7 @@ function AgentCard({ member }: { member: CrewMember }) {
             className="flex items-center gap-1 text-[11px] text-[var(--theme-muted)] hover:text-[#B87333] hover:bg-[var(--theme-hover)] px-2 py-1 rounded transition-colors -mr-2"
           >
             <HugeiconsIcon icon={Clock01Icon} size={12} />
-            Cron Jobs
+            {t('crew.viewCronJobs')}
           </button>
         </div>
       </div>
@@ -303,28 +310,28 @@ export function CrewScreen() {
                 className="text-2xl font-bold tracking-[0.18em] uppercase"
                 style={{ color: '#f59e0b' }}
               >
-                Crew Status
+                {t('crew.crewStatus')}
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--theme-muted)]">
-                Live agent health across profiles, recent session activity, assigned tasks, and cron coverage.
+                {t('crew.headerDesc')}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em]">
               <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-card)] px-3 py-1 text-[var(--theme-muted)]">
-                <span className="text-[var(--theme-text)]">{displayCrew.length}</span> crew
+                {t('crew.crewCount', { count: displayCrew.length })}
               </span>
               <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-emerald-300">
-                {onlineCount} online
+                {t('crew.onlineCount', { count: onlineCount })}
               </span>
               <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-card)] px-3 py-1 text-[var(--theme-muted)]">
-                {assignedTaskCount} assigned tasks
+                {t('crew.assignedTasks', { count: assignedTaskCount })}
               </span>
               <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-card)] px-3 py-1 text-[var(--theme-muted)]">
-                {runningCronCount} cron jobs
+                {t('crew.cronJobs', { count: runningCronCount })}
               </span>
               {updatedAgo ? (
                 <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-card)] px-3 py-1 text-[var(--theme-muted)]">
-                  Updated {updatedAgo}
+                  {t('crew.updatedAgo', { ago: updatedAgo })}
                 </span>
               ) : null}
             </div>
@@ -344,7 +351,7 @@ export function CrewScreen() {
               size={13}
               className={isLoading ? 'animate-spin' : ''}
             />
-            Refresh manifest
+            {t('crew.refreshManifest')}
           </button>
         </div>
         <div className="h-px" style={{ background: 'linear-gradient(to right, #B87333, transparent)' }} />
@@ -353,13 +360,13 @@ export function CrewScreen() {
       {/* ── Error state ── */}
       {isError && !isLoading && (
         <div className="rounded-lg border border-red-800/40 bg-red-900/10 p-4 text-sm text-red-400">
-          Failed to load crew status.{' '}
+          {t('crew.failedToLoad')}{' '}
           <button
             type="button"
             onClick={handleRefresh}
             className="underline hover:text-red-300"
           >
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       )}

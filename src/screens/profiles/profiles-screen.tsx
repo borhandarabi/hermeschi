@@ -19,7 +19,7 @@ import { DialogContent, DialogRoot, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
-import { t } from '@/lib/i18n'
+import { t, getLocale } from '@/lib/i18n'
 
 type ProfileSummary = {
   name: string
@@ -60,7 +60,7 @@ function formatDate(value?: string): string {
   if (!value) return '—'
   const parsed = Date.parse(value)
   if (Number.isNaN(parsed)) return value
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -210,13 +210,13 @@ export function ProfilesScreen() {
         ...(wizardModel ? { model: wizardModel } : {}),
         ...(wizardProvider ? { provider: wizardProvider } : {}),
       })
-      toast(`Created profile ${newProfileName.trim()}`, { type: 'success' })
+      toast(t('profiles.createdToast', { name: newProfileName.trim() }), { type: 'success' })
       setCreateOpen(false)
       resetWizard()
       await refreshProfiles()
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : 'Failed to create profile',
+        error instanceof Error ? error.message : t('profiles.createFailed'),
         { type: 'error' },
       )
     } finally {
@@ -228,11 +228,11 @@ export function ProfilesScreen() {
     setBusyName(name)
     try {
       await postJson('/api/profiles/activate', { name })
-      toast(`Activated profile ${name}`, { type: 'success' })
+      toast(t('profiles.activatedToast', { name }), { type: 'success' })
       await refreshProfiles()
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : 'Failed to activate profile',
+        error instanceof Error ? error.message : t('profiles.activateFailed'),
         { type: 'error' },
       )
     } finally {
@@ -243,17 +243,17 @@ export function ProfilesScreen() {
   async function handleDelete(name: string) {
     if (
       typeof window !== 'undefined' &&
-      !window.confirm(`Delete profile ${name}?`)
+      !window.confirm(t('profiles.deleteConfirm', { name }))
     )
       return
     setBusyName(name)
     try {
       await postJson('/api/profiles/delete', { name })
-      toast(`Deleted profile ${name}`, { type: 'success' })
+      toast(t('profiles.deletedToast', { name }), { type: 'success' })
       await refreshProfiles()
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : 'Failed to delete profile',
+        error instanceof Error ? error.message : t('profiles.deleteFailed'),
         { type: 'error' },
       )
     } finally {
@@ -269,7 +269,7 @@ export function ProfilesScreen() {
         oldName: renameTarget.name,
         newName: renameValue.trim(),
       })
-      toast(`Renamed ${renameTarget.name} → ${renameValue.trim()}`, {
+      toast(t('profiles.renamedToast', { oldName: renameTarget.name, newName: renameValue.trim() }), {
         type: 'success',
       })
       setRenameTarget(null)
@@ -277,7 +277,7 @@ export function ProfilesScreen() {
       await refreshProfiles()
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : 'Failed to rename profile',
+        error instanceof Error ? error.message : t('profiles.renameFailed'),
         { type: 'error' },
       )
     } finally {
@@ -293,7 +293,7 @@ export function ProfilesScreen() {
         name: detailsName,
         patch: { description: descriptionDraft.trim() || null },
       })
-      toast(`Saved description for ${detailsName}`, { type: 'success' })
+      toast(t('profiles.descriptionSavedToast', { name: detailsName }), { type: 'success' })
       await Promise.all([
         refreshProfiles(),
         queryClient.invalidateQueries({ queryKey: ['profiles', 'read', detailsName] }),
@@ -301,7 +301,7 @@ export function ProfilesScreen() {
       await detailQuery.refetch()
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : 'Failed to save description',
+        error instanceof Error ? error.message : t('profiles.saveDescriptionFailed'),
         { type: 'error' },
       )
     } finally {
@@ -318,13 +318,13 @@ export function ProfilesScreen() {
             <h1 className="text-lg font-semibold text-primary-900">{t('profiles.profiles')}</h1>
           </div>
           <p className="mt-1 text-sm text-primary-600">
-            Browse and manage Hermes profiles stored under{' '}
-            <span className="font-mono">~/.hermes/profiles</span>.
+            {t('profiles.browseAndManage')}{' '}
+            <span className="font-mono">{t('profiles.profilesDir')}</span>.
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">
           <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />
-          Create profile
+          {t('profiles.createProfile')}
         </Button>
       </div>
 
@@ -377,7 +377,7 @@ export function ProfilesScreen() {
                         className="text-white"
                       />
                       <span className="text-[9px] font-bold uppercase tracking-wider text-white">
-                        Active
+                        {t('profiles.activeLabel')}
                       </span>
                     </div>
                   )}
@@ -388,24 +388,24 @@ export function ProfilesScreen() {
                   {profile.name}
                 </h2>
                 <span className="mt-1 inline-block rounded-full bg-primary-100 px-2.5 py-0.5 text-[11px] font-medium text-primary-600 dark:bg-neutral-800 dark:text-neutral-400">
-                  {profile.provider || 'no provider'}
+                  {profile.provider || t('profiles.noProvider')}
                 </span>
                 <p className="mt-3 line-clamp-2 min-h-[2.5rem] px-6 text-center text-xs text-primary-500 dark:text-neutral-400">
-                  {profile.description?.trim() || 'No description yet'}
+                  {profile.description?.trim() || t('profiles.noDescriptionYet')}
                 </p>
               </div>
 
               {/* Stats ring */}
               <div className="mx-4 mt-4 grid grid-cols-4 divide-x divide-primary-200 rounded-xl border border-primary-200 bg-primary-100/50 dark:divide-neutral-800 dark:border-neutral-800 dark:bg-neutral-900/50">
-                <ProfileStat label="Skills" value={profile.skillCount} />
-                <ProfileStat label="Sessions" value={profile.sessionCount} />
+                <ProfileStat label={t('profiles.skills')} value={profile.skillCount} />
+                <ProfileStat label={t('profiles.sessions')} value={profile.sessionCount} />
                 <ProfileStat
-                  label="Model"
+                  label={t('profiles.model')}
                   value={profile.model || '\u2014'}
                   truncate
                 />
                 <ProfileStat
-                  label="Env"
+                  label={t('profiles.env')}
                   value={profile.hasEnv ? '\u2713' : '\u2014'}
                 />
               </div>
@@ -434,7 +434,7 @@ export function ProfilesScreen() {
                     size={13}
                     strokeWidth={1.8}
                   />{' '}
-                  Activate
+                  {t('profiles.activate')}
                 </button>
                 <button
                   type="button"
@@ -446,7 +446,7 @@ export function ProfilesScreen() {
                     size={13}
                     strokeWidth={1.8}
                   />{' '}
-                  Details
+                  {t('profiles.details')}
                 </button>
                 <button
                   type="button"
@@ -461,7 +461,7 @@ export function ProfilesScreen() {
                     size={13}
                     strokeWidth={1.8}
                   />{' '}
-                  Rename
+                  {t('common.rename')}
                 </button>
                 <button
                   type="button"
@@ -479,7 +479,7 @@ export function ProfilesScreen() {
                     size={13}
                     strokeWidth={1.8}
                   />{' '}
-                  Delete
+                  {t('common.delete')}
                 </button>
               </div>
             </article>
@@ -489,8 +489,7 @@ export function ProfilesScreen() {
 
       {sorted.length === 0 && !profilesQuery.isLoading ? (
         <div className="rounded-2xl border border-dashed border-primary-200 bg-primary-50/70 p-8 text-center text-sm text-primary-600">
-          No named profiles found yet. The active profile is{' '}
-          <span className="font-semibold">{activeProfile}</span>.
+          {t('profiles.noProfilesFound', { name: activeProfile })}
         </div>
       ) : null}
 
@@ -510,14 +509,14 @@ export function ProfilesScreen() {
               </div>
               <div>
                 <DialogTitle className="text-base font-semibold">
-                  Create profile
+                  {t('profiles.createProfileTitle')}
                 </DialogTitle>
                 <p className="mt-0.5 text-xs text-primary-500 dark:text-neutral-400">
                   {wizardStep === 1
-                    ? 'Name & template'
+                    ? t('profiles.stepNameTemplate')
                     : wizardStep === 2
-                      ? 'Choose model'
-                      : 'Review & create'}
+                      ? t('profiles.stepChooseModel')
+                      : t('profiles.stepReviewCreate')}
                 </p>
               </div>
             </div>
@@ -567,25 +566,24 @@ export function ProfilesScreen() {
               <div className="space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold uppercase tracking-wider text-primary-600 dark:text-neutral-400">
-                    Profile name
+                    {t('profiles.profileName')}
                   </label>
                   <Input
                     value={newProfileName}
                     onChange={(e) => setNewProfileName(e.target.value)}
-                    placeholder="e.g. builder, researcher, ops"
+                    placeholder={t('profiles.profileNamePlaceholder')}
                     className="h-11 text-sm"
                     autoFocus
                   />
                   {newProfileName.trim() && !nameValid ? (
                     <p className="text-xs text-red-500">
-                      Use letters, numbers, underscores, or hyphens. Cannot be
-                      &quot;default&quot;.
+                      {t('profiles.nameInvalid')}
                     </p>
                   ) : newProfileName.trim() && nameValid ? (
-                    <p className="text-xs text-emerald-600">✓ Valid name</p>
+                    <p className="text-xs text-emerald-600">{t('profiles.nameValid')}</p>
                   ) : (
                     <p className="text-xs text-primary-400 dark:text-neutral-500">
-                      Choose a short, memorable identifier
+                      {t('profiles.nameChooseHint')}
                     </p>
                   )}
                 </div>
@@ -598,7 +596,7 @@ export function ProfilesScreen() {
                         size={13}
                         strokeWidth={1.8}
                       />
-                      Clone from existing
+                      {t('profiles.cloneFromExisting')}
                     </span>
                   </label>
                   <select
@@ -606,27 +604,22 @@ export function ProfilesScreen() {
                     onChange={(e) => setCloneFrom(e.target.value)}
                     className="h-11 w-full rounded-xl border border-primary-200 bg-primary-50 px-3 text-sm text-primary-900 outline-none transition-colors focus:border-accent-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                   >
-                    <option value="">Start fresh — empty config</option>
+                    <option value="">{t('profiles.startFresh')}</option>
                     {profiles.map((p) => (
                       <option key={p.name} value={p.name}>
                         {p.name} {p.model ? `(${p.model})` : ''}{' '}
-                        {p.active ? '• active' : ''}
+                        {p.active ? t('profiles.cloneActive') : ''}
                       </option>
                     ))}
                   </select>
                   <p className="text-xs text-primary-400 dark:text-neutral-500">
-                    Copies config, skills path, and env from the selected
-                    profile
+                    {t('profiles.cloneHelp')}
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-primary-200 bg-primary-50/60 p-3 dark:border-neutral-800 dark:bg-neutral-900/40">
                   <p className="text-xs text-primary-500 dark:text-neutral-400">
-                    Profiles are stored under{' '}
-                    <code className="rounded bg-primary-100 px-1 py-0.5 font-mono text-[11px] dark:bg-neutral-800">
-                      ~/.hermes/profiles/&lt;name&gt;/
-                    </code>{' '}
-                    with their own config, skills, sessions, and env.
+                    {t('profiles.profilesStoredUnder')}
                   </p>
                 </div>
               </div>
@@ -636,16 +629,15 @@ export function ProfilesScreen() {
               <div className="space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold uppercase tracking-wider text-primary-600 dark:text-neutral-400">
-                    Default model
+                    {t('profiles.defaultModel')}
                   </label>
                   {loadingModels ? (
                     <div className="flex h-11 items-center rounded-xl border border-primary-200 bg-primary-50 px-3 text-sm text-primary-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-500">
-                      Loading configured models…
+                      {t('profiles.loadingModels')}
                     </div>
                   ) : allModels.length === 0 ? (
                     <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-xs text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-300">
-                      No models found. Make sure Hermes Agent is running and
-                      has models configured.
+                      {t('profiles.noModelsFound')}
                     </div>
                   ) : (
                     <select
@@ -658,7 +650,7 @@ export function ProfilesScreen() {
                       }}
                       className="h-11 w-full rounded-xl border border-primary-200 bg-primary-50 px-3 text-sm text-primary-900 outline-none transition-colors focus:border-accent-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                     >
-                      <option value="">Skip — configure later</option>
+                      <option value="">{t('profiles.skipConfigureLater')}</option>
                       {allModels.map((m) => (
                         <option key={m.id} value={m.id}>
                           {m.name || m.id}
@@ -670,7 +662,7 @@ export function ProfilesScreen() {
                   {wizardModel && (
                     <p className="text-xs text-emerald-600 dark:text-emerald-400">
                       ✓ {wizardModel}
-                      {wizardProvider ? ` via ${wizardProvider}` : ''}
+                      {wizardProvider ? t('profiles.modelViaProvider', { provider: wizardProvider }) : ''}
                     </p>
                   )}
                 </div>
@@ -678,8 +670,7 @@ export function ProfilesScreen() {
                 {!wizardModel && !loadingModels && allModels.length > 0 && (
                   <div className="rounded-xl border border-primary-200 bg-primary-50/60 p-3 dark:border-neutral-800 dark:bg-neutral-900/40">
                     <p className="text-xs text-primary-500 dark:text-neutral-400">
-                      Select a model or skip to configure later from profile
-                      details or config.yaml.
+                      {t('profiles.selectModelOrSkip')}
                     </p>
                   </div>
                 )}
@@ -690,20 +681,20 @@ export function ProfilesScreen() {
               <div className="space-y-4">
                 <div className="rounded-2xl border border-primary-200 bg-primary-50/80 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary-500 dark:text-neutral-400">
-                    Profile summary
+                    {t('profiles.profileSummary')}
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <SummaryField label="Name" value={newProfileName.trim()} />
+                    <SummaryField label={t('profiles.summaryName')} value={newProfileName.trim()} />
                     <SummaryField
-                      label="Template"
-                      value={cloneFrom || 'Fresh start'}
+                      label={t('profiles.summaryTemplate')}
+                      value={cloneFrom || t('profiles.freshStart')}
                     />
                     <SummaryField
-                      label="Model"
+                      label={t('profiles.summaryModel')}
                       value={
                         wizardModel
                           ? `${wizardModel}${wizardProvider ? ` (${wizardProvider})` : ''}`
-                          : 'Not set'
+                          : t('profiles.notSet')
                       }
                       muted={!wizardModel}
                     />
@@ -712,13 +703,10 @@ export function ProfilesScreen() {
 
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 dark:border-emerald-900/40 dark:bg-emerald-950/20">
                   <p className="text-xs text-emerald-700 dark:text-emerald-300">
-                    This will create{' '}
-                    <code className="rounded bg-emerald-100 px-1 py-0.5 font-mono text-[11px] dark:bg-emerald-900/40">
-                      ~/.hermes/profiles/{newProfileName.trim()}/
-                    </code>{' '}
-                    with config.yaml
-                    {cloneFrom ? ` cloned from ${cloneFrom}` : ''}, skills/, and
-                    sessions/ directories.
+                    {t('profiles.thisWillCreate', {
+                      name: newProfileName.trim(),
+                      cloned: cloneFrom ? t('profiles.clonedFrom', { source: cloneFrom }) : '',
+                    })}
                   </p>
                 </div>
               </div>
@@ -734,7 +722,7 @@ export function ProfilesScreen() {
                   size="sm"
                   onClick={() => setWizardStep((s) => (s - 1) as 1 | 2 | 3)}
                 >
-                  Back
+                  {t('common.back')}
                 </Button>
               )}
             </div>
@@ -747,7 +735,7 @@ export function ProfilesScreen() {
                   resetWizard()
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               {wizardStep < 3 ? (
                 <Button
@@ -756,7 +744,7 @@ export function ProfilesScreen() {
                   disabled={wizardStep === 1 && !nameValid}
                   className="gap-1.5"
                 >
-                  Next
+                  {t('common.next')}
                   <HugeiconsIcon
                     icon={ArrowRight01Icon}
                     size={14}
@@ -775,7 +763,7 @@ export function ProfilesScreen() {
                     size={14}
                     strokeWidth={1.8}
                   />
-                  Create Profile
+                  {t('profiles.createProfileBtn')}
                 </Button>
               )}
             </div>
@@ -800,10 +788,10 @@ export function ProfilesScreen() {
               </div>
               <div>
                 <DialogTitle className="text-base font-semibold">
-                  Rename profile
+                  {t('profiles.renameProfile')}
                 </DialogTitle>
                 <p className="mt-0.5 text-xs text-primary-500 dark:text-neutral-400">
-                  Renaming{' '}
+                  {t('profiles.renamingName')}{' '}
                   <span className="font-semibold text-primary-700 dark:text-neutral-200">
                     {renameTarget?.name}
                   </span>
@@ -814,19 +802,19 @@ export function ProfilesScreen() {
           <div className="px-6 py-5 space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-wider text-primary-600 dark:text-neutral-400">
-                New name
+                {t('profiles.newName')}
               </label>
               <Input
                 value={renameValue}
                 onChange={(e) => setRenameValue(e.target.value)}
-                placeholder="new-profile-name"
+                placeholder={t('profiles.newNamePlaceholder')}
                 className="h-11 text-sm"
                 autoFocus
               />
               {renameValue.trim() &&
                 !/^[A-Za-z0-9_-]+$/.test(renameValue.trim()) && (
                   <p className="text-xs text-red-500">
-                    Use letters, numbers, underscores, or hyphens.
+                    {t('profiles.nameInvalidSimple')}
                   </p>
                 )}
             </div>
@@ -840,7 +828,7 @@ export function ProfilesScreen() {
                 setRenameValue('')
               }}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               size="sm"
@@ -851,7 +839,7 @@ export function ProfilesScreen() {
                 !/^[A-Za-z0-9_-]+$/.test(renameValue.trim())
               }
             >
-              Rename
+              {t('common.rename')}
             </Button>
           </div>
         </DialogContent>
@@ -876,7 +864,7 @@ export function ProfilesScreen() {
                     {detailsName}
                   </DialogTitle>
                   <p className="mt-0.5 text-xs text-primary-500 dark:text-neutral-400">
-                    Profile details &amp; configuration
+                    {t('profiles.profileDetails')}
                   </p>
                 </div>
               </div>
@@ -886,7 +874,7 @@ export function ProfilesScreen() {
                 onClick={() => void detailQuery.refetch()}
                 disabled={detailQuery.isFetching}
               >
-                {detailQuery.isFetching ? 'Refreshing…' : 'Refresh'}
+                {detailQuery.isFetching ? t('common.saving') : t('common.refresh')}
               </Button>
             </div>
           </div>
@@ -897,36 +885,36 @@ export function ProfilesScreen() {
               <div className="space-y-4 text-sm">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <DetailField
-                    label="Name"
+                    label={t('profiles.detailName')}
                     value={detailQuery.data.profile.name}
                   />
                   <DetailField
-                    label="Active"
-                    value={detailQuery.data.profile.active ? 'Yes' : 'No'}
+                    label={t('profiles.detailActive')}
+                    value={detailQuery.data.profile.active ? t('profiles.yes') : t('profiles.no')}
                     accent={detailQuery.data.profile.active}
                   />
                 </div>
                 <DetailField
-                  label="Path"
+                  label={t('profiles.detailPath')}
                   value={detailQuery.data.profile.path}
                   mono
                 />
                 <div className="grid gap-3 sm:grid-cols-3">
                   <DetailField
-                    label="Env file"
-                    value={detailQuery.data.profile.envPath || 'Not set'}
+                    label={t('profiles.detailEnvFile')}
+                    value={detailQuery.data.profile.envPath || t('profiles.notSet')}
                     mono
                     muted={!detailQuery.data.profile.envPath}
                   />
                   <DetailField
-                    label="Sessions"
-                    value={detailQuery.data.profile.sessionsDir || 'Not set'}
+                    label={t('profiles.detailSessions')}
+                    value={detailQuery.data.profile.sessionsDir || t('profiles.notSet')}
                     mono
                     muted={!detailQuery.data.profile.sessionsDir}
                   />
                   <DetailField
-                    label="Skills"
-                    value={detailQuery.data.profile.skillsDir || 'Not set'}
+                    label={t('profiles.detailSkills')}
+                    value={detailQuery.data.profile.skillsDir || t('profiles.notSet')}
                     mono
                     muted={!detailQuery.data.profile.skillsDir}
                   />
@@ -934,24 +922,24 @@ export function ProfilesScreen() {
                 <div className="rounded-xl border border-primary-200 bg-primary-50/80 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div className="text-xs font-semibold uppercase tracking-wider text-primary-500 dark:text-neutral-400">
-                      Description
+                      {t('profiles.description')}
                     </div>
                     <Button
                       size="sm"
                       onClick={() => void handleSaveDescription()}
                       disabled={savingDescription}
                     >
-                      {savingDescription ? 'Saving…' : 'Save'}
+                      {savingDescription ? t('common.saving') : t('common.save')}
                     </Button>
                   </div>
                   <textarea
                     value={descriptionDraft}
                     onChange={(event) => setDescriptionDraft(event.target.value)}
-                    placeholder="What this profile is for, how it should behave, or what makes it different"
+                    placeholder={t('profiles.descriptionPlaceholder')}
                     className="min-h-[96px] w-full rounded-lg border border-primary-200 bg-primary-100/70 p-3 text-sm text-primary-900 outline-none transition-colors focus:border-accent-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                   />
                   <p className="mt-2 text-xs text-primary-400 dark:text-neutral-500">
-                    Saved into the profile config, so manual file edits show up here after refresh.
+                    {t('profiles.descriptionSavedNote')}
                   </p>
                 </div>
                 <div className="rounded-xl border border-primary-200 bg-primary-50/80 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
@@ -961,7 +949,7 @@ export function ProfilesScreen() {
                       size={14}
                       strokeWidth={1.8}
                     />{' '}
-                    Config
+                    {t('profiles.config')}
                   </div>
                   <pre className="max-h-48 overflow-auto rounded-lg border border-primary-200 bg-primary-100/70 p-3 text-xs leading-relaxed text-primary-800 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200">
                     {JSON.stringify(detailQuery.data.profile.config, null, 2)}
@@ -970,11 +958,11 @@ export function ProfilesScreen() {
               </div>
             ) : detailQuery.isLoading ? (
               <div className="flex min-h-[120px] items-center justify-center text-sm text-primary-500 dark:text-neutral-400">
-                Loading profile\u2026
+                {t('profiles.loadingProfile')}
               </div>
             ) : (
               <div className="flex min-h-[120px] items-center justify-center text-sm text-red-500">
-                Failed to load profile.
+                {t('profiles.failedToLoadProfile')}
               </div>
             )}
           </div>
@@ -986,7 +974,7 @@ export function ProfilesScreen() {
               size="sm"
               onClick={() => setDetailsName(null)}
             >
-              Close
+              {t('common.close')}
             </Button>
           </div>
         </DialogContent>
