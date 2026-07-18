@@ -1,4 +1,6 @@
-# خط پایهٔ عملکرد موبایل HermesWorld
+<div dir="rtl">
+
+# خط پایهٔ عملکرد موبایل HermesChiWorld
 
 شاخه: `perf/mobile-bundle-split`
 پایه: `origin/perf/playground-engine-pass-1`
@@ -33,7 +35,7 @@ chunkهای معوق‌شدهٔ ایجادشده توسط split استاتیک s
 | chunk مسیر Playground خام | ~۳۷٫۶ KB | ~۳۷٫۷ KB | عملاً تخت |
 | chunk مسیر Playground gzip | ~۷٫۱ KB | ~۷٫۲ KB | عملاً تخت |
 
-موفقیت معنادار، مسیر standalone استاتیک HermesWorld است؛ مسیر اپ همین حالا توسط Vite split شده بود.
+موفقیت معنادار، مسیر standalone استاتیک HermesChiWorld است؛ مسیر اپ همین حالا توسط Vite split شده بود.
 
 ## Lighthouse موبایل، سرور استاتیک محلی
 
@@ -72,7 +74,9 @@ Chrome headless، RAF با ۱۲۰Hz را گزارش می‌دهد، بنابرا
 
 | Asset | PNG | WebP | تفاضل |
 | --- | ---: | ---: | ---: |
-| `hermesworld-logo-horizontal@2x` | ۱۳۷٬۵۴۱ B | ۵۹٬۰۸۸ B | ‎-۷۸٬۴۵۳ B |
-| `hermesworld-logo-horizontal@3x` | ۲۵۸٬۴۶۱ B | ۹۸٬۰۷۶ B | ‎-۱۶۰٬۳۸۵ B |
-| `hermesworld-logo-stacked@2x` | ۳۳۵٬۱۹۰ B | ۹۹٬۹۵۴ B | ‎-۲۳۵٬۲۳۶ B |
-| `hermesworld-logo-stacked@3x` | ۶۴۰٬۸۲۱ B | ۱۶۱٬۰۱۲ B | ‎-۴۷۹٬۸۰۹ B |
+| `hermeschiworld-logo-horizontal@2x` | ۱۳۷٬۵۴۱ B | ۵۹٬۰۸۸ B | ‎-۷۸٬۴۵۳ B |
+| `hermeschiworld-logo-horizontal@3x` | ۲۵۸٬۴۶۱ B | ۹۸٬۰۷۶ B | ‎-۱۶۰٬۳۸۵ B |
+| `hermeschiworld-logo-stacked@2x` | ۳۳۵٬۱۹۰ B | ۹۹٬۹۵۴ B | ‎-۲۳۵٬۲۳۶ B |
+| `hermeschiworld-logo-stacked@3x` | ۶۴۰٬۸۲۱ B | ۱۶۱٬۰۱۲ B | ‎-۴۷۹٬۸۰۹ B |
+
+</div>

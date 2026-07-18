@@ -97,7 +97,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Desktop workspace for Hermes Agent — chat, orchestration, and multi-agent coding pipelines";
-    homepage = "https://github.com/outsourc-e/hermeschi";
+    homepage = "https://github.com/borhandarabi/hermeschi";
     license = lib.licenses.mit;
     maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;

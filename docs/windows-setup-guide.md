@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # راهنمای راه‌اندازی ویندوز — HermesChi
 
 آخرین به‌روزرسانی: ۲۰۲۶-۰۵-۲۸
@@ -115,3 +117,5 @@ Stop-Process -Id <PID> -Force
 | کد فضای کار | `C:\Users\<you>\hermeschi\` |
 | skillهای سفارشی | `C:\Users\<you>\AppData\Local\hermes\skills\` |
 | پیکربندی Hermes | `C:\Users\<you>\.hermes\config.yaml` |
+
+</div>

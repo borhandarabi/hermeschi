@@ -167,7 +167,7 @@ in
 
     systemd.services.hermeschi = {
       description = "HermesChi Web Server";
-      documentation = [ "https://github.com/outsourc-e/hermeschi" ];
+      documentation = [ "https://github.com/borhandarabi/hermeschi" ];
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 

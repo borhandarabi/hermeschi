@@ -49,7 +49,7 @@ module.exports = {
   },
   publish: {
     provider: 'github',
-    owner: 'outsourc-e',
+    owner: 'borhandarabi',
     repo: 'hermeschi',
     releaseType: 'release',
   },

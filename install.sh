@@ -2,7 +2,7 @@
 # HermesChi — one-liner installer
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/outsourc-e/hermeschi/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/borhandarabi/hermeschi/main/install.sh | bash
 #
 # What it does:
 #   1. Verifies Node 22+, git, pnpm
@@ -15,7 +15,7 @@
 
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/outsourc-e/hermeschi.git}"
+REPO_URL="${REPO_URL:-https://github.com/borhandarabi/hermeschi.git}"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/hermes-workspace}"
 GATEWAY_PORT="${GATEWAY_PORT:-8642}"
 NOUS_INSTALLER_URL="${NOUS_INSTALLER_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
@@ -35,7 +35,7 @@ banner() {
 
    ╭────────────────────────────────────────────╮
    │  HERMES WORKSPACE — zero-fork installer   │
-   │  outsourc-e/hermeschi               │
+   │  borhandarabi/hermeschi               │
    ╰────────────────────────────────────────────╯
 
 EOF

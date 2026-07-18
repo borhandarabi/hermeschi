@@ -1,9 +1,9 @@
 import { PlaygroundHeroCanvas } from './components/playground-hero-canvas'
 
-const HERMES_REPO_URL = 'https://github.com/outsourc-e/hermeschi'
-const HERMES_ROADMAP_URL = 'https://github.com/outsourc-e/hermeschi/blob/main/docs/hermeschiworld/master-roadmap.md'
-const HERMES_DOCS_URL = 'https://github.com/outsourc-e/hermeschi/tree/main/docs/hermeschiworld'
-const HERMES_FEATURES_URL = 'https://github.com/outsourc-e/hermeschi/blob/main/FEATURES-INVENTORY.md'
+const HERMES_REPO_URL = 'https://github.com/borhandarabi/hermeschi'
+const HERMES_ROADMAP_URL = 'https://github.com/borhandarabi/hermeschi/blob/main/docs/hermeschiworld/master-roadmap.md'
+const HERMES_DOCS_URL = 'https://github.com/borhandarabi/hermeschi/tree/main/docs/hermeschiworld'
+const HERMES_FEATURES_URL = 'https://github.com/borhandarabi/hermeschi/blob/main/FEATURES-INVENTORY.md'
 
 const externalLinkProps = { target: '_blank', rel: 'noreferrer' }
 

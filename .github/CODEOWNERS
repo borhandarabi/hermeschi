@@ -7,58 +7,58 @@
 # See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # ── Auth & authentication middleware ──────────────────────────────────────
-/src/server/auth-middleware.ts       @outsourc-e
-/src/server/auth-middleware.test.ts  @outsourc-e
-/src/routes/api/auth.ts              @outsourc-e
-/src/routes/api/auth-check.ts        @outsourc-e
-/src/routes/api/oauth.device-code.ts @outsourc-e
-/src/routes/api/oauth.poll-token.ts  @outsourc-e
+/src/server/auth-middleware.ts       @borhandarabi
+/src/server/auth-middleware.test.ts  @borhandarabi
+/src/routes/api/auth.ts              @borhandarabi
+/src/routes/api/auth-check.ts        @borhandarabi
+/src/routes/api/oauth.device-code.ts @borhandarabi
+/src/routes/api/oauth.poll-token.ts  @borhandarabi
 
 # ── Security: rate limiter, security policy, security CI ─────────────────
-/src/server/rate-limit.ts            @outsourc-e
-/src/server/rate-limit.test.ts       @outsourc-e
-/SECURITY.md                         @outsourc-e
-/.github/workflows/security.yml      @outsourc-e
+/src/server/rate-limit.ts            @borhandarabi
+/src/server/rate-limit.test.ts       @borhandarabi
+/SECURITY.md                         @borhandarabi
+/.github/workflows/security.yml      @borhandarabi
 
 # ── CI/CD workflows (all) ────────────────────────────────────────────────
-/.github/workflows/                  @outsourc-e
+/.github/workflows/                  @borhandarabi
 
 # ── Docker & container configs ───────────────────────────────────────────
-/Dockerfile                          @outsourc-e
-/docker-compose.yml                  @outsourc-e
-/docker-compose.dev.yml              @outsourc-e
-/docker/                             @outsourc-e
-/.dockerignore                       @outsourc-e
-/.devcontainer/                      @outsourc-e
+/Dockerfile                          @borhandarabi
+/docker-compose.yml                  @borhandarabi
+/docker-compose.dev.yml              @borhandarabi
+/docker/                             @borhandarabi
+/.dockerignore                       @borhandarabi
+/.devcontainer/                      @borhandarabi
 
 # ── Server-side infrastructure (all) ─────────────────────────────────────
-/src/server/                         @outsourc-e
+/src/server/                         @borhandarabi
 
 # ── Nix packaging & flake ────────────────────────────────────────────────
-/flake.nix                           @outsourc-e
-/flake.lock                          @outsourc-e
-/nix/                                @outsourc-e
+/flake.nix                           @borhandarabi
+/flake.lock                          @borhandarabi
+/nix/                                @borhandarabi
 
 # ── Root config & infrastructure ─────────────────────────────────────────
-/package.json                        @outsourc-e
-/pnpm-lock.yaml                      @outsourc-e
-/pnpm-workspace.yaml                 @outsourc-e
-/tsconfig.json                       @outsourc-e
-/vite.config.ts                      @outsourc-e
-/wrangler.jsonc                      @outsourc-e
-/eslint.config.js                    @outsourc-e
-/prettier.config.js                  @outsourc-e
-/electron-builder.config.cjs         @outsourc-e
+/package.json                        @borhandarabi
+/pnpm-lock.yaml                      @borhandarabi
+/pnpm-workspace.yaml                 @borhandarabi
+/tsconfig.json                       @borhandarabi
+/vite.config.ts                      @borhandarabi
+/wrangler.jsonc                      @borhandarabi
+/eslint.config.js                    @borhandarabi
+/prettier.config.js                  @borhandarabi
+/electron-builder.config.cjs         @borhandarabi
 
 # ── Electron (desktop app) ───────────────────────────────────────────────
-/electron/                           @outsourc-e
+/electron/                           @borhandarabi
 
 # ── Server entry point ───────────────────────────────────────────────────
-/server-entry.js                     @outsourc-e
+/server-entry.js                     @borhandarabi
 
 # ── Install & bootstrap ──────────────────────────────────────────────────
-/install.sh                          @outsourc-e
-/.env.example                        @outsourc-e
+/install.sh                          @borhandarabi
+/.env.example                        @borhandarabi
 
 # ── GitHub Actions directory (non-workflow files) ────────────────────────
-/.github/                            @outsourc-e
+/.github/                            @borhandarabi

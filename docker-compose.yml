@@ -15,7 +15,7 @@
 # Images:
 #   This file pulls pre-built images by default — no local build required.
 #     - nousresearch/hermes-agent:latest  (Hermes Agent, Dockerfile upstream)
-#     - ghcr.io/outsourc-e/hermeschi:latest  (this workspace)
+#     - ghcr.io/borhandarabi/hermeschi:latest  (this workspace)
 #
 #   To build from source instead (e.g. for development), use:
 #     docker compose -f docker-compose.yml -f docker-compose.dev.yml up
@@ -88,7 +88,7 @@ services:
   # The HermesChi Web UI
   # Connects to hermes-agent at http://hermes-agent:8642
   hermeschi:
-    image: ghcr.io/outsourc-e/hermeschi:latest
+    image: ghcr.io/borhandarabi/hermeschi:latest
     restart: unless-stopped
     depends_on:
       hermes-agent:

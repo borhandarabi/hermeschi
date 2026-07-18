@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # مشخصات IDE عامل Swarm2
 
 وضعیت: پیش‌نویس v1
@@ -512,3 +514,5 @@ jq -r .name package.json
 ۶. پس از تغییرات route-module جدید، یک restart کامل dev-server را به Hot reload ترجیح دهید.
 
 این کار `/swarm2` را از یک سطح کنترل زیبا به اولین نسخهٔ واقعی IDE زیر-کلاید تبدیل می‌کند.
+
+</div>

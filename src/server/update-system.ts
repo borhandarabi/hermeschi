@@ -350,7 +350,7 @@ export function readWorkspaceUpdateStatus(
   const repoMatches = remoteUrlMatches(remoteUrl, [
     'hermeschi',
     'hermes-workspace',
-    'outsourc-e/hermeschi',
+    'borhandarabi/hermeschi',
   ])
   if (repoMatches) git(['fetch', 'origin', '--quiet'], gitRepo, 30_000)
   const currentHead = git(['rev-parse', 'HEAD'], gitRepo)
@@ -456,7 +456,7 @@ export function readAgentUpdateStatus(): ProductUpdateStatus {
   const remoteUrl = git(['remote', 'get-url', 'origin'], repoPath)
   const repoMatches = remoteUrlMatches(remoteUrl, [
     'hermes-agent',
-    'outsourc-e/hermes-agent',
+    'borhandarabi/hermes-agent',
     'NousResearch/hermes-agent',
   ])
   if (repoMatches) git(['fetch', 'origin', '--quiet'], repoPath, 30_000)

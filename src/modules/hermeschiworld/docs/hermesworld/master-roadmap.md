@@ -2,7 +2,7 @@
 
 Status: active build sprint
 Owner: Eric / Aurora
-Repo: `outsourc-e/hermeschi`
+Repo: `borhandarabi/hermeschi`
 Scope: HermesChiWorld inside HermesChi, dashboard/plugin embedded first, standalone later
 
 ## Product thesis

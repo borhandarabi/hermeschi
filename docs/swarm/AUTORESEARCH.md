@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # حالت Autoresearch
 
 Autoresearch یک harness bounded optimization برای Hermes Agentهاست. workflow پیش‌فرض research نیست.
@@ -252,3 +254,5 @@ Reward-hacking review:
 Remaining risks:
 Next recommended loop or stop condition:
 ```
+
+</div>

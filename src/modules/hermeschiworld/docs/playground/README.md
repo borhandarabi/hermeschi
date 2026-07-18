@@ -19,7 +19,7 @@ So **Hermes turns onboarding into a multiplayer RPG world**. You don't read abou
 ## Try it
 
 ```bash
-git clone https://github.com/outsourc-e/hermeschi
+git clone https://github.com/borhandarabi/hermeschi
 cd hermeschi
 pnpm install
 pnpm dev
@@ -181,7 +181,7 @@ Deploy options for the WS relay are listed in `memory/goals/2026-05-03-playgroun
 
 ## Credits
 
-- Built on [HermesChi](https://github.com/outsourc-e/hermeschi) and [Hermes Agent](https://github.com/NousResearch/hermes-agent).
+- Built on [HermesChi](https://github.com/borhandarabi/hermeschi) and [Hermes Agent](https://github.com/NousResearch/hermes-agent).
 - Inspired by RuneScape, PlayROHAN, Lost Ark, and Skyrim. No assets copied — everything is original primitives + Hermes Greek-mythology theming.
 - Hackathon: Nous Research × Kimi 2026.
 

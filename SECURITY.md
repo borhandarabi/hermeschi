@@ -6,7 +6,7 @@ If you discover a security vulnerability in HermesChi, please report it responsi
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Instead, report via [GitHub Security Advisories](https://github.com/outsourc-e/hermeschi/security/advisories) or DM [@ericousodev on X](https://x.com/ericousodev).
+Instead, report via [GitHub Security Advisories](https://github.com/borhandarabi/hermeschi/security/advisories) or DM [@ericousodev on X](https://x.com/ericousodev).
 
 We will acknowledge your report within 48 hours and aim to provide a fix within 7 days for critical issues.
 

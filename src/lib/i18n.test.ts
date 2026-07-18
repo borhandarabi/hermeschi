@@ -100,11 +100,11 @@ describe('i18n translation lookups', () => {
   it('returns Persian strings under the fa locale', () => {
     withLocale('fa', () => {
       expect(t('nav.dashboard')).toBe('داشبورد')
-      expect(t('nav.chat')).toBe('گفتگو')
-      expect(t('nav.profiles')).toBe('نمایه‌ها')
+      expect(t('nav.chat')).toBe('چت')
+      expect(t('nav.profiles')).toBe('پروفایل‌ها')
       expect(t('settings.language')).toBe('زبان')
       expect(t('settings.languageDesc')).toBe(
-        'زبان نمایش رابط کاربری فضای کار را انتخاب کنید.',
+        'زبان رابط کاربری را انتخاب کنید.',
       )
       expect(t('common.save')).toBe('ذخیره')
       expect(t('common.cancel')).toBe('لغو')
@@ -134,7 +134,7 @@ describe('i18n translation lookups', () => {
     withLocale('fa', () => {
       expect(t('chat.composer.placeholder')).toBe('پیام بنویسید…')
       expect(t('chat.composer.send')).toBe('ارسال')
-      expect(t('chat.empty.title')).toBe('گفتگوی جدیدی را آغاز کنید')
+      expect(t('chat.empty.title')).toBe('گفتگوی جدیدی را شروع کنید')
       expect(t('chat.sidebar.today')).toBe('امروز')
       expect(t('chat.connection.connected')).toBe('متصل')
       expect(t('chat.tool.read')).toBe('در حال خواندن فایل')

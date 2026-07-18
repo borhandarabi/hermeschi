@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # مشخصات هماهنگی خودران Swarm2
 
 تاریخ: 2026-04-28
@@ -310,3 +312,5 @@ If this is one task in a larger workflow, stop after the checkpoint and wait for
 ۴. افزودن IDهای ماموریت و IDهای تخصیص.
 ۵. افزودن اندپوینت حلقهٔ هماهنگ‌کننده.
 ۶. افزودن bootstrapping برای swarmهای ایجادشده توسط کاربر.
+
+</div>

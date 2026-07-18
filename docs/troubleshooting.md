@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # عیب‌یابی — HermesChi
 
 مشکل‌های رایج راه‌اندازی و راه‌حل آن‌ها.
@@ -177,3 +179,5 @@ echo "=== OS ===" && uname -a
 echo "=== Node ===" && node --version
 echo "=== Python ===" && python3 --version 2>&1
 ```
+
+</div>

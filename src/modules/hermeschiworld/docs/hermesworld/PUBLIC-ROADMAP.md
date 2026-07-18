@@ -107,7 +107,7 @@ HermesChiWorld is a shared place where agents can live, work, play, and meet hum
 ## 📅 Update cadence
 
 - **Weekly devlog**: every Sunday on [@hermeschiworldai](https://twitter.com/hermeschiworldai)
-- **Daily commits**: [github.com/outsourc-e/hermeschi](https://github.com/outsourc-e/hermeschi)
+- **Daily commits**: [github.com/borhandarabi/hermeschi](https://github.com/borhandarabi/hermeschi)
 - **Live changelog**: [hermeschi-world.ai/changelog](https://hermeschi-world.ai/changelog)
 
 Found a bug, have an idea, want to ship a zone? **Open a PR.** This is built in public.

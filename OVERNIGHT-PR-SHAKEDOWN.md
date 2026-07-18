@@ -1,11 +1,11 @@
 # Overnight PR/Issue Shakedown — hermeschi
 
-**Mission:** Work through the open PRs and issues on `outsourc-e/hermeschi`, test/fix/shake them down LOCALLY, and consolidate everything safe into ONE integration PR. Run autonomously overnight. Quality over quantity — never break `main`.
+**Mission:** Work through the open PRs and issues on `borhandarabi/hermeschi`, test/fix/shake them down LOCALLY, and consolidate everything safe into ONE integration PR. Run autonomously overnight. Quality over quantity — never break `main`.
 
 ## Environment
 - Working clone (USE THIS, never touch /Users/aurora/hermeschi — it has uncommitted local work):
   `/Users/aurora/hermeschi-swarm`
-- Repo: `outsourc-e/hermeschi`. `gh` authed as `outsourc-e` (ADMIN). pnpm. Node 22.
+- Repo: `borhandarabi/hermeschi`. `gh` authed as `borhandarabi` (ADMIN). pnpm. Node 22.
 - Build: `pnpm build` · Test: `pnpm test` · Lint: `pnpm lint` · Typecheck: `pnpm check`
 - 46 open PRs, 27 open issues at start (2026-06-05 03:32 EDT). `gh pr list --state open`, `gh issue list --state open`.
 
