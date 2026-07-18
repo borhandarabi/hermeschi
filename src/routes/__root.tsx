@@ -80,44 +80,6 @@ const themeScript = `
     // tag with no access to the module graph. Keep in sync with
     // RTL_LOCALES in src/lib/i18n/index.ts.
     try {
-      // ── localStorage migration shim (hermes-* → hermeschi-*) ───────
-      // Runs once, before React hydrates, so migrated values are
-      // available immediately. Safe to remove after a few releases.
-      if (localStorage.getItem('hermeschi-migration-done-v1') !== '1') {
-        var migrations = [
-          ['hermes-workspace-locale', 'hermeschi-locale', true],
-          ['hermes-workspace-agent-name', 'hermeschi-agent-name', true],
-          ['hermes-workspace-preferred-provider', 'hermeschi-preferred-provider', true],
-          ['hermes-workspace-orchestrator-avatar', 'hermeschi-orchestrator-avatar', true],
-          ['hermes-session-model', 'hermeschi-session-model', true],
-          ['hermes-workspace-v1', 'hermeschi-v1', true],
-          ['hermes-react-dom-recovery-at', 'hermeschi-react-dom-recovery-at', true],
-          ['hermes-update-v2-', 'hermeschi-update-v2-', false],
-          ['hermes-workspace-', 'hermeschi-', false],
-        ]
-        for (var mi = 0; mi < localStorage.length; mi++) {
-          var oldKey = localStorage.key(mi)
-          if (!oldKey || oldKey === 'hermeschi-migration-done-v1' || oldKey.indexOf('hermeschi-') === 0) continue
-          for (var mj = 0; mj < migrations.length; mj++) {
-            var m = migrations[mj]
-            var oldPrefix = m[0], newPrefix = m[1], exact = m[2]
-            var matches = exact ? oldKey === oldPrefix : oldKey.indexOf(oldPrefix) === 0
-            if (matches) {
-              var newKey = exact ? newPrefix : newPrefix + oldKey.slice(oldPrefix.length)
-              if (localStorage.getItem(newKey) === null) {
-                var val = localStorage.getItem(oldKey)
-                if (val !== null) {
-                  localStorage.setItem(newKey, val)
-                  localStorage.removeItem(oldKey)
-                }
-              }
-              break
-            }
-          }
-        }
-        localStorage.setItem('hermeschi-migration-done-v1', '1')
-      }
-
       const RTL_LOCALES = ['fa']
       const storedLocale = localStorage.getItem('hermeschi-locale')
       const supportedLocales = ['en', 'fa']

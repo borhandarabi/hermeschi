@@ -4542,7 +4542,7 @@ export const EN = {
   'skills.securityReviewRecommended': 'REVIEW RECOMMENDED',
   'skills.securityManualReview': 'MANUAL REVIEW',
   'skills.securityScan': 'Security Scan',
-  'skills.securityHermesWorkspace': 'HermesChi',
+  'skills.securityHermesChi': 'HermesChi',
   'skills.securitySafe': 'No risky patterns detected. This skill appears safe to install.',
   'skills.securityHighRisk': 'Found {count} potential security concern{s}. Review before installing.',
   'skills.securityConcerns': "The skill's code was scanned for common risk patterns. {count} item{s} noted.",

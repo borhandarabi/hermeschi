@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { sanitizeConductorMissionGoal } from './conductor-mission-sanitize'
 
 describe('sanitizeConductorMissionGoal', () => {
-  it('removes public hermes-workspace self URLs (legacy domain)', () => {
+  it('removes public hermeschi self URLs (legacy domain)', () => {
     const result = sanitizeConductorMissionGoal(
-      'Research this via https://hermes-workspace.illuwa.click/conductor and summarize.',
+      'Research this via https://hermeschi.example.com/conductor and summarize.',
     )
 
     expect(result.goal).toBe(

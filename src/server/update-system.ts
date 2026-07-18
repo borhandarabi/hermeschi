@@ -349,7 +349,7 @@ export function readWorkspaceUpdateStatus(
   const remoteUrl = git(['remote', 'get-url', 'origin'], gitRepo)
   const repoMatches = remoteUrlMatches(remoteUrl, [
     'hermeschi',
-    'hermes-workspace',
+    'hermeschi',
     'borhandarabi/hermeschi',
   ])
   if (repoMatches) git(['fetch', 'origin', '--quiet'], gitRepo, 30_000)

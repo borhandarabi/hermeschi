@@ -1139,7 +1139,7 @@ function SecurityScanCard({ security }: { security: SecurityRisk }) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="text-primary-500 font-medium w-16 shrink-0">
-              {t('skills.securityHermesWorkspace')}
+              {t('skills.securityHermesChi')}
             </span>
             <span
               className={cn(

@@ -10,7 +10,7 @@ const CLOUDFLARE_5XX_MARKERS = [
 ]
 
 const SELF_WORKSPACE_URL_PATTERN =
-  /https?:\/\/(?:hermeschi|hermes-workspace)\.[^\s<>)"']+(?:\/[^\s<>)"']*)?/gi
+  /https?:\/\/(?:hermeschi|hermeschiworld)\.[^\s<>)"']+(?:\/[^\s<>)"']*)?/gi
 
 export type ConductorGoalSanitization = {
   goal: string

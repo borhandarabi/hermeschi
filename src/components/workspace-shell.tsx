@@ -296,7 +296,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
   }, [isMobile, setSidebarCollapsed, toggleSidebar])
 
   // Public/launch surfaces should behave like normal web pages, not app-shell panes.
-  // This keeps /hermes-world and /world scrollable at the document level and avoids
+  // This keeps game routes scrollable at the document level and avoids
   // local-only workspace chrome for X/GitHub traffic.
   if (isChromeFreeSurface) {
     return <>{children}</>

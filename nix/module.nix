@@ -109,7 +109,7 @@ in
     hermesChiWorldEnabled = mkOption {
       type = types.bool;
       default = true;
-      description = "Show the HermesWorld multiplayer link in the sidebar.";
+      description = "Show the HermesChiWorld multiplayer link in the sidebar.";
     };
 
     extraEnvironment = mkOption {

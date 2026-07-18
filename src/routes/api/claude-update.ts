@@ -32,7 +32,7 @@ export const UPDATE_REMOTE_DEFINITIONS: Array<RemoteDefinition> = [
     name: 'origin',
     label: 'HermesChi',
     expectedRepo: 'hermeschi',
-    aliases: ['claude-workspace', 'hermes-workspace', 'hermeschi', 'borhandarabi/hermeschi'],
+    aliases: ['hermeschi', 'borhandarabi/hermeschi'],
   },
   {
     name: 'upstream',

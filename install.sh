@@ -162,7 +162,7 @@ fi
 
 # ─── clone workspace ──────────────────────────────────────────────────────
 
-cyan "→ Cloning hermes-workspace…"
+cyan "→ Cloning hermeschi…"
 if [[ -d "$INSTALL_DIR/.git" ]]; then
   yellow "  $INSTALL_DIR exists; pulling latest"
   git -C "$INSTALL_DIR" pull --ff-only
