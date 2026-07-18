@@ -3643,6 +3643,13 @@ const EN = {
   'echoStudio.tabCreate': 'create',
   'echoStudio.tabManage': 'manage',
   'echoStudio.tabTheme': 'theme',
+  'echoStudio.templateTitleAnalytics': 'Tool Analytics',
+  'echoStudio.templateTitleSystem': 'System Monitor',
+  'echoStudio.templateTitleChat': 'Chat Analytics',
+  'echoStudio.templatePromptAnalytics': 'A dashboard with a line graph showing tool usage over time, a period selector (week/month), top 3 KPI cards for most used tools, a live counter for active calls, and a detailed table below with project, tool name, count, date, and status columns.',
+  'echoStudio.templatePromptSystem': 'A system monitoring dashboard with CPU/RAM/Disk gauges, a real-time process list, uptime counter, and alert history table. Include a dark theme and auto-refresh every 30 seconds.',
+  'echoStudio.templatePromptChat': 'A chat analytics dashboard showing messages per day as a bar chart, top users table, average response time trend, sentiment breakdown pie chart, and a searchable message log.',
+  'profiles.modelViaProvider': ' via {provider}',
   // ── Crew screen ─────────────────────────────────────────────────────
   'crew.crewStatus': 'Crew Status',
   'crew.headerDesc': 'Live agent health across profiles, recent session activity, assigned tasks, and cron coverage.',
@@ -3665,6 +3672,16 @@ const EN = {
   'crew.sessions': 'Sessions',
   'crew.messages': 'Messages',
   'crew.tools': 'Tools',
+  'crew.statusOnline': 'online',
+  'crew.statusOffline': 'offline',
+  'crew.statusUnknown': 'unknown',
+  'crew.never': 'Never',
+  'crew.justNow': 'Just now',
+  'crew.minutesAgo': '{count}m ago',
+  'crew.hoursAgo': '{count}h ago',
+  'crew.daysAgo': '{count}d ago',
+  'crew.justNowLower': 'just now',
+  'crew.secondsAgo': '{count}s ago',
 } as const
 
 export type TranslationKey = keyof typeof EN
@@ -7310,6 +7327,13 @@ const FA: LocaleTranslations = {
   'echoStudio.tabCreate': 'ایجاد',
   'echoStudio.tabManage': 'مدیریت',
   'echoStudio.tabTheme': 'پوسته',
+  'echoStudio.templateTitleAnalytics': 'تحلیل ابزار',
+  'echoStudio.templateTitleSystem': 'پایشگر سامانه',
+  'echoStudio.templateTitleChat': 'تحلیل گفتگو',
+  'echoStudio.templatePromptAnalytics': 'داشبوردی با نمودار خطی نشان‌دهندهٔ استفاده از ابزار در طول زمان، انتخابگر دوره (هفته/ماه)، ۳ کارت KPI برای پراستفاده‌ترین ابزارها، شمارندهٔ زنده برای تماس‌های فعال و جدولی مفصل در پایین با ستون‌های پروژه، نام ابزار، تعداد، تاریخ و وضعیت.',
+  'echoStudio.templatePromptSystem': 'داشبورد پایش سامانه با گیج‌های CPU/RAM/دیسک، فهرست فرآیندهای زنده، شمارندهٔ زمان فعالیت و جدول تاریخچهٔ هشدار. شامل پوستهٔ تاریک و بازخوانی خودکار هر ۳۰ ثانیه.',
+  'echoStudio.templatePromptChat': 'داشبورد تحلیل گفتگو با نمایش پیام‌ها در روز به‌صورت نمودار میله‌ای، جدول کاربران برتر، روند میانگین زمان پاسخ، نمودار دایره‌ای تفکیک احساسات و گزارش پیام‌های قابل جستجو.',
+  'profiles.modelViaProvider': ' از طریق {provider}',
   // ── Crew screen ─────────────────────────────────────────────────────
   'crew.crewStatus': 'وضعیت تیم',
   'crew.headerDesc': 'سلامت زندهٔ عامل در سراسر نمایه‌ها، فعالیت نشست اخیر، وظایف واگذارشده و پوشش cron.',
@@ -7332,6 +7356,16 @@ const FA: LocaleTranslations = {
   'crew.sessions': 'نشست‌ها',
   'crew.messages': 'پیام‌ها',
   'crew.tools': 'ابزارها',
+  'crew.statusOnline': 'برخط',
+  'crew.statusOffline': 'آفلاین',
+  'crew.statusUnknown': 'نامشخص',
+  'crew.never': 'هرگز',
+  'crew.justNow': 'همین حالا',
+  'crew.minutesAgo': '{count} دقیقه پیش',
+  'crew.hoursAgo': '{count} ساعت پیش',
+  'crew.daysAgo': '{count} روز پیش',
+  'crew.justNowLower': 'همین حالا',
+  'crew.secondsAgo': '{count} ثانیه پیش',
 }
 
 const LOCALES: Record<LocaleId, LocaleTranslations> = {

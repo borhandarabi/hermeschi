@@ -1,16 +1,45 @@
 import { useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 type Tab = 'create' | 'manage' | 'theme'
 
-const QUICK_TEMPLATES = [
-  { id: 'analytics', label: 'Analytics Dashboard', icon: '</>' },
-  { id: 'system', label: 'System Monitor', icon: '☰' },
-  { id: 'chat', label: 'Chat Analytics', icon: '💬' },
+const QUICK_TEMPLATES: ReadonlyArray<{
+  id: string
+  labelKey: TranslationKey
+  icon: string
+}> = [
+  { id: 'analytics', labelKey: 'echoStudio.templateAnalytics', icon: '</>' },
+  { id: 'system', labelKey: 'echoStudio.templateSystem', icon: '☰' },
+  { id: 'chat', labelKey: 'echoStudio.templateChat', icon: '💬' },
 ]
 
-const DEFAULT_PROMPT =
-  "Describe the UI you want: charts, tables, KPIs, filters, real-time updates... Example: 'A dashboard with a line graph showing tool usage over time, a period selector (week/month), top 3 KPI cards for most used tools, a live counter for active calls, and a detailed table below with project, tool name, count, date, and status columns.'"
+const TAB_LABEL_KEYS: Record<Tab, TranslationKey> = {
+  create: 'echoStudio.tabCreate',
+  manage: 'echoStudio.tabManage',
+  theme: 'echoStudio.tabTheme',
+}
+
+const TEMPLATE_META: Record<
+  string,
+  { id: string; titleKey: TranslationKey; promptKey: TranslationKey }
+> = {
+  analytics: {
+    id: 'tool-analytics',
+    titleKey: 'echoStudio.templateTitleAnalytics',
+    promptKey: 'echoStudio.templatePromptAnalytics',
+  },
+  system: {
+    id: 'system-monitor',
+    titleKey: 'echoStudio.templateTitleSystem',
+    promptKey: 'echoStudio.templatePromptSystem',
+  },
+  chat: {
+    id: 'chat-analytics',
+    titleKey: 'echoStudio.templateTitleChat',
+    promptKey: 'echoStudio.templatePromptChat',
+  },
+}
 
 export function EchoStudioScreen() {
   const [tab, setTab] = useState<Tab>('create')
@@ -36,31 +65,11 @@ export function EchoStudioScreen() {
   }
 
   const handleTemplate = (id: string) => {
-    const templates: Record<string, { id: string; title: string; prompt: string }> = {
-      analytics: {
-        id: 'tool-analytics',
-        title: 'Tool Analytics',
-        prompt:
-          'A dashboard with a line graph showing tool usage over time, a period selector (week/month), top 3 KPI cards for most used tools, a live counter for active calls, and a detailed table below with project, tool name, count, date, and status columns.',
-      },
-      system: {
-        id: 'system-monitor',
-        title: 'System Monitor',
-        prompt:
-          'A system monitoring dashboard with CPU/RAM/Disk gauges, a real-time process list, uptime counter, and alert history table. Include a dark theme and auto-refresh every 30 seconds.',
-      },
-      chat: {
-        id: 'chat-analytics',
-        title: 'Chat Analytics',
-        prompt:
-          'A chat analytics dashboard showing messages per day as a bar chart, top users table, average response time trend, sentiment breakdown pie chart, and a searchable message log.',
-      },
-    }
-    const t = templates[id]
-    if (t) {
-      setPageId(t.id)
-      setPageTitle(t.title)
-      setPrompt(t.prompt)
+    const meta = TEMPLATE_META[id]
+    if (meta) {
+      setPageId(meta.id)
+      setPageTitle(t(meta.titleKey))
+      setPrompt(t(meta.promptKey))
     }
   }
 
@@ -69,26 +78,26 @@ export function EchoStudioScreen() {
       <div className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">Echo Studio</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('echoStudio.headerTitle')}</h1>
           <p className="mt-1 text-sm text-primary-500">
-            Describe what you want. I'll build the full page with backend API.
+            {t('echoStudio.headerDesc')}
           </p>
         </div>
 
         {/* Tabs */}
         <div className="mb-6 flex gap-1 rounded-lg border border-primary-200 bg-primary-50/85 p-1 backdrop-blur-xl">
-          {(['create', 'manage', 'theme'] as Tab[]).map((t) => (
+          {(['create', 'manage', 'theme'] as Tab[]).map((tabId) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabId}
+              onClick={() => setTab(tabId)}
               className={cn(
                 'flex-1 rounded-md px-4 py-2 text-sm font-medium capitalize transition-colors',
-                tab === t
+                tab === tabId
                   ? 'bg-primary-100 text-ink shadow-sm dark:bg-neutral-800'
                   : 'text-primary-500 hover:text-ink',
               )}
             >
-              {t}
+              {t(TAB_LABEL_KEYS[tabId])}
             </button>
           ))}
         </div>
@@ -102,13 +111,13 @@ export function EchoStudioScreen() {
                 {/* Page ID */}
                 <div>
                   <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-500">
-                    Page ID (URL Slug)
+                    {t('echoStudio.pageIdLabel')}
                   </label>
                   <input
                     type="text"
                     value={pageId}
                     onChange={(e) => setPageId(e.target.value)}
-                    placeholder="e.g. tool-analytics"
+                    placeholder={t('echoStudio.pageIdPlaceholder')}
                     className="w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-primary-400 focus:border-accent-500 dark:bg-neutral-900"
                   />
                 </div>
@@ -116,13 +125,13 @@ export function EchoStudioScreen() {
                 {/* Page Title */}
                 <div>
                   <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-500">
-                    Page Title
+                    {t('echoStudio.pageTitleLabel')}
                   </label>
                   <input
                     type="text"
                     value={pageTitle}
                     onChange={(e) => setPageTitle(e.target.value)}
-                    placeholder="e.g. Tool Analytics"
+                    placeholder={t('echoStudio.pageTitlePlaceholder')}
                     className="w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-primary-400 focus:border-accent-500 dark:bg-neutral-900"
                   />
                 </div>
@@ -130,12 +139,12 @@ export function EchoStudioScreen() {
                 {/* Prompt */}
                 <div>
                   <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-500">
-                    What should this page do?
+                    {t('echoStudio.promptLabel')}
                   </label>
                   <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder={DEFAULT_PROMPT}
+                    placeholder={t('echoStudio.promptPlaceholder')}
                     rows={5}
                     className="w-full resize-y rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-primary-400 focus:border-accent-500 dark:bg-neutral-900"
                   />
@@ -157,12 +166,12 @@ export function EchoStudioScreen() {
                     {creating ? (
                       <>
                         <span className="inline-block size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        Creating...
+                        {t('echoStudio.creating')}
                       </>
                     ) : (
                       <>
                         <span>✨</span>
-                        Create Full Page + API
+                        {t('echoStudio.createBtn')}
                       </>
                     )}
                   </button>
@@ -173,18 +182,18 @@ export function EchoStudioScreen() {
             {/* Quick Templates */}
             <div>
               <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-500">
-                Quick Templates
+                {t('echoStudio.quickTemplates')}
               </h2>
               <div className="flex flex-wrap gap-3">
-                {QUICK_TEMPLATES.map((t) => (
+                {QUICK_TEMPLATES.map((tmpl) => (
                   <button
-                    key={t.id}
+                    key={tmpl.id}
                     type="button"
-                    onClick={() => handleTemplate(t.id)}
+                    onClick={() => handleTemplate(tmpl.id)}
                     className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-primary-50/50 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-accent-500 hover:bg-accent-50/50 dark:hover:bg-accent-900/20"
                   >
-                    <span className="text-base">{t.icon}</span>
-                    {t.label}
+                    <span className="text-base">{tmpl.icon}</span>
+                    {t(tmpl.labelKey)}
                   </button>
                 ))}
               </div>
@@ -192,9 +201,9 @@ export function EchoStudioScreen() {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4">
-              <StatCard label="Screens Created" value={screensCreated} />
-              <StatCard label="Widgets Active" value={widgetsActive} />
-              <StatCard label="API Endpoints" value={apiEndpoints} />
+              <StatCard label={t('echoStudio.screensCreated')} value={screensCreated} />
+              <StatCard label={t('echoStudio.widgetsActive')} value={widgetsActive} />
+              <StatCard label={t('echoStudio.apiEndpoints')} value={apiEndpoints} />
             </div>
           </div>
         )}
@@ -202,9 +211,9 @@ export function EchoStudioScreen() {
         {/* Manage Tab */}
         {tab === 'manage' && (
           <div className="rounded-2xl border border-primary-200 bg-primary-50/50 p-8 text-center">
-            <p className="text-lg text-primary-500">No screens created yet.</p>
+            <p className="text-lg text-primary-500">{t('echoStudio.noScreens')}</p>
             <p className="mt-1 text-sm text-primary-400">
-              Use the Create tab to build your first dashboard.
+              {t('echoStudio.useCreateTab')}
             </p>
           </div>
         )}
@@ -212,9 +221,9 @@ export function EchoStudioScreen() {
         {/* Theme Tab */}
         {tab === 'theme' && (
           <div className="rounded-2xl border border-primary-200 bg-primary-50/50 p-8 text-center">
-            <p className="text-lg text-primary-500">Theme customization coming soon.</p>
+            <p className="text-lg text-primary-500">{t('echoStudio.themeComingSoon')}</p>
             <p className="mt-1 text-sm text-primary-400">
-              Choose from light, dark, and custom color schemes for your dashboards.
+              {t('echoStudio.themeDesc')}
             </p>
           </div>
         )}
