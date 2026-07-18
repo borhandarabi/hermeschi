@@ -18,6 +18,7 @@ import {
   CommandSeparator,
 } from '@/components/ui/command'
 import { useAutocompleteFilter } from '@/components/ui/autocomplete'
+import { t } from '@/lib/i18n'
 
 type CommandSession = {
   key: string
@@ -64,7 +65,7 @@ function CommandSessionDialog({
   const groupedItems = useMemo<Array<CommandSessionGroup>>(() => {
     return [
       {
-        value: 'Sessions',
+        value: t('chat.command.groupSessions'),
         items: sessions.map((session) => ({
           value: session.key,
           label: getSessionLabel(session),
@@ -100,11 +101,11 @@ function CommandSessionDialog({
           onValueChange={setValue}
           mode="none"
         >
-          <CommandInput placeholder="Search sessions" />
+          <CommandInput placeholder={t('chat.command.searchSessions')} />
           <CommandPanel className="flex min-h-0 flex-1 flex-col">
             {isEmpty ? (
               <div className="h-72 min-h-0 flex items-center justify-center text-sm text-primary-600">
-                No sessions found.
+                {t('chat.command.noSessions')}
               </div>
             ) : (
               <CommandList className="h-72 min-h-0">
@@ -150,20 +151,20 @@ function CommandSessionDialog({
                     strokeWidth={1.5}
                   />
                 </span>
-                <span>Navigate</span>
+                <span>{t('chat.command.navigate')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="rounded-md border border-primary-200 bg-surface px-2 py-1 text-[11px] font-medium text-primary-700">
-                  Enter
+                  {t('chat.command.enter')}
                 </span>
-                <span>Open</span>
+                <span>{t('chat.command.open')}</span>
               </div>
             </div>
             <div className="flex items-center gap-2 text-primary-700">
               <span className="rounded-md border border-primary-200 bg-surface px-2 py-1 text-[11px] font-medium text-primary-700">
-                Esc
+                {t('chat.command.esc')}
               </span>
-              <span>Close</span>
+              <span>{t('chat.command.close')}</span>
             </div>
           </CommandFooter>
         </Command>

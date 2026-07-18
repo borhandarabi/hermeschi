@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/tooltip'
 import { writeTextToClipboard } from '@/lib/clipboard'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type MessageActionsBarProps = {
   text: string
@@ -86,9 +87,9 @@ export function MessageActionsBar({
               className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
             >
               <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={1.6} />
-              <span className="text-[11px] font-medium">Retry</span>
+              <span className="text-[11px] font-medium">{t('chat.message.retry')}</span>
             </TooltipTrigger>
-            <TooltipContent side="top">Resend failed message</TooltipContent>
+            <TooltipContent side="top">{t('chat.message.resendFailed')}</TooltipContent>
           </TooltipRoot>
         </TooltipProvider>
       )}
@@ -107,7 +108,7 @@ export function MessageActionsBar({
               strokeWidth={1.6}
             />
           </TooltipTrigger>
-          <TooltipContent side="top">Copy</TooltipContent>
+          <TooltipContent side="top">{t('chat.message.copy')}</TooltipContent>
         </TooltipRoot>
       </TooltipProvider>
       <MessageTimestamp timestamp={timestamp} />
