@@ -2,6 +2,7 @@ import { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type ErrorBoundaryProps = {
   children: ReactNode
@@ -89,11 +90,11 @@ export class ErrorBoundary extends Component<
     const error = this.state.error
     if (!error) return this.props.children
 
-    const title = this.props.title ?? 'Something went wrong'
+    const title = this.props.title ?? t('errorBoundary.defaultTitle')
     const description = this.state.recovering
-      ? 'Recovering from a stale DOM/runtime mismatch. The page will reload automatically.'
+      ? t('errorBoundary.recovering')
       : (this.props.description ??
-        'The chat encountered an unexpected issue. Reload to try again.')
+        t('errorBoundary.defaultDescription'))
 
     return (
       <div
@@ -115,7 +116,7 @@ export class ErrorBoundary extends Component<
             {error.stack?.split('\n').slice(0, 5).join('\n')}
           </pre>
           <div className="mt-5 flex justify-center">
-            <Button onClick={() => this.reloadPage()}>Reload</Button>
+            <Button onClick={() => this.reloadPage()}>{t('errorBoundary.reload')}</Button>
           </div>
         </div>
       </div>

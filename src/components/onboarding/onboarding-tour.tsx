@@ -6,6 +6,7 @@ import { tourSteps } from './tour-steps'
 import type { CallBackProps, Styles } from 'react-joyride'
 import { useSettingsStore } from '@/hooks/use-settings'
 import { useResolvedTheme } from '@/hooks/use-chat-settings'
+import { t } from '@/lib/i18n'
 
 const TOUR_STORAGE_KEY = 'claude-onboarding-completed'
 
@@ -160,11 +161,11 @@ export function OnboardingTour() {
       callback={handleJoyrideCallback}
       styles={styles}
       locale={{
-        back: 'Back',
-        close: 'Close',
-        last: 'Done',
-        next: 'Next',
-        skip: 'Skip tour',
+        back: t('onboardingTour.back'),
+        close: t('onboardingTour.close'),
+        last: t('onboardingTour.last'),
+        next: t('onboardingTour.next'),
+        skip: t('onboardingTour.skip'),
       }}
       floaterProps={{
         disableAnimation: false,

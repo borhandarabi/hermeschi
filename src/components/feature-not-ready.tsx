@@ -9,6 +9,7 @@
  */
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert02Icon } from '@hugeicons/core-free-icons'
+import { t } from '@/lib/i18n'
 
 export type FeatureNotReadyProps = {
   /** Friendly title — e.g. "Conductor". */
@@ -28,7 +29,7 @@ export function FeatureNotReady({
   reason,
   action,
   learnMoreUrl,
-  learnMoreLabel = 'Learn more',
+  learnMoreLabel = t('featureNotReady.learnMore'),
 }: FeatureNotReadyProps) {
   return (
     <div className="flex h-full min-h-[480px] items-center justify-center p-8">
@@ -52,14 +53,14 @@ export function FeatureNotReady({
           <HugeiconsIcon icon={Alert02Icon} size={26} strokeWidth={1.6} />
         </div>
         <div className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-300/80">
-          Upstream not ready
+          {t('featureNotReady.upstreamNotReady')}
         </div>
         <div className="mb-3 text-2xl font-extrabold">{feature}</div>
         <p className="mb-4 text-sm leading-relaxed text-white/75">{reason}</p>
         {action && (
           <p className="mb-5 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-[12px] leading-relaxed text-white/85">
             <span className="mr-1 font-bold uppercase tracking-[0.14em] text-white/55">
-              Next:
+              {t('featureNotReady.nextLabel')}
             </span>
             {action}
           </p>

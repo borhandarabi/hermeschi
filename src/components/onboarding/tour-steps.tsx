@@ -1,11 +1,12 @@
 import type { Step } from 'react-joyride'
+import { t } from '@/lib/i18n'
 
 export const tourSteps: Array<Step> = [
   // Step 1: Welcome
   {
     target: 'body',
     placement: 'center',
-    title: 'Welcome to Hermes Workspace! ⚕',
+    title: t('tour.welcomeTitle'),
     content: (
       <div
         style={{
@@ -17,12 +18,11 @@ export const tourSteps: Array<Step> = [
       >
         <img
           src="/claude-avatar.webp"
-          alt="Hermes Agent"
+          alt={t('tour.hermesAgent')}
           style={{ width: 48, height: 48, borderRadius: 12 }}
         />
         <p style={{ textAlign: 'center', margin: 0 }}>
-          Your AI-powered command center for managing agents, chats, files, and
-          more. Let&apos;s take a quick tour!
+          {t('tour.welcomeBody')}
         </p>
       </div>
     ),
@@ -32,72 +32,63 @@ export const tourSteps: Array<Step> = [
   {
     target: '[data-tour="sidebar-container"]',
     placement: 'right',
-    title: 'Sidebar Navigation',
-    content:
-      'Navigate between all your tools here. Collapse/expand sections to customize your workspace.',
+    title: t('tour.sidebarTitle'),
+    content: t('tour.sidebarBody'),
   },
   // Step 3: New Session
   {
     target: '[data-tour="new-session"]',
     placement: 'right',
-    title: 'Start a New Chat',
-    content:
-      'Click here to start a new AI chat session. Each conversation is saved automatically.',
+    title: t('tour.newChatTitle'),
+    content: t('tour.newChatBody'),
   },
   // Step 4: Dashboard
   {
     target: '[data-tour="dashboard"]',
     placement: 'right',
-    title: 'Your Dashboard',
-    content:
-      'Your overview of sessions, usage, and activity. See everything at a glance.',
+    title: t('tour.dashboardTitle'),
+    content: t('tour.dashboardBody'),
   },
   // Step 5: Agent Hub
   {
     target: '[data-tour="agent-hub"]',
     placement: 'right',
-    title: 'Agent Hub',
-    content:
-      'Manage your AI agents and configurations. Create custom agents with specialized behaviors.',
+    title: t('tour.agentHubTitle'),
+    content: t('tour.agentHubBody'),
   },
   // Step 7: Skills
   {
     target: '[data-tour="skills"]',
     placement: 'right',
-    title: 'Skills Library',
-    content:
-      'Browse and install agent skills to extend capabilities. Add new tools and abilities to your agents.',
+    title: t('tour.skillsTitle'),
+    content: t('tour.skillsBody'),
   },
   // Step 8: Terminal
   {
     target: '[data-tour="terminal"]',
     placement: 'right',
-    title: 'Built-in Terminal',
-    content:
-      'Built-in terminal for quick commands. Execute shell commands without leaving Hermes Workspace.',
+    title: t('tour.terminalTitle'),
+    content: t('tour.terminalBody'),
   },
   // Step 9: Usage Meter (in header)
   {
     target: '[data-tour="usage-meter"]',
     placement: 'bottom',
-    title: 'Usage Monitor',
-    content:
-      'Monitor your AI provider usage in real-time. Track costs and API consumption.',
+    title: t('tour.usageTitle'),
+    content: t('tour.usageBody'),
   },
   // Step 10: Settings
   {
     target: '[data-tour="settings"]',
     placement: 'right',
-    title: 'Settings & Customization',
-    content:
-      'Configure providers, themes, accent colors, and more. Make Hermes Workspace yours.',
+    title: t('tour.settingsTitle'),
+    content: t('tour.settingsBody'),
   },
   // Step 11: Finish
   {
     target: 'body',
     placement: 'center',
-    title: "You're all set! 🎉",
-    content:
-      'Start chatting with your AI, explore the tools, and customize Hermes Workspace to fit your workflow. Need help? Press ? to see all keyboard shortcuts.',
+    title: t('tour.finishTitle'),
+    content: t('tour.finishBody'),
   },
 ]

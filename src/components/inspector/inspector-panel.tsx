@@ -5,6 +5,7 @@ import type { ActivityEvent } from './activity-store'
 import { getUnavailableReason } from '@/lib/feature-gates'
 import { useFeatureAvailable } from '@/hooks/use-feature-available'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
@@ -33,16 +34,16 @@ type TabId =
 
 const TABS: Array<{
   id: TabId
-  label: string
+  labelKey: TranslationKey
   feature?: 'memory' | 'skills'
 }> = [
-  { id: 'activity', label: 'Activity' },
-  { id: 'artifacts', label: 'Artifacts' },
-  { id: 'files', label: 'Files' },
-  { id: 'memory', label: 'Memory', feature: 'memory' },
-  { id: 'skills', label: 'Skills', feature: 'skills' },
-  { id: 'mcp', label: 'MCP' },
-  { id: 'logs', label: 'Logs' },
+  { id: 'activity', labelKey: 'inspector.tab.activity' },
+  { id: 'artifacts', labelKey: 'inspector.tab.artifacts' },
+  { id: 'files', labelKey: 'inspector.tab.files' },
+  { id: 'memory', labelKey: 'inspector.tab.memory', feature: 'memory' },
+  { id: 'skills', labelKey: 'inspector.tab.skills', feature: 'skills' },
+  { id: 'mcp', labelKey: 'inspector.tab.mcp' },
+  { id: 'logs', labelKey: 'inspector.tab.logs' },
 ]
 
 // ── Shared loading / error ────────────────────────────────────────────────────
@@ -69,13 +70,13 @@ function ArtifactsTab() {
   const artifacts = events.filter((e) => e.type === 'artifact')
 
   if (artifacts.length === 0) {
-    return <EmptyState text="No agent-authored artifacts yet" />
+    return <EmptyState text={t('inspector.artifactsEmpty')} />
   }
 
   return (
     <div className="space-y-2 p-3 overflow-auto max-h-[calc(100vh-140px)]">
       <p className="text-xs" style={{ color: 'var(--theme-muted)' }}>
-        {artifacts.length} artifacts emitted by the agent
+        {t('inspector.artifactsCount', { count: artifacts.length })}
       </p>
       {artifacts.map((artifact, index) => (
         <div
@@ -128,7 +129,7 @@ function ActivityTab() {
   }, [events.length])
 
   if (events.length === 0) {
-    return <EmptyState text="No activity yet — start a conversation" />
+    return <EmptyState text={t('inspector.activityEmpty')} />
   }
 
   return (
@@ -182,14 +183,14 @@ function FilesTab() {
 
   if (files.length === 0) {
     return (
-      <EmptyState text="No files touched yet — activity will appear during chat" />
+      <EmptyState text={t('inspector.filesEmpty')} />
     )
   }
 
   return (
     <div className="space-y-1 p-3">
       <p className="mb-2 text-xs" style={{ color: 'var(--theme-muted)' }}>
-        Files touched in session ({files.length})
+        {t('inspector.filesTouched', { count: files.length })}
       </p>
       {files.map((file: string, i: number) => (
         <div
@@ -238,7 +239,7 @@ function MemoryTab() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err.message || 'Failed to load memory')
+          setError(err.message || t('inspector.loadMemoryFailed'))
           setLoading(false)
         }
       })
@@ -247,15 +248,15 @@ function MemoryTab() {
     }
   }, [])
 
-  if (loading) return <LoadingState text="Loading memory…" />
-  if (error) return <ErrorState text={`Memory: ${error}`} />
+  if (loading) return <LoadingState text={t('inspector.loadingMemory')} />
+  if (error) return <ErrorState text={`${t('inspector.tab.memory')}: ${error}`} />
   if (!files || files.length === 0)
-    return <EmptyState text="No memory files available" />
+    return <EmptyState text={t('inspector.memoryEmpty')} />
 
   return (
     <div className="space-y-2 p-3 overflow-auto max-h-[calc(100vh-140px)]">
       <p className="mb-1 text-xs" style={{ color: 'var(--theme-muted)' }}>
-        {files.length} memory files available
+        {t('inspector.memoryCount', { count: files.length })}
       </p>
       {files.map((file, index) => (
         <div
@@ -308,7 +309,7 @@ function SkillsTab() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err.message || 'Failed to load skills')
+          setError(err.message || t('inspector.loadSkillsFailed'))
           setLoading(false)
         }
       })
@@ -317,14 +318,14 @@ function SkillsTab() {
     }
   }, [])
 
-  if (loading) return <LoadingState text="Loading skills…" />
-  if (error) return <ErrorState text={`Skills: ${error}`} />
-  if (skills.length === 0) return <EmptyState text="No skills found" />
+  if (loading) return <LoadingState text={t('inspector.loadingSkills')} />
+  if (error) return <ErrorState text={`${t('inspector.tab.skills')}: ${error}`} />
+  if (skills.length === 0) return <EmptyState text={t('inspector.skillsEmpty')} />
 
   // Group by category
   const grouped: Record<string, Array<SkillItem>> = {}
   for (const skill of skills) {
-    const cat = skill.category || 'Uncategorized'
+    const cat = skill.category || t('inspector.uncategorized')
     if (!grouped[cat]) grouped[cat] = []
     grouped[cat].push(skill)
   }
@@ -332,7 +333,7 @@ function SkillsTab() {
   return (
     <div className="space-y-3 p-3 overflow-auto max-h-[calc(100vh-140px)]">
       <p className="text-xs" style={{ color: 'var(--theme-muted)' }}>
-        {skills.length} skills loaded
+        {t('inspector.skillsCount', { count: skills.length })}
       </p>
       {Object.entries(grouped).map(([category, items]) => (
         <div key={category}>
@@ -420,7 +421,7 @@ function McpTab() {
       })
       .catch((err) => {
         if (cancelled) return
-        setError(err.message || 'Failed to load MCP servers')
+        setError(err.message || t('inspector.loadMcpFailed'))
         setLoading(false)
       })
     return () => {
@@ -428,15 +429,17 @@ function McpTab() {
     }
   }, [])
 
-  if (loading) return <LoadingState text="Loading MCP servers…" />
-  if (error) return <ErrorState text={`MCP: ${error}`} />
+  if (loading) return <LoadingState text={t('inspector.loadingMcp')} />
+  if (error) return <ErrorState text={`${t('inspector.tab.mcp')}: ${error}`} />
   if (!servers || servers.length === 0)
-    return <EmptyState text="No MCP servers configured" />
+    return <EmptyState text={t('inspector.mcpEmpty')} />
 
   return (
     <div className="space-y-2 p-3 overflow-auto max-h-[calc(100vh-140px)]">
       <p className="mb-1 text-xs" style={{ color: 'var(--theme-muted)' }}>
-        {servers.length} MCP server{servers.length === 1 ? '' : 's'}
+        {servers.length === 1
+          ? t('inspector.mcpCountOne', { count: servers.length })
+          : t('inspector.mcpCountMany', { count: servers.length })}
       </p>
       {servers.map((server) => (
         <div
@@ -451,9 +454,9 @@ function McpTab() {
           <div className="flex items-center justify-between gap-2">
             <span className="font-medium">{server.name}</span>
             <span style={{ color: 'var(--theme-accent)' }}>
-              {server.enabled ? 'on' : 'off'}
+              {server.enabled ? t('inspector.on') : t('inspector.off')}
               {typeof server.discoveredToolsCount === 'number'
-                ? ` · ${server.discoveredToolsCount} tools`
+                ? ` · ${t('inspector.toolsCount', { count: server.discoveredToolsCount })}`
                 : ''}
             </span>
           </div>
@@ -480,7 +483,7 @@ function LogsTab() {
     return (
       <div className="p-3">
         <p className="text-xs" style={{ color: 'var(--theme-muted)' }}>
-          Raw event stream — waiting for activity…
+          {t('inspector.logsWaiting')}
         </p>
       </div>
     )
@@ -489,7 +492,7 @@ function LogsTab() {
   return (
     <div className="p-3">
       <p className="mb-2 text-xs" style={{ color: 'var(--theme-muted)' }}>
-        Raw events ({events.length})
+        {t('inspector.logsCount', { count: events.length })}
       </p>
       <pre
         ref={scrollRef}
@@ -553,14 +556,14 @@ export function InspectorPanel({ embedded = false }: { embedded?: boolean } = {}
               className="text-sm font-semibold"
               style={{ color: 'var(--theme-text)' }}
             >
-              Inspector
+              {t('inspector.title')}
             </span>
             <button
               type="button"
               onClick={() => useInspectorStore.getState().setOpen(false)}
               className="rounded p-1 text-xs hover:opacity-70 transition-opacity"
               style={{ color: 'var(--theme-muted)' }}
-              aria-label="Close inspector"
+              aria-label={t('inspector.close')}
             >
               ✕
             </button>
@@ -609,10 +612,10 @@ export function InspectorPanel({ embedded = false }: { embedded?: boolean } = {}
                         : undefined
                     }
                   >
-                    <span>{tab.label}</span>
+                    <span>{t(tab.labelKey)}</span>
                     {!available ? (
                       <span className="ml-1 rounded-full border border-amber-300 bg-amber-100 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-amber-700">
-                        Gate
+                        {t('inspector.gate')}
                       </span>
                     ) : null}
                   </button>
@@ -647,7 +650,7 @@ export function InspectorToggleButton({ className }: { className?: string }) {
     <button
       type="button"
       onClick={toggle}
-      title={isOpen ? 'Close inspector' : 'Open inspector'}
+      title={isOpen ? t('inspector.close') : t('inspector.open')}
       className={cn(
         'flex items-center justify-center rounded-lg px-2 py-1.5 text-xs transition-colors',
         isOpen ? 'opacity-100' : 'opacity-60 hover:opacity-90',
@@ -658,7 +661,7 @@ export function InspectorToggleButton({ className }: { className?: string }) {
         color: 'var(--theme-text)',
         border: '1px solid var(--theme-border)',
       }}
-      aria-label="Toggle inspector panel"
+      aria-label={t('inspector.toggle')}
     >
       <span className="font-mono text-[11px]">{'{ }'}</span>
     </button>
