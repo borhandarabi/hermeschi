@@ -1799,8 +1799,10 @@ const EN = {
   'swarm.artifacts.publishedByRuntime': 'Published by the worker runtime. Files, diffs, reports, and previews share the same card slot.',
   'swarm.artifacts.moreCount': '+{count} more',
   // ── Swarm2 — memory panel ────────────────────────────────────────────
+  'swarm.memory.panelTitle': 'Memory',
   'swarm.memory.loading': 'Loading…',
   'swarm.memory.identity': 'Identity',
+  'swarm.memory.memoryMdFile': 'MEMORY.md',
   'swarm.memory.noDurable': 'No durable memory yet for {workerId}.',
   'swarm.memory.latestEpisodes': 'Latest episodes — {name}',
   // ── Swarm2 — activity feed ───────────────────────────────────────────
@@ -3773,8 +3775,10 @@ const FA: LocaleTranslations = {
   'swarm.artifacts.publishedByRuntime': 'منتشرشده توسط زمان اجرای عامل. فایل‌ها، diffها، گزارش‌ها و پیش‌نمایش‌ها همان جایگاه کارت را به اشتراک می‌گذارند.',
   'swarm.artifacts.moreCount': '‎+{count} مورد دیگر',
   // ── Swarm2 — memory panel ────────────────────────────────────────────
+  'swarm.memory.panelTitle': 'حافظه',
   'swarm.memory.loading': 'در حال بارگذاری…',
   'swarm.memory.identity': 'هویت',
+  'swarm.memory.memoryMdFile': 'MEMORY.md',
   'swarm.memory.noDurable': 'هنوز حافظهٔ پایداری برای {workerId} نیست.',
   'swarm.memory.latestEpisodes': 'آخرین قسمت‌ها — {name}',
   // ── Swarm2 — activity feed ───────────────────────────────────────────

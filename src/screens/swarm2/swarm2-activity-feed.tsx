@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Activity01Icon } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { CrewMember } from '@/hooks/use-crew-status'
 
 type RuntimeEntry = {
@@ -32,12 +33,12 @@ type ActivityRow = {
 }
 
 function relativeTime(ts: number | null | undefined): string {
-  if (!ts) return 'just now'
+  if (!ts) return t('time.justNow')
   const diff = Date.now() - ts
-  if (diff < 60_000) return `${Math.max(1, Math.floor(diff / 1000))}s ago`
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`
-  return `${Math.floor(diff / 86_400_000)}d ago`
+  if (diff < 60_000) return t('time.secondsAgo', { count: Math.max(1, Math.floor(diff / 1000)) })
+  if (diff < 3_600_000) return t('time.minutesAgo', { count: Math.floor(diff / 60_000) })
+  if (diff < 86_400_000) return t('time.hoursAgo', { count: Math.floor(diff / 3_600_000) })
+  return t('time.daysAgo', { count: Math.floor(diff / 86_400_000) })
 }
 
 function stripLogPrefix(line: string): string {
@@ -115,11 +116,10 @@ export function Swarm2ActivityFeed({
       <section className="rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-5 shadow-[0_18px_60px_color-mix(in_srgb,var(--theme-shadow)_12%,transparent)]">
         <div className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text)]">
           <HugeiconsIcon icon={Activity01Icon} size={14} />
-          Recent swarm activity
+          {t('swarm.activity.recentSwarmActivity')}
         </div>
         <p className="mt-3 text-sm text-[var(--theme-muted)]">
-          No worker output captured yet. Once swarm TUIs emit logs they will show
-          up here, ordered by latest event.
+          {t('swarm.activity.emptyOutput')}
         </p>
       </section>
     )
@@ -134,15 +134,15 @@ export function Swarm2ActivityFeed({
           </span>
           <div>
             <h2 className="text-sm font-semibold text-[var(--theme-text)]">
-              Recent swarm activity
+              {t('swarm.activity.recentSwarmActivity')}
             </h2>
             <p className="text-[11px] text-[var(--theme-muted-2)]">
-              Latest signals across all wired workers
+              {t('swarm.activity.latestSignals')}
             </p>
           </div>
         </div>
         <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--theme-muted)]">
-          {rows.length} entries
+          {t('swarm.activity.entriesCount', { count: rows.length })}
         </div>
       </header>
 
