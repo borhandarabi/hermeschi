@@ -7,6 +7,7 @@
 import type { GatewayModelCatalogEntry } from '@/lib/gateway-api'
 import { ROUGH_COST_PER_1K_TOKENS_USD } from '@/lib/config/costs'
 import type { MissionCheckpoint } from '../lib/mission-checkpoint'
+import { t, getLocale } from '@/lib/i18n'
 import {
   MODEL_PRESET_MAP,
   MODEL_PRESETS,
@@ -58,7 +59,7 @@ export function buildDetectedAgentName(
   if (derivedTitle) return derivedTitle
   const friendlyId = typeof session.friendlyId === 'string' ? session.friendlyId.trim() : ''
   if (friendlyId) return friendlyId
-  return `Detected Agent ${fallbackIndex + 1}`
+  return t('gateway.hubUtils.detectedAgent', { index: fallbackIndex + 1 })
 }
 
 export function resolveGatewayModelId(modelId: string): string {
@@ -69,7 +70,7 @@ export function resolveGatewayModelId(modelId: string): string {
 }
 
 export function getModelDisplayLabel(modelId: string): string {
-  if (!modelId) return 'Unknown'
+  if (!modelId) return t('gateway.hubUtils.unknownModel')
   const preset = MODEL_PRESETS.find((entry) => entry.id === modelId)
   if (preset) return preset.label
   const parts = modelId.split('/')
@@ -80,7 +81,7 @@ export function getModelDisplayLabelFromLookup(
   modelId: string,
   gatewayModelLabelById?: Map<string, { label: string; provider: string }>,
 ): string {
-  if (!modelId) return 'Unknown'
+  if (!modelId) return t('gateway.hubUtils.unknownModel')
   const preset = MODEL_PRESETS.find((entry) => entry.id === modelId)
   if (preset) return preset.label
   const gatewayModel = gatewayModelLabelById?.get(modelId)
@@ -200,7 +201,7 @@ export function buildTeamFromTemplate(templateId: TeamTemplateId): TeamMember[] 
     name: toTitleCase(agentName),
     avatar: index % 10,
     modelId: modelSuggestions[index] ?? 'auto',
-    roleDescription: `${toTitleCase(agentName)} lead for this mission`,
+    roleDescription: t('gateway.hubUtils.roleLead', { name: toTitleCase(agentName) }),
     goal: '',
     backstory: '',
     status: 'available',
@@ -321,9 +322,9 @@ export function formatDuration(ms: number): string {
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`
-  if (minutes > 0) return `${minutes}m ${seconds}s`
-  return `${seconds}s`
+  if (hours > 0) return t('gateway.hubUtils.duration.hoursMinutesSeconds', { hours, minutes, seconds })
+  if (minutes > 0) return t('gateway.hubUtils.duration.minutesSeconds', { minutes, seconds })
+  return t('gateway.hubUtils.duration.seconds', { seconds })
 }
 
 function cleanAgentOutputLines(lines: string[]): string[] {
@@ -371,11 +372,11 @@ function extractKeyFindings(agentSummaries: MissionAgentSummary[]): string[] {
 
 function determineMissionOutcome(taskStats: MissionTaskStats, agentSummaries: MissionAgentSummary[]): string {
   const hasOutput = agentSummaries.some((summary) => cleanAgentOutputLines(summary.lines).length > 0)
-  if (!hasOutput) return '**Outcome:** ❌ No output'
-  if (taskStats.failed > 0) return '**Outcome:** ⚠️ Partial'
-  if (taskStats.total > 0 && taskStats.completed >= taskStats.total) return '**Outcome:** ✅ Complete'
-  if (taskStats.total === 0 && hasOutput) return '**Outcome:** ✅ Complete'
-  return '**Outcome:** ⚠️ Partial'
+  if (!hasOutput) return t('gateway.hubUtils.report.outcome.noOutput')
+  if (taskStats.failed > 0) return t('gateway.hubUtils.report.outcome.partial')
+  if (taskStats.total > 0 && taskStats.completed >= taskStats.total) return t('gateway.hubUtils.report.outcome.complete')
+  if (taskStats.total === 0 && hasOutput) return t('gateway.hubUtils.report.outcome.complete')
+  return t('gateway.hubUtils.report.outcome.partial')
 }
 
 export function generateMissionReport(payload: MissionReportPayload): string {
@@ -383,44 +384,44 @@ export function generateMissionReport(payload: MissionReportPayload): string {
   const taskStats = computeMissionTaskStats(payload.tasks)
   const costEstimate = estimateMissionCost(payload.tokenCount)
   const lines: string[] = []
-  const rawGoal = payload.goal || 'Untitled mission'
+  const rawGoal = payload.goal || t('gateway.hubUtils.untitledMission')
   const cleanGoal = rawGoal.replace(/^Mission\s+/i, '').trim() || rawGoal
 
-  lines.push('# Mission Report')
+  lines.push(t('gateway.hubUtils.report.title'))
   lines.push('')
-  lines.push(`**Goal:** ${cleanGoal}`)
-  lines.push(`**Team:** ${payload.teamName}`)
-  lines.push(`**Started:** ${new Date(payload.startedAt).toLocaleString()}`)
-  lines.push(`**Completed:** ${new Date(payload.completedAt).toLocaleString()}`)
-  lines.push(`**Duration:** ${formatDuration(durationMs)}`)
+  lines.push(t('gateway.hubUtils.report.goal', { goal: cleanGoal }))
+  lines.push(t('gateway.hubUtils.report.team', { teamName: payload.teamName }))
+  lines.push(t('gateway.hubUtils.report.started', { time: new Date(payload.startedAt).toLocaleString(getLocale()) }))
+  lines.push(t('gateway.hubUtils.report.completed', { time: new Date(payload.completedAt).toLocaleString(getLocale()) }))
+  lines.push(t('gateway.hubUtils.report.duration', { duration: formatDuration(durationMs) }))
   lines.push(determineMissionOutcome(taskStats, payload.agentSummaries))
   lines.push('')
 
   const execSummary = extractExecutiveSummary(payload.agentSummaries)
   if (execSummary) {
-    lines.push('## Executive Summary')
+    lines.push(t('gateway.hubUtils.report.execSummary'))
     lines.push(execSummary)
     lines.push('')
   }
 
-  lines.push('## Team')
+  lines.push(t('gateway.hubUtils.report.teamHeading'))
   if (payload.team.length === 0) {
-    lines.push('- No agents')
+    lines.push(t('gateway.hubUtils.report.noAgents'))
   } else {
     payload.team.forEach((member) => {
-      lines.push(`- **${member.name}** — ${member.modelId}`)
+      lines.push(t('gateway.hubUtils.report.teamMember', { name: member.name, modelId: member.modelId }))
     })
   }
   lines.push('')
-  lines.push('## Tasks')
-  lines.push(`- Total: ${taskStats.total}`)
-  lines.push(`- Completed: ${taskStats.completed}`)
-  if (taskStats.failed > 0) lines.push(`- Failed: ${taskStats.failed}`)
+  lines.push(t('gateway.hubUtils.report.tasksHeading'))
+  lines.push(t('gateway.hubUtils.report.totalTasks', { count: taskStats.total }))
+  lines.push(t('gateway.hubUtils.report.completedTasks', { count: taskStats.completed }))
+  if (taskStats.failed > 0) lines.push(t('gateway.hubUtils.report.failedTasks', { count: taskStats.failed }))
   lines.push('')
 
   const keyFindings = extractKeyFindings(payload.agentSummaries)
   if (keyFindings.length > 0) {
-    lines.push('## Key Findings')
+    lines.push(t('gateway.hubUtils.report.keyFindings'))
     keyFindings.forEach((finding) => {
       const normalized = finding.replace(/^\d+\.\s+/, '- ')
       lines.push(normalized.startsWith('- ') || normalized.startsWith('* ') ? normalized : `- ${normalized}`)
@@ -428,31 +429,39 @@ export function generateMissionReport(payload: MissionReportPayload): string {
     lines.push('')
   }
 
-  lines.push('## Per-Agent Summary')
+  lines.push(t('gateway.hubUtils.report.perAgentSummary'))
   if (payload.agentSummaries.length === 0) {
-    lines.push('*No agent output captured*')
+    lines.push(t('gateway.hubUtils.report.noAgentOutput'))
   } else {
     payload.agentSummaries.forEach((summary) => {
-      lines.push(`### ${summary.agentName} (${summary.modelId || 'unknown'})`)
+      lines.push(t('gateway.hubUtils.report.agentHeading', {
+        agentName: summary.agentName,
+        modelId: summary.modelId || t('gateway.hubUtils.report.unknownModelId'),
+      }))
       const markdownOutput = getAgentOutputMarkdown(summary.lines)
-      lines.push(markdownOutput || '*No output captured*')
+      lines.push(markdownOutput || t('gateway.hubUtils.report.noOutput'))
       lines.push('')
     })
   }
 
-  lines.push('## Artifacts')
+  lines.push(t('gateway.hubUtils.report.artifacts'))
   if (payload.artifacts.length === 0) {
-    lines.push('*None*')
+    lines.push(t('gateway.hubUtils.report.noArtifacts'))
   } else {
     payload.artifacts.forEach((artifact) => {
       const typeEmoji = artifact.type === 'code' ? '📄' : artifact.type === 'html' ? '🌐' : '📝'
-      lines.push(`- ${typeEmoji} **${artifact.title}** [${artifact.type}] — ${artifact.agentName}`)
+      lines.push(t('gateway.hubUtils.report.artifactLine', {
+        emoji: typeEmoji,
+        title: artifact.title,
+        type: artifact.type,
+        agentName: artifact.agentName,
+      }))
     })
   }
   lines.push('')
-  lines.push('## Cost Estimate')
-  lines.push(`- Tokens: ${payload.tokenCount.toLocaleString()}`)
-  lines.push(`- Estimated Cost: $${costEstimate.toFixed(2)} (rough)`)
+  lines.push(t('gateway.hubUtils.report.costEstimate'))
+  lines.push(t('gateway.hubUtils.report.tokens', { count: payload.tokenCount.toLocaleString(getLocale()) }))
+  lines.push(t('gateway.hubUtils.report.estimatedCost', { cost: costEstimate.toFixed(2) }))
   lines.push('')
 
   return lines.join('\n')
@@ -472,7 +481,7 @@ export function buildStoredMissionReportFromCheckpoint(cp: MissionCheckpoint): S
     missionId: cp.id,
     name: cp.label,
     goal: cp.label,
-    teamName: cp.team.length > 0 ? `${cp.team.length}-agent team` : 'Archived Mission',
+    teamName: cp.team.length > 0 ? t('gateway.hubUtils.agentTeam', { count: cp.team.length }) : t('gateway.hubUtils.archivedMission'),
     agents: cp.team.map((member) => ({
       id: member.id,
       name: member.name,

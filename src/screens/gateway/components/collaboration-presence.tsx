@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { t } from '@/lib/i18n'
 
 type PresenceHeartbeat = {
   type: 'heartbeat'
@@ -187,7 +188,9 @@ export function CollaborationPresence() {
       <div className="flex -space-x-1">
         {shownUsers.map((user) => {
           const isSelf = user.userId === identityRef.current.userId
-          const label = isSelf ? `${user.name} (You)` : user.name
+          const label = isSelf
+            ? t('gateway.collaborationPresence.selfLabel', { name: user.name })
+            : user.name
           return (
             <div
               key={user.userId}
@@ -195,13 +198,13 @@ export function CollaborationPresence() {
               style={{ backgroundColor: user.color }}
               title={label}
             >
-              {isSelf ? 'Y' : 'U'}
+              {isSelf ? t('gateway.collaborationPresence.you').charAt(0) : t('gateway.collaborationPresence.userFallback').charAt(0)}
             </div>
           )
         })}
       </div>
-      {overflowCount > 0 ? <span className="text-primary-400">+{overflowCount} more</span> : null}
-      <span className="hidden sm:inline text-primary-300">{isSolo ? 'Only you' : `${users.length} viewing`}</span>
+      {overflowCount > 0 ? <span className="text-primary-400">{t('gateway.collaborationPresence.more', { count: overflowCount })}</span> : null}
+      <span className="hidden sm:inline text-primary-300">{isSolo ? t('gateway.collaborationPresence.onlyYou') : t('gateway.collaborationPresence.viewingCount', { count: users.length })}</span>
     </div>
   )
 }

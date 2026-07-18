@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import type { AgentWorkingRow, AgentWorkingStatus } from './agents-working-panel'
 import { AgentOutputPanel } from './agent-output-panel'
 import type { HubTask } from './task-board'
+import { t } from '@/lib/i18n'
 
 export type LiveActivityPanelProps = {
   agents: AgentWorkingRow[]
@@ -124,10 +125,10 @@ function AgentCard({
         {agent.currentTask
           ? agent.currentTask
           : agent.status === 'none'
-            ? 'No session'
+            ? t('gateway.liveActivity.noSession')
             : agent.status === 'spawning'
-              ? 'Spawning…'
-              : 'Waiting for mission…'}
+              ? t('gateway.liveActivity.spawning')
+              : t('gateway.liveActivity.waitingForMission')}
       </p>
 
       {/* Row 3: most recent output line (dimmed, monospace) */}
@@ -137,7 +138,7 @@ function AgentCard({
         </p>
       ) : (
         <p className="mt-1 font-mono text-[9px] text-neutral-300 dark:text-neutral-700">
-          {agent.status === 'active' ? '// working…' : '// idle'}
+          {agent.status === 'active' ? t('gateway.liveActivity.working') : t('gateway.liveActivity.idle')}
         </p>
       )}
 
@@ -153,7 +154,7 @@ function AgentCard({
               : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200',
           )}
         >
-          {isSelected ? '✓ Viewing' : 'View'}
+          {isSelected ? t('gateway.liveActivity.viewing') : t('gateway.liveActivity.view')}
         </button>
 
         {/* ⋯ Overflow menu — warden controls */}
@@ -165,7 +166,7 @@ function AgentCard({
               setMenuOpen((p) => !p)
             }}
             className="rounded-lg px-2 py-1 text-[13px] text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 dark:text-neutral-600 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
-            aria-label="Agent options"
+            aria-label={t('gateway.liveActivity.aria.agentOptions')}
           >
             ⋯
           </button>
@@ -188,7 +189,7 @@ function AgentCard({
                   }}
                   className="block w-full px-3 py-1.5 text-left text-[11px] text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 >
-                  View Output
+                  {t('gateway.liveActivity.viewOutput')}
                 </button>
                 {agent.status === 'error' ? (
                   <button
@@ -199,14 +200,14 @@ function AgentCard({
                     }}
                     className="block w-full px-3 py-1.5 text-left text-[11px] text-amber-600 transition-colors hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/20"
                   >
-                    Respawn
+                    {t('gateway.liveActivity.respawn')}
                   </button>
                 ) : null}
                 {agent.status !== 'none' && agent.status !== 'error' ? (
                   <>
                     <div className="my-1 border-t border-neutral-100 dark:border-neutral-800" />
                     <p className="px-3 pb-0.5 pt-1 text-[9px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
-                      Warden
+                      {t('gateway.liveActivity.warden')}
                     </p>
                     <button
                       type="button"
@@ -214,7 +215,7 @@ function AgentCard({
                         setMenuOpen(false)
                         if (!onSteer) return
                         const directive = window.prompt(
-                          `Send directive to ${agent.name}`,
+                          t('gateway.liveActivity.sendDirectivePrompt', { name: agent.name }),
                           '',
                         )
                         if (!directive || !directive.trim()) return
@@ -222,7 +223,7 @@ function AgentCard({
                       }}
                       className="block w-full px-3 py-1.5 text-left text-[11px] text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
                     >
-                      Steer
+                      {t('gateway.liveActivity.steer')}
                     </button>
                     <button
                       type="button"
@@ -232,7 +233,7 @@ function AgentCard({
                       }}
                       className="block w-full px-3 py-1.5 text-left text-[11px] text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
                     >
-                      {agent.status === 'paused' ? 'Resume' : 'Pause'}
+                      {agent.status === 'paused' ? t('gateway.liveActivity.resume') : t('gateway.liveActivity.pause')}
                     </button>
                   </>
                 ) : null}
@@ -245,7 +246,7 @@ function AgentCard({
                   }}
                   className="block w-full px-3 py-1.5 text-left text-[11px] text-red-500 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20"
                 >
-                  Kill session
+                  {t('gateway.liveActivity.killSession')}
                 </button>
               </div>
             </>
@@ -301,20 +302,22 @@ export function LiveActivityPanel({
     if (activeCount > 0 && idleCount > 0) {
       return (
         <span className="font-mono text-[9px]">
-          <span className="text-emerald-500">{activeCount} active</span>
+          <span className="text-emerald-500">{t('gateway.liveActivity.activeCount', { count: activeCount })}</span>
           <span className="text-neutral-400"> · </span>
-          <span className="text-neutral-500">{idleCount} idle</span>
+          <span className="text-neutral-500">{t('gateway.liveActivity.idleCount', { count: idleCount })}</span>
         </span>
       )
     }
     if (activeCount > 0) {
       return (
-        <span className="font-mono text-[9px] text-emerald-500">{activeCount} active</span>
+        <span className="font-mono text-[9px] text-emerald-500">{t('gateway.liveActivity.activeCount', { count: activeCount })}</span>
       )
     }
     return (
       <span className="font-mono text-[9px] text-neutral-500">
-        {agents.length} agent{agents.length !== 1 ? 's' : ''}
+        {agents.length === 1
+          ? t('gateway.liveActivity.agentsCountOne', { count: agents.length })
+          : t('gateway.liveActivity.agentsCount', { count: agents.length })}
       </span>
     )
   }
@@ -325,7 +328,7 @@ export function LiveActivityPanel({
       <div className="flex shrink-0 items-center justify-between border-b border-neutral-200 bg-white/80 px-3 py-2 backdrop-blur dark:border-white/10 dark:bg-neutral-950/70">
         <div className="flex items-center gap-2">
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-            Agents Working
+            {t('gateway.liveActivity.agentsWorking')}
           </h3>
           {missionRunning && activeCount > 0 ? (
             <span className="relative flex size-1.5 shrink-0">
@@ -348,7 +351,7 @@ export function LiveActivityPanel({
                 : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300',
             )}
           >
-            Activity
+            {t('gateway.liveActivity.tab.activity')}
           </button>
           <button
             type="button"
@@ -360,7 +363,7 @@ export function LiveActivityPanel({
                 : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300',
             )}
           >
-            Output
+            {t('gateway.liveActivity.tab.output')}
             {selectedAgentId && tab !== 'output' ? (
               <span className="ml-1 inline-flex size-1.5 rounded-full bg-emerald-500" />
             ) : null}
@@ -376,10 +379,10 @@ export function LiveActivityPanel({
               <div className="text-center">
                 <p className="mb-1 text-2xl">🤖</p>
                 <p className="font-mono text-[10px] text-neutral-500 dark:text-neutral-600">
-                  // no agents configured
+                  {t('gateway.liveActivity.noAgentsConfigured')}
                 </p>
                 <p className="mt-1 text-[10px] text-neutral-400 dark:text-neutral-600">
-                  Add agents in the Team tab
+                  {t('gateway.liveActivity.addAgentsTeam')}
                 </p>
               </div>
             </div>
@@ -409,16 +412,16 @@ export function LiveActivityPanel({
               {/* Status legend */}
               <div className="mt-1 flex flex-wrap items-center justify-end gap-3 px-1 pt-1">
                 <span className="flex items-center gap-1 text-[9px] text-neutral-400 dark:text-neutral-600">
-                  <span className="size-1.5 rounded-full bg-emerald-500" /> Active
+                  <span className="size-1.5 rounded-full bg-emerald-500" /> {t('gateway.liveActivity.legend.active')}
                 </span>
                 <span className="flex items-center gap-1 text-[9px] text-neutral-400 dark:text-neutral-600">
-                  <span className="size-1.5 rounded-full bg-amber-500" /> Idle
+                  <span className="size-1.5 rounded-full bg-amber-500" /> {t('gateway.liveActivity.legend.idle')}
                 </span>
                 <span className="flex items-center gap-1 text-[9px] text-neutral-400 dark:text-neutral-600">
-                  <span className="size-1.5 rounded-full bg-neutral-400" /> No session
+                  <span className="size-1.5 rounded-full bg-neutral-400" /> {t('gateway.liveActivity.legend.noSession')}
                 </span>
                 <span className="flex items-center gap-1 text-[9px] text-neutral-400 dark:text-neutral-600">
-                  <span className="size-1.5 rounded-full bg-red-500" /> Error
+                  <span className="size-1.5 rounded-full bg-red-500" /> {t('gateway.liveActivity.legend.error')}
                 </span>
               </div>
             </div>
@@ -433,11 +436,11 @@ export function LiveActivityPanel({
           <div className="flex shrink-0 items-center justify-between border-b border-neutral-200 px-3 py-2 dark:border-white/10">
             <div className="flex items-center gap-2 min-w-0">
               <span className="truncate text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                {selectedAgent ? selectedAgent.name : 'No agent selected'}
+                {selectedAgent ? selectedAgent.name : t('gateway.liveActivity.noAgentSelected')}
               </span>
               {selectedAgentId && (
                 <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
-                  live
+                  {t('gateway.liveActivity.live')}
                 </span>
               )}
             </div>
@@ -445,7 +448,7 @@ export function LiveActivityPanel({
               <button
                 type="button"
                 onClick={() => setPinnedOutput((p) => !p)}
-                title={pinnedOutput ? 'Unpin output tab' : 'Pin output tab (stay here when closing)'}
+                title={pinnedOutput ? t('gateway.liveActivity.unpinTab') : t('gateway.liveActivity.pinTab')}
                 className={cn(
                   'rounded p-1 text-[11px] transition-colors',
                   pinnedOutput
@@ -459,7 +462,7 @@ export function LiveActivityPanel({
                 type="button"
                 onClick={handleCloseOutput}
                 className="rounded p-1 text-[11px] text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
-                aria-label="Close output"
+                aria-label={t('gateway.liveActivity.aria.closeOutput')}
               >
                 ✕
               </button>
@@ -472,9 +475,7 @@ export function LiveActivityPanel({
               <div className="text-center">
                 <p className="mb-2 text-2xl opacity-40">📡</p>
                 <p className="text-xs text-neutral-500 dark:text-neutral-600">
-                  Click{' '}
-                  <strong className="text-neutral-700 dark:text-neutral-400">View</strong>{' '}
-                  on an agent to stream their output here.
+                  {t('gateway.liveActivity.noOutputSelected')}
                 </p>
               </div>
             </div>

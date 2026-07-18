@@ -14,6 +14,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/utils'
 import type { MissionEvent } from '@/screens/gateway/lib/mission-events'
+import { t, getLocale } from '@/lib/i18n'
 
 type MissionEventLogProps = {
   events: MissionEvent[]
@@ -28,11 +29,11 @@ type EventVisual = {
   toneClassName: string
 }
 
-const FILTER_OPTIONS: Array<{ key: EventFilter; label: string }> = [
-  { key: 'all', label: 'All' },
-  { key: 'agent', label: 'Agent Events' },
-  { key: 'task', label: 'Task Events' },
-  { key: 'errors', label: 'Errors Only' },
+const FILTER_OPTIONS: Array<{ key: EventFilter; labelKey: 'all' | 'agent' | 'task' | 'errors' }> = [
+  { key: 'all', labelKey: 'all' },
+  { key: 'agent', labelKey: 'agent' },
+  { key: 'task', labelKey: 'task' },
+  { key: 'errors', labelKey: 'errors' },
 ]
 
 function getEventVisual(eventType: MissionEvent['type']): EventVisual {
@@ -63,7 +64,7 @@ function getEventVisual(eventType: MissionEvent['type']): EventVisual {
 }
 
 function formatTimestamp(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString([], {
+  return new Date(timestamp).toLocaleTimeString(getLocale(), {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -75,41 +76,60 @@ function getAgentLabel(event: MissionEvent, agentNames?: Record<string, string>)
     return agentNames?.[event.payload.agentId] ?? event.payload.agentId
   }
 
-  return 'Mission'
+  return t('gateway.missionEventLog.mission')
 }
 
 function getEventDescription(event: MissionEvent, agentNames?: Record<string, string>): string {
   switch (event.type) {
     case 'agent.spawned':
-      return `spawned session ${event.payload.sessionKey} on ${event.payload.model}`
+      return t('gateway.missionEventLog.event.agent.spawned', {
+        sessionKey: event.payload.sessionKey,
+        model: event.payload.model,
+      })
     case 'agent.started':
       return event.payload.firstChunk
-        ? `started with "${event.payload.firstChunk}"`
-        : 'started processing'
+        ? t('gateway.missionEventLog.event.agent.startedWith', { firstChunk: event.payload.firstChunk })
+        : t('gateway.missionEventLog.event.agent.startedProcessing')
     case 'agent.thinking':
-      return 'entered reasoning mode'
+      return t('gateway.missionEventLog.event.agent.thinking')
     case 'agent.output':
-      return event.payload.isStreaming ? 'streaming output' : 'emitted output'
+      return event.payload.isStreaming
+        ? t('gateway.missionEventLog.event.agent.streamingOutput')
+        : t('gateway.missionEventLog.event.agent.emittedOutput')
     case 'agent.completed':
-      return `completed with ${event.payload.tokenCount} tokens`
+      return t('gateway.missionEventLog.event.agent.completed', { tokenCount: event.payload.tokenCount })
     case 'agent.failed':
-      return event.payload.willRetry ? `failed and will retry: ${event.payload.error}` : `failed: ${event.payload.error}`
+      return event.payload.willRetry
+        ? t('gateway.missionEventLog.event.agent.failedRetry', { error: event.payload.error })
+        : t('gateway.missionEventLog.event.agent.failed', { error: event.payload.error })
     case 'agent.retrying':
-      return `retry ${event.payload.retryCount} spawned as ${event.payload.newSessionKey}`
+      return t('gateway.missionEventLog.event.agent.retrying', {
+        retryCount: event.payload.retryCount,
+        newSessionKey: event.payload.newSessionKey,
+      })
     case 'mission.started':
-      return `started "${event.payload.goal}" with ${event.payload.team.length} agents`
+      return t('gateway.missionEventLog.event.mission.started', {
+        goal: event.payload.goal,
+        teamCount: event.payload.team.length,
+      })
     case 'mission.completed':
-      return 'completed successfully'
+      return t('gateway.missionEventLog.event.mission.completed')
     case 'mission.aborted':
-      return `aborted: ${event.payload.reason}`
+      return t('gateway.missionEventLog.event.mission.aborted', { reason: event.payload.reason })
     case 'task.assigned': {
       const agentName = agentNames?.[event.payload.agentId] ?? event.payload.agentId
-      return `assigned ${event.payload.taskId} to ${agentName}`
+      return t('gateway.missionEventLog.event.task.assigned', {
+        taskId: event.payload.taskId,
+        agentName,
+      })
     }
     case 'task.completed':
-      return `completed ${event.payload.taskId}`
+      return t('gateway.missionEventLog.event.task.completed', { taskId: event.payload.taskId })
     case 'task.failed':
-      return `failed ${event.payload.taskId}: ${event.payload.error}`
+      return t('gateway.missionEventLog.event.task.failed', {
+        taskId: event.payload.taskId,
+        error: event.payload.error,
+      })
   }
 }
 
@@ -155,7 +175,7 @@ export function MissionEventLog({ events, agentNames, className }: MissionEventL
                   : 'border-primary-700 bg-primary-800/80 text-primary-300 hover:border-primary-700 hover:bg-primary-800 hover:text-primary-100',
               )}
             >
-              {option.label}
+              {t(`gateway.missionEventLog.filter.${option.labelKey}`)}
             </button>
           ))}
         </div>
@@ -164,7 +184,7 @@ export function MissionEventLog({ events, agentNames, className }: MissionEventL
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {filteredEvents.length === 0 ? (
           <div className="rounded-xl border border-dashed border-primary-700 bg-primary-950/60 px-4 py-8 text-center">
-            <p className="text-sm text-primary-300">No mission events yet.</p>
+            <p className="text-sm text-primary-300">{t('gateway.missionEventLog.empty')}</p>
           </div>
         ) : (
           <ol className="space-y-2">
@@ -217,7 +237,9 @@ export function MissionEventLog({ events, agentNames, className }: MissionEventL
                               }
                               className="text-xs font-medium text-primary-400 transition-colors hover:text-primary-100"
                             >
-                              {isExpanded ? 'Hide output' : 'Show output'}
+                              {isExpanded
+                                ? t('gateway.missionEventLog.hideOutput')
+                                : t('gateway.missionEventLog.showOutput')}
                             </button>
                             <AnimatePresence initial={false}>
                               {isExpanded ? (

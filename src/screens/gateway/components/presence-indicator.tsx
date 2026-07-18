@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -32,7 +33,7 @@ function getPresenceId(): string {
 
 function getPresenceName(): string {
   // Try to get a user-friendly name
-  return localStorage.getItem('clawsuite-username') || 'You'
+  return localStorage.getItem('clawsuite-username') || t('gateway.presenceIndicator.you')
 }
 
 function getPresenceColor(id: string): string {
@@ -123,7 +124,7 @@ export function PresenceIndicator({ currentTab }: { currentTab: string }) {
             key={peer.id}
             className="relative flex size-6 items-center justify-center rounded-full border-2 border-white dark:border-slate-900 text-[9px] font-bold text-white shadow-sm"
             style={{ backgroundColor: peer.color }}
-            title={`${peer.name} — viewing ${peer.tab}`}
+            title={t('gateway.presenceIndicator.peerTitle', { name: peer.name, tab: peer.tab })}
           >
             {peer.name.charAt(0).toUpperCase()}
             {/* Viewing indicator dot */}
@@ -143,8 +144,8 @@ export function PresenceIndicator({ currentTab }: { currentTab: string }) {
         peers.length > 0 && 'hidden sm:inline',
       )}>
         {peers.length === 1
-          ? `${peers[0].name} is here`
-          : `${peers.length} others online`}
+          ? t('gateway.presenceIndicator.isHere', { name: peers[0].name })
+          : t('gateway.presenceIndicator.othersOnline', { count: peers.length })}
       </span>
     </div>
   )
