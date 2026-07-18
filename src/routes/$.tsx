@@ -2,6 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft01Icon, Home01Icon } from '@hugeicons/core-free-icons'
 import { usePageTitle } from '@/hooks/use-page-title'
+import { t } from '@/lib/i18n'
 import { buttonVariants } from '@/components/ui/button'
 
 export const Route = createFileRoute('/$')({
@@ -9,7 +10,7 @@ export const Route = createFileRoute('/$')({
 })
 
 function NotFoundPage() {
-  usePageTitle('404 — Not Found')
+  usePageTitle(t('notFound.title'))
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-primary-50">
@@ -30,10 +31,10 @@ function NotFoundPage() {
 
         {/* Message */}
         <h1 className="text-2xl font-semibold text-primary-900 mb-2">
-          Page Not Found
+          {t('notFound.heading')}
         </h1>
         <p className="text-primary-600 mb-8">
-          The page you're looking for doesn't exist or has been moved.
+          {t('notFound.description')}
         </p>
 
         {/* Actions */}
@@ -43,44 +44,44 @@ function NotFoundPage() {
             className={buttonVariants({ variant: 'outline', size: 'default' })}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={18} strokeWidth={1.5} />
-            Go Back
+            {t('notFound.goBack')}
           </button>
           <Link
             to={'/chat' as string}
             className={buttonVariants({ variant: 'default', size: 'default' })}
           >
             <HugeiconsIcon icon={Home01Icon} size={18} strokeWidth={1.5} />
-            Chat
+            {t('nav.chat')}
           </Link>
         </div>
 
         {/* Helpful Links */}
         <div className="mt-12 pt-8 border-t border-primary-200">
-          <p className="text-sm text-primary-500 mb-3">Quick Links</p>
+          <p className="text-sm text-primary-500 mb-3">{t('notFound.quickLinks')}</p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <Link
               to={'/chat' as string}
               className="text-accent-500 hover:text-accent-600 hover:underline"
             >
-              Chat
+              {t('nav.chat')}
             </Link>
             <Link
               to="/files"
               className="text-accent-500 hover:text-accent-600 hover:underline"
             >
-              Files
+              {t('nav.files')}
             </Link>
             <Link
               to="/memory"
               className="text-accent-500 hover:text-accent-600 hover:underline"
             >
-              Memory
+              {t('nav.memory')}
             </Link>
             <Link
               to="/skills"
               className="text-accent-500 hover:text-accent-600 hover:underline"
             >
-              Skills
+              {t('nav.skills')}
             </Link>
           </div>
         </div>

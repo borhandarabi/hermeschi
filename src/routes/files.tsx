@@ -19,10 +19,9 @@ import { usePageTitle } from '@/hooks/use-page-title'
 import { FileExplorerSidebar } from '@/components/file-explorer'
 import type { FileEntry } from '@/components/file-explorer/file-explorer-sidebar'
 import { resolveTheme, useSettings } from '@/hooks/use-settings'
+import { t } from '@/lib/i18n'
 
-const PLACEHOLDER_VALUE = `// Files workspace
-// Click a file in the tree to load it into this editor.
-`
+const PLACEHOLDER_VALUE = t('files.placeholderValue')
 
 const LANGUAGE_BY_EXT: Record<string, string> = {
   ts: 'typescript',
@@ -92,18 +91,18 @@ export const Route = createFileRoute('/files')({
     return (
       <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-primary-50">
         <h2 className="text-xl font-semibold text-primary-900 mb-3">
-          Failed to Load Files
+          {t('files.errorTitle')}
         </h2>
         <p className="text-sm text-primary-600 mb-4 max-w-md">
           {error instanceof Error
             ? error.message
-            : 'An unexpected error occurred'}
+            : t('common.unexpectedError')}
         </p>
         <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors"
         >
-          Reload Page
+          {t('common.reloadPage')}
         </button>
       </div>
     )
@@ -113,7 +112,7 @@ export const Route = createFileRoute('/files')({
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-accent-500 border-r-transparent mb-3" />
-          <p className="text-sm text-primary-500">Loading file explorer...</p>
+          <p className="text-sm text-primary-500">{t('files.loadingExplorer')}</p>
         </div>
       </div>
     )
@@ -121,7 +120,7 @@ export const Route = createFileRoute('/files')({
 })
 
 function FilesRoute() {
-  usePageTitle('Files')
+  usePageTitle(t('files.title'))
   const { settings } = useSettings()
   const [isMobile, setIsMobile] = useState(false)
   const [fileExplorerCollapsed, setFileExplorerCollapsed] = useState(false)
@@ -265,8 +264,8 @@ function FilesRoute() {
               type="button"
               onClick={() => setFileExplorerCollapsed((prev) => !prev)}
               className="rounded-lg p-1.5 text-primary-600 hover:bg-primary-100 transition-colors"
-              aria-label={fileExplorerCollapsed ? 'Show files' : 'Hide files'}
-              title={fileExplorerCollapsed ? 'Show files' : 'Hide files'}
+              aria-label={fileExplorerCollapsed ? t('files.showFiles') : t('files.hideFiles')}
+              title={fileExplorerCollapsed ? t('files.showFiles') : t('files.hideFiles')}
             >
               <HugeiconsIcon icon={Folder01Icon} size={20} strokeWidth={1.5} />
             </button>
@@ -283,19 +282,19 @@ function FilesRoute() {
                     {loaded.path}
                     {loaded.dirty && (
                       <span className="ml-2 text-accent-500">
-                        · unsaved changes
+                        {t('files.unsavedChanges')}
                       </span>
                     )}
                     {savedFlash && (
-                      <span className="ml-2 text-emerald-600">· saved</span>
+                      <span className="ml-2 text-emerald-600">{t('files.savedFlash')}</span>
                     )}
                   </p>
                 </>
               ) : (
                 <>
-                  <h1 className="hidden text-base font-medium md:block md:text-lg">Files</h1>
+                  <h1 className="hidden text-base font-medium md:block md:text-lg">{t('files.title')}</h1>
                   <p className="hidden text-sm text-primary-600 sm:block">
-                    Click a file in the sidebar to load it into the editor.
+                    {t('files.clickSidebarToLoad')}
                   </p>
                 </>
               )}
@@ -308,7 +307,7 @@ function FilesRoute() {
                     onClick={() => setRenderMarkdown((v) => !v)}
                     className="rounded-md border border-primary-200 px-2.5 py-1 text-xs font-medium text-primary-700 hover:bg-primary-100"
                   >
-                    {renderMarkdown ? 'Edit' : 'Preview'}
+                    {renderMarkdown ? t('common.edit') : t('files.preview')}
                   </button>
                 ) : null}
                 {!isImage ? (
@@ -318,34 +317,34 @@ function FilesRoute() {
                     disabled={!loaded.dirty || saving}
                     className="rounded-md bg-accent-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-accent-600 disabled:opacity-50"
                   >
-                    {saving ? 'Saving…' : 'Save'}
+                    {saving ? t('common.saving') : t('common.save')}
                   </button>
                 ) : null}
                 <button
                   type="button"
                   onClick={handleOpenInTab}
                   className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2.5 py-1 text-xs font-medium text-primary-700 hover:bg-primary-100"
-                  title="Open this file in a new browser tab"
+                  title={t('files.openInTabTitle')}
                 >
                   <HugeiconsIcon
                     icon={ExternalLink}
                     size={14}
                     strokeWidth={1.6}
                   />
-                  Open
+                  {t('files.open')}
                 </button>
                 <button
                   type="button"
                   onClick={handleDownload}
                   className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2.5 py-1 text-xs font-medium text-primary-700 hover:bg-primary-100"
-                  title="Download this file to your computer"
+                  title={t('files.downloadTitle')}
                 >
                   <HugeiconsIcon
                     icon={Download01Icon}
                     size={14}
                     strokeWidth={1.6}
                   />
-                  Download
+                  {t('files.download')}
                 </button>
               </div>
             ) : null}
@@ -353,7 +352,7 @@ function FilesRoute() {
           <div className="min-h-0 flex-1 pb-24 md:pb-0">
             {loaded?.loading ? (
               <div className="flex h-full items-center justify-center text-sm text-primary-500">
-                Loading…
+                {t('files.loading')}
               </div>
             ) : loaded?.error ? (
               <div className="flex h-full items-center justify-center p-6 text-sm text-red-600">

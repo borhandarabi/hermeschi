@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { usePageTitle } from '@/hooks/use-page-title'
+import { t } from '@/lib/i18n'
 import { TasksScreen } from '@/screens/tasks/tasks-screen'
 
 const searchSchema = z.object({
@@ -14,6 +15,6 @@ export const Route = createFileRoute('/tasks')({
 })
 
 function TasksRoute() {
-  usePageTitle('Tasks')
+  usePageTitle(t('tasks.title'))
   return <TasksScreen />
 }
