@@ -110,7 +110,7 @@ function ThemeToggleMini() {
       }}
       className="shrink-0 rounded-lg p-1.5 transition-colors hover:opacity-80"
       style={{ color: 'var(--theme-muted)' }}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDark ? t('common.switchToLight') : t('common.switchToDark')}
     >
       <HugeiconsIcon
         icon={isDark ? Sun02Icon : Moon02Icon}
@@ -403,7 +403,7 @@ function SectionLabel({
           type="button"
           onClick={onToggle}
           className="ml-auto p-0.5 rounded hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors"
-          aria-label={expanded ? `Collapse ${label}` : `Expand ${label}`}
+          aria-label={expanded ? t('chat.sidebar.collapseLabel', { label }) : t('chat.sidebar.expandLabel', { label })}
         >
           <HugeiconsIcon
             icon={ArrowDown01Icon}
@@ -780,7 +780,7 @@ function ChatSidebarComponent({
   const searchItem: NavItemDef = {
     kind: 'button',
     icon: Search01Icon,
-    label: 'Search',
+    label: t('common.search'),
     active: isSearchModalOpen,
     onClick: openSearchModal,
   }
@@ -828,28 +828,28 @@ function ChatSidebarComponent({
       kind: 'link',
       to: '/tasks',
       icon: CheckListIcon,
-      label: 'Tasks',
+      label: t('nav.tasks'),
       active: isTasksActive,
     },
     {
       kind: 'link',
       to: '/conductor',
       icon: Rocket01Icon,
-      label: 'Conductor',
+      label: t('nav.conductor'),
       active: isConductorActive,
     },
     {
       kind: 'link',
       to: '/operations',
       icon: UserMultipleIcon,
-      label: 'Operations',
+      label: t('nav.operations'),
       active: isOperationsActive,
     },
     {
       kind: 'link',
       to: '/swarm',
       icon: UserGroupIcon,
-      label: 'Swarm',
+      label: t('nav.swarm'),
       active: isSwarmActive,
     },
     ...(echoStudioEnabled
@@ -858,7 +858,7 @@ function ChatSidebarComponent({
             kind: 'link' as const,
             to: '/echo-studio',
             icon: DashboardSquare01Icon,
-            label: 'Echo Studio',
+            label: t('nav.echoStudio'),
             active: pathname.startsWith('/echo-studio'),
           },
         ]
@@ -886,7 +886,7 @@ function ChatSidebarComponent({
       kind: 'link',
       to: '/mcp',
       icon: McpServerIcon,
-      label: 'MCP',
+      label: t('nav.mcp'),
       active: isMcpActive,
     },
     {
@@ -956,14 +956,14 @@ function ChatSidebarComponent({
               >
                 <img
                   src="/claude-avatar.webp"
-                  alt="Hermes Agent"
+                  alt={t('chat.sidebar.hermesAgent')}
                   className="size-6 rounded-lg"
                 />
                 <span
                   className="text-sm font-semibold tracking-tight"
                   style={{ color: 'var(--theme-text)' }}
                 >
-                  Hermes Workspace
+                  {t('chat.sidebar.hermesWorkspace')}
                 </span>
               </Link>
             </motion.div>
@@ -978,7 +978,7 @@ function ChatSidebarComponent({
                   size="icon-sm"
                   variant="ghost"
                   aria-label={
-                    isVisuallyCollapsed ? 'Open Sidebar' : 'Close Sidebar'
+                    isVisuallyCollapsed ? t('chat.sidebar.openSidebar') : t('chat.sidebar.closeSidebar')
                   }
                   className="absolute right-2 top-1/2 shrink-0 -translate-y-1/2 opacity-80 hover:opacity-100"
                   data-tour="sidebar-collapse-toggle"
@@ -1000,7 +1000,7 @@ function ChatSidebarComponent({
               }
             />
             <TooltipContent side="right">
-              {isVisuallyCollapsed ? 'Open Sidebar' : 'Close Sidebar'}
+              {isVisuallyCollapsed ? t('chat.sidebar.openSidebar') : t('chat.sidebar.closeSidebar')}
             </TooltipContent>
           </TooltipRoot>
         </TooltipProvider>
@@ -1073,7 +1073,7 @@ function ChatSidebarComponent({
               className="size-5 shrink-0"
               style={{ color: '#facc15' }}
             />
-            <span>HermesWorld</span>
+            <span>{t('chat.sidebar.hermesWorld')}</span>
             <span
               className="ml-auto inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold leading-none"
               style={{
@@ -1084,7 +1084,7 @@ function ChatSidebarComponent({
                 letterSpacing: '0.08em',
               }}
             >
-              NEW
+              {t('chat.sidebar.newBadge')}
             </span>
           </Link>
         </div>
@@ -1095,7 +1095,7 @@ function ChatSidebarComponent({
         {/* Navigation sections */}
         <div className={cn('shrink-0 space-y-0.5 px-2', isMobile && 'order-2')}>
           <SectionLabel
-            label="Main"
+            label={t('chat.sidebar.main')}
             isCollapsed={isVisuallyCollapsed}
             transition={transition}
             collapsible
@@ -1112,7 +1112,7 @@ function ChatSidebarComponent({
           />
 
           <SectionLabel
-            label="Knowledge"
+            label={t('chat.sidebar.knowledge')}
             isCollapsed={isVisuallyCollapsed}
             transition={transition}
             collapsible
@@ -1223,7 +1223,7 @@ function ChatSidebarComponent({
                     size={20}
                     strokeWidth={1.5}
                   />
-                  Settings
+                  {t('nav.settings')}
                 </span>
               </MenuItem>
             </MenuContent>

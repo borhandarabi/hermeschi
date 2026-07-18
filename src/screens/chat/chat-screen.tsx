@@ -108,6 +108,7 @@ import { ErrorToastContainer, showErrorToast } from '@/components/error-toast'
 import { persistRecoveryMessage, useChatStore } from '@/stores/chat-store'
 import { useSessionModelStore } from '@/stores/session-model-store'
 import { useResearchCard } from '@/hooks/use-research-card'
+import { t } from '@/lib/i18n'
 // MOBILE_TAB_BAR_OFFSET removed — tab bar always hidden in chat
 import { useTapDebug } from '@/hooks/use-tap-debug'
 import { useChatMode } from '@/hooks/use-chat-mode'
@@ -737,7 +738,7 @@ export function ChatScreen({
           ? actionValue
           : actionValue
             ? JSON.stringify(actionValue)
-            : 'Tool call requires approval'
+            : t('chat.approval.toolCallRequiresApproval')
       const contextValue = payload.context ?? payload.input ?? payload.args
       const context =
         typeof contextValue === 'string'
@@ -750,7 +751,7 @@ export function ChatScreen({
       const agentName =
         typeof agentNameValue === 'string' && agentNameValue.trim().length > 0
           ? agentNameValue
-          : 'Agent'
+          : t('chat.approval.agentFallback')
       const agentIdValue =
         payload.agentId ?? payload.sessionKey ?? payload.source
       const agentId =
@@ -1234,7 +1235,7 @@ export function ChatScreen({
         }
         const errorMessage = `Failed to send message. ${messageText}`
         setError(errorMessage)
-        toast('Failed to send message', { type: 'error' })
+        toast(t('chat.error.failedToSend'), { type: 'error' })
         showErrorToast(messageText)
         setPendingGeneration(false)
         setWaitingForResponse(false)
@@ -1662,7 +1663,7 @@ export function ChatScreen({
           }
         : statusQuery.data && !statusQuery.data.ok
           ? {
-              message: statusQuery.data.error || 'Hermes Agent unavailable',
+              message: statusQuery.data.error || t('chat.error.hermesUnavailable'),
               status: statusQuery.data.status,
             }
           : null
@@ -1785,11 +1786,11 @@ export function ChatScreen({
       navigate({ to: '/', replace: true })
     }
     const message = sessionsError
-      ? `Failed to load sessions. ${sessionsError}`
+      ? t('chat.error.failedToLoadSessions', { error: sessionsError })
       : historyError
-        ? `Failed to load history. ${historyError}`
+        ? t('chat.error.failedToLoadHistory', { error: historyError })
         : statusError
-          ? `Hermes Agent unavailable. ${statusError.message}`
+          ? t('chat.error.hermesUnavailableWithError', { error: statusError.message })
           : null
     if (message) setError(message)
   }, [
@@ -2285,7 +2286,7 @@ export function ChatScreen({
               deriveFriendlyIdFromKey(sessionKey)
 
         if (!sessionKey || !friendlyId) {
-          throw new Error('Invalid session response')
+          throw new Error(t('chat.error.invalidSessionResponse'))
         }
 
         queryClient.invalidateQueries({ queryKey: chatQueryKeys.sessions })
@@ -2371,7 +2372,7 @@ export function ChatScreen({
           activeSessionKey ||
           activeFriendlyId
         clearHistoryMessages(queryClient, activeFriendlyId, sessionKey)
-        toast('Chat cleared', { type: 'success' })
+        toast(t('chat.error.chatCleared'), { type: 'success' })
         return true
       }
 
@@ -2397,7 +2398,7 @@ export function ChatScreen({
           messages: finalDisplayMessages,
         })
         if (exported) {
-          toast('Conversation exported', { type: 'success' })
+          toast(t('chat.error.conversationExported'), { type: 'success' })
         }
         return true
       }
@@ -2801,8 +2802,8 @@ export function ChatScreen({
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                        {'\uD83D\uDD10'} Approval Required -{' '}
-                        {approval.agentName || 'Agent'}
+                        {'\uD83D\uDD10'} {t('chat.approval.title')}{' '}
+                        {approval.agentName || t('chat.approval.agentFallback')}
                       </p>
                       <p className="mt-0.5 truncate text-xs text-amber-600 dark:text-amber-500">
                         {approval.action}
@@ -2821,7 +2822,7 @@ export function ChatScreen({
                         }}
                         className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600"
                       >
-                        Approve
+                        {t('chat.approval.approve')}
                       </button>
                       <button
                         type="button"
@@ -2830,7 +2831,7 @@ export function ChatScreen({
                         }}
                         className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 dark:border-red-800/50 dark:bg-red-900/10 dark:text-red-400"
                       >
-                        Deny
+                        {t('chat.approval.deny')}
                       </button>
                     </div>
                   </div>
