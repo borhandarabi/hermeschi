@@ -14,7 +14,7 @@ function withLocale<T>(locale: LocaleId, fn: () => T): T {
   const originalWindow = globalThis.window
   const originalNavigator = globalThis.navigator
   const originalLocalStorage = globalThis.localStorage
-  const store = new Map<string, string>([['hermes-workspace-locale', locale]])
+  const store = new Map<string, string>([['hermeschi-locale', locale]])
   const listeners: Array<(e: unknown) => void> = []
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
