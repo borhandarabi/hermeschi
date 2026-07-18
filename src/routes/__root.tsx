@@ -81,7 +81,7 @@ const themeScript = `
     // RTL_LOCALES in src/lib/i18n.ts.
     try {
       const RTL_LOCALES = ['fa']
-      const storedLocale = localStorage.getItem('hermes-workspace-locale')
+      const storedLocale = localStorage.getItem('hermeschi-locale')
       const supportedLocales = ['en', 'fa']
       const navigatorLang = (navigator && navigator.language) || ''
       const navigatorLangShort = navigatorLang.split('-')[0]
