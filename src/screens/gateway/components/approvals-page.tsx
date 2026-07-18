@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchGatewayApprovals, type GatewayApprovalEntry } from '@/lib/gateway-api'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { ApprovalRequest } from '../lib/approvals-store'
 
 type ApprovalsPageProps = {
@@ -22,15 +23,15 @@ type UnifiedApproval = {
 }
 
 function timeAgo(ms?: number): string {
-  if (!ms || !Number.isFinite(ms)) return 'unknown'
+  if (!ms || !Number.isFinite(ms)) return t('gateway.approvalsPage.unknown')
   const delta = Math.max(0, Date.now() - ms)
   const seconds = Math.floor(delta / 1000)
-  if (seconds < 60) return `${seconds}s ago`
+  if (seconds < 60) return t('gateway.approvalsPage.timeAgoSeconds', { count: seconds })
   const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 60) return t('gateway.approvalsPage.timeAgoMinutes', { count: minutes })
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
+  if (hours < 24) return t('gateway.approvalsPage.timeAgoHours', { count: hours })
+  return t('gateway.approvalsPage.timeAgoDays', { count: Math.floor(hours / 24) })
 }
 
 function stringifyInput(input: unknown): string {
@@ -48,7 +49,7 @@ function toToolName(entry: GatewayApprovalEntry): string {
     const firstToken = entry.action.trim().split(/[\s:(]/)[0]
     if (firstToken) return firstToken.slice(0, 32)
   }
-  return 'tool-call'
+  return t('gateway.approvalsPage.toolCall')
 }
 
 function toPreview(entry: GatewayApprovalEntry): string {
@@ -58,7 +59,7 @@ function toPreview(entry: GatewayApprovalEntry): string {
       : entry.action && entry.action.trim().length > 0
         ? entry.action
         : stringifyInput(entry.input)
-  return preview || 'Approval requested'
+  return preview || t('gateway.approvalsPage.approvalRequested')
 }
 
 function toRisk(value: string): 'low' | 'medium' | 'high' {
@@ -86,7 +87,7 @@ function normalizeGatewayApproval(entry: GatewayApprovalEntry): UnifiedApproval 
     id: `gw-${entry.id}`,
     source: 'gateway',
     gatewayApprovalId: entry.id,
-    agentName: entry.agentName ?? entry.sessionKey ?? 'Gateway',
+    agentName: entry.agentName ?? entry.sessionKey ?? t('gateway.approvalsPage.gateway'),
     requestedAt: entry.requestedAt ?? Date.now(),
     toolName: toToolName(entry),
     commandPreview: preview,
@@ -96,7 +97,7 @@ function normalizeGatewayApproval(entry: GatewayApprovalEntry): UnifiedApproval 
 
 function normalizeAgentApproval(entry: ApprovalRequest): UnifiedApproval {
   const preview = entry.context?.trim() || entry.action
-  const toolName = entry.action.trim().split(/[\s:(]/)[0]?.slice(0, 32) || 'agent-action'
+  const toolName = entry.action.trim().split(/[\s:(]/)[0]?.slice(0, 32) || t('gateway.approvalsPage.agentAction')
   return {
     key: `agent:${entry.id}`,
     id: entry.id,
@@ -217,15 +218,15 @@ export function ApprovalsPage({ approvals, onApprove, onDeny }: ApprovalsPagePro
         <div className="rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-sm dark:border-neutral-800 dark:bg-[var(--theme-panel,#111520)]">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">Approvals</h2>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Live gateway queue with local approval history</p>
+              <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">{t('gateway.approvalsPage.title')}</h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">{t('gateway.approvalsPage.subtitle')}</p>
             </div>
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                {pendingRows.length} pending
+                {t('gateway.approvalsPage.pendingCount', { count: pendingRows.length })}
               </span>
               <span className="rounded-full border border-neutral-200 bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
-                Polling 2s
+                {t('gateway.approvalsPage.polling')}
               </span>
             </div>
           </div>
@@ -239,19 +240,19 @@ export function ApprovalsPage({ approvals, onApprove, onDeny }: ApprovalsPagePro
         <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
           <section className="min-h-0 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-[var(--theme-panel,#111520)]">
             <div className="border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Pending Queue</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{t('gateway.approvalsPage.pendingQueue')}</h3>
             </div>
 
             <div className="h-full max-h-full overflow-y-auto p-3 sm:p-4">
               {loading && pendingRows.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-500">Loading approvals...</p>
+                <p className="py-10 text-center text-sm text-neutral-500">{t('gateway.approvalsPage.loadingApprovals')}</p>
               ) : null}
 
               {!loading && pendingRows.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-14 text-center">
                   <span className="text-3xl">✅</span>
-                  <p className="mt-2 text-sm font-medium text-neutral-700 dark:text-neutral-200">No pending approvals</p>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Agents can continue without intervention</p>
+                  <p className="mt-2 text-sm font-medium text-neutral-700 dark:text-neutral-200">{t('gateway.approvalsPage.noPending')}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{t('gateway.approvalsPage.noPendingHint')}</p>
                 </div>
               ) : null}
 
@@ -279,7 +280,7 @@ export function ApprovalsPage({ approvals, onApprove, onDeny }: ApprovalsPagePro
                                 {row.toolName}
                               </span>
                               <span className={cn('rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase', riskBadgeClass(row.risk))}>
-                                {row.risk} risk
+                                {row.risk === 'low' ? t('gateway.approvalsPage.riskLow') : row.risk === 'medium' ? t('gateway.approvalsPage.riskMedium') : t('gateway.approvalsPage.riskHigh')}
                               </span>
                               <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                                 {row.source}
@@ -302,7 +303,7 @@ export function ApprovalsPage({ approvals, onApprove, onDeny }: ApprovalsPagePro
                               disabled={isBusy}
                               className="min-h-10 flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-initial"
                             >
-                              {resolvingAction === 'approve' ? 'Approving...' : 'Approve'}
+                              {resolvingAction === 'approve' ? t('gateway.approvalsPage.approving') : t('gateway.approvalsPage.approve')}
                             </button>
                             <button
                               type="button"
@@ -310,7 +311,7 @@ export function ApprovalsPage({ approvals, onApprove, onDeny }: ApprovalsPagePro
                               disabled={isBusy}
                               className="min-h-10 flex-1 rounded-lg border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-800/70 dark:bg-neutral-900 dark:text-red-400 dark:hover:bg-red-950/20 sm:flex-initial"
                             >
-                              {resolvingAction === 'deny' ? 'Denying...' : 'Deny'}
+                              {resolvingAction === 'deny' ? t('gateway.approvalsPage.denying') : t('gateway.approvalsPage.deny')}
                             </button>
                           </div>
                         </div>
@@ -324,13 +325,13 @@ export function ApprovalsPage({ approvals, onApprove, onDeny }: ApprovalsPagePro
 
           <section className="min-h-0 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-[var(--theme-panel,#111520)]">
             <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">History</h3>
-              <span className="text-[10px] text-neutral-400">From approvals store</span>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{t('gateway.approvalsPage.history')}</h3>
+              <span className="text-[10px] text-neutral-400">{t('gateway.approvalsPage.fromStore')}</span>
             </div>
 
             <div className="h-full max-h-full overflow-y-auto p-3 sm:p-4">
               {historyRows.length === 0 ? (
-                <p className="py-10 text-center text-xs text-neutral-500">No approvals resolved yet</p>
+                <p className="py-10 text-center text-xs text-neutral-500">{t('gateway.approvalsPage.noHistory')}</p>
               ) : (
                 <div className="space-y-2">
                   {historyRows.map((entry) => {

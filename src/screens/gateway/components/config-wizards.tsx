@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 import type { TeamMember, TeamTemplateId } from './team-panel'
 import { TEAM_TEMPLATES } from './team-panel'
 
@@ -349,7 +350,7 @@ export function AgentWizardModal({
   onClose,
 }: AgentWizardProps) {
   const isCustomPrompt = member.backstory.trim() !== '' && !systemPromptTemplates.some((t) => t.prompt === member.backstory)
-  const headerSubtitle = member.roleDescription?.trim() || 'Configure your agent'
+  const headerSubtitle = member.roleDescription?.trim() || t('gateway.wizard.configureAgent')
   const systemPromptRef = useRef<HTMLTextAreaElement>(null)
 
   // Auto-resize textarea whenever backstory changes (e.g. template selected)
@@ -367,7 +368,7 @@ export function AgentWizardModal({
         {/* Avatar slot (rendered by parent to avoid circular import) */}
         {avatarNode}
         <div className="min-w-0 flex-1">
-          <p className="text-lg font-bold text-neutral-900 dark:text-white">{member.name || `Agent ${memberIndex + 1}`}</p>
+          <p className="text-lg font-bold text-neutral-900 dark:text-white">{member.name || t('gateway.wizard.agentName', { index: memberIndex + 1 })}</p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">{headerSubtitle}</p>
         </div>
         <button type="button" onClick={onClose}
@@ -380,32 +381,32 @@ export function AgentWizardModal({
       <div className="px-6 py-5 space-y-4">
         {/* Row 1: NAME (full width, prominent) */}
         <div>
-          <FieldLabel>Name</FieldLabel>
+          <FieldLabel>{t('gateway.wizard.field.name')}</FieldLabel>
           <input
             value={member.name}
             onChange={(e) => onUpdate({ name: e.target.value })}
             className="h-10 w-full rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800 px-3 text-base font-semibold text-neutral-900 dark:text-white outline-none ring-accent-400 focus:ring-1 transition-colors"
-            placeholder={`Agent ${memberIndex + 1}`}
+            placeholder={t('gateway.wizard.agentName', { index: memberIndex + 1 })}
           />
         </div>
 
         {/* Row 2: MODEL (half) + ROLE (half) */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <FieldLabel>Model</FieldLabel>
+            <FieldLabel>{t('gateway.wizard.field.model')}</FieldLabel>
             <select value={member.modelId} onChange={(e) => onUpdate({ modelId: e.target.value })} className={SELECT_CLS}>
-              <optgroup label="Presets">
+              <optgroup label={t('gateway.team.optgroupPresets')}>
                 {modelPresets.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
               </optgroup>
               {gatewayModels.length > 0 ? (
-                <optgroup label="Available Models">
+                <optgroup label={t('gateway.wizard.field.availableModels')}>
                   {gatewayModels.map((m) => <option key={m.value} value={m.value}>{m.label} ({m.provider})</option>)}
                 </optgroup>
               ) : null}
             </select>
           </div>
           <div>
-            <FieldLabel>Role</FieldLabel>
+            <FieldLabel>{t('gateway.wizard.field.role')}</FieldLabel>
             <input value={member.roleDescription} onChange={(e) => onUpdate({ roleDescription: e.target.value })} className={INPUT_CLS} />
           </div>
         </div>
@@ -413,17 +414,17 @@ export function AgentWizardModal({
         {/* Row 3: Memory Path + Skill Allowlist */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <FieldLabel>Memory Path <span className="text-[9px] text-neutral-400 font-normal">(optional)</span></FieldLabel>
+            <FieldLabel>{t('gateway.wizard.field.memoryPath')} <span className="text-[9px] text-neutral-400 font-normal">{t('gateway.wizard.field.optional')}</span></FieldLabel>
             <input
               value={member.memoryPath ?? ''}
               onChange={(e) => onUpdate({ memoryPath: e.target.value || undefined } as Partial<typeof member>)}
               className={INPUT_CLS}
-              placeholder="e.g. ~/workspace/agent-memory"
+              placeholder={t('gateway.wizard.placeholder.memoryPath')}
             />
-            <p className="mt-0.5 text-[9px] text-neutral-400">Custom memory/workspace directory for this agent</p>
+            <p className="mt-0.5 text-[9px] text-neutral-400">{t('gateway.wizard.hint.memoryPath')}</p>
           </div>
           <div>
-            <FieldLabel>Skill Allowlist <span className="text-[9px] text-neutral-400 font-normal">(optional)</span></FieldLabel>
+            <FieldLabel>{t('gateway.wizard.field.skillAllowlist')} <span className="text-[9px] text-neutral-400 font-normal">{t('gateway.wizard.field.optional')}</span></FieldLabel>
             <input
               value={(member.skillAllowlist ?? []).join(', ')}
               onChange={(e) => {
@@ -431,26 +432,26 @@ export function AgentWizardModal({
                 onUpdate({ skillAllowlist: skills.length > 0 ? skills : undefined } as Partial<typeof member>)
               }}
               className={INPUT_CLS}
-              placeholder="web_search, exec, read, write"
+              placeholder={t('gateway.wizard.placeholder.skills')}
             />
-            <p className="mt-0.5 text-[9px] text-neutral-400">Comma-separated skill names. Empty = all skills allowed.</p>
+            <p className="mt-0.5 text-[9px] text-neutral-400">{t('gateway.wizard.hint.skills')}</p>
           </div>
         </div>
 
         {/* System Prompt */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <FieldLabel>System Prompt</FieldLabel>
+            <FieldLabel>{t('gateway.wizard.field.systemPrompt')}</FieldLabel>
             <div className="flex gap-1.5">
               <span className={cn('rounded-md border px-1.5 py-0.5 text-[9px] font-semibold',
                 isCustomPrompt ? 'border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-900/20 dark:text-violet-400'
                   : 'border-neutral-200 dark:border-neutral-700 text-neutral-400')}>
-                {isCustomPrompt ? '✏️ Custom' : 'Template'}
+                {isCustomPrompt ? t('gateway.wizard.custom') : t('gateway.wizard.template')}
               </span>
               {member.backstory.trim() ? (
                 <button type="button" onClick={() => onUpdate({ backstory: '' })}
                   className="rounded-md border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 text-[9px] text-neutral-400 hover:text-red-500 transition-colors">
-                  ✕ Clear
+                  {t('gateway.wizard.clear')}
                 </button>
               ) : null}
             </div>
@@ -459,7 +460,7 @@ export function AgentWizardModal({
           {/* Template chips by category — compact */}
           <div className="space-y-1.5">
             {(['engineering', 'research', 'content', 'ops', 'general'] as const).map((cat) => {
-              const catTemplates = systemPromptTemplates.filter((t) => t.category === cat)
+              const catTemplates = systemPromptTemplates.filter((tpl) => tpl.category === cat)
               const catLabels: Record<string, string> = { engineering: '⚙️', research: '🔬', content: '📝', ops: '🗺️', general: '🤖' }
               return (
                 <div key={cat} className="flex flex-wrap items-center gap-1">
@@ -489,7 +490,7 @@ export function AgentWizardModal({
             onChange={(e) => { onUpdate({ backstory: e.target.value }) }}
             className="mt-2 w-full resize-none rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800 px-3 py-2.5 text-xs text-neutral-900 dark:text-white outline-none ring-accent-400 focus:ring-1 font-mono leading-relaxed overflow-auto"
             style={{ minHeight: 100, maxHeight: 400 }}
-            placeholder="Persona, instructions, and context for this agent..."
+            placeholder={t('gateway.wizard.placeholder.systemPrompt')}
           />
         </div>
       </div>
@@ -507,14 +508,14 @@ export function AgentWizardModal({
           )}
         >
           {addMode ? null : <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3h8M5 3V2h2v1M4 3v7h4V3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-          {addMode ? 'Cancel' : 'Remove Agent'}
+          {addMode ? t('gateway.wizard.cancel') : t('gateway.wizard.removeAgent')}
         </button>
         <button
           type="button"
           onClick={onClose}
           className="rounded-lg bg-accent-500 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent-600 transition-colors"
         >
-          {addMode ? '+ Add Agent' : 'Save Changes'}
+          {addMode ? t('gateway.wizard.addAgent') : t('gateway.wizard.saveChanges')}
         </button>
       </div>
     </WizardModal>
@@ -640,7 +641,7 @@ export function TeamWizardModal({
             type="button"
             onClick={() => setShowIconPicker((v) => !v)}
             className="absolute -bottom-0.5 -right-0.5 flex size-5 items-center justify-center rounded-full border-2 border-white dark:border-neutral-900 bg-neutral-700 text-white shadow-md hover:bg-neutral-600 transition-colors"
-            title="Change icon"
+            title={t('gateway.wizard.aria.changeIcon')}
           >
             <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M7 1.5l1.5 1.5L3 8.5H1.5V7L7 1.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
@@ -654,15 +655,15 @@ export function TeamWizardModal({
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-lg font-bold text-neutral-900 dark:text-white">{name || 'Untitled Team'}</p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">{localMembers.length} agent{localMembers.length !== 1 ? 's' : ''}</p>
+          <p className="text-lg font-bold text-neutral-900 dark:text-white">{name || t('gateway.wizard.untitledTeam')}</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">{localMembers.length === 1 ? t('gateway.wizard.teamAgentsOne', { count: localMembers.length }) : t('gateway.wizard.teamAgentsMany', { count: localMembers.length })}</p>
         </div>
 
         {/* Star — active team toggle */}
         <button
           type="button"
           onClick={() => { if (!isActive) { onLoad(); onClose() } }}
-          title={isActive ? 'Active team' : 'Set as active team'}
+          title={isActive ? t('gateway.wizard.aria.activeTeam') : t('gateway.wizard.aria.setActiveTeam')}
           className={cn('text-2xl leading-none transition-colors mr-1', isActive ? 'text-accent-400 cursor-default' : 'text-neutral-300 hover:text-accent-400 cursor-pointer')}
         >
           {isActive ? '⭐' : '☆'}
@@ -677,27 +678,27 @@ export function TeamWizardModal({
       <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
         {/* Team name */}
         <div>
-          <FieldLabel>Team Name</FieldLabel>
+          <FieldLabel>{t('gateway.wizard.field.teamName')}</FieldLabel>
           <input value={name} onChange={(e) => setName(e.target.value)} className={INPUT_CLS} />
         </div>
 
         {/* Specialty */}
         <div>
-          <FieldLabel>Specialty</FieldLabel>
+          <FieldLabel>{t('gateway.wizard.field.specialty')}</FieldLabel>
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What is this team best at? e.g. Deep research & analysis"
+            placeholder={t('gateway.wizard.placeholder.specialty')}
             className={INPUT_CLS}
           />
         </div>
 
         {/* Section A: current team members */}
         <div>
-          <FieldLabel>TEAM ({localMembers.length} agent{localMembers.length !== 1 ? 's' : ''})</FieldLabel>
+          <FieldLabel>{t('gateway.wizard.field.team', { count: localMembers.length, s: localMembers.length !== 1 ? 's' : '' })}</FieldLabel>
           <div className="space-y-1.5">
             {localMembers.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-neutral-200 dark:border-neutral-700 py-3 text-center text-xs text-neutral-400">No agents yet — add some below</p>
+              <p className="rounded-lg border border-dashed border-neutral-200 dark:border-neutral-700 py-3 text-center text-xs text-neutral-400">{t('gateway.wizard.noAgentsInTeam')}</p>
             ) : localMembers.map((member) => (
               <div key={member.id} className="flex items-center gap-2.5 rounded-lg border border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5">
                 <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-900/30 text-[11px] font-bold text-accent-600 dark:text-accent-400">
@@ -705,14 +706,14 @@ export function TeamWizardModal({
                 </div>
                 <p className="min-w-0 flex-1 text-xs font-semibold text-neutral-900 dark:text-white truncate">{member.name}</p>
                 <button type="button" onClick={() => removeAgent(member.id)}
-                  className="flex size-6 items-center justify-center rounded-full text-neutral-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors" title="Remove from team">
+                  className="flex size-6 items-center justify-center rounded-full text-neutral-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors" title={t('gateway.wizard.aria.removeFromTeam')}>
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
                 </button>
               </div>
             ))}
           </div>
           {notInTeam.length > 0 && localMembers.length > 0 ? (
-            <p className="mt-1 text-center text-[9px] text-neutral-400">↓ scroll to add more agents</p>
+            <p className="mt-1 text-center text-[9px] text-neutral-400">{t('gateway.wizard.scrollToAdd')}</p>
           ) : null}
         </div>
 
@@ -721,7 +722,7 @@ export function TeamWizardModal({
           <div>
             <div className="flex items-center gap-2 my-1">
               <div className="flex-1 h-px bg-neutral-100 dark:bg-neutral-800" />
-              <span className="text-[9px] font-semibold uppercase tracking-widest text-neutral-400">Add Agents</span>
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-neutral-400">{t('gateway.wizard.addAgents')}</span>
               <div className="flex-1 h-px bg-neutral-100 dark:bg-neutral-800" />
             </div>
             <div className="space-y-1.5">
@@ -735,7 +736,7 @@ export function TeamWizardModal({
                     {agent.role ? <p className="text-[10px] text-neutral-400 truncate">{agent.role}</p> : null}
                   </div>
                   <button type="button" onClick={() => addAgent(agent.id)}
-                    className="flex size-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors" title="Add to team">
+                    className="flex size-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors" title={t('gateway.wizard.aria.addToTeam')}>
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
                   </button>
                 </div>
@@ -752,14 +753,14 @@ export function TeamWizardModal({
           className="flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-800/50 px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3h8M5 3V2h2v1M4 3v7h4V3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          Delete Team
+          {t('gateway.wizard.deleteTeam')}
         </button>
         <button
           type="button"
           onClick={handleSave}
           className="rounded-lg bg-accent-500 px-5 py-2 text-sm font-semibold text-white hover:bg-accent-600 transition-colors"
         >
-          ✓ Save
+          {t('gateway.wizard.save')}
         </button>
       </div>
     </WizardModal>
@@ -837,7 +838,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
   }
 
   function handleCreate() {
-    const name = teamName.trim() || `Custom Team ${new Date().toLocaleDateString()}`
+    const name = teamName.trim() || t('gateway.wizard.customTeamName', { date: new Date().toLocaleDateString(getLocale()) })
     const agentIds = currentTeam.filter((m) => selectedAgents.has(m.id)).map((m) => m.id)
     if (selectedTemplate) {
       const tpl = quickStartTemplates.find((t) => t.id === selectedTemplate)
@@ -852,9 +853,9 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
   const canCreate = selectedAgents.size > 0
 
   const stepLabel =
-    step === 1 ? 'Step 1 of 3' :
-    step === 2 ? 'Step 2 of 3' :
-                 'Step 3 of 3'
+    step === 1 ? t('gateway.wizard.stepLabel', { current: 1, total: 3 }) :
+    step === 2 ? t('gateway.wizard.stepLabel', { current: 2, total: 3 }) :
+                 t('gateway.wizard.stepLabel', { current: 3, total: 3 })
 
   return (
     <WizardModal open onClose={onClose} width="max-w-lg">
@@ -864,7 +865,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
           {teamIcon}
         </div>
         <div className="flex-1">
-          <p className="text-base font-bold text-neutral-900 dark:text-white">New Team</p>
+          <p className="text-base font-bold text-neutral-900 dark:text-white">{t('gateway.wizard.newTeam')}</p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">{stepLabel}</p>
         </div>
         {/* Step dots */}
@@ -883,16 +884,16 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
       {step === 1 ? (
         <>
           <div className="px-6 py-8">
-            <p className="mb-5 text-xl font-bold text-neutral-900 dark:text-white">Name your team</p>
+            <p className="mb-5 text-xl font-bold text-neutral-900 dark:text-white">{t('gateway.wizard.nameYourTeam')}</p>
             <input
               ref={nameInputRef}
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && teamName.trim() && !e.nativeEvent.isComposing) setStep(2) }}
-              placeholder="e.g. Research Squad, Dev Team..."
+              placeholder={t('gateway.wizard.placeholder.teamName')}
               className="h-11 w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 text-sm text-neutral-900 dark:text-white outline-none ring-accent-400 focus:ring-2 transition-colors"
             />
-            <p className="mt-2 text-xs text-neutral-400 dark:text-neutral-500">You can change this later</p>
+            <p className="mt-2 text-xs text-neutral-400 dark:text-neutral-500">{t('gateway.wizard.youCanChangeLater')}</p>
           </div>
           <div className="flex justify-end border-t border-neutral-100 dark:border-neutral-800 px-6 py-4">
             <button
@@ -901,7 +902,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
               disabled={!teamName.trim()}
               className="rounded-lg bg-accent-500 px-5 py-2 text-sm font-semibold text-white hover:bg-accent-600 disabled:opacity-40 transition-colors"
             >
-              Next →
+              {t('gateway.wizard.next')}
             </button>
           </div>
         </>
@@ -911,7 +912,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
       {step === 2 ? (
         <>
           <div className="px-6 py-6">
-            <p className="mb-4 text-xl font-bold text-neutral-900 dark:text-white">Choose a picture</p>
+            <p className="mb-4 text-xl font-bold text-neutral-900 dark:text-white">{t('gateway.wizard.choosePicture')}</p>
             <div className="grid grid-cols-6 gap-2">
               {INLINE_TEAM_ICONS.map((ic) => (
                 <button
@@ -936,14 +937,14 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
               onClick={() => setStep(1)}
               className="rounded-lg border border-neutral-200 dark:border-neutral-700 px-4 py-2 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
             >
-              ← Back
+              {t('gateway.wizard.back')}
             </button>
             <button
               type="button"
               onClick={() => setStep(3)}
               className="rounded-lg bg-accent-500 px-5 py-2 text-sm font-semibold text-white hover:bg-accent-600 transition-colors"
             >
-              Next →
+              {t('gateway.wizard.next')}
             </button>
           </div>
         </>
@@ -955,7 +956,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
           <div className="px-6 py-5 max-h-[65vh] overflow-y-auto space-y-4">
             {/* Templates section */}
             <div>
-              <p className="mb-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Start from a template</p>
+              <p className="mb-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">{t('gateway.wizard.startFromTemplate')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {quickStartTemplates.map((tpl) => (
                   <button
@@ -988,21 +989,21 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 border-t border-neutral-200 dark:border-neutral-700" />
-              <span className="text-[10px] text-neutral-400 dark:text-neutral-500 whitespace-nowrap">— or configure from scratch —</span>
+              <span className="text-[10px] text-neutral-400 dark:text-neutral-500 whitespace-nowrap">{t('gateway.wizard.orFromScratch')}</span>
               <div className="flex-1 border-t border-neutral-200 dark:border-neutral-700" />
             </div>
 
             {/* Agent checklist */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <FieldLabel>Agents to Include</FieldLabel>
+                <FieldLabel>{t('gateway.wizard.field.agentsToInclude')}</FieldLabel>
                 <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400">
-                  {selectedAgents.size} of {currentTeam.length} selected
+                  {t('gateway.wizard.selectedCount', { count: selectedAgents.size, total: currentTeam.length })}
                 </span>
               </div>
               <div className="space-y-1.5">
                 {currentTeam.length === 0 ? (
-                  <p className="text-center text-xs text-neutral-400 py-3">No agents configured yet</p>
+                  <p className="text-center text-xs text-neutral-400 py-3">{t('gateway.wizard.noAgentsConfigured')}</p>
                 ) : currentTeam.map((m) => {
                   const checked = selectedAgents.has(m.id)
                   const modelParts = m.modelId.split('/')
@@ -1036,7 +1037,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
                   )
                 })}
                 {selectedAgents.size === 0 ? (
-                  <p className="text-[10px] text-red-500 text-center pt-1">Select at least one agent</p>
+                  <p className="text-[10px] text-red-500 text-center pt-1">{t('gateway.wizard.selectAtLeastOne')}</p>
                 ) : null}
               </div>
             </div>
@@ -1048,7 +1049,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
               onClick={() => setStep(2)}
               className="rounded-lg border border-neutral-200 dark:border-neutral-700 px-4 py-2 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
             >
-              ← Back
+              {t('gateway.wizard.back')}
             </button>
             <button
               type="button"
@@ -1056,7 +1057,7 @@ export function AddTeamModal({ currentTeam, quickStartTemplates, existingIcons =
               disabled={!canCreate}
               className="rounded-lg bg-accent-500 px-5 py-2 text-sm font-semibold text-white hover:bg-accent-600 disabled:opacity-50 transition-colors"
             >
-              Create Team
+              {t('gateway.wizard.createTeam')}
             </button>
           </div>
         </>
@@ -1095,7 +1096,7 @@ export function ProviderEditModal({ provider, currentModels, availableModels, on
             <div className="mt-1 flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
               <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                {currentModels.length} model{currentModels.length !== 1 ? 's' : ''} active
+                {currentModels.length === 1 ? t('gateway.wizard.modelsActive', { count: currentModels.length, s: '' }) : t('gateway.wizard.modelsActive', { count: currentModels.length, s: 's' })}
               </span>
             </div>
           ) : null}
@@ -1110,7 +1111,7 @@ export function ProviderEditModal({ provider, currentModels, availableModels, on
         {/* Current models list */}
         {currentModels.length > 0 ? (
           <div>
-            <FieldLabel>Available Models</FieldLabel>
+            <FieldLabel>{t('gateway.wizard.field.availableModels')}</FieldLabel>
             <div className="rounded-lg border border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50 p-2 max-h-36 overflow-y-auto">
               {currentModels.map((m) => (
                 <div key={m.value} className="flex items-center gap-2 px-1 py-1">
@@ -1131,13 +1132,13 @@ export function ProviderEditModal({ provider, currentModels, availableModels, on
           return (
             <div>
               <FieldLabel>
-                Default Model{' '}
+                {t('gateway.wizard.field.defaultModel')}{' '}
                 {availableModels.length === 0 ? (
-                  <span className="font-normal normal-case text-neutral-300 dark:text-neutral-600">— common models</span>
+                  <span className="font-normal normal-case text-neutral-300 dark:text-neutral-600">{t('gateway.wizard.commonModels')}</span>
                 ) : null}
               </FieldLabel>
               <select value={defaultModel} onChange={(e) => setDefaultModel(e.target.value)} className={SELECT_CLS}>
-                <option value="">Use gateway default</option>
+                <option value="">{t('gateway.wizard.useGatewayDefault')}</option>
                 {combined.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
             </div>
@@ -1147,14 +1148,14 @@ export function ProviderEditModal({ provider, currentModels, availableModels, on
         {/* API key update */}
         <div>
           <FieldLabel>
-            Update API Key{' '}
-            <span className="font-normal normal-case text-neutral-300 dark:text-neutral-600">— leave blank to keep current</span>
+            {t('gateway.wizard.field.updateApiKey')}{' '}
+            <span className="font-normal normal-case text-neutral-300 dark:text-neutral-600">{t('gateway.wizard.leaveBlankToKeep')}</span>
           </FieldLabel>
           <input
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="New API key…"
+            placeholder={t('gateway.wizard.placeholder.apiKey')}
             className={cn(INPUT_CLS, 'font-mono')}
           />
         </div>
@@ -1168,21 +1169,21 @@ export function ProviderEditModal({ provider, currentModels, availableModels, on
               onClick={() => void onDelete()}
               className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 transition-colors"
             >
-              Remove Provider
+              {t('gateway.wizard.removeProvider')}
             </button>
           ) : null}
         </div>
         <div className="flex gap-2">
           <button type="button" onClick={onClose}
             className="rounded-lg border border-neutral-200 dark:border-neutral-700 px-4 py-2 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-            Cancel
+            {t('gateway.wizard.cancel')}
           </button>
           <button
             type="button"
             onClick={() => { onSave(apiKey, defaultModel); onClose() }}
             className="rounded-lg bg-accent-500 px-5 py-2 text-sm font-semibold text-white hover:bg-accent-600 transition-colors"
           >
-            Update Provider
+            {t('gateway.wizard.updateProvider')}
           </button>
         </div>
       </div>

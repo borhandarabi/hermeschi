@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { AgentWorkingRow, AgentWorkingStatus } from './agents-working-panel'
 import type { ModelPresetId } from './team-panel'
 import { AGENT_ACCENT_COLORS, AgentAvatar } from './agent-avatar'
@@ -67,7 +68,7 @@ export function getOfficeModelBadge(modelId: string): string {
 }
 
 export function getOfficeModelLabel(modelId: string): string {
-  if (!modelId) return 'Unknown'
+  if (!modelId) return t('gateway.office.modelUnknown')
   return OFFICE_MODEL_LABEL[modelId as ModelPresetId] ?? modelId.split('/')[1] ?? modelId
 }
 
@@ -78,13 +79,13 @@ export function getAgentStatusMeta(status: AgentWorkingStatus): {
   pulse?: boolean
 } {
   switch (status) {
-    case 'active': return { label: 'Active', className: 'text-emerald-600', dotClassName: 'bg-emerald-500', pulse: true }
+    case 'active': return { label: t('gateway.office.statusActive'), className: 'text-emerald-600', dotClassName: 'bg-emerald-500', pulse: true }
     case 'ready':
-    case 'idle': return { label: 'Idle', className: 'text-neutral-600', dotClassName: 'bg-neutral-400' }
-    case 'error': return { label: 'Error', className: 'text-red-600', dotClassName: 'bg-red-500' }
-    case 'none': return { label: 'Offline', className: 'text-neutral-400', dotClassName: 'bg-neutral-400' }
-    case 'spawning': return { label: 'Starting', className: 'text-blue-600', dotClassName: 'bg-blue-500', pulse: true }
-    case 'paused': return { label: 'Paused', className: 'text-amber-700', dotClassName: 'bg-amber-500' }
+    case 'idle': return { label: t('gateway.office.statusIdle'), className: 'text-neutral-600', dotClassName: 'bg-neutral-400' }
+    case 'error': return { label: t('gateway.office.statusError'), className: 'text-red-600', dotClassName: 'bg-red-500' }
+    case 'none': return { label: t('gateway.office.statusOffline'), className: 'text-neutral-400', dotClassName: 'bg-neutral-400' }
+    case 'spawning': return { label: t('gateway.office.statusStarting'), className: 'text-blue-600', dotClassName: 'bg-blue-500', pulse: true }
+    case 'paused': return { label: t('gateway.office.statusPaused'), className: 'text-amber-700', dotClassName: 'bg-amber-500' }
     default: return { label: String(status), className: 'text-neutral-600', dotClassName: 'bg-neutral-400' }
   }
 }
@@ -147,9 +148,9 @@ const SOCIAL_SPOTS_BY_TEMPLATE: Record<OfficeLayoutTemplate, SocialSpot[]> = {
 }
 
 const LAYOUT_TEMPLATE_OPTIONS: Array<{ key: OfficeLayoutTemplate; label: string }> = [
-  { key: 'grid', label: '⊞ Grid' },
-  { key: 'roundtable', label: '○ Roundtable' },
-  { key: 'warroom', label: '▬▬ War Room' },
+  { key: 'grid', label: t('gateway.office.layout.grid') },
+  { key: 'roundtable', label: t('gateway.office.layout.roundtable') },
+  { key: 'warroom', label: t('gateway.office.layout.warroom') },
 ]
 
 function truncateSpeech(text: string, max = 64): string {
@@ -160,12 +161,19 @@ function truncateSpeech(text: string, max = 64): string {
 
 function getSpeechLine(agent: AgentWorkingRow, phase: number): string {
   if (agent.status === 'active' && agent.lastLine) return truncateSpeech(agent.lastLine, 60)
-  if (agent.currentTask) return `Working on ${truncateSpeech(agent.currentTask, 48)}`
-  if (agent.status === 'spawning') return 'Booting up...'
-  if (agent.status === 'paused') return 'On break ☕'
-  if (agent.status === 'error') return 'Need help!'
+  if (agent.currentTask) return t('gateway.office.socialLine.workingOn', { task: truncateSpeech(agent.currentTask, 48) })
+  if (agent.status === 'spawning') return t('gateway.office.socialLine.bootingUp')
+  if (agent.status === 'paused') return t('gateway.office.socialLine.onBreak')
+  if (agent.status === 'error') return t('gateway.office.socialLine.needHelp')
   // Idle agents cycle through social activities
-  const socialLines = ['Grabbing coffee ☕', 'Checking messages 📱', 'Stretching 🙆', 'Chatting with team 💬', 'Reading docs 📖', 'Getting water 💧']
+  const socialLines = [
+    t('gateway.office.socialLine.coffee'),
+    t('gateway.office.socialLine.messages'),
+    t('gateway.office.socialLine.stretching'),
+    t('gateway.office.socialLine.chatting'),
+    t('gateway.office.socialLine.reading'),
+    t('gateway.office.socialLine.water'),
+  ]
   if (agent.status === 'idle' || agent.status === 'ready') {
     return socialLines[Math.floor(phase / 4) % socialLines.length]
   }
@@ -222,7 +230,7 @@ function truncateMonitorText(text: string, max = 30): string {
 function getDeskMonitorText(agent: AgentWorkingRow, agentTaskTitle?: string): string {
   const taskTitle = agentTaskTitle?.trim()
   if (taskTitle) return truncateMonitorText(taskTitle, 30)
-  if (agent.status === 'idle' || agent.status === 'ready') return 'Ready'
+  if (agent.status === 'idle' || agent.status === 'ready') return t('gateway.office.deskReady')
   return getAgentStatusMeta(agent.status).label
 }
 
@@ -297,7 +305,7 @@ function CoffeeMachineSVG({ x, y }: { x: number; y: number }) {
       <circle cx="0" cy="-14" r="6" fill="#dc2626" opacity="0.8" />
       <text x="0" y="-11" fontSize="6" fill="white" textAnchor="middle">☕</text>
       <rect x="-16" y="20" width="32" height="6" rx="2" fill="#a8a29e" />
-      <text x="0" y="38" fontSize="8" fill="#78716c" textAnchor="middle">Coffee</text>
+      <text x="0" y="38" fontSize="8" fill="#78716c" textAnchor="middle">{t('gateway.office.furniture.coffee')}</text>
     </g>
   )
 }
@@ -309,7 +317,7 @@ function WaterCoolerSVG({ x, y }: { x: number; y: number }) {
       <circle cx="0" cy="-26" r="10" fill="#bfdbfe" stroke="#93c5fd" strokeWidth="1.5" />
       <circle cx="-5" cy="0" r="2" fill="#0ea5e9" />
       <circle cx="5" cy="0" r="2" fill="#ef4444" />
-      <text x="0" y="32" fontSize="8" fill="#64748b" textAnchor="middle">Water</text>
+      <text x="0" y="32" fontSize="8" fill="#64748b" textAnchor="middle">{t('gateway.office.furniture.water')}</text>
     </g>
   )
 }
@@ -319,7 +327,7 @@ function SnackBarSVG({ x, y }: { x: number; y: number }) {
     <g transform={`translate(${x} ${y})`}>
       <rect x="-24" y="-16" width="48" height="28" rx="4" fill="#fef3c7" stroke="#fbbf24" strokeWidth="1" />
       <text x="0" y="2" fontSize="14" textAnchor="middle">🍪</text>
-      <text x="0" y="24" fontSize="8" fill="#92400e" textAnchor="middle">Snacks</text>
+      <text x="0" y="24" fontSize="8" fill="#92400e" textAnchor="middle">{t('gateway.office.furniture.snacks')}</text>
     </g>
   )
 }
@@ -349,9 +357,9 @@ function formatRuntime(startedAt: number, tokenCount?: number): string {
 }
 
 function kindLabel(kind: string): string {
-  if (kind === 'subagent' || kind === 'sub-agent') return 'Sub-Agent'
-  if (kind === 'main') return 'Main'
-  if (kind === 'chat') return 'Chat'
+  if (kind === 'subagent' || kind === 'sub-agent') return t('gateway.office.kind.subAgent')
+  if (kind === 'main') return t('gateway.office.kind.main')
+  if (kind === 'chat') return t('gateway.office.kind.chat')
   return kind.charAt(0).toUpperCase() + kind.slice(1)
 }
 
@@ -445,10 +453,10 @@ export function OfficeView({
   const deskPositions = DESK_POSITIONS_BY_TEMPLATE[layoutTemplate]
   const socialSpots = SOCIAL_SPOTS_BY_TEMPLATE[layoutTemplate]
   const socialLabelPosition = layoutTemplate === 'roundtable'
-    ? { x: 450, y: 108, text: 'Collaboration Ring' }
+    ? { x: 450, y: 108, text: t('gateway.office.collabRing') }
     : layoutTemplate === 'warroom'
-      ? { x: 480, y: 112, text: 'Briefing Lounge' }
-      : { x: 840, y: 110, text: 'Break Area' }
+      ? { x: 480, y: 112, text: t('gateway.office.briefingLounge') }
+      : { x: 840, y: 110, text: t('gateway.office.breakArea') }
 
   const changeLayout = (nextTemplate: OfficeLayoutTemplate) => {
     setLayoutTemplate(nextTemplate)
@@ -489,8 +497,8 @@ export function OfficeView({
       <div className={cn('flex items-center justify-center p-8', compact ? 'h-full' : 'min-h-[320px]')}>
         <div className="text-center">
           <p className="mb-3 text-4xl">🏢</p>
-          <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Empty office</p>
-          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Add agents in Configure to fill the office.</p>
+          <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">{t('gateway.office.empty')}</p>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{t('gateway.office.emptyHint')}</p>
         </div>
       </div>
     )
@@ -555,11 +563,11 @@ export function OfficeView({
       {/* Header bar */}
       {hideHeader ? null : <div className="flex shrink-0 flex-wrap items-start justify-between gap-2 border-b border-neutral-200 bg-white/80 px-5 py-3 backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="text-base font-bold text-neutral-900 dark:text-white">ClawSuite Office</span>
+          <span className="text-base font-bold text-neutral-900 dark:text-white">{t('gateway.office.title')}</span>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-[10px] font-medium text-neutral-600 dark:text-neutral-400 tabular-nums">{agentRows.length} agents</span>
-            <span className="rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400 tabular-nums">{activeCount} working</span>
-            <span className="rounded-full bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400 tabular-nums">{sessionCount} sessions</span>
+            <span className="rounded-full bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-[10px] font-medium text-neutral-600 dark:text-neutral-400 tabular-nums">{t('gateway.office.agentsCount', { count: agentRows.length })}</span>
+            <span className="rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400 tabular-nums">{t('gateway.office.workingCount', { count: activeCount })}</span>
+            <span className="rounded-full bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400 tabular-nums">{t('gateway.office.sessionsCount', { count: sessionCount })}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -569,7 +577,7 @@ export function OfficeView({
                 <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
                 <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
               </span>
-              Mission Live
+              {t('gateway.office.missionLive')}
             </span>
           ) : null}
           <button
@@ -577,7 +585,7 @@ export function OfficeView({
             onClick={() => onNewMission?.()}
             className="min-h-11 rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-600 sm:px-4 sm:py-2 sm:text-sm"
           >
-            + New Mission
+            {t('gateway.office.newMission')}
           </button>
         </div>
       </div>}
@@ -621,7 +629,7 @@ export function OfficeView({
             type="button"
             onClick={() => setLayoutPickerOpen((v) => !v)}
             className="inline-flex min-h-11 items-center rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 transition-colors hover:bg-neutral-50 dark:border-slate-700 dark:bg-slate-800 dark:text-neutral-300 dark:hover:bg-slate-700 sm:px-4 sm:py-2 sm:text-sm"
-            title="Change office layout"
+            title={t('gateway.office.aria.changeLayout')}
           >
             <span>✏️</span>
           </button>
@@ -797,7 +805,7 @@ export function OfficeView({
                 transform: movementTransform,
                 transition: 'left 0.8s ease-in-out, top 0.8s ease-in-out',
               }}
-              title={`${agent.name} · ${statusMeta.label}`}
+              title={t('gateway.office.agentTitle', { name: agent.name, status: statusMeta.label })}
             >
               {/* Speech bubble */}
               {showSpeech ? (
@@ -847,11 +855,11 @@ export function OfficeView({
                   <span className="size-1 animate-pulse rounded-full bg-emerald-500" />
                   <span className="size-1 animate-pulse rounded-full bg-emerald-500 [animation-delay:120ms]" />
                   <span className="size-1 animate-pulse rounded-full bg-emerald-500 [animation-delay:240ms]" />
-                  <span className="ml-0.5">Working</span>
+                  <span className="ml-0.5">{t('gateway.office.working')}</span>
                 </span>
               ) : isIdle && !pos.atDesk && !compact ? (
                 <span className="mt-1 rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
-                  On break
+                  {t('gateway.office.onBreak')}
                 </span>
               ) : null}
 
@@ -873,9 +881,9 @@ export function OfficeView({
             className="mb-2 flex w-full items-center justify-between px-1 text-left"
           >
             <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
-              Remote Sessions
+              {t('gateway.office.remoteSessions')}
             </p>
-            <span className="text-[10px] text-neutral-400">{remoteCollapsed ? 'Show' : 'Hide'}</span>
+            <span className="text-[10px] text-neutral-400">{remoteCollapsed ? t('gateway.office.show') : t('gateway.office.hide')}</span>
           </button>
           {!remoteCollapsed ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -894,12 +902,12 @@ export function OfficeView({
       {/* Footer — hidden in compact mode */}
       {!compact ? (
         <div className="hidden items-center justify-between border-t border-neutral-200 bg-white/80 px-4 py-2 text-xs text-neutral-500 backdrop-blur dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400 md:flex">
-          <span>{agentRows.length}/{deskPositions.length} desks occupied</span>
+          <span>{t('gateway.office.desksOccupied', { count: agentRows.length, total: deskPositions.length })}</span>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-500" /> Working</span>
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-neutral-400" /> Idle</span>
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-red-500" /> Error</span>
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-neutral-400" /> Empty</span>
+            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-emerald-500" /> {t('gateway.office.legend.working')}</span>
+            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-neutral-400" /> {t('gateway.office.legend.idle')}</span>
+            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-red-500" /> {t('gateway.office.legend.error')}</span>
+            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-neutral-400" /> {t('gateway.office.legend.empty')}</span>
           </div>
         </div>
       ) : null}

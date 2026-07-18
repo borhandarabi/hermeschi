@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 function formatRelativeTime(ts: number): string {
   const diffMs = Math.max(0, Date.now() - ts)
@@ -90,19 +91,19 @@ function getModelBadgeClass(modelId: string): string {
 }
 
 function getModelLabel(modelId: string): string {
-  if (!modelId) return 'Unknown'
+  if (!modelId) return t('gateway.agentsWorking.modelUnknown')
   return MODEL_LABEL[modelId] ?? (modelId.split('/')[1] || modelId)
 }
 
 const STATUS_TEXT: Record<AgentWorkingStatus, string> = {
-  active:            '● working',
-  spawning:          '◌ spawning...',
-  ready:             '○ ready',
-  idle:              '○ idle',
-  paused:            '⏸ paused',
-  error:             '✕ error',
-  none:              '— no session',
-  waiting_for_input: '⏳ waiting for input',
+  active:            t('gateway.agentsWorking.status.active'),
+  spawning:          t('gateway.agentsWorking.status.spawning'),
+  ready:             t('gateway.agentsWorking.status.ready'),
+  idle:              t('gateway.agentsWorking.status.idle'),
+  paused:            t('gateway.agentsWorking.status.paused'),
+  error:             t('gateway.agentsWorking.status.error'),
+  none:              t('gateway.agentsWorking.status.none'),
+  waiting_for_input: t('gateway.agentsWorking.status.waiting'),
 }
 
 function SpinnerIcon({ className }: { className?: string }) {
@@ -213,7 +214,7 @@ function AgentRow({
               type="button"
               onClick={(e) => { e.stopPropagation(); onRespawn() }}
               className="shrink-0 text-xs text-neutral-500 transition-colors hover:text-neutral-700"
-              title="Respawn agent"
+              title={t('gateway.agentsWorking.aria.respawn')}
             >
               ↻
             </button>
@@ -244,7 +245,7 @@ function AgentRow({
                           e.stopPropagation()
                           setMenuOpen(false)
                           const directive = window.prompt(
-                            `Send directive to ${agent.name}`,
+                            t('gateway.agentsWorking.sendDirectivePrompt', { name: agent.name }),
                             '',
                           )
                           if (!directive || !directive.trim()) return
@@ -252,7 +253,7 @@ function AgentRow({
                         }}
                         className="block w-full rounded-lg px-3 py-2 text-left text-[11px] font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
                       >
-                        Send directive
+                        {t('gateway.agentsWorking.sendDirective')}
                       </button>
                     ) : null}
                     {canSteer && onPause ? (
@@ -265,7 +266,7 @@ function AgentRow({
                         }}
                         className="block w-full rounded-lg px-3 py-2 text-left text-[11px] font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
                       >
-                        {agent.status === 'paused' ? 'Resume' : 'Pause'}
+                        {agent.status === 'paused' ? t('gateway.agentsWorking.resume') : t('gateway.agentsWorking.pause')}
                       </button>
                     ) : null}
                     <button
@@ -273,7 +274,7 @@ function AgentRow({
                       onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onKill() }}
                       className="block w-full rounded-lg px-3 py-2 text-left text-[11px] font-medium text-red-400 transition-colors hover:bg-red-950/20"
                     >
-                      Kill session
+                      {t('gateway.agentsWorking.killSession')}
                     </button>
                   </div>
                 </>
@@ -350,7 +351,7 @@ function AgentCompactCard({
         </span>
       </div>
       <p className="mt-1 truncate font-mono text-[9px] text-neutral-500">
-        {agent.lastLine ?? (isActive ? '● working' : STATUS_TEXT[agent.status])}
+        {agent.lastLine ?? (isActive ? t('gateway.agentsWorking.status.active') : STATUS_TEXT[agent.status])}
       </p>
       {agent.lastAt ? (
         <span className="mt-0.5 block text-[10px] text-neutral-500 dark:text-neutral-400">
@@ -388,26 +389,26 @@ export function AgentsWorkingPanel({
       <div className="flex items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
           <h3 className="text-[11px] font-bold uppercase tracking-wider text-neutral-500" style={{ fontVariant: 'small-caps' }}>
-            Agents Working
+            {t('gateway.agentsWorking.title')}
           </h3>
           {activeCount > 0 ? (
             <div className="flex items-center gap-1">
               <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
               <span className="font-mono text-[10px] font-medium text-emerald-600">
-                {activeCount} live
+                {t('gateway.agentsWorking.liveCount', { count: activeCount })}
               </span>
             </div>
           ) : null}
         </div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] text-neutral-500">
-            {agents.length} agent{agents.length !== 1 ? 's' : ''}
+            {agents.length === 1 ? t('gateway.agentsWorking.agentsOne', { count: agents.length }) : t('gateway.agentsWorking.agentsMany', { count: agents.length })}
           </span>
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
             className="rounded p-0.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
-            aria-label={collapsed ? 'Expand agents panel' : 'Collapse agents panel'}
+            aria-label={collapsed ? t('gateway.agentsWorking.aria.expand') : t('gateway.agentsWorking.aria.collapse')}
           >
             <svg
               viewBox="0 0 16 16"
@@ -427,7 +428,7 @@ export function AgentsWorkingPanel({
       {!collapsed ? (
         agents.length === 0 ? (
           <p className="px-3 pb-3 text-center font-mono text-[10px] text-neutral-500">
-            // no agents configured
+            {t('gateway.agentsWorking.empty')}
           </p>
         ) : (
           <>

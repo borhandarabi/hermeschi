@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 
 export type MissionReportEntry = {
   id: string
@@ -33,15 +34,15 @@ function dayKey(ts: number | string | undefined): string {
 function relativeDay(dateStr: string): string {
   const today = new Date().toISOString().slice(0, 10)
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
-  if (dateStr === today) return 'Today'
-  if (dateStr === yesterday) return 'Yesterday'
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  if (dateStr === today) return t('gateway.costAnalytics.today')
+  if (dateStr === yesterday) return t('gateway.costAnalytics.yesterday')
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString(getLocale(), { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
 type BarEntry = { label: string; value: number; pct: number }
 
 function CSSBarChart({ entries, unit = '', color = 'bg-accent-500' }: { entries: BarEntry[]; unit?: string; color?: string }) {
-  if (entries.length === 0) return <p className="text-xs text-neutral-400 italic">No data</p>
+  if (entries.length === 0) return <p className="text-xs text-neutral-400 italic">{t('gateway.costAnalytics.noData')}</p>
   return (
     <div className="space-y-1.5">
       {entries.map((e) => (
@@ -165,20 +166,20 @@ export function CostAnalyticsDashboard({ missionReports, compact = false }: Cost
   )
   const summaryCards = compact
     ? [
-        { label: 'Tot. Mis', value: String(stats.missionCount) },
-        { label: 'Tot. Tok', value: stats.totalTokens.toLocaleString() },
-        { label: 'Tot. Cost', value: `$${stats.totalCost.toFixed(4)}` },
-        { label: 'Avg/Mis', value: `$${stats.avgCost.toFixed(4)}` },
-        { label: 'Today', value: `$${stats.todayCost.toFixed(4)}`, detail: `${stats.todayTokens.toLocaleString()} tok` },
-        { label: '7d', value: `$${stats.weekCost.toFixed(4)}`, detail: `${stats.weekTokens.toLocaleString()} tok` },
+        { label: t('gateway.costAnalytics.totMis'), value: String(stats.missionCount) },
+        { label: t('gateway.costAnalytics.totTok'), value: stats.totalTokens.toLocaleString() },
+        { label: t('gateway.costAnalytics.totCost'), value: `$${stats.totalCost.toFixed(4)}` },
+        { label: t('gateway.costAnalytics.avgMis'), value: `$${stats.avgCost.toFixed(4)}` },
+        { label: t('gateway.costAnalytics.today'), value: `$${stats.todayCost.toFixed(4)}`, detail: t('gateway.costAnalytics.tokensUnit', { count: stats.todayTokens.toLocaleString() }) },
+        { label: t('gateway.costAnalytics.week7d'), value: `$${stats.weekCost.toFixed(4)}`, detail: t('gateway.costAnalytics.tokensUnit', { count: stats.weekTokens.toLocaleString() }) },
       ]
     : [
-        { label: 'Total Missions', value: String(stats.missionCount) },
-        { label: 'Total Tokens', value: stats.totalTokens.toLocaleString() },
-        { label: 'Total Cost', value: `$${stats.totalCost.toFixed(4)}` },
-        { label: 'Avg / Mission', value: `$${stats.avgCost.toFixed(4)}` },
-        { label: 'Today', value: `$${stats.todayCost.toFixed(4)}`, detail: `${stats.todayTokens.toLocaleString()} tok` },
-        { label: 'This Week', value: `$${stats.weekCost.toFixed(4)}`, detail: `${stats.weekTokens.toLocaleString()} tok` },
+        { label: t('gateway.costAnalytics.totalMissions'), value: String(stats.missionCount) },
+        { label: t('gateway.costAnalytics.totalTokens'), value: stats.totalTokens.toLocaleString() },
+        { label: t('gateway.costAnalytics.totalCost'), value: `$${stats.totalCost.toFixed(4)}` },
+        { label: t('gateway.costAnalytics.avgPerMission'), value: `$${stats.avgCost.toFixed(4)}` },
+        { label: t('gateway.costAnalytics.today'), value: `$${stats.todayCost.toFixed(4)}`, detail: t('gateway.costAnalytics.tokensUnit', { count: stats.todayTokens.toLocaleString() }) },
+        { label: t('gateway.costAnalytics.thisWeek'), value: `$${stats.weekCost.toFixed(4)}`, detail: t('gateway.costAnalytics.tokensUnit', { count: stats.weekTokens.toLocaleString() }) },
       ]
   const chartTitleClass = compact ? 'mb-2 text-xs font-semibold text-neutral-900 dark:text-white' : 'mb-3 text-sm font-semibold text-neutral-900 dark:text-white'
 
@@ -199,26 +200,26 @@ export function CostAnalyticsDashboard({ missionReports, compact = false }: Cost
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* By Agent */}
         <div className={CARD}>
-          <h3 className={chartTitleClass}>Cost by Agent</h3>
+          <h3 className={chartTitleClass}>{t('gateway.costAnalytics.costByAgent')}</h3>
           <CSSBarChart entries={stats.agentBars} unit="$" color="bg-violet-500" />
         </div>
 
         {/* By Model */}
         <div className={CARD}>
-          <h3 className={chartTitleClass}>Cost by Model</h3>
+          <h3 className={chartTitleClass}>{t('gateway.costAnalytics.costByModel')}</h3>
           <CSSBarChart entries={stats.modelBars} unit="$" color="bg-sky-500" />
         </div>
 
         {/* Daily Timeline */}
         <div className={CARD}>
-          <h3 className={chartTitleClass}>Daily Cost (7d)</h3>
+          <h3 className={chartTitleClass}>{t('gateway.costAnalytics.dailyCost7d')}</h3>
           <CSSBarChart entries={stats.dayBars} unit="$" color="bg-emerald-500" />
         </div>
       </div>
 
       {stats.missionCount === 0 && (
         <div className="flex items-center justify-center py-12 text-sm text-neutral-400">
-          No mission data yet. Complete some missions to see analytics.
+          {t('gateway.costAnalytics.noMissionData')}
         </div>
       )}
     </div>

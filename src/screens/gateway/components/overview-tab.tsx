@@ -3,6 +3,7 @@
 // To reduce agent-hub-layout.tsx size, the inline overview rendering could be
 // migrated to use this component instead.
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { AgentWorkingRow } from './agents-working-panel'
 import type { TeamMember } from './team-panel'
 import { AGENT_ACCENT_COLORS, AgentAvatar, resolveAgentAvatarIndex } from './agent-avatar'
@@ -68,14 +69,14 @@ export function OverviewTab({
           {missionActive ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-neutral-900">Mission Status</p>
+                <p className="text-xs font-semibold text-neutral-900">{t('gateway.overview.missionStatus')}</p>
                 <p className="mt-1 truncate text-sm text-neutral-700">
-                  {truncateMissionGoal(activeMissionGoal || missionGoal || 'Active mission')}
+                  {truncateMissionGoal(activeMissionGoal || missionGoal || t('gateway.overview.activeMission'))}
                 </p>
                 <p className="mt-1 text-[11px] text-neutral-500">
-                  {activeCount} active agent{activeCount === 1 ? '' : 's'}
+                  {activeCount === 1 ? t('gateway.overview.activeAgentsOne', { count: activeCount }) : t('gateway.overview.activeAgentsMany', { count: activeCount })}
                   {' · '}
-                  {totalTasks > 0 ? `${doneTasks}/${totalTasks} tasks done` : 'No tasks yet'}
+                  {totalTasks > 0 ? t('gateway.overview.tasksDone', { done: doneTasks, total: totalTasks }) : t('gateway.overview.noTasksYet')}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -84,23 +85,23 @@ export function OverviewTab({
                   onClick={onViewMission}
                   className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50"
                 >
-                  View Mission
+                  {t('gateway.overview.viewMission')}
                 </button>
                 <button
                   type="button"
                   onClick={onStopMission}
                   className="rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-600"
                 >
-                  Stop
+                  {t('gateway.overview.stop')}
                 </button>
               </div>
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold text-neutral-900">No active mission</p>
+                <p className="text-xs font-semibold text-neutral-900">{t('gateway.overview.noActiveMission')}</p>
                 <p className="mt-1 text-[11px] text-neutral-500">
-                  Configure your team and launch a mission when ready.
+                  {t('gateway.overview.configureLaunch')}
                 </p>
               </div>
               <button
@@ -108,7 +109,7 @@ export function OverviewTab({
                 onClick={onOpenLaunchWizard}
                 className="rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-600"
               >
-                Start Mission
+                {t('gateway.overview.startMission')}
               </button>
             </div>
           )}
@@ -116,10 +117,10 @@ export function OverviewTab({
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            { label: 'Agents', value: teamCount.toString(), sub: teamLabel },
-            { label: 'Active', value: activeCount.toString(), sub: missionActive ? 'Currently working' : 'Idle' },
-            { label: 'Tasks', value: totalTasks.toString(), sub: totalTasks > 0 ? `${doneTasks} done` : 'No tasks yet' },
-            { label: 'Approvals', value: pendingApprovalCount.toString(), sub: pendingApprovalCount > 0 ? 'Needs review' : 'All clear' },
+            { label: t('gateway.overview.stat.agents'), value: teamCount.toString(), sub: teamLabel },
+            { label: t('gateway.overview.stat.active'), value: activeCount.toString(), sub: missionActive ? t('gateway.overview.stat.currentlyWorking') : t('gateway.overview.stat.idle') },
+            { label: t('gateway.overview.stat.tasks'), value: totalTasks.toString(), sub: totalTasks > 0 ? t('gateway.overview.stat.done', { count: doneTasks }) : t('gateway.overview.noTasksYet') },
+            { label: t('gateway.overview.stat.approvals'), value: pendingApprovalCount.toString(), sub: pendingApprovalCount > 0 ? t('gateway.overview.stat.needsReview') : t('gateway.overview.stat.allClear') },
           ].map((stat) => (
             <div
               key={stat.label}
@@ -135,7 +136,7 @@ export function OverviewTab({
         <section className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-3">
-              <h2 className="text-sm font-semibold text-neutral-900">Agents</h2>
+              <h2 className="text-sm font-semibold text-neutral-900">{t('gateway.overview.agents')}</h2>
               {agentWorkingRows.length > 0 ? (
                 <div className="flex -space-x-2">
                   {agentWorkingRows.slice(0, 5).map((agent, index) => {
@@ -170,7 +171,7 @@ export function OverviewTab({
                             : 'text-neutral-500 hover:text-neutral-700',
                         )}
                       >
-                        {mode === 'cards' ? 'Cards' : 'Live'}
+                        {mode === 'cards' ? t('gateway.overview.cards') : t('gateway.overview.live')}
                       </button>
                     ))}
                   </div>
@@ -182,14 +183,14 @@ export function OverviewTab({
               onClick={onOpenConfigureAgents}
               className="text-xs font-medium text-accent-600 hover:text-accent-700"
             >
-              Configure
+              {t('gateway.overview.configure')}
             </button>
           </div>
           {agentWorkingRows.length === 0 ? (
             <div className="rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-6 text-center">
               <p className="text-2xl" aria-hidden>🤖</p>
-              <p className="mt-1 text-sm font-medium text-neutral-700">No agents configured yet</p>
-              <p className="mt-1 text-xs text-neutral-500">Open Configure to add your first agent.</p>
+              <p className="mt-1 text-sm font-medium text-neutral-700">{t('gateway.overview.noAgentsConfigured')}</p>
+              <p className="mt-1 text-xs text-neutral-500">{t('gateway.overview.openConfigureHint')}</p>
             </div>
           ) : overviewAgentsView === 'live' ? (
             <OfficeView
@@ -231,7 +232,7 @@ export function OverviewTab({
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-neutral-900">{agent.name}</p>
                           <p className="truncate text-[11px] text-neutral-500">
-                            {agent.roleDescription || 'No role description'}
+                            {agent.roleDescription || t('gateway.overview.noRoleDescription')}
                           </p>
                         </div>
                       </div>
@@ -254,7 +255,7 @@ export function OverviewTab({
                         <span className={cn('size-2 rounded-full', statusMeta.dotClassName)} />
                       )}
                       <span className={cn('font-medium', statusMeta.className)}>● {statusMeta.label}</span>
-                      {agent.taskCount > 0 ? <span>· {agent.taskCount} tasks</span> : null}
+                      {agent.taskCount > 0 ? <span>{t('gateway.overview.tasksCount', { count: agent.taskCount })}</span> : null}
                     </div>
                     {agent.lastLine ? (
                       <p className="mt-2 line-clamp-2 min-h-[2.2rem] font-mono text-[11px] text-neutral-500">
@@ -262,7 +263,7 @@ export function OverviewTab({
                       </p>
                     ) : (
                       <p className={cn('mt-2 min-h-[2.2rem] font-mono text-[11px]', statusMeta.className)}>
-                        {agent.status === 'none' ? '● Waiting for session' : `● ${statusMeta.label}`}
+                        {agent.status === 'none' ? t('gateway.overview.waitingForSession') : `● ${statusMeta.label}`}
                       </p>
                     )}
                     <div className="mt-auto flex gap-2 pt-3">
@@ -276,7 +277,7 @@ export function OverviewTab({
                             : 'border-accent-200 text-accent-600 hover:bg-accent-50',
                         )}
                       >
-                        Configure
+                        {t('gateway.overview.configure')}
                       </button>
                       <button
                         type="button"
@@ -288,7 +289,7 @@ export function OverviewTab({
                             : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50',
                         )}
                       >
-                        View Output
+                        {t('gateway.overview.viewOutput')}
                       </button>
                     </div>
                   </div>
@@ -299,9 +300,9 @@ export function OverviewTab({
         </section>
 
         <section className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-          <h2 className="text-sm font-semibold text-neutral-900">Recent Activity</h2>
+          <h2 className="text-sm font-semibold text-neutral-900">{t('gateway.overview.recentActivity')}</h2>
           {recentActivityItems.length === 0 ? (
-            <p className="mt-2 text-xs text-neutral-500">📝 No recent activity yet.</p>
+            <p className="mt-2 text-xs text-neutral-500">{t('gateway.overview.noRecentActivity')}</p>
           ) : (
             <ul className="mt-2 space-y-2">
               {recentActivityItems.map((item, index) => (
