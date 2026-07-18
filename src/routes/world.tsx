@@ -2,8 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
 import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 
-const HermesWorldLanding = GAME_BUILD_ENABLED
-  ? lazy(() => import('@/modules/hermesworld/screens/playground/hermes-world-landing').then((m) => ({ default: m.HermesWorldLanding })))
+const HermesChiWorldLanding = GAME_BUILD_ENABLED
+  ? lazy(() => import('@/modules/hermeschiworld/screens/playground/hermeschi-world-landing').then((m) => ({ default: m.HermesChiWorldLanding })))
   : null
 
 export const Route = createFileRoute('/world')({
@@ -17,7 +17,7 @@ function WorldRoute() {
   }
   return (
     <Suspense fallback={null}>
-      <HermesWorldLanding! />
+      <HermesChiWorldLanding />
     </Suspense>
   )
 }

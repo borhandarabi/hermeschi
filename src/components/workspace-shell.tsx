@@ -445,7 +445,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
             </div>
           </main>
 
-          {/* Chat panel — visible on non-chat routes (but not in HermesWorld, which has its own in-game chat) */}
+          {/* Chat panel — visible on non-chat routes (but not in HermesChiWorld, which has its own in-game chat) */}
           {!isOnChatRoute && !isChromeFreeSurface && !isMobile && (
             <Suspense fallback={null}>
               <ChatPanel />
@@ -453,7 +453,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
           )}
         </div>
 
-        {/* Floating chat toggle — visible on non-chat routes (but not in HermesWorld) */}
+        {/* Floating chat toggle — visible on non-chat routes (but not in HermesChiWorld) */}
         {!isChromeFreeSurface && !isOnChatRoute && !isMobile && <ChatPanelToggle />}
 
         {showDesktopSidebarBackdrop ? (

@@ -3,16 +3,16 @@ import { lazy, Suspense } from 'react'
 import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 import { t } from '@/lib/i18n'
 
-const HermesWorldLanding = GAME_BUILD_ENABLED
-  ? lazy(() => import('@/modules/hermesworld/screens/playground/hermes-world-landing').then((m) => ({ default: m.HermesWorldLanding })))
+const HermesChiWorldLanding = GAME_BUILD_ENABLED
+  ? lazy(() => import('@/modules/hermeschiworld/screens/playground/hermeschi-world-landing').then((m) => ({ default: m.HermesChiWorldLanding })))
   : null
 
 export const Route = createFileRoute('/hermes-world')({
   ssr: false,
-  component: HermesWorldRoute,
+  component: HermesChiWorldRoute,
 })
 
-function HermesWorldRoute() {
+function HermesChiWorldRoute() {
   if (!GAME_BUILD_ENABLED || !isGameRuntimeEnabled()) {
     return (
       <main className="flex h-full items-center justify-center p-8 text-center">
@@ -24,7 +24,7 @@ function HermesWorldRoute() {
   }
   return (
     <Suspense fallback={null}>
-      <HermesWorldLanding! />
+      <HermesChiWorldLanding />
     </Suspense>
   )
 }

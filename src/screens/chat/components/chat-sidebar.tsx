@@ -1051,7 +1051,7 @@ function ChatSidebarComponent({
         </div>
       )}
 
-      {/* ── HermesWorld featured link (only when game build is enabled) ── */}
+      {/* ── HermesChiWorld featured link (only when game build is enabled) ── */}
       {GAME_BUILD_ENABLED && isGameRuntimeEnabled() && !isVisuallyCollapsed && (
         <div className="px-2 pb-2">
           <Link
@@ -1063,7 +1063,7 @@ function ChatSidebarComponent({
               isPlaygroundActive &&
                 'bg-accent-500/10 text-accent-500 hover:bg-accent-50 dark:hover:bg-accent-900/300/15',
             )}
-            data-tour="hermesworld"
+            data-tour="hermeschiworld"
           >
             <HugeiconsIcon
               icon={Castle02Icon}
@@ -1072,7 +1072,7 @@ function ChatSidebarComponent({
               className="size-5 shrink-0"
               style={{ color: '#facc15' }}
             />
-            <span>{t('chat.sidebar.hermesWorld')}</span>
+            <span>{t('chat.sidebar.hermesChiWorld')}</span>
             <span
               className="ms-auto inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold leading-none"
               style={{

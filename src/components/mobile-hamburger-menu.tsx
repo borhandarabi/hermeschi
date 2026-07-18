@@ -54,7 +54,7 @@ export const MOBILE_HAMBURGER_NAV_ITEMS: Array<MobileHamburgerNavItem> = [
   },
   {
     id: 'playground',
-    labelKey: 'nav.hermesWorld',
+    labelKey: 'nav.hermesChiWorld',
     icon: Castle02Icon,
     to: '/playground',
     match: (p: string) => p.startsWith('/playground'),
