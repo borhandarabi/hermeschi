@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type AgendaViewProps = {
   activeMissions: Array<{
@@ -71,9 +72,9 @@ const PRIORITY_WEIGHT: Record<string, number> = {
 }
 
 function getGreeting(hour: number): string {
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
+  if (hour < 12) return t('gateway.agenda.greetingMorning')
+  if (hour < 18) return t('gateway.agenda.greetingAfternoon')
+  return t('gateway.agenda.greetingEvening')
 }
 
 function toLocalYmd(date: Date): string {
@@ -103,29 +104,29 @@ function getPriorityWeight(priority: string): number {
 }
 
 function formatDuration(ms: number): string {
-  if (ms <= 0) return '0m'
+  if (ms <= 0) return t('gateway.agenda.durationZero')
   const totalMinutes = Math.floor(ms / 60_000)
   const days = Math.floor(totalMinutes / (60 * 24))
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60)
   const minutes = totalMinutes % 60
 
-  if (days > 0) return `${days}d ${hours}h`
-  if (hours > 0) return `${hours}h ${minutes}m`
-  return `${minutes}m`
+  if (days > 0) return t('gateway.agenda.durationDaysHours', { days, hours })
+  if (hours > 0) return t('gateway.agenda.durationHoursMinutes', { hours, minutes })
+  return t('gateway.agenda.durationMinutes', { count: minutes })
 }
 
 function formatTimeAgo(timestamp: number, nowTs: number): string {
   const diff = nowTs - timestamp
-  if (diff < 45_000) return 'just now'
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`
-  return `${Math.floor(diff / 86_400_000)}d ago`
+  if (diff < 45_000) return t('gateway.agenda.justNow')
+  if (diff < 3_600_000) return t('gateway.agenda.minutesAgo', { count: Math.floor(diff / 60_000) })
+  if (diff < 86_400_000) return t('gateway.agenda.hoursAgo', { count: Math.floor(diff / 3_600_000) })
+  return t('gateway.agenda.daysAgo', { count: Math.floor(diff / 86_400_000) })
 }
 
 function formatCountdown(timestamp: number, nowTs: number): string {
   const diff = timestamp - nowTs
-  if (diff <= 0) return 'now'
-  return `in ${formatDuration(diff)}`
+  if (diff <= 0) return t('gateway.agenda.now')
+  return t('gateway.agenda.inDuration', { duration: formatDuration(diff) })
 }
 
 function formatStatus(status: string): string {
@@ -173,7 +174,7 @@ function SectionCard({
             {count}
           </span>
           <span className="text-xs text-primary-300" aria-hidden>
-            {open ? 'Hide' : 'Show'}
+            {open ? t('gateway.agenda.hide') : t('gateway.agenda.show')}
           </span>
         </div>
       </button>
@@ -284,18 +285,18 @@ export function AgendaView({
   return (
     <div className="space-y-3">
       <header className="rounded-xl border border-primary-800 bg-primary-900 p-4">
-        <p className="text-xs uppercase tracking-wide text-primary-400">Today overview</p>
+        <p className="text-xs uppercase tracking-wide text-primary-400">{t('gateway.agenda.todayOverview')}</p>
         <h2 className="mt-1 text-lg font-semibold text-primary-100">{greeting}</h2>
-        <p className="text-xs text-primary-300">Here is your daily briefing.</p>
+        <p className="text-xs text-primary-300">{t('gateway.agenda.dailyBriefing')}</p>
       </header>
 
       <SectionCard
         id="attention"
-        title="🔴 Needs Attention"
+        title={t('gateway.agenda.needsAttention')}
         count={needsAttention.length}
         open={openSections.attention}
         onToggle={toggleSection}
-        emptyText="No blockers right now."
+        emptyText={t('gateway.agenda.noBlockers')}
         tone="attention"
       >
         <ul className="space-y-2">
@@ -303,7 +304,7 @@ export function AgendaView({
             <li key={`${item.type}-${item.id}`} className="rounded-lg border border-primary-800 bg-primary-950/60 px-3 py-2">
               <p className="text-sm font-medium text-primary-100">{item.title}</p>
               <p className="mt-0.5 text-xs text-primary-300">
-                {item.type === 'mission' ? `Mission ${formatStatus(item.status)}` : 'Failed run'}
+                {item.type === 'mission' ? t('gateway.agenda.missionStatus', { status: formatStatus(item.status) }) : t('gateway.agenda.failedRun')}
                 {' · '}
                 {formatTimeAgo(item.at, nowTs)}
               </p>
@@ -314,20 +315,20 @@ export function AgendaView({
 
       <SectionCard
         id="active"
-        title="🟢 Active Now"
+        title={t('gateway.agenda.activeNow')}
         count={activeNow.length}
         open={openSections.active}
         onToggle={toggleSection}
-        emptyText="No active missions."
+        emptyText={t('gateway.agenda.noActiveMissions')}
       >
         <ul className="space-y-2">
           {activeNow.map((mission) => (
             <li key={mission.id} className="rounded-lg border border-primary-800 bg-primary-950/60 px-3 py-2">
               <p className="text-sm font-medium text-primary-100">{mission.title}</p>
               <p className="mt-0.5 text-xs text-primary-300">
-                {mission.agents} agent{mission.agents === 1 ? '' : 's'}
+                {mission.agents === 1 ? t('gateway.agenda.agentsOne', { count: mission.agents }) : t('gateway.agenda.agentsMany', { count: mission.agents })}
                 {' · '}
-                {formatDuration(nowTs - mission.startedAt)} elapsed
+                {formatDuration(nowTs - mission.startedAt)} {t('gateway.agenda.elapsed')}
               </p>
             </li>
           ))}
@@ -336,11 +337,11 @@ export function AgendaView({
 
       <SectionCard
         id="tasks"
-        title="📋 Tasks Due Today"
+        title={t('gateway.agenda.tasksDueToday')}
         count={tasksDueToday.length}
         open={openSections.tasks}
         onToggle={toggleSection}
-        emptyText="No tasks due today."
+        emptyText={t('gateway.agenda.noTasksDueToday')}
       >
         <ul className="space-y-2">
           {tasksDueToday.map((task) => (
@@ -359,11 +360,11 @@ export function AgendaView({
 
       <SectionCard
         id="upcoming"
-        title="⏰ Upcoming (24h)"
+        title={t('gateway.agenda.upcoming24h')}
         count={upcoming24h.length}
         open={openSections.upcoming}
         onToggle={toggleSection}
-        emptyText="No cron runs scheduled in the next 24 hours."
+        emptyText={t('gateway.agenda.noUpcoming')}
       >
         <ul className="space-y-2">
           {upcoming24h.map((cron) => (
@@ -381,11 +382,11 @@ export function AgendaView({
 
       <SectionCard
         id="completed"
-        title="✅ Recently Completed"
+        title={t('gateway.agenda.recentlyCompleted')}
         count={recentlyCompleted.length}
         open={openSections.completed}
         onToggle={toggleSection}
-        emptyText="No recent completions yet."
+        emptyText={t('gateway.agenda.noRecentCompletions')}
       >
         <ul className="space-y-2">
           {recentlyCompleted.map((completion) => (
@@ -411,11 +412,11 @@ export function AgendaView({
 
       <SectionCard
         id="agents"
-        title="🤖 Agent Status"
+        title={t('gateway.agenda.agentStatus')}
         count={agentStatuses.length}
         open={openSections.agents}
         onToggle={toggleSection}
-        emptyText="No agents available."
+        emptyText={t('gateway.agenda.noAgents')}
       >
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {agentStatuses.map((agent) => {

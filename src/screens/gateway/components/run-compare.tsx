@@ -1,3 +1,5 @@
+import { t } from '@/lib/i18n'
+
 type RunSnapshot = {
   id: string
   title: string
@@ -48,14 +50,14 @@ function percentChange(base: number, next: number): number {
 }
 
 function compareLowerIsBetter(base: number, next: number): DeltaResult {
-  if (next === base) return { tone: 'same', arrow: '=', label: 'Same' }
+  if (next === base) return { tone: 'same', arrow: '=', label: t('gateway.runCompare.delta.same') }
   const pct = percentChange(base, next)
   if (next < base) return { tone: 'better', arrow: '↑', label: `${pct.toFixed(1)}%` }
   return { tone: 'worse', arrow: '↓', label: `${pct.toFixed(1)}%` }
 }
 
 function compareCount(base: number, next: number): DeltaResult {
-  if (next === base) return { tone: 'same', arrow: '=', label: 'Same' }
+  if (next === base) return { tone: 'same', arrow: '=', label: t('gateway.runCompare.delta.same') }
   const pct = percentChange(base, next)
   if (next > base) return { tone: 'neutral', arrow: '↑', label: `${pct.toFixed(1)}%` }
   return { tone: 'neutral', arrow: '↓', label: `${pct.toFixed(1)}%` }
@@ -71,12 +73,12 @@ function statusScore(status: string): number {
 }
 
 function compareStatus(base: string, next: string): DeltaResult {
-  if (base === next) return { tone: 'same', arrow: '=', label: 'Same' }
+  if (base === next) return { tone: 'same', arrow: '=', label: t('gateway.runCompare.delta.same') }
   const baseScore = statusScore(base)
   const nextScore = statusScore(next)
-  if (nextScore > baseScore) return { tone: 'better', arrow: '↑', label: 'Improved' }
-  if (nextScore < baseScore) return { tone: 'worse', arrow: '↓', label: 'Regressed' }
-  return { tone: 'neutral', arrow: '↑', label: 'Changed' }
+  if (nextScore > baseScore) return { tone: 'better', arrow: '↑', label: t('gateway.runCompare.delta.improved') }
+  if (nextScore < baseScore) return { tone: 'worse', arrow: '↓', label: t('gateway.runCompare.delta.regressed') }
+  return { tone: 'neutral', arrow: '↑', label: t('gateway.runCompare.delta.changed') }
 }
 
 function deltaClassName(tone: DeltaTone): string {
@@ -96,7 +98,7 @@ export function RunCompare({ runA, runB, onClose }: RunCompareProps) {
 
   const durationDelta: DeltaResult = durationA !== null && durationB !== null
     ? compareLowerIsBetter(durationA, durationB)
-    : { tone: 'neutral', arrow: '=', label: 'N/A' }
+    : { tone: 'neutral', arrow: '=', label: t('gateway.runCompare.delta.na') }
 
   const tokenDelta = compareLowerIsBetter(runA.tokenCount, runB.tokenCount)
   const costDelta = compareLowerIsBetter(runA.costEstimate, runB.costEstimate)
@@ -107,16 +109,16 @@ export function RunCompare({ runA, runB, onClose }: RunCompareProps) {
     <section className="w-full rounded-xl border border-primary-800 bg-primary-900 p-4">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-primary-100">Compare Runs</h3>
-          <p className="text-xs text-primary-400">Run metrics side by side</p>
+          <h3 className="text-sm font-semibold text-primary-100">{t('gateway.runCompare.title')}</h3>
+          <p className="text-xs text-primary-400">{t('gateway.runCompare.subtitle')}</p>
         </div>
         <button
           type="button"
           onClick={onClose}
           className="rounded-lg border border-primary-700 bg-primary-800 px-2 py-1 text-xs font-medium text-primary-200 transition-colors hover:border-accent-500 hover:text-accent-300"
-          aria-label="Close compare view"
+          aria-label={t('gateway.runCompare.aria.close')}
         >
-          Close
+          {t('gateway.runCompare.close')}
         </button>
       </div>
 
@@ -124,44 +126,44 @@ export function RunCompare({ runA, runB, onClose }: RunCompareProps) {
         <div className="min-w-[640px] space-y-2">
           <div className="grid grid-cols-[1fr_auto_1fr] gap-2">
             <div className="rounded-xl border border-primary-800 bg-primary-950 p-3">
-              <p className="text-[11px] uppercase tracking-wide text-primary-400">Run A</p>
+              <p className="text-[11px] uppercase tracking-wide text-primary-400">{t('gateway.runCompare.runA')}</p>
               <p className="truncate text-xs font-semibold text-primary-100">{runA.title}</p>
               <p className="truncate text-xs text-primary-300">{runA.id}</p>
             </div>
             <div />
             <div className="rounded-xl border border-primary-800 bg-primary-950 p-3">
-              <p className="text-[11px] uppercase tracking-wide text-primary-400">Run B</p>
+              <p className="text-[11px] uppercase tracking-wide text-primary-400">{t('gateway.runCompare.runB')}</p>
               <p className="truncate text-xs font-semibold text-primary-100">{runB.title}</p>
               <p className="truncate text-xs text-primary-300">{runB.id}</p>
             </div>
           </div>
 
           <MetricRow
-            label="Duration"
+            label={t('gateway.runCompare.metric.duration')}
             leftValue={runA.duration}
             rightValue={runB.duration}
             delta={durationDelta}
           />
           <MetricRow
-            label="Token Count"
+            label={t('gateway.runCompare.metric.tokenCount')}
             leftValue={runA.tokenCount.toLocaleString()}
             rightValue={runB.tokenCount.toLocaleString()}
             delta={tokenDelta}
           />
           <MetricRow
-            label="Cost"
+            label={t('gateway.runCompare.metric.cost')}
             leftValue={fmtCost(runA.costEstimate)}
             rightValue={fmtCost(runB.costEstimate)}
             delta={costDelta}
           />
           <MetricRow
-            label="Agent Count"
+            label={t('gateway.runCompare.metric.agentCount')}
             leftValue={String(runA.agents.length)}
             rightValue={String(runB.agents.length)}
             delta={agentDelta}
           />
           <MetricRow
-            label="Status"
+            label={t('gateway.runCompare.metric.status')}
             leftValue={runA.status}
             rightValue={runB.status}
             delta={statusDelta}

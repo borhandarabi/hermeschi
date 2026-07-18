@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 
 export type ExportableMissionReport = {
   id: string
@@ -26,7 +27,7 @@ function formatDuration(ms: number): string {
 function generateMarkdown(report: ExportableMissionReport): string {
   const lines: string[] = []
   const completedDate = report.completedAt
-    ? new Date(report.completedAt).toLocaleString()
+    ? new Date(report.completedAt).toLocaleString(getLocale())
     : 'Unknown'
 
   lines.push(`# Mission Report: ${report.name || report.goal}`)
@@ -69,7 +70,7 @@ function generateMarkdown(report: ExportableMissionReport): string {
   }
 
   lines.push('---')
-  lines.push(`*Exported from ClawSuite Agent Hub on ${new Date().toLocaleString()}*`)
+  lines.push(`*Exported from ClawSuite Agent Hub on ${new Date().toLocaleString(getLocale())}*`)
 
   return lines.join('\n')
 }
@@ -120,7 +121,7 @@ export function ExportMissionButton({ report }: { report: ExportableMissionRepor
           'hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors',
         )}
       >
-        📄 Export .md
+        {t('gateway.exportMission.exportMd')}
       </button>
       <button
         type="button"
@@ -133,7 +134,7 @@ export function ExportMissionButton({ report }: { report: ExportableMissionRepor
             : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
         )}
       >
-        {copied ? '✓ Copied' : '📋 Copy MD'}
+        {copied ? t('gateway.exportMission.copied') : t('gateway.exportMission.copyMd')}
       </button>
     </div>
   )

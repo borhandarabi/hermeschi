@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type RunLearningsProps = {
   runId: string
@@ -22,19 +23,19 @@ type LearningCategory = RunLearningsProps['learnings'][number]['category']
 type CategoryFilter = 'all' | LearningCategory
 
 const FILTER_OPTIONS: Array<{ key: CategoryFilter; label: string; className?: string }> = [
-  { key: 'all', label: 'All' },
-  { key: 'success', label: 'Success', className: 'border-emerald-700/60 bg-emerald-900/30 text-emerald-300' },
-  { key: 'failure', label: 'Failure', className: 'border-red-700/60 bg-red-900/30 text-red-300' },
-  { key: 'optimization', label: 'Optimization', className: 'border-sky-700/60 bg-sky-900/30 text-sky-300' },
+  { key: 'all', label: t('gateway.runLearnings.filterAll') },
+  { key: 'success', label: t('gateway.runLearnings.filterSuccess'), className: 'border-emerald-700/60 bg-emerald-900/30 text-emerald-300' },
+  { key: 'failure', label: t('gateway.runLearnings.filterFailure'), className: 'border-red-700/60 bg-red-900/30 text-red-300' },
+  { key: 'optimization', label: t('gateway.runLearnings.filterOptimization'), className: 'border-sky-700/60 bg-sky-900/30 text-sky-300' },
 ]
 
 function relativeTime(ts: number, now: number): string {
   const seconds = Math.max(0, Math.floor((now - ts) / 1000))
-  if (seconds < 5) return 'just now'
-  if (seconds < 60) return `${seconds}s ago`
-  if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-  return `${Math.floor(seconds / 86400)}d ago`
+  if (seconds < 5) return t('gateway.runLearnings.justNow')
+  if (seconds < 60) return t('gateway.runLearnings.secondsAgo', { count: seconds })
+  if (seconds < 3600) return t('gateway.runLearnings.minutesAgo', { count: Math.floor(seconds / 60) })
+  if (seconds < 86400) return t('gateway.runLearnings.hoursAgo', { count: Math.floor(seconds / 3600) })
+  return t('gateway.runLearnings.daysAgo', { count: Math.floor(seconds / 86400) })
 }
 
 function categoryBadgeClass(category: LearningCategory): string {
@@ -44,9 +45,9 @@ function categoryBadgeClass(category: LearningCategory): string {
 }
 
 function categoryLabel(category: LearningCategory): string {
-  if (category === 'success') return 'Success'
-  if (category === 'failure') return 'Failure'
-  return 'Optimization'
+  if (category === 'success') return t('gateway.runLearnings.catSuccess')
+  if (category === 'failure') return t('gateway.runLearnings.catFailure')
+  return t('gateway.runLearnings.catOptimization')
 }
 
 async function copyText(value: string): Promise<void> {
@@ -105,14 +106,14 @@ export function RunLearnings({ runId, runTitle, learnings, onAddLearning, onClos
     >
       <header className="flex items-center justify-between border-b border-primary-800 px-4 py-3">
         <h2 className="truncate pr-3 text-sm font-semibold text-primary-100">
-          📝 Learnings from: {runTitle}
+          {t('gateway.runLearnings.title', { title: runTitle })}
         </h2>
         <button
           type="button"
           onClick={onClose}
           className="rounded-lg border border-primary-700 px-2.5 py-1 text-xs font-medium text-primary-300 transition-colors hover:bg-primary-900 hover:text-primary-100"
         >
-          Close
+          {t('gateway.runLearnings.close')}
         </button>
       </header>
 
@@ -139,7 +140,7 @@ export function RunLearnings({ runId, runTitle, learnings, onAddLearning, onClos
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
         {filteredLearnings.length === 0 ? (
           <div className="rounded-xl border border-dashed border-primary-800 bg-primary-900/60 px-4 py-8 text-center text-sm text-primary-300">
-            No learnings yet for this filter.
+            {t('gateway.runLearnings.noLearnings')}
           </div>
         ) : (
           <ol className="space-y-2">
@@ -175,7 +176,7 @@ export function RunLearnings({ runId, runTitle, learnings, onAddLearning, onClos
                       onClick={() => void handleCopy(learning.id, learning.text)}
                       className="shrink-0 rounded-lg border border-primary-700 px-2 py-1 text-[11px] font-medium text-primary-300 transition-colors hover:bg-primary-800 hover:text-primary-100"
                     >
-                      {copiedId === learning.id ? 'Copied' : 'Copy'}
+                      {copiedId === learning.id ? t('gateway.runLearnings.copied') : t('gateway.runLearnings.copy')}
                     </button>
                   </div>
                 </motion.li>
@@ -188,7 +189,7 @@ export function RunLearnings({ runId, runTitle, learnings, onAddLearning, onClos
       <form onSubmit={handleSubmit} className="border-t border-primary-800 px-4 py-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sr-only" htmlFor="learning-category">
-            Category
+            {t('gateway.runLearnings.category')}
           </label>
           <select
             id="learning-category"
@@ -196,20 +197,20 @@ export function RunLearnings({ runId, runTitle, learnings, onAddLearning, onClos
             onChange={(event) => setDraftCategory(event.target.value as LearningCategory)}
             className="h-10 rounded-lg border border-primary-700 bg-primary-900 px-3 text-sm text-primary-100 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
           >
-            <option value="success">Success</option>
-            <option value="failure">Failure</option>
-            <option value="optimization">Optimization</option>
+            <option value="success">{t('gateway.runLearnings.catSuccess')}</option>
+            <option value="failure">{t('gateway.runLearnings.catFailure')}</option>
+            <option value="optimization">{t('gateway.runLearnings.catOptimization')}</option>
           </select>
 
           <label className="sr-only" htmlFor="learning-text">
-            Learning text
+            {t('gateway.runLearnings.text')}
           </label>
           <input
             id="learning-text"
             type="text"
             value={draftText}
             onChange={(event) => setDraftText(event.target.value)}
-            placeholder="Add a reusable learning..."
+            placeholder={t('gateway.runLearnings.placeholder')}
             className="h-10 min-w-0 flex-1 rounded-lg border border-primary-700 bg-primary-900 px-3 text-sm text-primary-100 placeholder:text-primary-400 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
           />
 
@@ -218,7 +219,7 @@ export function RunLearnings({ runId, runTitle, learnings, onAddLearning, onClos
             disabled={!draftText.trim()}
             className="h-10 rounded-lg bg-accent-500 px-4 text-sm font-semibold text-primary-950 transition-colors hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Add Learning
+            {t('gateway.runLearnings.add')}
           </button>
         </div>
       </form>

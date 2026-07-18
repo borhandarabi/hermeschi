@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import {
   type WorkflowTemplate,
   getAllTemplates,
@@ -14,14 +15,14 @@ type TemplatePickerProps = {
 const DEMO_TEMPLATES: WorkflowTemplate[] = [
   {
     id: 'tpl-code-review',
-    name: 'Code Review',
-    description: 'Review codebase for bugs, performance issues, and code quality',
+    name: t('gateway.templatePicker.tplCodeReview.name'),
+    description: t('gateway.templatePicker.tplCodeReview.desc'),
     icon: '🔍',
-    goal: 'Review the codebase for bugs, performance issues, and code quality',
+    goal: t('gateway.templatePicker.tplCodeReview.goal'),
     tasks: [
-      { title: 'Analyze architecture and key code paths' },
-      { title: 'Identify defects and performance bottlenecks' },
-      { title: 'Summarize prioritized findings' },
+      { title: t('gateway.templatePicker.tplCodeReview.task1') },
+      { title: t('gateway.templatePicker.tplCodeReview.task2') },
+      { title: t('gateway.templatePicker.tplCodeReview.task3') },
     ],
     createdAt: 0,
     updatedAt: 0,
@@ -29,14 +30,14 @@ const DEMO_TEMPLATES: WorkflowTemplate[] = [
   },
   {
     id: 'tpl-feature-build',
-    name: 'Feature Build',
-    description: 'Plan and implement a new feature end-to-end',
+    name: t('gateway.templatePicker.tplFeatureBuild.name'),
+    description: t('gateway.templatePicker.tplFeatureBuild.desc'),
     icon: '🏗️',
-    goal: 'Plan, implement, test, and document the new feature',
+    goal: t('gateway.templatePicker.tplFeatureBuild.goal'),
     tasks: [
-      { title: 'Break the feature into implementation steps' },
-      { title: 'Build and integrate the feature' },
-      { title: 'Validate behavior and document changes' },
+      { title: t('gateway.templatePicker.tplFeatureBuild.task1') },
+      { title: t('gateway.templatePicker.tplFeatureBuild.task2') },
+      { title: t('gateway.templatePicker.tplFeatureBuild.task3') },
     ],
     createdAt: 0,
     updatedAt: 0,
@@ -44,14 +45,14 @@ const DEMO_TEMPLATES: WorkflowTemplate[] = [
   },
   {
     id: 'tpl-audit',
-    name: 'Security Audit',
-    description: 'Audit codebase for security risks and mitigations',
+    name: t('gateway.templatePicker.tplAudit.name'),
+    description: t('gateway.templatePicker.tplAudit.desc'),
     icon: '🛡️',
-    goal: 'Perform a security audit: check dependencies, secrets exposure, input validation',
+    goal: t('gateway.templatePicker.tplAudit.goal'),
     tasks: [
-      { title: 'Audit dependencies and known vulnerabilities' },
-      { title: 'Scan for exposed secrets and credentials' },
-      { title: 'Review input validation and sanitization paths' },
+      { title: t('gateway.templatePicker.tplAudit.task1') },
+      { title: t('gateway.templatePicker.tplAudit.task2') },
+      { title: t('gateway.templatePicker.tplAudit.task3') },
     ],
     createdAt: 0,
     updatedAt: 0,
@@ -90,7 +91,7 @@ export function TemplatePicker({ onSelect, onClose }: TemplatePickerProps) {
       <div className="w-full max-w-lg rounded-2xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4 dark:border-neutral-700">
           <h2 className="text-base font-semibold text-neutral-900 dark:text-white">
-            Mission Templates
+            {t('gateway.templatePicker.title')}
           </h2>
           <button
             type="button"
@@ -106,7 +107,7 @@ export function TemplatePicker({ onSelect, onClose }: TemplatePickerProps) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search templates..."
+            placeholder={t('gateway.templatePicker.searchPlaceholder')}
             className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             autoFocus
           />
@@ -116,7 +117,7 @@ export function TemplatePicker({ onSelect, onClose }: TemplatePickerProps) {
           {builtIn.length > 0 && (
             <>
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
-                Built-in
+                {t('gateway.templatePicker.builtIn')}
               </p>
               <div className="grid gap-2">
                 {builtIn.map((template) => (
@@ -133,7 +134,7 @@ export function TemplatePicker({ onSelect, onClose }: TemplatePickerProps) {
           {custom.length > 0 && (
             <>
               <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
-                Custom
+                {t('gateway.templatePicker.custom')}
               </p>
               <div className="grid gap-2">
                 {custom.map((template) => (
@@ -153,7 +154,7 @@ export function TemplatePicker({ onSelect, onClose }: TemplatePickerProps) {
 
           {filtered.length === 0 && (
             <p className="py-8 text-center text-sm text-neutral-400">
-              No templates found
+              {t('gateway.templatePicker.noTemplates')}
             </p>
           )}
         </div>
@@ -190,7 +191,7 @@ function TemplateCard({
             </span>
             {template.tasks.length > 0 && (
               <span className="rounded-full bg-neutral-200 px-1.5 py-0.5 text-[9px] font-medium text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400">
-                {template.tasks.length} tasks
+                {t('gateway.templatePicker.tasksCount', { count: template.tasks.length })}
               </span>
             )}
           </div>
