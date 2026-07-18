@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { t } from '@/lib/i18n'
 
 const POLL_INTERVAL_MS = 10_000
 const FLASH_DURATION_MS = 1_800
@@ -132,7 +133,7 @@ export function ClaudeReconnectBanner({
                   if (res.ok && data.ok) {
                     setMessage(
                       data.message ||
-                        'Auto-restarting Hermes Agent gateway…',
+                        t('reconnectBanner.autoRestarting'),
                     )
                     // Probe again shortly so the banner clears as soon as
                     // the gateway answers /health.
@@ -156,7 +157,7 @@ export function ClaudeReconnectBanner({
             wasDisconnectedRef.current = true
             setBannerState('disconnected')
             setMessage(
-              error instanceof Error ? error.message : 'Connection failed',
+              error instanceof Error ? error.message : t('reconnectBanner.connectionFailed'),
             )
           }
           return false
@@ -210,17 +211,17 @@ export function ClaudeReconnectBanner({
       }
 
       if (!response.ok || !payload.ok) {
-        throw new Error(payload.error || 'Failed to start Hermes Agent')
+        throw new Error(payload.error || t('reconnectBanner.startFailed'))
       }
 
       setMessage(
         payload.message === 'already running'
-          ? 'Hermes Agent is already running'
-          : 'Starting Hermes Agent…',
+          ? t('reconnectBanner.alreadyRunning')
+          : t('reconnectBanner.startingAgent'),
       )
     } catch (error) {
       setMessage(
-        error instanceof Error ? error.message : 'Failed to start Hermes Agent',
+        error instanceof Error ? error.message : t('reconnectBanner.startFailed'),
       )
     } finally {
       setIsStarting(false)
@@ -260,7 +261,7 @@ export function ClaudeReconnectBanner({
           />
           <div className="min-w-0">
             <p className="text-sm font-semibold">
-              {isDisconnected ? 'Hermes Agent not connected' : 'Connected'}
+              {isDisconnected ? t('reconnectBanner.notConnected') : t('reconnectBanner.connected')}
             </p>
             {message ? (
               <p className="truncate text-xs opacity-80">{message}</p>
@@ -281,7 +282,7 @@ export function ClaudeReconnectBanner({
                 color: 'inherit',
               }}
             >
-              {isChecking ? 'Retrying…' : 'Retry'}
+              {isChecking ? t('reconnectBanner.retrying') : t('reconnectBanner.retry')}
             </button>
             <button
               type="button"
@@ -292,7 +293,7 @@ export function ClaudeReconnectBanner({
                 background: 'var(--theme-danger)',
               }}
             >
-              {isStarting ? 'Starting…' : 'Start Agent'}
+              {isStarting ? t('reconnectBanner.starting') : t('reconnectBanner.startAgent')}
             </button>
           </div>
         ) : null}

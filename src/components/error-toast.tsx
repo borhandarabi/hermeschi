@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 const AUTO_DISMISS_MS = 8_000
 
@@ -13,42 +14,39 @@ type ErrorEntry = {
 
 function classifyError(raw: string): string {
   const lower = raw.toLowerCase()
+  let key: TranslationKey | null = null
   if (
     lower.includes('429') ||
     lower.includes('rate limit') ||
     lower.includes('too many')
   ) {
-    return 'Rate limited — try again in a moment'
-  }
-  if (
+    key = 'errorToast.rateLimited'
+  } else if (
     lower.includes('401') ||
     lower.includes('403') ||
     lower.includes('unauthorized') ||
     lower.includes('invalid api key') ||
     lower.includes('api key')
   ) {
-    return 'Authentication error — check your API key in Settings'
-  }
-  if (
+    key = 'errorToast.authError'
+  } else if (
     lower.includes('500') ||
     lower.includes('server error') ||
     lower.includes('model error')
   ) {
-    return 'Model error — the provider is having issues'
-  }
-  if (
+    key = 'errorToast.modelError'
+  } else if (
     lower.includes('network') ||
     lower.includes('timeout') ||
     lower.includes('failed to fetch') ||
     lower.includes('connection')
   ) {
-    return 'Connection lost — retrying…'
-  }
-  if (lower.includes('tool_use') && lower.includes('tool_result')) {
-    return 'Tool call context error — conversation history got out of sync. Start a new session to continue.'
+    key = 'errorToast.connectionLost'
+  } else if (lower.includes('tool_use') && lower.includes('tool_result')) {
+    key = 'errorToast.toolContext'
   }
   // Return original message if no pattern matched
-  return raw
+  return key ? t(key) : raw
 }
 
 let externalPush: ((msg: string) => void) | null = null
@@ -91,7 +89,7 @@ function ToastItem({ entry, onDismiss }: ToastItemProps) {
         type="button"
         onClick={() => onDismiss(entry.id)}
         className="shrink-0 text-primary-400 hover:text-primary-600 transition-colors text-lg leading-none"
-        aria-label="Dismiss"
+        aria-label={t('errorToast.dismiss')}
       >
         ×
       </button>

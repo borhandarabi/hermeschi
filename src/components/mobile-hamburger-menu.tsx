@@ -27,67 +27,76 @@ import {
   useChatSettingsStore,
 } from '@/hooks/use-chat-settings'
 import { useSettingsStore } from '@/hooks/use-settings'
+import { t, type TranslationKey } from '@/lib/i18n'
 
-export const MOBILE_HAMBURGER_NAV_ITEMS = [
+type MobileHamburgerNavItem = {
+  id: string
+  labelKey: TranslationKey
+  icon: typeof Chat01Icon
+  to: string
+  match: (p: string) => boolean
+}
+
+export const MOBILE_HAMBURGER_NAV_ITEMS: Array<MobileHamburgerNavItem> = [
   {
     id: 'chat',
-    label: 'Chat',
+    labelKey: 'nav.chat',
     icon: Chat01Icon,
     to: '/chat/main',
     match: (p: string) => p.startsWith('/chat') || p === '/new' || p === '/',
   },
   {
     id: 'dashboard',
-    label: 'Dashboard',
+    labelKey: 'nav.dashboard',
     icon: DashboardSquare01Icon,
     to: '/dashboard',
     match: (p: string) => p.startsWith('/dashboard'),
   },
   {
     id: 'playground',
-    label: 'HermesWorld',
+    labelKey: 'nav.hermesWorld',
     icon: Castle02Icon,
     to: '/playground',
     match: (p: string) => p.startsWith('/playground'),
   },
   {
     id: 'terminal',
-    label: 'Terminal',
+    labelKey: 'nav.terminal',
     icon: CommandLineIcon,
     to: '/terminal',
     match: (p: string) => p.startsWith('/terminal'),
   },
   {
     id: 'jobs',
-    label: 'Jobs',
+    labelKey: 'nav.jobs',
     icon: Clock01Icon,
     to: '/jobs',
     match: (p: string) => p.startsWith('/jobs'),
   },
   {
     id: 'conductor',
-    label: 'Conductor',
+    labelKey: 'nav.conductor',
     icon: Rocket01Icon,
     to: '/conductor',
     match: (p: string) => p.startsWith('/conductor'),
   },
   {
     id: 'operations',
-    label: 'Operations',
+    labelKey: 'nav.operations',
     icon: UserMultipleIcon,
     to: '/operations',
     match: (p: string) => p.startsWith('/operations'),
   },
   {
     id: 'swarm',
-    label: 'Swarm',
+    labelKey: 'nav.swarm',
     icon: UserGroupIcon,
     to: '/swarm',
     match: (p: string) => p === '/swarm' || p.startsWith('/swarm2'),
   },
   {
     id: 'echo-studio',
-    label: 'Echo Studio',
+    labelKey: 'nav.echoStudio',
     icon: Rocket01Icon,
     to: '/echo-studio',
     match: (p: string) => p.startsWith('/echo-studio'),
@@ -95,28 +104,28 @@ export const MOBILE_HAMBURGER_NAV_ITEMS = [
 
   {
     id: 'memory',
-    label: 'Memory',
+    labelKey: 'nav.memory',
     icon: BrainIcon,
     to: '/memory',
     match: (p: string) => p.startsWith('/memory'),
   },
   {
     id: 'skills',
-    label: 'Skills',
+    labelKey: 'nav.skills',
     icon: PuzzleIcon,
     to: '/skills',
     match: (p: string) => p.startsWith('/skills'),
   },
   {
     id: 'mcp',
-    label: 'MCP',
+    labelKey: 'nav.mcp',
     icon: McpServerIcon,
     to: '/mcp',
     match: (p: string) => p.startsWith('/mcp'),
   },
   {
     id: 'profiles',
-    label: 'Profiles',
+    labelKey: 'nav.profiles',
     icon: UserGroupIcon,
     to: '/profiles',
     match: (p: string) => p.startsWith('/profiles'),
@@ -137,7 +146,7 @@ export function HamburgerTrigger({ className }: { className?: string }) {
   return (
     <button
       type="button"
-      aria-label="Open navigation menu"
+      aria-label={t('mobile.menu.openNav')}
       onClick={openHamburgerMenu}
       className={cn(
         'flex items-center justify-center size-9 rounded-xl',
@@ -229,7 +238,7 @@ export function MobileHamburgerMenu() {
           <div className="flex items-center gap-2.5">
             <img
               src="/claude-avatar.webp"
-              alt="Hermes Agent"
+              alt={t('mobile.menu.hermesAgent')}
               className="size-8 rounded-xl shrink-0"
             />
             <div className="flex flex-col leading-tight">
@@ -237,19 +246,19 @@ export function MobileHamburgerMenu() {
                 className="font-bold text-[15px] tracking-tight"
                 style={{ color: 'var(--color-ink, #111)' }}
               >
-                Hermes Agent
+                {t('mobile.menu.hermesAgent')}
               </span>
               <span
                 className="text-[11px]"
                 style={{ color: 'var(--color-muted, #888)' }}
               >
-                Workspace
+                {t('mobile.menu.workspace')}
               </span>
             </div>
           </div>
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t('mobile.menu.closeMenu')}
             onClick={() => setOpen(false)}
             className="flex items-center justify-center size-8 rounded-full active:scale-90 transition-all"
             style={{ color: 'var(--color-muted, #888)' }}
@@ -290,7 +299,7 @@ export function MobileHamburgerMenu() {
                   size={20}
                   strokeWidth={isActive ? 2 : 1.6}
                 />
-                <span className="text-[15px] font-medium">{item.label}</span>
+                <span className="text-[15px] font-medium">{t(item.labelKey)}</span>
               </button>
             )
           })}
@@ -342,7 +351,7 @@ export function MobileHamburgerMenu() {
               type="button"
               onClick={() => handleNav('/settings')}
               className="flex items-center justify-center size-9 rounded-xl active:bg-white/10 transition-colors"
-              aria-label="Settings"
+              aria-label={t('mobile.menu.settings')}
               style={{ color: 'var(--color-ink-muted, #888)' }}
             >
               <HugeiconsIcon
@@ -362,7 +371,7 @@ export function MobileHamburgerMenu() {
                 setTheme(next)
               }}
               className="flex items-center justify-center size-9 rounded-xl active:bg-white/10 transition-colors"
-              aria-label="Toggle theme"
+              aria-label={t('mobile.menu.toggleTheme')}
               style={{ color: 'var(--color-ink-muted, #888)' }}
             >
               <svg

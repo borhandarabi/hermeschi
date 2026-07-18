@@ -7,6 +7,7 @@ import type { BrailleSpinnerPreset } from './ui/braille-spinner'
 import type { LoaderStyle } from '@/hooks/use-chat-settings'
 import { useChatSettingsStore } from '@/hooks/use-chat-settings'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type LoaderPreference = LoaderStyle
 
@@ -70,8 +71,9 @@ function renderLoader(loaderStyle: LoaderStyle, iconClassName?: string) {
 function LoadingIndicator({
   className,
   iconClassName,
-  ariaLabel = 'Assistant is streaming',
+  ariaLabel,
 }: LoadingIndicatorProps) {
+  const resolvedAriaLabel = ariaLabel ?? t('loadingIndicator.streaming')
   const loaderStyle = useChatSettingsStore(
     (state) => state.settings.loaderStyle,
   )
@@ -84,7 +86,7 @@ function LoadingIndicator({
         'chat-streaming-loader inline-flex items-center justify-center bg-transparent p-0 text-current',
         className,
       )}
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
     >
       {renderLoader(loaderStyle, iconClassName)}
     </span>

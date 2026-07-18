@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { t } from '@/lib/i18n'
 
 export function LoginScreen() {
   const [password, setPassword] = useState('')
@@ -24,11 +25,11 @@ export function LoginScreen() {
         // Success! Reload to trigger auth check
         window.location.reload()
       } else {
-        setError(data.error || 'Invalid password')
+        setError(data.error || t('login.invalidPassword'))
         setLoading(false)
       }
     } catch (err) {
-      setError('Authentication failed. Please try again.')
+      setError(t('login.authFailed'))
       setLoading(false)
     }
   }
@@ -61,17 +62,17 @@ export function LoginScreen() {
                 <circle cx="50" cy="50" r="15" fill="currentColor" />
               </svg>
               <h1 className="text-2xl font-bold tracking-tight text-primary-900">
-                Hermes Workspace
+                {t('login.hermesWorkspace')}
               </h1>
             </div>
           </div>
 
           {/* Title */}
           <h2 className="mb-2 text-center text-lg font-semibold text-primary-900">
-            Enter Password
+            {t('login.enterPassword')}
           </h2>
           <p className="mb-6 text-center text-sm text-primary-600">
-            This workspace is password-protected
+            {t('login.protected')}
           </p>
 
           {/* Form */}
@@ -81,7 +82,7 @@ export function LoginScreen() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder={t('login.password')}
                 className="w-full rounded-lg border border-primary-200 bg-primary-50 px-4 py-2.5 text-primary-900 placeholder-primary-400 outline-none transition-all focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
                 disabled={loading}
                 autoFocus
@@ -99,21 +100,21 @@ export function LoginScreen() {
               disabled={loading || !password}
               className="w-full rounded-lg bg-accent-500 px-4 py-2.5 font-medium text-white transition-all hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Authenticating...' : 'Continue'}
+              {loading ? t('login.authenticating') : t('login.continue')}
             </button>
           </form>
         </div>
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-primary-500">
-          Powered by{' '}
+          {t('login.poweredBy')}{' '}
           <a
             href="https://github.com/NousResearch/hermes-agent"
             target="_blank"
             rel="noopener noreferrer"
             className="text-accent-500 hover:text-accent-600 transition-colors"
           >
-            Hermes Agent
+            {t('login.hermesAgent')}
           </a>
         </p>
       </div>

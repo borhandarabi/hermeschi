@@ -35,6 +35,7 @@ import {
   CHAT_RUN_COMMAND_EVENT,
 } from '@/screens/chat/chat-events'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 type CommandPaletteProps = {
   pathname: string
@@ -62,6 +63,12 @@ const SCREEN_GROUP_ORDER = [
   'Recent Sessions',
   'Slash Commands',
 ] as const
+
+const GROUP_LABEL_KEYS: Record<(typeof SCREEN_GROUP_ORDER)[number], TranslationKey> = {
+  'Screens': 'commandPalette.screensGroup',
+  'Recent Sessions': 'commandPalette.recentSessionsGroup',
+  'Slash Commands': 'commandPalette.slashCommandsGroup',
+}
 
 function getSessionLabel(session: SessionMeta) {
   return (
@@ -170,63 +177,63 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
       {
         id: 'screen-chat',
         group: 'Screens',
-        label: 'Chat',
+        label: t('nav.chat'),
         keywords: 'conversation new session home',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: Chat01Icon,
         onSelect: () => void navigate({ to: '/chat' }),
       },
       {
         id: 'screen-files',
         group: 'Screens',
-        label: 'Files',
+        label: t('nav.files'),
         keywords: 'workspace editor browser',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: File01Icon,
         onSelect: () => void navigate({ to: '/files' }),
       },
       {
         id: 'screen-terminal',
         group: 'Screens',
-        label: 'Terminal',
+        label: t('nav.terminal'),
         keywords: 'console shell command line',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: CommandLineIcon,
         onSelect: () => void navigate({ to: '/terminal' }),
       },
       {
         id: 'screen-memory',
         group: 'Screens',
-        label: 'Memory',
+        label: t('nav.memory'),
         keywords: 'knowledge durable memory notes',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: BrainIcon,
         onSelect: () => void navigate({ to: '/memory' }),
       },
       {
         id: 'screen-skills',
         group: 'Screens',
-        label: 'Skills',
+        label: t('nav.skills'),
         keywords: 'install tools capabilities',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: PuzzleIcon,
         onSelect: () => void navigate({ to: '/skills' }),
       },
       {
         id: 'screen-mcp',
         group: 'Screens',
-        label: 'MCP',
+        label: t('nav.mcp'),
         keywords: 'mcp servers model context protocol presets',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: McpServerIcon,
         onSelect: () => void navigate({ to: '/mcp' }),
       },
       {
         id: 'screen-settings',
         group: 'Screens',
-        label: 'Settings',
+        label: t('nav.settings'),
         keywords: 'preferences configuration',
-        shortcut: 'Go',
+        shortcut: t('commandPalette.shortcutGo'),
         icon: Settings01Icon,
         onSelect: () => void navigate({ to: '/settings', search: {} }),
       },
@@ -244,7 +251,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
           group: 'Recent Sessions',
           label: getSessionLabel(session),
           keywords: `${session.key} ${session.friendlyId} ${session.title ?? ''} ${session.derivedTitle ?? ''}`,
-          shortcut: 'Open',
+          shortcut: t('commandPalette.shortcutOpen'),
           icon: Chat01Icon,
           onSelect: () =>
             void navigate({
@@ -262,7 +269,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/new',
         keywords: 'start new session conversation',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/new'),
       },
@@ -271,7 +278,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/clear',
         keywords: 'clear current chat history conversation',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/clear'),
       },
@@ -280,7 +287,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/model',
         keywords: 'open model picker settings claude provider',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/model'),
       },
@@ -289,7 +296,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/skills',
         keywords: 'browse manage skills page',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/skills'),
       },
@@ -298,7 +305,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/mcp',
         keywords: 'mcp servers model context protocol page',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/mcp'),
       },
@@ -307,7 +314,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/skin',
         keywords: 'open appearance settings theme',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/skin'),
       },
@@ -316,7 +323,7 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
         group: 'Slash Commands',
         label: '/save',
         keywords: 'export current conversation transcript',
-        shortcut: 'Run',
+        shortcut: t('commandPalette.shortcutRun'),
         icon: CommandLineIcon,
         onSelect: () => runSlashCommand('/save'),
       },
@@ -449,18 +456,18 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
           onValueChange={setQuery}
           mode="none"
         >
-          <CommandInput placeholder="Search screens, sessions, and commands" />
+          <CommandInput placeholder={t('commandPalette.searchPlaceholder')} />
           <CommandPanel className="flex min-h-0 flex-1 flex-col">
             {groupedActions.length === 0 ? (
               <div className="flex h-72 items-center justify-center text-sm text-primary-600">
-                No results for “{query.trim()}”.
+                {t('commandPalette.noResultsFor', { query: query.trim() })}
               </div>
             ) : (
               <CommandList className="h-72 min-h-0">
                 {groupedActions.map((group, groupIndex) => (
                   <Fragment key={group.group}>
                     <CommandGroup items={group.items}>
-                      <CommandGroupLabel>{group.group}</CommandGroupLabel>
+                      <CommandGroupLabel>{t(GROUP_LABEL_KEYS[group.group])}</CommandGroupLabel>
                       {group.items.map((action) => {
                         const actionIndex = filteredActions.findIndex(
                           (item) => item.id === action.id,
@@ -522,20 +529,20 @@ export function CommandPalette({ pathname, sessions }: CommandPaletteProps) {
                     strokeWidth={1.5}
                   />
                 </span>
-                <span>Navigate</span>
+                <span>{t('commandPalette.navigate')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="rounded-md border border-primary-200 bg-surface px-2 py-1 text-[11px] font-medium text-primary-700">
                   Enter
                 </span>
-                <span>Select</span>
+                <span>{t('commandPalette.select')}</span>
               </div>
             </div>
             <div className="flex items-center gap-2 text-primary-700">
               <span className="rounded-md border border-primary-200 bg-surface px-2 py-1 text-[11px] font-medium text-primary-700">
                 {isMacPlatform ? '⌘K' : 'Ctrl K'}
               </span>
-              <span>Toggle</span>
+              <span>{t('commandPalette.toggle')}</span>
             </div>
           </CommandFooter>
         </Command>

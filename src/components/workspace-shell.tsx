@@ -175,20 +175,20 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
 
   // Derive active session from URL
   const mobilePageTitle = (() => {
-    if (pathname.startsWith('/terminal')) return 'Terminal'
-    if (pathname.startsWith('/files')) return 'Files'
-    if (pathname.startsWith('/jobs')) return 'Jobs'
-    if (pathname.startsWith('/conductor')) return 'Conductor'
-    if (pathname.startsWith('/operations')) return 'Operations'
-    if (pathname.startsWith('/swarm2') || pathname === '/swarm') return 'Swarm'
-    if (pathname.startsWith('/echo-studio')) return 'Echo Studio'
-    if (pathname.startsWith('/memory')) return 'Memory'
-    if (pathname.startsWith('/skills')) return 'Skills'
-    if (pathname.startsWith('/mcp')) return 'MCP'
-    if (pathname.startsWith('/profiles')) return 'Profiles'
-    if (pathname.startsWith('/settings')) return 'Settings'
-    if (pathname.startsWith('/debug')) return 'Debug'
-    if (pathname.startsWith('/activity')) return 'Activity'
+    if (pathname.startsWith('/terminal')) return t('nav.terminal')
+    if (pathname.startsWith('/files')) return t('nav.files')
+    if (pathname.startsWith('/jobs')) return t('nav.jobs')
+    if (pathname.startsWith('/conductor')) return t('nav.conductor')
+    if (pathname.startsWith('/operations')) return t('nav.operations')
+    if (pathname.startsWith('/swarm2') || pathname === '/swarm') return t('nav.swarm')
+    if (pathname.startsWith('/echo-studio')) return t('nav.echoStudio')
+    if (pathname.startsWith('/memory')) return t('nav.memory')
+    if (pathname.startsWith('/skills')) return t('nav.skills')
+    if (pathname.startsWith('/mcp')) return t('nav.mcp')
+    if (pathname.startsWith('/profiles')) return t('nav.profiles')
+    if (pathname.startsWith('/settings')) return t('nav.settings')
+    if (pathname.startsWith('/debug')) return t('nav.debug')
+    if (pathname.startsWith('/activity')) return t('nav.activity')
     return null
   })()
 
@@ -341,7 +341,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
                 className="text-[13px] font-medium select-none"
                 style={{ color: 'var(--theme-accent, #B98A44)' }}
               >
-                Hermes
+                {t('common.hermesBrand')}
               </span>
             </div>
             {/* Right spacer to balance */}
@@ -461,7 +461,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
         {showDesktopSidebarBackdrop ? (
           <button
             type="button"
-            aria-label="Collapse navigation sidebar"
+            aria-label={t('workspace.collapseSidebar')}
             onClick={() => setSidebarCollapsed(true)}
             className={DESKTOP_SIDEBAR_BACKDROP_CLASS}
           />

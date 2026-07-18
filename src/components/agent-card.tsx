@@ -2,6 +2,7 @@ import { Cancel01Icon, CheckmarkCircle01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type AgentCardStatus = 'running' | 'completed' | 'failed'
 
@@ -60,14 +61,14 @@ function formatRuntimeCompact(runtimeSeconds: number): string {
 }
 
 function formatTokenBadge(tokenCount: number): string {
-  if (tokenCount >= 1000) {
-    const compact = Intl.NumberFormat(undefined, {
-      notation: 'compact',
-      maximumFractionDigits: 1,
-    }).format(tokenCount)
-    return `${compact} tok`
-  }
-  return `${tokenCount} tok`
+  const formatted =
+    tokenCount >= 1000
+      ? Intl.NumberFormat(undefined, {
+          notation: 'compact',
+          maximumFractionDigits: 1,
+        }).format(tokenCount)
+      : String(tokenCount)
+  return t('agentCard.tokenCount', { count: formatted })
 }
 
 function StatusIndicator({ status }: { status: AgentCardStatus }) {
@@ -79,7 +80,7 @@ function StatusIndicator({ status }: { status: AgentCardStatus }) {
           size={14}
           strokeWidth={1.8}
         />
-        <span className="text-[11px] font-medium text-emerald-300">Done</span>
+        <span className="text-[11px] font-medium text-emerald-300">{t('miniAgentCard.done')}</span>
       </span>
     )
   }
@@ -88,7 +89,7 @@ function StatusIndicator({ status }: { status: AgentCardStatus }) {
     return (
       <span className="inline-flex items-center gap-1 text-red-300">
         <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={1.8} />
-        <span className="text-[11px] font-medium text-red-300">Failed</span>
+        <span className="text-[11px] font-medium text-red-300">{t('miniAgentCard.failed')}</span>
       </span>
     )
   }
@@ -99,7 +100,7 @@ function StatusIndicator({ status }: { status: AgentCardStatus }) {
         <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
         <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
       </span>
-      <span className="text-[11px] font-medium text-emerald-300">Running</span>
+      <span className="text-[11px] font-medium text-emerald-300">{t('miniAgentCard.running')}</span>
     </span>
   )
 }
