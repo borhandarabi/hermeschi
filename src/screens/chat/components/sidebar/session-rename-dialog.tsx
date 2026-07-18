@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { t } from '@/lib/i18n'
 
 type SessionRenameDialogProps = {
   open: boolean
@@ -37,9 +38,9 @@ export function SessionRenameDialog({
     <DialogRoot open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <div className="p-4">
-          <DialogTitle className="mb-1">Rename</DialogTitle>
+          <DialogTitle className="mb-1">{t('chat.session.renameTitle')}</DialogTitle>
           <DialogDescription className="mb-4">
-            Enter a new name for this session.
+            {t('chat.session.renamePlaceholder')}
           </DialogDescription>
           <input
             type="text"
@@ -52,12 +53,12 @@ export function SessionRenameDialog({
               }
             }}
             className="w-full rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-sm text-primary-900 outline-none focus:border-primary-400"
-            placeholder="Session name"
+            placeholder={t('chat.session.renamePlaceholder')}
             autoFocus
           />
           <div className="mt-4 flex justify-end gap-2">
-            <DialogClose onClick={onCancel}>Cancel</DialogClose>
-            <Button onClick={() => onSave(renameValue)}>Save</Button>
+            <DialogClose onClick={onCancel}>{t('common.cancel')}</DialogClose>
+            <Button onClick={() => onSave(renameValue)}>{t('chat.session.renameSave')}</Button>
           </div>
         </div>
       </DialogContent>
