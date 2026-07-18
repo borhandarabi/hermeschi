@@ -371,6 +371,21 @@ function readProviderId(entry: ModelCatalogEntry): string | null {
   return normalized || null
 }
 
+/**
+ * Maps provider IDs from PROVIDER_CATALOG to translated description keys.
+ * Lets the providers screen surface localized descriptions instead of the
+ * English strings hardcoded in `@/lib/provider-catalog`.
+ */
+const PROVIDER_DESC_KEYS: Record<string, TranslationKey> = {
+  anthropic: 'chat.providers.anthropic.desc',
+  openai: 'chat.providers.openai.desc',
+  google: 'chat.providers.google.desc',
+  openrouter: 'chat.providers.openrouter.desc',
+  minimax: 'chat.providers.minimax.desc',
+  ollama: 'chat.providers.ollama.desc',
+  'atomic-chat': 'chat.providers.atomic-chat.desc',
+}
+
 function buildProviderSummaries(payload: {
   models?: Array<ModelCatalogEntry>
   configuredProviders?: Array<string>
@@ -405,7 +420,9 @@ function buildProviderSummaries(payload: {
       id: providerId,
       name: getProviderDisplayName(providerId),
       description:
-        metadata?.description ||
+        (PROVIDER_DESC_KEYS[providerId]
+          ? t(PROVIDER_DESC_KEYS[providerId])
+          : metadata?.description) ||
         t('settings.providerConfiguredDefault'),
       modelCount,
       status: modelCount > 0 ? 'active' : 'configured',

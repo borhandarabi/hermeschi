@@ -13,7 +13,6 @@ import {
   CLAUDE_CONFIG_PATH,
   PROVIDER_CATALOG,
   buildConfigExample,
-  getAuthTypeLabel,
   getProviderInfo,
 } from '@/lib/provider-catalog'
 import { writeTextToClipboard } from '@/lib/clipboard'
@@ -68,6 +67,44 @@ const AUTH_TYPE_ORDER: Array<ProviderAuthType> = [
   'oauth',
   'local',
 ]
+
+/** Maps each auth type to a translated chip label (provider cards & supports list). */
+const AUTH_TYPE_LABEL_KEYS: Record<ProviderAuthType, TranslationKey> = {
+  'api-key': 'chat.providers.authType.apiKey',
+  'oauth': 'chat.providers.authType.oauth',
+  'cli-token': 'chat.providers.authType.cliToken',
+  'local': 'chat.providers.authType.local',
+}
+
+/** Maps provider IDs from PROVIDER_CATALOG to translated description keys. */
+const PROVIDER_DESC_KEYS: Record<string, TranslationKey> = {
+  'anthropic': 'chat.providers.anthropic.desc',
+  'openai': 'chat.providers.openai.desc',
+  'google': 'chat.providers.google.desc',
+  'openrouter': 'chat.providers.openrouter.desc',
+  'minimax': 'chat.providers.minimax.desc',
+  'ollama': 'chat.providers.ollama.desc',
+  'atomic-chat': 'chat.providers.atomic-chat.desc',
+}
+
+/**
+ * Returns the translated description for a provider catalog entry, falling
+ * back to the in-catalog English description when no translation key exists
+ * (e.g. for unknown / dynamically discovered providers).
+ */
+function getProviderDescription(provider: { id: string; description: string }): string {
+  const key = PROVIDER_DESC_KEYS[provider.id]
+  return key ? t(key) : provider.description
+}
+
+/**
+ * Returns the translated label for a provider auth type. Replaces the
+ * English-only `getAuthTypeLabel` from provider-catalog so the wizard
+ * surfaces localized text in chips and the "supports" interpolation.
+ */
+function getAuthTypeLabelT(authType: ProviderAuthType): string {
+  return t(AUTH_TYPE_LABEL_KEYS[authType])
+}
 
 function getAuthTypeMeta(authType: ProviderAuthType): AuthTypeMeta {
   if (authType === 'api-key') {
@@ -441,7 +478,7 @@ export function ProviderWizard({
                         </div>
 
                         <p className="mt-2 text-xs text-primary-600 text-pretty line-clamp-2">
-                          {provider.description}
+                          {getProviderDescription(provider)}
                         </p>
 
                         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -451,7 +488,7 @@ export function ProviderWizard({
                                 key={authType}
                                 className="rounded-full border border-primary-300 bg-primary-100 px-2 py-0.5 text-xs text-primary-700"
                               >
-                                {getAuthTypeLabel(authType)}
+                                {getAuthTypeLabelT(authType)}
                               </span>
                             )
                           })}
@@ -473,7 +510,7 @@ export function ProviderWizard({
                     name: selectedProvider.name,
                     authTypes: selectedProvider.authTypes
                       .map(function mapAuthType(authType) {
-                        return getAuthTypeLabel(authType)
+                        return getAuthTypeLabelT(authType)
                       })
                       .join(', '),
                   })}
