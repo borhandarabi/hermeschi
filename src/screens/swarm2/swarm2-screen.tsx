@@ -30,6 +30,7 @@ import { RouterChat } from '@/components/swarm/router-chat'
 import { SwarmTerminal } from '@/components/swarm/swarm-terminal'
 import { WorkflowHelpModal } from '@/components/workflow-help-modal'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 const SWARM2_ROOM_STORAGE_KEY = 'claude-swarm2-room-v1'
 
@@ -1536,7 +1537,7 @@ export function Swarm2Screen() {
                 type="button"
                 onClick={() => setNotificationsOpen((open) => !open)}
                 className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] text-base shadow-sm hover:bg-[var(--theme-card2)]"
-                aria-label="Swarm notifications"
+                aria-label={t('swarm.title')}
                 title="Swarm notifications"
               >
                 <HugeiconsIcon icon={AlarmClockIcon} size={17} strokeWidth={1.8} />
@@ -1550,7 +1551,7 @@ export function Swarm2Screen() {
                 <div className="absolute right-0 top-12 z-40 w-[min(28rem,calc(100vw-2rem))] rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-3 text-left shadow-[0_24px_80px_var(--theme-shadow)]">
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">Swarm updates</div>
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">{t('swarm.activity.title')}</div>
                       <div className="text-xs text-[var(--theme-muted-2)]">Actionable state from canonical mission checkpoints and durable report lanes.</div>
                     </div>
                     <button type="button" onClick={() => setNotificationsOpen(false)} className="rounded-lg px-2 py-1 text-xs hover:bg-[var(--theme-card2)]">Close</button>
