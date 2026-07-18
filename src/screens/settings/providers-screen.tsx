@@ -25,6 +25,7 @@ import {
   getProviderInfo,
   normalizeProviderId,
 } from '@/lib/provider-catalog'
+import { t, type TranslationKey } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 // FIX: replaced direct server module imports with workspace API calls to avoid
@@ -115,12 +116,12 @@ type SelectOption = {
 type SettingDefinition = {
   id: string
   tab: SettingsTabId
-  label: string
-  description: string
+  label: TranslationKey
+  description: TranslationKey
   path?: string
   kind: SettingKind
   options?: Array<SelectOption>
-  placeholder?: string
+  placeholder?: TranslationKey
   min?: number
   step?: number
   rows?: number
@@ -235,25 +236,25 @@ async function fetchModels(): Promise<{
   }
 }
 
-const TAB_ORDER: Array<{ id: SettingsTabId; label: string }> = [
-  { id: 'providers', label: 'Providers' },
-  { id: 'models', label: 'Models' },
-  { id: 'agents', label: 'AI & Agents' },
-  { id: 'session', label: 'Session' },
-  { id: 'memory', label: 'Memory' },
+const TAB_ORDER: Array<{ id: SettingsTabId; label: TranslationKey }> = [
+  { id: 'providers', label: 'settings.providers' },
+  { id: 'models', label: 'settings.models' },
+  { id: 'agents', label: 'settings.tab.aiAgents' },
+  { id: 'session', label: 'settings.tab.session' },
+  { id: 'memory', label: 'nav.memory' },
 ]
 
 const MEMORY_PROVIDER_OPTIONS: Array<SelectOption> = [
-  { label: 'Local', value: 'local' },
-  { label: 'OpenAI', value: 'openai' },
-  { label: 'Gemini', value: 'gemini' },
-  { label: 'Voyage', value: 'voyage' },
-  { label: 'Mistral', value: 'mistral' },
-  { label: 'Ollama', value: 'ollama' },
+  { label: 'settings.memoryProvider.local', value: 'local' },
+  { label: 'settings.memoryProvider.openai', value: 'openai' },
+  { label: 'settings.memoryProvider.gemini', value: 'gemini' },
+  { label: 'settings.memoryProvider.voyage', value: 'voyage' },
+  { label: 'settings.memoryProvider.mistral', value: 'mistral' },
+  { label: 'settings.memoryProvider.ollama', value: 'ollama' },
 ]
 
 const MEMORY_FALLBACK_OPTIONS: Array<SelectOption> = [
-  { label: 'None', value: 'none' },
+  { label: 'settings.memoryFallback.none', value: 'none' },
   ...MEMORY_PROVIDER_OPTIONS,
 ]
 
@@ -262,22 +263,20 @@ const SETTINGS: Array<SettingDefinition> = [
     id: 'primary-model',
     tab: 'models',
     path: 'model.default',
-    label: 'Default model',
-    description:
-      'Backend default model used when a chat does not select a per-session override.',
+    label: 'settings.def.defaultModel.label',
+    description: 'settings.def.defaultModel.desc',
     kind: 'text',
-    placeholder: 'provider/model',
+    placeholder: 'settings.def.defaultModel.placeholder',
   },
   {
     id: 'fallback-chain',
     tab: 'models',
     path: 'agents.defaults.model.fallbacks',
-    label: 'Fallback chain',
-    description:
-      'Ordered fallback models. Use one per line or separate with commas.',
+    label: 'settings.def.fallbackChain.label',
+    description: 'settings.def.fallbackChain.desc',
     kind: 'multiline',
     rows: 3,
-    placeholder: 'anthropic-oauth/claude-sonnet-4-6',
+    placeholder: 'settings.def.fallbackChain.placeholder',
     formatter: formatStringList,
     parser: parseStringList,
   },
@@ -285,9 +284,8 @@ const SETTINGS: Array<SettingDefinition> = [
     id: 'context-tokens-models',
     tab: 'models',
     path: 'agents.defaults.contextTokens',
-    label: 'Context tokens',
-    description:
-      'Default token budget applied to agents when no narrower override is present.',
+    label: 'settings.def.contextTokens.label',
+    description: 'settings.def.contextTokens.desc',
     kind: 'number',
     min: 1,
     step: 1000,
@@ -299,9 +297,8 @@ const SETTINGS: Array<SettingDefinition> = [
     id: 'context-tokens-session',
     tab: 'session',
     path: 'agents.defaults.contextTokens',
-    label: 'Session context tokens',
-    description:
-      'Same agent default context budget surfaced here for session setup workflows.',
+    label: 'settings.def.sessionContextTokens.label',
+    description: 'settings.def.sessionContextTokens.desc',
     kind: 'number',
     min: 1,
     step: 1000,
@@ -310,8 +307,8 @@ const SETTINGS: Array<SettingDefinition> = [
     id: 'memory-provider',
     tab: 'memory',
     path: 'agents.defaults.memorySearch.provider',
-    label: 'Memory search provider',
-    description: 'Embedding provider used for memory lookup and consolidation.',
+    label: 'settings.def.memoryProvider.label',
+    description: 'settings.def.memoryProvider.desc',
     kind: 'select',
     options: MEMORY_PROVIDER_OPTIONS,
   },
@@ -319,9 +316,8 @@ const SETTINGS: Array<SettingDefinition> = [
     id: 'memory-fallback',
     tab: 'memory',
     path: 'agents.defaults.memorySearch.fallback',
-    label: 'Memory fallback provider',
-    description:
-      'Fallback provider when the primary memory search provider is unavailable.',
+    label: 'settings.def.memoryFallback.label',
+    description: 'settings.def.memoryFallback.desc',
     kind: 'select',
     options: MEMORY_FALLBACK_OPTIONS,
   },
@@ -329,24 +325,24 @@ const SETTINGS: Array<SettingDefinition> = [
     id: 'memory-sync-on-session-start',
     tab: 'memory',
     path: 'agents.defaults.memorySearch.sync.onSessionStart',
-    label: 'Sync on session start',
-    description: 'Refresh indexed memory paths when a new session starts.',
+    label: 'settings.def.syncOnSessionStart.label',
+    description: 'settings.def.syncOnSessionStart.desc',
     kind: 'boolean',
   },
   {
     id: 'memory-sync-on-search',
     tab: 'memory',
     path: 'agents.defaults.memorySearch.sync.onSearch',
-    label: 'Sync on search',
-    description: 'Run a sync before memory search queries.',
+    label: 'settings.def.syncOnSearch.label',
+    description: 'settings.def.syncOnSearch.desc',
     kind: 'boolean',
   },
   {
     id: 'memory-sync-interval',
     tab: 'memory',
     path: 'agents.defaults.memorySearch.sync.intervalMinutes',
-    label: 'Consolidation interval',
-    description: 'Background memory consolidation cadence, in minutes.',
+    label: 'settings.def.consolidationInterval.label',
+    description: 'settings.def.consolidationInterval.desc',
     kind: 'number',
     min: 0,
     step: 5,
@@ -410,7 +406,7 @@ function buildProviderSummaries(payload: {
       name: getProviderDisplayName(providerId),
       description:
         metadata?.description ||
-        'Configured provider in your local Hermes setup.',
+        t('settings.providerConfiguredDefault'),
       modelCount,
       status: modelCount > 0 ? 'active' : 'configured',
     })
@@ -540,7 +536,7 @@ function ProviderStatusBadge({ status }: { status: ProviderStatus }) {
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-primary-300 bg-white px-2 py-0.5 text-xs font-medium text-primary-700">
       <HugeiconsIcon icon={CheckmarkCircle02Icon} size={20} strokeWidth={1.5} />
-      {status === 'active' ? 'Active' : 'Configured'}
+      {status === 'active' ? t('settings.providerStatus.active') : t('settings.providerStatus.configured')}
     </span>
   )
 }
@@ -578,7 +574,7 @@ function SettingCard(props: {
     if (setting.kind === 'number') {
       nextValue = parseNumberValue(rawValue)
       if (nextValue === null) {
-        toast(`Enter a valid number for ${setting.label}`, { type: 'error' })
+        toast(t('settings.toast.enterValidNumber', { label: t(setting.label) }), { type: 'error' })
         return
       }
     } else if (setting.kind === 'multiline' || setting.kind === 'text') {
@@ -599,7 +595,7 @@ function SettingCard(props: {
     await saveSetting({
       path: setting.path,
       value: nextValue,
-      label: setting.label,
+      label: t(setting.label),
     })
 
     setDraftValues((prev) => {
@@ -615,20 +611,20 @@ function SettingCard(props: {
         <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-sm font-semibold text-primary-900">
-              {setting.label}
+              {t(setting.label)}
             </h3>
             {setting.unsupported ? (
               <span className="rounded-full border border-primary-300 bg-primary-100 px-2 py-0.5 text-[11px] font-medium text-primary-700">
-                Not available
+                {t('settings.notAvailable')}
               </span>
             ) : null}
             {isActiveSave ? (
               <span className="rounded-full border border-primary-300 bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-700">
-                Saving...
+                {t('settings.saving')}
               </span>
             ) : null}
           </div>
-          <p className="text-sm text-primary-600">{setting.description}</p>
+          <p className="text-sm text-primary-600">{t(setting.description)}</p>
           {setting.path ? (
             <p className="text-xs text-primary-500">{setting.path}</p>
           ) : null}
@@ -640,13 +636,13 @@ function SettingCard(props: {
               <Switch
                 checked={coerceBoolean(currentValue)}
                 disabled={disabled}
-                aria-label={setting.label}
+                aria-label={t(setting.label)}
                 onCheckedChange={(checked) => {
                   if (!setting.path || setting.unsupported) return
                   void saveSetting({
                     path: setting.path,
                     value: checked,
-                    label: setting.label,
+                    label: t(setting.label),
                   })
                 }}
               />
@@ -663,14 +659,14 @@ function SettingCard(props: {
                 void saveSetting({
                   path: setting.path,
                   value: event.target.value,
-                  label: setting.label,
+                  label: t(setting.label),
                 })
               }}
             >
-              <option value="">Select…</option>
+              <option value="">{t('settings.selectOption')}</option>
               {(setting.options ?? []).map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.label as TranslationKey)}
                 </option>
               ))}
             </select>
@@ -681,7 +677,7 @@ function SettingCard(props: {
               <Input
                 value={draftValue}
                 disabled={disabled}
-                placeholder={setting.placeholder}
+                placeholder={setting.placeholder ? t(setting.placeholder) : undefined}
                 list={
                   setting.id === 'primary-model'
                     ? 'settings-model-options'
@@ -723,7 +719,7 @@ function SettingCard(props: {
               disabled={disabled}
               min={setting.min}
               step={setting.step}
-              placeholder={setting.placeholder}
+              placeholder={setting.placeholder ? t(setting.placeholder) : undefined}
               onChange={(event) => {
                 const nextValue = event.target.value
                 setDraftValues((prev) => ({
@@ -749,7 +745,7 @@ function SettingCard(props: {
               value={draftValue}
               disabled={disabled}
               rows={setting.rows ?? 4}
-              placeholder={setting.placeholder}
+              placeholder={setting.placeholder ? t(setting.placeholder) : undefined}
               onChange={(event) => {
                 const nextValue = event.target.value
                 setDraftValues((prev) => ({
@@ -787,29 +783,34 @@ type PerformanceDraft = {
 }
 
 const MODEL_PROVIDER_OPTIONS: Array<SelectOption> = [
-  { label: 'Custom', value: 'custom' },
-  { label: 'OpenRouter', value: 'openrouter' },
-  { label: 'Anthropic', value: 'anthropic' },
-  { label: 'OpenAI', value: 'openai' },
-  { label: 'Google (Gemini)', value: 'google' },
+  { label: 'settings.modelProvider.custom', value: 'custom' },
+  { label: 'settings.modelProvider.openrouter', value: 'openrouter' },
+  { label: 'settings.modelProvider.anthropic', value: 'anthropic' },
+  { label: 'settings.modelProvider.openai', value: 'openai' },
+  { label: 'settings.modelProvider.google', value: 'google' },
 ]
 
-const MODEL_PRESETS = [
+const MODEL_PRESETS: Array<{
+  id: string
+  label: TranslationKey
+  provider: 'custom'
+  baseUrl: string
+}> = [
   {
     id: 'atomic-chat',
-    label: 'Atomic Chat',
+    label: 'settings.modelPreset.atomicChat',
     provider: 'custom' as const,
     baseUrl: 'http://127.0.0.1:1337/v1',
   },
   {
     id: 'ollama',
-    label: 'Ollama',
+    label: 'settings.modelPreset.ollama',
     provider: 'custom' as const,
     baseUrl: 'http://127.0.0.1:11434/v1',
   },
   {
     id: 'llama-server',
-    label: 'llama-server',
+    label: 'settings.modelPreset.llamaServer',
     provider: 'custom' as const,
     baseUrl: 'http://127.0.0.1:8080/v1',
   },
@@ -918,7 +919,7 @@ function ModelConfigSection(props: {
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <label className="space-y-1.5">
           <span className="text-xs font-medium uppercase tracking-[0.12em] text-primary-600">
-            Provider
+            {t('settings.modelConfig.provider')}
           </span>
           <select
             className="h-10 w-full rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] px-3 text-sm text-primary-900 outline-none"
@@ -932,7 +933,7 @@ function ModelConfigSection(props: {
           >
             {MODEL_PROVIDER_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.label as TranslationKey)}
               </option>
             ))}
           </select>
@@ -940,12 +941,12 @@ function ModelConfigSection(props: {
 
         <label className="space-y-1.5">
           <span className="text-xs font-medium uppercase tracking-[0.12em] text-primary-600">
-            Model Name
+            {t('settings.modelConfig.modelName')}
           </span>
           <Input
             value={value.model}
             list={datalistId}
-            placeholder="gpt-4.1, claude-sonnet-4-5, qwen2.5:32b"
+            placeholder={t('settings.modelConfig.modelPlaceholder')}
             className="border-[var(--theme-border)] bg-[var(--theme-card)] font-mono text-sm"
             onChange={(event) => {
               onChange({
@@ -959,11 +960,11 @@ function ModelConfigSection(props: {
 
       <label className="mt-4 block space-y-1.5">
         <span className="text-xs font-medium uppercase tracking-[0.12em] text-primary-600">
-          Base URL
+          {t('settings.modelConfig.baseUrl')}
         </span>
         <Input
           value={value.baseUrl}
-          placeholder="http://127.0.0.1:11434/v1"
+          placeholder={t('settings.modelConfig.baseUrlPlaceholder')}
           className="border-[var(--theme-border)] bg-[var(--theme-card)] font-mono text-sm"
           onChange={(event) => {
             onChange({
@@ -991,7 +992,7 @@ function ModelConfigSection(props: {
                 })
               }}
             >
-              {preset.label}
+              {t(preset.label)}
             </Button>
           ))}
         </div>
@@ -1082,13 +1083,13 @@ function ActiveModelCard({
         queryClient.invalidateQueries({ queryKey: ['claude', 'config'] }),
         queryClient.invalidateQueries({ queryKey: ['claude-config'] }),
       ])
-      toast('Model config saved — takes effect on next message', {
+      toast(t('settings.toast.modelConfigSaved'), {
         type: 'success',
       })
     },
     onError: (error) => {
       toast(
-        error instanceof Error ? error.message : 'Failed to save model config',
+        error instanceof Error ? error.message : t('settings.toast.failedSaveModelConfig'),
         { type: 'error' },
       )
     },
@@ -1106,11 +1107,10 @@ function ActiveModelCard({
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <h3 className="text-base font-medium text-primary-900">
-            Model Configuration
+            {t('settings.modelConfig.title')}
           </h3>
           <p className="text-sm text-primary-600">
-            Update the primary model, optional fallback, and stream timeout
-            settings saved in the active profile configuration.
+            {t('settings.modelConfig.desc')}
           </p>
         </div>
         <Button
@@ -1118,23 +1118,23 @@ function ActiveModelCard({
           onClick={() => void saveMutation.mutateAsync()}
           disabled={configQuery.isPending || saveMutation.isPending}
         >
-          {saveMutation.isPending ? 'Saving...' : 'Save'}
+          {saveMutation.isPending ? t('settings.saving') : t('common.save')}
         </Button>
       </div>
 
       {configQuery.isPending ? (
         <p className="mt-4 text-sm text-primary-500">
-          Loading configuration...
+          {t('settings.modelConfig.loadingConfig')}
         </p>
       ) : configQuery.error ? (
         <p className="mt-4 text-sm text-red-500">
-          Could not load config — is Hermes Agent running?
+          {t('settings.modelConfig.loadFailed')}
         </p>
       ) : (
         <div className="mt-5 space-y-4">
           <ModelConfigSection
-            title="Primary Model"
-            description="Default provider, model, and base URL used for new Hermes Agent requests."
+            title={t('settings.modelConfig.primaryTitle')}
+            description={t('settings.modelConfig.primaryDesc')}
             value={primaryConfig}
             onChange={setPrimaryConfig}
             modelOptions={modelOptions}
@@ -1146,11 +1146,10 @@ function ActiveModelCard({
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold text-primary-900">
-                  Fallback Model
+                  {t('settings.modelConfig.fallbackTitle')}
                 </h3>
                 <p className="text-sm text-primary-600">
-                  Optional secondary model Hermes Agent can use if the primary path
-                  fails.
+                  {t('settings.modelConfig.fallbackDesc')}
                 </p>
               </div>
               <Button
@@ -1162,15 +1161,15 @@ function ActiveModelCard({
                   setShowFallback((current) => !current)
                 }}
               >
-                {showFallback ? 'Hide Fallback' : 'Show Fallback'}
+                {showFallback ? t('settings.modelConfig.hideFallback') : t('settings.modelConfig.showFallback')}
               </Button>
             </div>
 
             {showFallback ? (
               <div className="mt-4">
                 <ModelConfigSection
-                  title="Fallback Settings"
-                  description="Keep these fields empty if you do not want a fallback model configured."
+                  title={t('settings.modelConfig.fallbackSettingsTitle')}
+                  description={t('settings.modelConfig.fallbackSettingsDesc')}
                   value={fallbackConfig}
                   onChange={setFallbackConfig}
                   modelOptions={modelOptions}
@@ -1183,18 +1182,17 @@ function ActiveModelCard({
           <section className="rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-4 shadow-sm">
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-primary-900">
-                Performance
+                {t('settings.modelConfig.performanceTitle')}
               </h3>
               <p className="text-sm text-primary-600">
-                Increase these timeouts for slower local models or larger
-                prompts that stream output more gradually.
+                {t('settings.modelConfig.performanceDesc')}
               </p>
             </div>
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <label className="space-y-1.5">
                 <span className="text-xs font-medium uppercase tracking-[0.12em] text-primary-600">
-                  Stream Stale Timeout
+                  {t('settings.modelConfig.streamStaleTimeout')}
                 </span>
                 <Input
                   type="number"
@@ -1208,12 +1206,12 @@ function ActiveModelCard({
                     }))
                   }}
                 />
-                <p className="text-xs text-primary-500">Default: 90s</p>
+                <p className="text-xs text-primary-500">{t('settings.modelConfig.streamStaleTimeoutDefault')}</p>
               </label>
 
               <label className="space-y-1.5">
                 <span className="text-xs font-medium uppercase tracking-[0.12em] text-primary-600">
-                  Stream Read Timeout
+                  {t('settings.modelConfig.streamReadTimeout')}
                 </span>
                 <Input
                   type="number"
@@ -1227,13 +1225,12 @@ function ActiveModelCard({
                     }))
                   }}
                 />
-                <p className="text-xs text-primary-500">Default: 60s</p>
+                <p className="text-xs text-primary-500">{t('settings.modelConfig.streamReadTimeoutDefault')}</p>
               </label>
             </div>
 
             <p className="mt-4 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card2)] px-3 py-2 text-sm text-primary-600">
-              Slow local runners such as Ollama and `llama-server` often need
-              more headroom before Hermes Agent decides a stream has stalled.
+              {t('settings.modelConfig.slowRunnersTip')}
             </p>
           </section>
         </div>
@@ -1272,16 +1269,15 @@ function ProviderManagementSection(props: {
       <header className="flex flex-col gap-4 rounded-xl border border-primary-200 bg-primary-50/80 px-5 py-4 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="space-y-1.5">
           <h2 className="text-base font-semibold text-primary-900">
-            Provider Setup
+            {t('settings.providerSetup.title')}
           </h2>
           <p className="text-sm text-primary-600">
-            View configured providers and walk through safe setup instructions
-            for new providers.
+            {t('settings.providerSetup.desc')}
           </p>
         </div>
         <Button size="sm" onClick={onAddProvider}>
           <HugeiconsIcon icon={Add01Icon} size={20} strokeWidth={1.5} />
-          Add Provider
+          {t('settings.providerSetup.addProvider')}
         </Button>
       </header>
 
@@ -1289,36 +1285,36 @@ function ProviderManagementSection(props: {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="text-base font-medium text-primary-900">
-              Configured Providers
+              {t('settings.providerSetup.configuredTitle')}
             </h3>
             <p className="mt-1 text-xs text-primary-600">
-              API keys stay in your local Hermes config and are never sent to
-              Studio.
+              {t('settings.providerSetup.apiKeysNote')}
             </p>
           </div>
           <p className="text-xs text-primary-600 tabular-nums">
-            {providerSummaries.length} provider
-            {providerSummaries.length === 1 ? '' : 's'}
+            {providerSummaries.length === 1
+              ? t('settings.providerSetup.providerCountOne', { count: providerSummaries.length })
+              : t('settings.providerSetup.providerCountMany', { count: providerSummaries.length })}
           </p>
         </div>
 
         {modelsQuery.isPending ? (
           <p className="rounded-xl border border-primary-200 bg-white px-3 py-2 text-sm text-primary-600">
-            Loading providers from Hermes Agent...
+            {t('settings.providerSetup.loadingProviders')}
           </p>
         ) : null}
 
         {modelsQuery.error ? (
           <div className="rounded-xl border border-primary-200 bg-white px-4 py-3">
             <p className="mb-2 text-sm text-primary-700">
-              Unable to load providers right now. Check your Hermes Agent connection.
+              {t('settings.providerSetup.unableToLoad')}
             </p>
             <Button
               variant="outline"
               size="sm"
               onClick={() => modelsQuery.refetch()}
             >
-              Retry
+              {t('common.retry')}
             </Button>
           </div>
         ) : null}
@@ -1328,8 +1324,7 @@ function ProviderManagementSection(props: {
         providerSummaries.length === 0 ? (
           <div className="rounded-xl border border-primary-200 bg-white px-4 py-4">
             <p className="text-sm text-primary-700">
-              No providers are configured yet. Use Add Provider to open setup
-              instructions.
+              {t('settings.providerSetup.noProviders')}
             </p>
           </div>
         ) : null}
@@ -1363,7 +1358,7 @@ function ProviderManagementSection(props: {
 
                   <div className="mt-3 flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 px-2.5 py-2">
                     <span className="text-xs text-primary-600">
-                      Available models
+                      {t('settings.providerSetup.availableModels')}
                     </span>
                     <span className="text-sm font-medium text-primary-900 tabular-nums">
                       {provider.modelCount}
@@ -1379,14 +1374,14 @@ function ProviderManagementSection(props: {
                         onEdit(provider)
                       }}
                       disabled={isDeleting}
-                      aria-label={`Edit ${provider.name}`}
+                      aria-label={t('settings.providerSetup.editAria', { name: provider.name })}
                     >
                       <HugeiconsIcon
                         icon={Edit01Icon}
                         size={14}
                         strokeWidth={1.5}
                       />
-                      Edit
+                      {t('common.edit')}
                     </Button>
                     <Button
                       variant="outline"
@@ -1396,14 +1391,14 @@ function ProviderManagementSection(props: {
                         onDelete(provider)
                       }}
                       disabled={isDeleting}
-                      aria-label={`Delete ${provider.name}`}
+                      aria-label={t('settings.providerSetup.deleteAria', { name: provider.name })}
                     >
                       <HugeiconsIcon
                         icon={Delete02Icon}
                         size={14}
                         strokeWidth={1.5}
                       />
-                      {isDeleting ? 'Removing…' : 'Delete'}
+                      {isDeleting ? t('settings.providerSetup.removing') : t('common.delete')}
                     </Button>
                   </div>
                 </article>
@@ -1467,10 +1462,10 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
     },
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({ queryKey: ['claude', 'config'] })
-      toast(`${variables.label} saved`, { type: 'success' })
+      toast(t('settings.toast.settingSaved', { label: variables.label }), { type: 'success' })
     },
     onError: (error) => {
-      toast(error instanceof Error ? error.message : 'Failed to save setting', {
+      toast(error instanceof Error ? error.message : t('settings.toast.failedSaveSetting'), {
         type: 'error',
       })
     },
@@ -1541,7 +1536,7 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
 
   async function handleDelete(provider: ProviderSummary) {
     const confirmed = window.confirm(
-      `Remove provider "${provider.name}"? This will delete the API key from your local config.`,
+      t('settings.confirmRemoveProvider', { name: provider.name }),
     )
     if (!confirmed) return
 
@@ -1557,17 +1552,17 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
       })
       const data = (await res.json()) as { ok: boolean; error?: string }
       if (!data.ok) {
-        toast(`Failed to remove provider: ${data.error ?? 'Unknown error'}`, {
+        toast(t('settings.toast.failedRemoveProvider', { error: data.error ?? t('settings.toast.unknownError') }), {
           type: 'error',
         })
       } else {
         await queryClient.invalidateQueries({
           queryKey: ['claude', 'providers', 'models'],
         })
-        toast(`Provider "${provider.name}" removed`, { type: 'success' })
+        toast(t('settings.toast.providerRemoved', { name: provider.name }), { type: 'success' })
       }
     } catch {
-      toast('Network error — could not remove provider.', { type: 'error' })
+      toast(t('settings.toast.networkErrorRemoveProvider'), { type: 'error' })
     } finally {
       setDeletingId(null)
     }
@@ -1594,7 +1589,7 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
         )}
       >
         <BackendUnavailableState
-          feature="Provider Setup"
+          feature={t('settings.feature.providerSetup')}
           description={getUnavailableReason('config')}
         />
       </div>
@@ -1617,10 +1612,10 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
           <header className="flex flex-col gap-4 rounded-xl border border-primary-200 bg-primary-50/80 px-5 py-4 shadow-sm">
             <div className="space-y-1">
               <h1 className="hidden md:block text-lg font-semibold text-primary-900">
-                Settings
+                {t('settings.title')}
               </h1>
               <p className="text-sm text-primary-600">
-                Configure providers plus Hermes Agent defaults in one place.
+                {t('settings.header.desc')}
               </p>
             </div>
 
@@ -1636,7 +1631,7 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
                 <Input
                   value={search}
                   type="search"
-                  placeholder="Search settings, paths, or descriptions"
+                  placeholder={t('settings.searchPlaceholder')}
                   className="pl-10"
                   onChange={(event) => {
                     setSearch(event.target.value)
@@ -1646,8 +1641,10 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
 
               <div className="text-sm text-primary-600">
                 {searchQuery
-                  ? `${totalSearchMatches} matching setting${totalSearchMatches === 1 ? '' : 's'}`
-                  : `${SETTINGS.length} configurable defaults`}
+                  ? (totalSearchMatches === 1
+                      ? t('settings.searchMatchesOne', { count: totalSearchMatches })
+                      : t('settings.searchMatchesMany', { count: totalSearchMatches }))
+                  : t('settings.configurableDefaults', { count: SETTINGS.length })}
               </div>
             </div>
           </header>
@@ -1671,7 +1668,7 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
                     value={tab.id}
                     className="rounded-lg px-3 py-2 text-sm"
                   >
-                    {tab.label}
+                    {t(tab.label)}
                     <span className="ml-1 rounded-full bg-primary-100 px-1.5 py-0.5 text-[11px] text-primary-700">
                       {count}
                     </span>
@@ -1704,14 +1701,14 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
                 <TabsContent key={tab.id} value={tab.id} className="space-y-4">
                   {configQuery.isPending ? (
                     <div className="rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm text-primary-600">
-                      Loading current configuration...
+                      {t('settings.loadingCurrentConfig')}
                     </div>
                   ) : null}
 
                   {configQuery.error ? (
                     <div className="rounded-xl border border-primary-200 bg-white px-4 py-3">
                       <p className="text-sm text-primary-700">
-                        Unable to load configuration right now.
+                        {t('settings.unableToLoadConfig')}
                       </p>
                       <Button
                         variant="outline"
@@ -1719,7 +1716,7 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
                         className="mt-3"
                         onClick={() => configQuery.refetch()}
                       >
-                        Retry
+                        {t('common.retry')}
                       </Button>
                     </div>
                   ) : null}
@@ -1728,7 +1725,7 @@ export function ProvidersScreen({ embedded = false }: ProvidersScreenProps) {
                   !configQuery.error &&
                   items.length === 0 ? (
                     <div className="rounded-xl border border-primary-200 bg-primary-50 px-4 py-4 text-sm text-primary-600">
-                      No settings in this tab match your current search.
+                      {t('settings.noMatchingSettings')}
                     </div>
                   ) : null}
 
