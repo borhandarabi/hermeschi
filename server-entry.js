@@ -4,6 +4,29 @@ import { join, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import server from './dist/server/server.js'
 
+// ── Env var migration shim (HERMES_WORKSPACE_* → HERMESCHI_*) ──────
+// Runs once at server startup. Maps deprecated env var names to the
+// new HermesChi names so existing .env files keep working. Safe to
+// remove after a few release cycles.
+;(function migrateEnvVars() {
+  const ENV_MIGRATIONS = {
+    HERMES_WORKSPACE_DIR: 'HERMESCHI_WORKSPACE_DIR',
+    HERMES_WEBUI_DEFAULT_WORKSPACE: 'HERMESCHI_WEBUI_DEFAULT_WORKSPACE',
+    HERMES_PASSWORD: 'HERMESCHI_PASSWORD',
+    HERMES_DASHBOARD_TOKEN: 'HERMESCHI_DASHBOARD_TOKEN',
+    HERMES_DASHBOARD_URL: 'HERMESCHI_DASHBOARD_URL',
+    HERMES_WORKSPACE_DESKTOP: 'HERMESCHI_DESKTOP',
+  }
+  for (const [oldName, newName] of Object.entries(ENV_MIGRATIONS)) {
+    if (process.env[newName] === undefined && process.env[oldName] !== undefined) {
+      process.env[newName] = process.env[oldName]
+      console.warn(
+        `[HermesChi] Env var '${oldName}' is deprecated. Use '${newName}' instead. Value auto-migrated.`,
+      )
+    }
+  }
+})()
+
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const CLIENT_DIR = join(__dirname, 'dist', 'client')
 
