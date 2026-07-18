@@ -17,6 +17,7 @@ import { botsFor } from './lib/playground-bots'
 import { PLAYGROUND_WORLDS, itemById, type PlaygroundItemId, type PlaygroundWorldId } from './lib/playground-rpg'
 import type { RemotePlayer } from './hooks/use-playground-multiplayer'
 import { useWorkspaceStore } from '@/stores/workspace-store'
+import { t } from '@/lib/i18n'
 
 
 const PlaygroundAdminPanel = lazy(() => import('./components/playground-admin-panel').then((module) => ({ default: module.PlaygroundAdminPanel })))
@@ -725,7 +726,7 @@ export function PlaygroundScreen() {
         <button
           type="button"
           onClick={() => setSettingsOpen(true)}
-          aria-label="Open settings"
+          aria-label={t('playground.settings.graphics')}
           title="Settings (Esc)"
           className="pointer-events-auto fixed right-3 top-[314px] z-[71] hidden h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-[15px] text-white shadow-xl backdrop-blur-xl md:flex"
           style={{ boxShadow: '0 8px 22px rgba(0,0,0,.55)', borderColor: 'rgba(241,197,109,0.42)' }}
@@ -1043,7 +1044,7 @@ function TitleScreen({
               <input
                 value={displayName}
                 onChange={(event) => onChangeDisplayName(event.target.value.slice(0, 24))}
-                placeholder="Enter your builder name..."
+                placeholder={t('agents.searchPlaceholder')}
                 maxLength={24}
                 className="mt-3 w-full rounded-xl border-2 bg-black/40 px-4 py-3.5 text-base text-white outline-none placeholder:text-white/25"
                 style={{ borderColor: 'rgba(245,217,122,0.25)' }}

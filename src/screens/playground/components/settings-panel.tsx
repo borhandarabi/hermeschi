@@ -1,5 +1,6 @@
 import type { ChangeEvent, ReactNode } from 'react'
 import { useHermesWorldSettings, type HermesWorldSettings } from './hermesworld-settings'
+import { t } from '@/lib/i18n'
 
 type Props = {
   open: boolean
@@ -47,7 +48,7 @@ export function SettingsPanel({ open, onClose, signedInName, onSignOut }: Props)
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="HermesWorld settings"
+        aria-label={t('playground.settings.graphics')}
         className="max-h-[92vh] w-[min(96vw,980px)] overflow-hidden rounded-3xl border-2 text-white shadow-2xl"
         style={{
           borderColor: 'rgba(241,197,109,.55)',
