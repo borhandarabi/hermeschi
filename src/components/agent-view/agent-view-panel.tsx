@@ -43,6 +43,7 @@ import { OrchestratorAvatar } from '@/components/orchestrator-avatar'
 import { useOrchestratorState } from '@/hooks/use-orchestrator-state'
 import { useChatActivityStore } from '@/stores/chat-activity-store'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import { InspectorPanel, InspectorToggleButton } from '@/components/inspector/inspector-panel'
 
 function getLastUserMessageBubbleElement(): HTMLElement | null {
@@ -308,7 +309,7 @@ function OrchestratorCard({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferredProvider])
 
-  const displayName = agentName || sessionName || 'Agent'
+  const displayName = agentName || sessionName || t('agentView.missionLabel')
 
   function startEdit() {
     setEditValue(agentName)
@@ -324,9 +325,9 @@ function OrchestratorCard({
   }
 
   // Build usage rows: provider rows if available, else synthetic context row
-  const ctxRow: OcUsageRow = { label: 'Ctx', pct: contextPct ?? 0, resetHint: null }
+  const ctxRow: OcUsageRow = { label: t('agentView.ctx'), pct: contextPct ?? 0, resetHint: null }
   const displayRows: OcUsageRow[] = usageRows.length > 0 ? usageRows : (contextPct !== null ? [ctxRow] : [])
-  const usageHeader = providerLabel ?? 'Usage'
+  const usageHeader = providerLabel ?? t('agentView.usage')
 
   // Provider logo URLs (Simple Icons CDN)
   const PROVIDER_LOGO_URLS: Record<string, string> = {
@@ -378,7 +379,7 @@ function OrchestratorCard({
           <OrchestratorAvatar size={compact ? 40 : 88} />
           {!compact ? (
             <span className="rounded bg-accent-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-accent-700">
-              Main Agent
+              {t('agentView.mainAgent')}
             </span>
           ) : null}
         </div>
@@ -400,7 +401,7 @@ function OrchestratorCard({
                   if (e.key === 'Enter') commitEdit()
                   if (e.key === 'Escape') setIsEditing(false)
                 }}
-                placeholder="Agent name..."
+                placeholder={t('agentView.agentNamePlaceholder')}
                 className="w-24 rounded border border-primary-200/25 bg-primary-50 px-1.5 py-0.5 text-xs font-semibold text-primary-900 outline-none focus:border-accent-400"
                 maxLength={20}
               />
@@ -412,7 +413,7 @@ function OrchestratorCard({
                   'font-semibold text-primary-900 transition-colors hover:text-accent-600',
                   compact ? 'text-sm' : 'text-base',
                 )}
-                title="Click to rename"
+                title={t('agentView.clickToRename')}
               >
                 {displayName}
               </button>
@@ -461,7 +462,7 @@ function OrchestratorCard({
                   : 'cursor-default text-primary-400',
                 providerFlash && 'text-emerald-500',
               )}
-              title={canCycleOc ? 'Click to switch provider' : undefined}
+              title={canCycleOc ? t('agentView.clickToSwitchProvider') : undefined}
             >
               {providerLogoUrl ? (
                 <img
@@ -521,11 +522,11 @@ function OrchestratorCard({
 
 
 function getStatusLabel(status: AgentNodeStatus): string {
-  if (status === 'failed') return 'failed'
-  if (status === 'thinking') return 'thinking'
-  if (status === 'complete') return 'complete'
-  if (status === 'queued') return 'queued'
-  return 'running'
+  if (status === 'failed') return t('agentView.failed')
+  if (status === 'thinking') return t('agentView.thinking')
+  if (status === 'complete') return t('agentView.complete')
+  if (status === 'queued') return t('agentView.queue')
+  return t('agentView.running')
 }
 
 function getAgentStatus(agent: ActiveAgent): AgentNodeStatus {
@@ -550,19 +551,19 @@ function getStatusBubble(
   progress: number,
 ): AgentStatusBubble {
   if (status === 'thinking') {
-    return { type: 'thinking', text: 'Reasoning through next step' }
+    return { type: 'thinking', text: t('agentView.statusReasoning') }
   }
   if (status === 'failed') {
-    return { type: 'error', text: 'Execution failed, awaiting retry' }
+    return { type: 'error', text: t('agentView.statusFailed') }
   }
   if (status === 'complete') {
-    return { type: 'checkpoint', text: 'Checkpoint complete' }
+    return { type: 'checkpoint', text: t('agentView.statusCheckpointComplete') }
   }
   if (status === 'queued') {
-    return { type: 'question', text: 'Queued for dispatch' }
+    return { type: 'question', text: t('agentView.statusQueued') }
   }
   const clampedProgress = Math.max(0, Math.min(100, Math.round(progress)))
-  return { type: 'checkpoint', text: `${clampedProgress}% complete` }
+  return { type: 'checkpoint', text: t('agentView.statusProgressComplete', { count: clampedProgress }) }
 }
 
 export function AgentViewPanel() {
@@ -857,7 +858,7 @@ export function AgentViewPanel() {
                       ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-700'
                       : 'border-primary-300/35 bg-primary-200/35 text-primary-700',
                   )}
-                  title={`${activeCount} agent${activeCount !== 1 ? 's' : ''} running · ${historyAgents.length} in history · ${queuedAgents.length} queued`}
+                  title={t('agentView.countsTooltip', { active: activeCount, history: historyAgents.length, queued: queuedAgents.length })}
                 >
                   {isLiveConnected ? (
                     <motion.span
@@ -885,7 +886,7 @@ export function AgentViewPanel() {
 
               {/* Center — title */}
               <h2 className="text-sm font-semibold text-primary-900">
-                Agent View
+                {t('agentView.panelTitle')}
               </h2>
 
               {/* Right — inspector + close */}
@@ -897,7 +898,7 @@ export function AgentViewPanel() {
                   onClick={function handleClosePanel() {
                     setOpen(false)
                   }}
-                  aria-label="Hide Agent View"
+                  aria-label={t('agentView.hidePanel')}
                 >
                   <HugeiconsIcon
                     icon={Cancel01Icon}
@@ -923,7 +924,7 @@ export function AgentViewPanel() {
                   {/* Centered Agents pill */}
                   <div className="mb-1 flex justify-center">
                     <span className="rounded-full bg-primary-200/30 px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary-500">
-                      Agents
+                      {t('agentView.agents')}
                     </span>
                   </div>
 
@@ -931,12 +932,12 @@ export function AgentViewPanel() {
                     <div>
                       {activeMissionName ? (
                         <p className="mb-0.5 text-[10px] font-medium text-accent-400 tabular-nums">
-                          Mission: {activeMissionName} · {missionStateLabel}
+                          {t('agentView.missionLabel')}: {activeMissionName} · {missionStateLabel}
                         </p>
                       ) : null}
                       <p className="text-[10px] text-primary-600 tabular-nums">
                         {isLoading
-                          ? 'syncing...'
+                          ? t('agentView.syncing')
                           : statusCounts.running === 0 &&
                               statusCounts.thinking === 0 &&
                               statusCounts.failed === 0 &&
@@ -944,13 +945,13 @@ export function AgentViewPanel() {
                             ? ''
                             : [
                                 statusCounts.running > 0 &&
-                                  `${statusCounts.running} running`,
+                                  t('agentView.runningCount', { count: statusCounts.running }),
                                 statusCounts.thinking > 0 &&
-                                  `${statusCounts.thinking} thinking`,
+                                  t('agentView.thinkingCount', { count: statusCounts.thinking }),
                                 statusCounts.failed > 0 &&
-                                  `${statusCounts.failed} failed`,
+                                  t('agentView.failedCount', { count: statusCounts.failed }),
                                 statusCounts.complete > 0 &&
-                                  `${statusCounts.complete} complete`,
+                                  t('agentView.completeCount', { count: statusCounts.complete }),
                               ]
                                 .filter(Boolean)
                                 .join(' · ')}
@@ -1101,7 +1102,7 @@ export function AgentViewPanel() {
                         {queuedNodes.length > 0 ? (
                           <motion.div layout className="mt-1.5 space-y-1">
                             <p className="text-[10px] text-primary-600 tabular-nums">
-                              Queue
+                              {t('agentView.queue')}
                             </p>
                             <motion.div
                               layout
@@ -1163,7 +1164,7 @@ export function AgentViewPanel() {
                             size={20}
                             strokeWidth={1.5}
                           />
-                          ⚡ Active Agents
+                          ⚡ {t('agentView.activeAgents')}
                         </CollapsibleTrigger>
                         <span className="rounded-full bg-primary-300/70 px-2 py-0.5 text-[11px] text-primary-800 tabular-nums">
                           {visibleCliAgents.length}
@@ -1173,7 +1174,7 @@ export function AgentViewPanel() {
                         <div className="space-y-0.5">
                           {cliAgentsQuery.isLoading ? (
                             <p className="px-2 py-1 text-[11px] text-primary-500 tabular-nums">
-                              Scanning...
+                              {t('agentView.scanning')}
                             </p>
                           ) : null}
                           {visibleCliAgents.map(function renderCliAgent(agent) {
@@ -1215,7 +1216,7 @@ export function AgentViewPanel() {
                                       } catch { /* noop */ }
                                     }}
                                     className="shrink-0 rounded px-1 py-0.5 text-[9px] text-primary-400 hover:bg-red-100 hover:text-red-500 transition-colors"
-                                    title="Kill agent"
+                                    title={t('agentView.killAgentTitle')}
                                   >
                                     ✕
                                   </button>
@@ -1226,7 +1227,7 @@ export function AgentViewPanel() {
                                   </p>
                                 ) : (
                                   <p className="mt-0.5 pl-3 text-[10px] text-primary-400 italic">
-                                    {agent.runtimeSeconds > 7200 ? '⚠ stale — no task' : 'no task description'}
+                                    {agent.runtimeSeconds > 7200 ? t('agentView.staleNoTask') : t('agentView.noTaskDescription')}
                                   </p>
                                 )}
                                 <div className="mt-1 ml-3 h-1 overflow-hidden rounded-full bg-primary-200">
@@ -1303,12 +1304,12 @@ export function AgentViewPanel() {
                       {activeCount}
                     </span>
                   </div>
-                  <h2 className="text-sm font-semibold text-primary-900">Agent View</h2>
+                  <h2 className="text-sm font-semibold text-primary-900">{t('agentView.panelTitle')}</h2>
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
                     className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-200"
-                    aria-label="Close"
+                    aria-label={t('agentView.closePanel')}
                   >
                     <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
                       <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -1322,23 +1323,23 @@ export function AgentViewPanel() {
                   <section className="rounded-2xl bg-primary-200/15 p-1">
                     <div className="mb-1 flex justify-center">
                       <span className="rounded-full bg-primary-200/30 px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary-500">
-                        Agents
+                        {t('agentView.agents')}
                       </span>
                     </div>
                     <div className="mb-1 flex items-center justify-between px-1">
                       <p className="text-[10px] text-primary-600 tabular-nums">
                         {isLoading
-                          ? 'syncing...'
+                          ? t('agentView.syncing')
                           : activeNodes.length === 0 && queuedNodes.length === 0
                             ? ''
-                            : `${activeNodes.length} active · ${queuedNodes.length} queued`}
+                            : t('agentView.activeQueued', { active: activeNodes.length, queued: queuedNodes.length })}
                       </p>
                     </div>
                     {activeNodes.length > 0 ? (
                       <div className="space-y-1.5 p-1">
                         {missionActiveAgents.length > 0 ? (
                           <p className="px-1 text-[10px] font-medium uppercase tracking-[0.16em] text-accent-400">
-                            {activeMissionName || 'Mission'} · {missionActiveAgents.length} session{missionActiveAgents.length === 1 ? '' : 's'}
+                            {t('agentView.activeMissionCount', { name: activeMissionName || t('agentView.missionLabel'), count: missionActiveAgents.length, s: missionActiveAgents.length === 1 ? '' : 's' })}
                           </p>
                         ) : null}
                         {activeNodes.map((node) => (
@@ -1351,16 +1352,16 @@ export function AgentViewPanel() {
                             footer={
                               <div className="flex items-center justify-between">
                                 {missionSessionIds.has(node.id) ? (
-                                  <span className="text-[10px] text-accent-400">Active mission</span>
+                                  <span className="text-[10px] text-accent-400">{t('agentView.activeMission')}</span>
                                 ) : nonMissionActiveAgents.length > 0 ? (
-                                  <span className="text-[10px] text-primary-500">Outside mission</span>
+                                  <span className="text-[10px] text-primary-500">{t('agentView.outsideMission')}</span>
                                 ) : <span />}
                                 <button
                                   type="button"
                                   onClick={() => killAgent(node.id)}
                                   className="text-[10px] text-red-500 hover:text-red-700 font-medium"
                                 >
-                                  Kill
+                                  {t('agentCard.kill')}
                                 </button>
                               </div>
                             }
@@ -1376,7 +1377,7 @@ export function AgentViewPanel() {
                         onClick={() => setHistoryOpen(!historyOpen)}
                         className="flex w-full items-center justify-between text-[11px] font-medium text-primary-700"
                       >
-                        <span>History ({historyAgents.length})</span>
+                        <span>{t('agentView.history', { count: historyAgents.length })}</span>
                         <span>{historyOpen ? '▾' : '▸'}</span>
                       </button>
                       {historyOpen ? (
@@ -1394,7 +1395,7 @@ export function AgentViewPanel() {
                                     onClick={() => setSelectedAgentChat({ sessionKey: agent.id, agentName: agent.name, statusLabel: agent.status })}
                                     className="text-[10px] text-accent-600 hover:text-accent-800 font-medium"
                                   >
-                                    View
+                                    {t('agentCard.view')}
                                   </button>
                                 </div>
                               }
@@ -1423,7 +1424,7 @@ export function AgentViewPanel() {
               setOpen(true)
             }}
             className="fixed right-4 bottom-4 z-30 inline-flex size-12 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600 text-primary-50 shadow-lg"
-            aria-label="Open Agent View"
+            aria-label={t('agentView.openPanel')}
           >
             <motion.span
               animate={
@@ -1453,8 +1454,8 @@ export function AgentViewPanel() {
       <AgentChatModal
         open={selectedAgentChat !== null}
         sessionKey={selectedAgentChat?.sessionKey ?? ''}
-        agentName={selectedAgentChat?.agentName ?? 'Agent'}
-        statusLabel={selectedAgentChat?.statusLabel ?? 'running'}
+        agentName={selectedAgentChat?.agentName ?? t('agentView.missionLabel')}
+        statusLabel={selectedAgentChat?.statusLabel ?? t('agentView.running')}
         onOpenChange={function handleAgentChatOpenChange(nextOpen) {
           if (!nextOpen) {
             setSelectedAgentChat(null)

@@ -29,6 +29,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { t } from '@/lib/i18n'
 
 export type FileEntry = {
   name: string
@@ -222,7 +223,7 @@ export function FileExplorerSidebar({
 
   const handleDelete = useCallback(
     async (entry: FileEntry) => {
-      if (!window.confirm(`Move ${entry.name} to trash?`)) return
+      if (!window.confirm(t('files.deletePrompt', { name: entry.name }))) return
       await fetch('/api/files', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -395,14 +396,14 @@ export function FileExplorerSidebar({
     >
       <div className="flex items-center justify-between h-12 px-3 border-b border-primary-200">
         <div className="text-sm font-semibold text-primary-900">
-          {ROOT_LABEL}
+          {t('files.workspaceLabel')}
         </div>
         <div className="flex items-center gap-1">
           <Button
             size="icon-sm"
             variant="ghost"
             onClick={refresh}
-            title="Refresh"
+            title={t('files.refresh')}
           >
             <HugeiconsIcon icon={RefreshIcon} size={18} />
           </Button>
@@ -410,7 +411,7 @@ export function FileExplorerSidebar({
             size="icon-sm"
             variant="ghost"
             onClick={() => handleUploadClick('')}
-            title="Upload"
+            title={t('files.upload')}
           >
             <HugeiconsIcon icon={Upload01Icon} size={18} />
           </Button>
@@ -418,7 +419,7 @@ export function FileExplorerSidebar({
             size="icon-sm"
             variant="ghost"
             onClick={() => openPrompt({ mode: 'new-file', targetPath: '' })}
-            title="New file"
+            title={t('files.newFile')}
           >
             <HugeiconsIcon icon={PlusSignIcon} size={18} />
           </Button>
@@ -429,7 +430,7 @@ export function FileExplorerSidebar({
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search files"
+          placeholder={t('files.searchSidebar')}
           className="w-full rounded-md border border-primary-200 bg-primary-50 px-2 py-1 text-sm text-primary-900 placeholder:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-300"
         />
       </div>
@@ -437,7 +438,7 @@ export function FileExplorerSidebar({
       <ScrollAreaRoot className="flex-1 min-h-0">
         <ScrollAreaViewport className="px-1">
           {loading ? (
-            <div className="px-3 py-2 text-xs text-primary-500">Loading…</div>
+            <div className="px-3 py-2 text-xs text-primary-500">{t('files.loading')}</div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
               <div className="flex size-10 items-center justify-center rounded-xl border border-primary-200 bg-primary-100/60">
@@ -450,10 +451,10 @@ export function FileExplorerSidebar({
               </div>
               <div>
                 <p className="text-sm font-medium text-primary-800">
-                  No workspace selected
+                  {t('files.noWorkspace')}
                 </p>
                 <p className="mt-1 text-xs text-primary-500 text-pretty">
-                  Select a folder to browse and edit files.
+                  {t('files.selectFolder')}
                 </p>
               </div>
               <Button
@@ -463,7 +464,7 @@ export function FileExplorerSidebar({
                 className="mt-1"
               >
                 <HugeiconsIcon icon={RefreshIcon} size={16} />
-                Retry
+                {t('files.retry')}
               </Button>
             </div>
           ) : entries.length === 0 ? (
@@ -478,10 +479,10 @@ export function FileExplorerSidebar({
               </div>
               <div>
                 <p className="text-sm font-medium text-primary-800">
-                  Workspace is empty
+                  {t('files.workspaceEmpty')}
                 </p>
                 <p className="mt-1 text-xs text-primary-500 text-pretty">
-                  Create files or upload content to get started.
+                  {t('files.createOrUpload')}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -493,7 +494,7 @@ export function FileExplorerSidebar({
                   }
                 >
                   <HugeiconsIcon icon={PlusSignIcon} size={16} />
-                  New file
+                  {t('files.newFile')}
                 </Button>
                 <Button
                   size="sm"
@@ -501,7 +502,7 @@ export function FileExplorerSidebar({
                   onClick={() => handleUploadClick('')}
                 >
                   <HugeiconsIcon icon={Upload01Icon} size={16} />
-                  Upload
+                  {t('files.upload')}
                 </Button>
               </div>
             </div>
@@ -540,7 +541,7 @@ export function FileExplorerSidebar({
               setContextMenu(null)
             }}
           >
-            <HugeiconsIcon icon={Pen01Icon} size={16} /> Rename
+            <HugeiconsIcon icon={Pen01Icon} size={16} /> {t('files.rename')}
           </button>
           {contextMenu.entry.type === 'folder' ? (
             <>
@@ -551,7 +552,7 @@ export function FileExplorerSidebar({
                   setContextMenu(null)
                 }}
               >
-                <HugeiconsIcon icon={PlusSignIcon} size={16} /> New file
+                <HugeiconsIcon icon={PlusSignIcon} size={16} /> {t('files.newFile')}
               </button>
               <button
                 className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 hover:bg-primary-100"
@@ -560,7 +561,7 @@ export function FileExplorerSidebar({
                   setContextMenu(null)
                 }}
               >
-                <HugeiconsIcon icon={Folder01Icon} size={16} /> New folder
+                <HugeiconsIcon icon={Folder01Icon} size={16} /> {t('files.newFolder')}
               </button>
               <button
                 className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 hover:bg-primary-100"
@@ -569,7 +570,7 @@ export function FileExplorerSidebar({
                   setContextMenu(null)
                 }}
               >
-                <HugeiconsIcon icon={Upload01Icon} size={16} /> Upload
+                <HugeiconsIcon icon={Upload01Icon} size={16} /> {t('files.upload')}
               </button>
             </>
           ) : (
@@ -580,7 +581,7 @@ export function FileExplorerSidebar({
                 setContextMenu(null)
               }}
             >
-              <HugeiconsIcon icon={Download01Icon} size={16} /> Download
+              <HugeiconsIcon icon={Download01Icon} size={16} /> {t('files.download')}
             </button>
           )}
           <button
@@ -590,7 +591,7 @@ export function FileExplorerSidebar({
               setContextMenu(null)
             }}
           >
-            <HugeiconsIcon icon={Delete01Icon} size={16} /> Delete
+            <HugeiconsIcon icon={Delete01Icon} size={16} /> {t('files.delete')}
           </button>
         </div>
       ) : null}
@@ -605,15 +606,15 @@ export function FileExplorerSidebar({
           <div className="p-5 space-y-3">
             <DialogTitle>
               {promptState?.mode === 'rename'
-                ? 'Rename'
+                ? t('files.renameTitle')
                 : promptState?.mode === 'new-folder'
-                  ? 'New Folder'
-                  : 'New File'}
+                  ? t('files.newFolderTitle')
+                  : t('files.newFileTitle')}
             </DialogTitle>
             <DialogDescription>
               {promptState?.mode === 'rename'
-                ? 'Enter a new name.'
-                : 'Enter a name to create.'}
+                ? t('files.renameDesc')
+                : t('files.createDesc')}
             </DialogDescription>
             <input
               value={promptValue}
@@ -622,8 +623,8 @@ export function FileExplorerSidebar({
               autoFocus
             />
             <div className="flex justify-end gap-2 pt-2">
-              <DialogClose render={<Button variant="outline">Cancel</Button>} />
-              <Button onClick={handlePromptSubmit}>Save</Button>
+              <DialogClose render={<Button variant="outline">{t('files.cancel')}</Button>} />
+              <Button onClick={handlePromptSubmit}>{t('files.save')}</Button>
             </div>
           </div>
         </DialogContent>
@@ -639,7 +640,7 @@ export function FileExplorerSidebar({
         type="button"
         onClick={onToggle}
         className="sr-only"
-        aria-label="Toggle file explorer"
+        aria-label={t('files.toggleExplorer')}
       />
     </aside>
   )

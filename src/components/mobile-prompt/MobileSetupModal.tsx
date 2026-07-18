@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { writeTextToClipboard } from '@/lib/clipboard'
+import { t } from '@/lib/i18n'
 
 const STORAGE_KEY_SEEN = 'claude-mobile-setup-seen'
 
@@ -61,8 +62,8 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
 
   const steps = [
     {
-      title: 'Install Tailscale on your desktop',
-      body: 'Install Tailscale on the machine running Hermes Workspace, then sign in.',
+      title: t('mobileSetup.step1Title'),
+      body: t('mobileSetup.step1Body'),
       showTailscaleIcon: true,
       action: (
         <a
@@ -71,24 +72,23 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-400"
         >
-          Open Tailscale Downloads
+          {t('mobileSetup.step1Action')}
         </a>
       ),
     },
     {
-      title: 'Keep your backend reachable',
-      body: 'Hermes Workspace can talk to any OpenAI-compatible backend on mobile too. Make sure both the workspace and backend stay reachable over Tailscale or your local network.',
+      title: t('mobileSetup.step2Title'),
+      body: t('mobileSetup.step2Body'),
       showTailscaleIcon: false,
       action: (
         <div className="rounded-lg border border-primary-700 bg-primary-950 px-4 py-3 text-sm text-primary-200">
-          Enhanced Hermes Agent gateway APIs are optional. If core chat already works
-          on desktop, mobile access mainly depends on network reachability.
+          {t('mobileSetup.step2Note')}
         </div>
       ),
     },
     {
-      title: 'Install Tailscale on your phone',
-      body: 'Install Tailscale on iOS or Android and sign in with the same account.',
+      title: t('mobileSetup.step3Title'),
+      body: t('mobileSetup.step3Body'),
       showTailscaleIcon: true,
       action: (
         <div className="flex gap-2">
@@ -98,7 +98,7 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-lg border border-primary-700 bg-primary-950 px-3 py-2 text-xs font-medium text-primary-100 transition-colors hover:bg-primary-800"
           >
-            iOS App
+            {t('mobileSetup.iosApp')}
           </a>
           <a
             href="https://play.google.com/store/apps/details?id=com.tailscale.ipn"
@@ -106,19 +106,19 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-lg border border-primary-700 bg-primary-950 px-3 py-2 text-xs font-medium text-primary-100 transition-colors hover:bg-primary-800"
           >
-            Android App
+            {t('mobileSetup.androidApp')}
           </a>
         </div>
       ),
     },
     {
-      title: 'Open Hermes Workspace on your phone',
+      title: t('mobileSetup.step4Title'),
       body:
         networkUrl?.source === 'tailscale'
-          ? 'Your Tailscale address. Open this on your phone browser to use the same workspace.'
+          ? t('mobileSetup.step4BodyTailscale')
           : networkUrl?.source === 'lan'
-            ? 'Your local network address. Your phone must be on the same WiFi.'
-            : 'Start Tailscale on this machine if you want a shareable address outside localhost.',
+            ? t('mobileSetup.step4BodyLan')
+            : t('mobileSetup.step4BodyLocalhost'),
       showTailscaleIcon: networkUrl?.source === 'tailscale',
       action: (
         <button
@@ -214,7 +214,7 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
           type="button"
           onClick={onClose}
           className="absolute top-4 right-4 rounded-lg p-1.5 text-primary-400 transition-colors hover:bg-primary-900 hover:text-primary-200"
-          aria-label="Close mobile setup"
+          aria-label={t('mobileSetup.close')}
         >
           <HugeiconsIcon icon={Cancel01Icon} size={18} strokeWidth={2} />
         </button>
@@ -222,11 +222,11 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
         <div className="mb-4 flex items-center gap-3 pr-10">
           <img
             src="/claude-avatar.webp"
-            alt="Hermes Agent"
+            alt={t('mobilePrompt.alt')}
             className="size-9 rounded-xl"
           />
           <div className="flex-1">
-            <h2 className="text-lg font-semibold text-white">Mobile Setup</h2>
+            <h2 className="text-lg font-semibold text-white">{t('mobileSetup.title')}</h2>
             <div className="mt-1 flex items-center gap-1.5">
               {steps.map((_, index) => (
                 <span
@@ -270,7 +270,7 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
             disabled={step === 0}
             className="rounded-lg px-3 py-2 text-sm text-primary-400 transition-colors hover:text-primary-200 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Back
+            {t('mobileSetup.back')}
           </button>
           <div className="flex items-center gap-2">
             <button
@@ -278,14 +278,14 @@ export function MobileSetupModal({ isOpen, onClose }: MobileSetupModalProps) {
               onClick={onClose}
               className="rounded-lg px-3 py-2 text-sm text-primary-400 transition-colors hover:text-primary-200"
             >
-              Close
+              {t('mobileSetup.close')}
             </button>
             <button
               type="button"
               onClick={handleNext}
               className="rounded-lg bg-accent-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-400"
             >
-              {isLastStep ? 'Finish' : 'Next'}
+              {isLastStep ? t('mobileSetup.finish') : t('mobileSetup.next')}
             </button>
           </div>
         </div>

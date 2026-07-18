@@ -11,6 +11,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type BackgroundRun = {
   runId: string
@@ -32,12 +33,12 @@ const STALE_THRESHOLD_MS = 5 * 60 * 1000
 
 function formatAge(ms: number): string {
   const seconds = Math.floor(ms / 1000)
-  if (seconds < 60) return `${seconds}s ago`
+  if (seconds < 60) return t('time.secondsAgo', { count: seconds })
   const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 60) return t('time.minutesAgo', { count: minutes })
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
+  if (hours < 24) return t('time.hoursAgo', { count: hours })
+  return t('time.daysAgo', { count: Math.floor(hours / 24) })
 }
 
 function statusColor(run: BackgroundRun): string {
@@ -124,7 +125,7 @@ export function BackgroundRunsSection() {
               size={20}
               strokeWidth={1.5}
             />
-            Background runs
+            {t('bgRuns.title')}
           </CollapsibleTrigger>
           <span
             className={cn(
@@ -135,12 +136,12 @@ export function BackgroundRunsSection() {
             )}
             title={
               staleCount > 0
-                ? `${staleCount} stale (>5m silent)`
-                : `${runs.length} running`
+                ? t('bgRuns.staleHint', { count: staleCount })
+                : t('bgRuns.runningHint', { count: runs.length })
             }
           >
             {runs.length}
-            {staleCount > 0 ? ` · ${staleCount} stale` : ''}
+            {staleCount > 0 ? t('bgRuns.staleSuffix', { count: staleCount }) : ''}
           </span>
         </div>
         <CollapsiblePanel contentClassName="pt-1">
@@ -151,8 +152,8 @@ export function BackgroundRunsSection() {
               const snippet =
                 run.lastAssistantText?.trim() ||
                 run.lastLifecycleEvent ||
-                (run.lastToolName ? `tool: ${run.lastToolName}` : '') ||
-                'no output yet'
+                (run.lastToolName ? t('bgRuns.toolSnippet', { name: run.lastToolName }) : '') ||
+                t('bgRuns.noOutputYet')
               return (
                 <div
                   key={`${run.sessionKey}:${run.runId}`}
@@ -189,16 +190,16 @@ export function BackgroundRunsSection() {
                       onClick={() => handleOpen(run)}
                       className="rounded px-1.5 py-0.5 text-[10px] font-medium text-accent-600 hover:bg-accent-100 hover:text-accent-800"
                     >
-                      Open
+                      {t('bgRuns.open')}
                     </button>
                     <button
                       type="button"
                       disabled={isBusy}
                       onClick={() => handleAbandon(run)}
                       className="rounded px-1.5 py-0.5 text-[10px] font-medium text-red-500 hover:bg-red-100 hover:text-red-700 disabled:opacity-50"
-                      title="Mark this run as failed and remove it from the active list"
+                      title={t('bgRuns.markDeadTitle')}
                     >
-                      {isBusy ? 'Killing…' : 'Mark dead'}
+                      {isBusy ? t('bgRuns.killing') : t('bgRuns.markDead')}
                     </button>
                   </div>
                 </div>

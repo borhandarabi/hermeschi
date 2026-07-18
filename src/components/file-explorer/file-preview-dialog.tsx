@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { t } from '@/lib/i18n'
 
 const LANGUAGE_MAP: Record<string, string> = {
   ts: 'typescript',
@@ -116,21 +117,21 @@ export default function FilePreviewDialog({
       <DialogContent className="w-[min(900px,96vw)]">
         <div className="p-5 border-b border-primary-200 flex items-center justify-between">
           <DialogTitle className="text-base font-semibold">
-            {path || 'File'}
+            {path || t('filePreview.file')}
           </DialogTitle>
           <div className="flex gap-2">
             {isTextFile(path || '') ? (
               <Button onClick={handleSave} disabled={!dirty || loading}>
-                Save
+                {t('filePreview.save')}
               </Button>
             ) : null}
-            <DialogClose render={<Button variant="outline">Close</Button>} />
+            <DialogClose render={<Button variant="outline">{t('filePreview.close')}</Button>} />
           </div>
         </div>
 
         <div className="p-4">
           {loading ? (
-            <div className="text-sm text-primary-500">Loading…</div>
+            <div className="text-sm text-primary-500">{t('filePreview.loading')}</div>
           ) : error ? (
             <div className="text-sm text-red-600">{error}</div>
           ) : path && isImageFile(path) ? (

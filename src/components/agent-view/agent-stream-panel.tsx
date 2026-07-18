@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { SteerModal } from './steer-modal'
 import { killAgentSession, toggleAgentPause } from '@/lib/gateway-api'
 import { toast } from '@/components/ui/toast'
+import { t } from '@/lib/i18n'
 
 export type AgentStreamPanelProps = {
   sessionKey: string
@@ -73,23 +74,23 @@ function textFromMessage(message: Row): string {
 
 const truncate = (value: string, max = 200) => (value.length <= max ? value : `${value.slice(0, max - 3)}...`)
 const formatAgo = (ts: number) => {
-  if (!ts) return 'just now'
+  if (!ts) return t('time.justNow')
   const s = Math.max(0, Math.floor((Date.now() - ts) / 1000))
-  if (s < 60) return `${s}s ago`
+  if (s < 60) return t('time.secondsAgo', { count: s })
   const m = Math.floor(s / 60)
-  if (m < 60) return `${m}m ago`
+  if (m < 60) return t('time.minutesAgo', { count: m })
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
-  return `${Math.floor(h / 24)}d ago`
+  if (h < 24) return t('time.hoursAgo', { count: h })
+  return t('time.daysAgo', { count: Math.floor(h / 24) })
 }
 const formatRuntime = (ts: number) => {
-  if (!ts) return '--'
+  if (!ts) return t('agentStream.runtimeEmpty')
   const s = Math.max(0, Math.floor((Date.now() - ts) / 1000))
   const h = Math.floor(s / 3600)
   const m = Math.floor((s % 3600) / 60)
-  if (h > 0) return `${h}h ${m}m`
-  if (m > 0) return `${m}m ${s % 60}s`
-  return `${s}s`
+  if (h > 0) return t('agentStream.runtimeHoursMinutes', { h, m })
+  if (m > 0) return t('agentStream.runtimeMinutesSeconds', { m, s: s % 60 })
+  return t('agentStream.runtimeSecondsOnly', { s })
 }
 const formatCost = (v: number) => (v > 0 ? (v >= 1 ? `$${v.toFixed(2)}` : `$${v.toFixed(4)}`) : '$0.00')
 
@@ -145,13 +146,13 @@ export function AgentStreamPanel({ sessionKey, agentName, agentColor, onClose }:
   const totalCost = toNum(session?.cost ?? usage.cost ?? usage.costUsd)
   const runtimeStart = toTs(session?.startedAt) || toTs(session?.createdAt) || toTs(session?.updatedAt)
   const isPaused = toStr(session?.status).toLowerCase().includes('pause') || session?.enabled === false
-  const model = toStr(session?.model) || 'unknown model'
+  const model = toStr(session?.model) || t('agentStream.unknownModel')
 
   const messages = useMemo(() => (historyQuery.data ?? []).map((row, index) => ({
     id: `${index}-${toTs(row.timestamp) || toTs(row.createdAt) || toTs(row.updatedAt)}`,
     role: normalizeRole(row.role),
     timestamp: toTs(row.timestamp) || toTs(row.createdAt) || toTs(row.updatedAt),
-    text: truncate(textFromMessage(row) || '(empty)', 200),
+    text: truncate(textFromMessage(row) || t('agentStream.empty'), 200),
   })), [historyQuery.data])
 
   useEffect(() => {
@@ -165,10 +166,10 @@ export function AgentStreamPanel({ sessionKey, agentName, agentColor, onClose }:
     const nextPaused = !isPaused
     try {
       await toggleAgentPause(sessionKey, nextPaused)
-      toast(`${agentName} ${nextPaused ? 'paused' : 'resumed'}`, { type: 'success' })
+      toast(nextPaused ? t('agentStream.pausedToast', { name: agentName }) : t('agentStream.resumedToast', { name: agentName }), { type: 'success' })
       void sessionsQuery.refetch()
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Failed to update pause state', { type: 'error' })
+      toast(error instanceof Error ? error.message : t('agentStream.pauseFailed'), { type: 'error' })
     } finally {
       setPausePending(false)
       setMenuOpen(false)
@@ -180,10 +181,10 @@ export function AgentStreamPanel({ sessionKey, agentName, agentColor, onClose }:
     setKillPending(true)
     try {
       await killAgentSession(sessionKey)
-      toast(`${agentName} terminated`, { type: 'success' })
+      toast(t('agentStream.terminatedToast', { name: agentName }), { type: 'success' })
       onClose()
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Failed to terminate agent', { type: 'error' })
+      toast(error instanceof Error ? error.message : t('agentStream.killFailed'), { type: 'error' })
     } finally {
       setKillPending(false)
       setMenuOpen(false)
@@ -192,7 +193,7 @@ export function AgentStreamPanel({ sessionKey, agentName, agentColor, onClose }:
 
   return (
     <>
-      <button type="button" aria-label="Close live stream panel" className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
+      <button type="button" aria-label={t('agentStream.closeStream')} className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
       <aside className="fixed inset-x-0 bottom-0 z-50 h-[70vh] rounded-t-2xl border-t border-neutral-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 md:right-0 md:bottom-0 md:left-auto md:top-[var(--titlebar-h,0px)] md:h-auto md:w-[400px] md:rounded-none md:border-t-0 md:border-l">
         <div className="flex h-full min-h-0 flex-col">
           <div className="sticky top-0 z-10 border-b border-neutral-200 bg-white/95 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/95">
@@ -202,20 +203,20 @@ export function AgentStreamPanel({ sessionKey, agentName, agentColor, onClose }:
                 <div className="flex items-center gap-2">
                   <span className={`h-2.5 w-2.5 rounded-full ${AGENT_COLOR_DOT_CLASS[agentColor] ?? 'bg-neutral-400'}`} />
                   <h3 className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">{agentName}</h3>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />Live</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />{t('agentStream.live')}</span>
                 </div>
                 <p className="mt-1 truncate text-xs text-neutral-500 dark:text-neutral-400">{model} · {sessionKey}</p>
               </div>
-              <button type="button" onClick={onClose} className="rounded-lg px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800" aria-label="Close panel">×</button>
+              <button type="button" onClick={onClose} className="rounded-lg px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800" aria-label={t('agentStream.closePanel')}>×</button>
             </div>
             <div className="flex flex-wrap gap-2 px-4 pb-3">
-              <span className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800"><span className="text-neutral-500 dark:text-neutral-400">Tokens</span><span className="font-medium text-neutral-800 dark:text-neutral-200">{inputTokens.toLocaleString()} / {outputTokens.toLocaleString()}</span></span>
-              <span className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800"><span className="text-neutral-500 dark:text-neutral-400">Cost</span><span className="font-medium text-neutral-800 dark:text-neutral-200">{formatCost(totalCost)}</span></span>
-              <span className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800"><span className="text-neutral-500 dark:text-neutral-400">Runtime</span><span className="font-medium text-neutral-800 dark:text-neutral-200">{formatRuntime(runtimeStart)}</span></span>
+              <span className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800"><span className="text-neutral-500 dark:text-neutral-400">{t('agentStream.tokens')}</span><span className="font-medium text-neutral-800 dark:text-neutral-200">{inputTokens.toLocaleString()} / {outputTokens.toLocaleString()}</span></span>
+              <span className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800"><span className="text-neutral-500 dark:text-neutral-400">{t('agentStream.cost')}</span><span className="font-medium text-neutral-800 dark:text-neutral-200">{formatCost(totalCost)}</span></span>
+              <span className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800"><span className="text-neutral-500 dark:text-neutral-400">{t('agentStream.runtime')}</span><span className="font-medium text-neutral-800 dark:text-neutral-200">{formatRuntime(runtimeStart)}</span></span>
             </div>
           </div>
           <div ref={streamRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
-            {messages.length === 0 ? <p className="text-xs text-neutral-500 dark:text-neutral-400">Waiting for messages...</p> : messages.map((message) => (
+            {messages.length === 0 ? <p className="text-xs text-neutral-500 dark:text-neutral-400">{t('agentStream.waiting')}</p> : messages.map((message) => (
               <div key={message.id} className="rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-900/40">
                 <div className="mb-1 flex items-center justify-between gap-2"><span className={`inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase ${ROLE_BADGE_CLASS[message.role] ?? ROLE_BADGE_CLASS.assistant}`}>{message.role}</span><span className="text-[10px] text-neutral-500 dark:text-neutral-400">{formatAgo(message.timestamp)}</span></div>
                 <p className={`whitespace-pre-wrap text-xs text-neutral-800 dark:text-neutral-200 ${message.role === 'tool' ? 'font-mono' : ''}`}>{message.text}</p>
@@ -224,12 +225,12 @@ export function AgentStreamPanel({ sessionKey, agentName, agentColor, onClose }:
           </div>
           <div className="sticky bottom-0 border-t border-neutral-200 bg-white/95 px-3 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/95">
             <div className="grid grid-cols-3 gap-2">
-              <button type="button" onClick={() => setSteerOpen(true)} className="rounded-lg border border-neutral-200 px-2 py-2 text-xs font-medium text-neutral-800 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800">Steer</button>
+              <button type="button" onClick={() => setSteerOpen(true)} className="rounded-lg border border-neutral-200 px-2 py-2 text-xs font-medium text-neutral-800 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800">{t('agentStream.steer')}</button>
               <div className="relative">
-                {menuOpen ? <div className="absolute bottom-full left-0 mb-2 w-full rounded-lg border border-neutral-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"><button type="button" onClick={() => void onPauseToggle()} disabled={pausePending} className="flex w-full rounded-md px-2 py-1.5 text-left text-xs text-neutral-700 hover:bg-neutral-100 disabled:opacity-60 dark:text-neutral-200 dark:hover:bg-neutral-800">{pausePending ? 'Updating...' : isPaused ? 'Resume' : 'Pause'}</button><button type="button" onClick={() => void onKill()} disabled={killPending} className="flex w-full rounded-md px-2 py-1.5 text-left text-xs text-red-600 hover:bg-red-50 disabled:opacity-60 dark:text-red-300 dark:hover:bg-red-950/40">{killPending ? 'Terminating...' : 'Kill'}</button></div> : null}
-                <button type="button" onClick={() => setMenuOpen((open) => !open)} className="w-full rounded-lg border border-neutral-200 px-2 py-2 text-xs font-medium text-neutral-800 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800">Pause/Kill</button>
+                {menuOpen ? <div className="absolute bottom-full left-0 mb-2 w-full rounded-lg border border-neutral-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"><button type="button" onClick={() => void onPauseToggle()} disabled={pausePending} className="flex w-full rounded-md px-2 py-1.5 text-left text-xs text-neutral-700 hover:bg-neutral-100 disabled:opacity-60 dark:text-neutral-200 dark:hover:bg-neutral-800">{pausePending ? t('agentStream.updating') : isPaused ? t('agentStream.resume') : t('agentStream.pause')}</button><button type="button" onClick={() => void onKill()} disabled={killPending} className="flex w-full rounded-md px-2 py-1.5 text-left text-xs text-red-600 hover:bg-red-50 disabled:opacity-60 dark:text-red-300 dark:hover:bg-red-950/40">{killPending ? t('agentStream.terminating') : t('agentStream.kill')}</button></div> : null}
+                <button type="button" onClick={() => setMenuOpen((open) => !open)} className="w-full rounded-lg border border-neutral-200 px-2 py-2 text-xs font-medium text-neutral-800 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800">{t('agentStream.pauseKill')}</button>
               </div>
-              <button type="button" onClick={() => { onClose(); void navigate({ to: '/chat/$sessionKey', params: { sessionKey } }) }} className="rounded-lg bg-accent-500 px-2 py-2 text-xs font-medium text-white hover:bg-accent-600">Open Chat</button>
+              <button type="button" onClick={() => { onClose(); void navigate({ to: '/chat/$sessionKey', params: { sessionKey } }) }} className="rounded-lg bg-accent-500 px-2 py-2 text-xs font-medium text-white hover:bg-accent-600">{t('agentStream.openChat')}</button>
             </div>
           </div>
         </div>

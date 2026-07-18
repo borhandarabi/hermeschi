@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useSettingsStore } from '@/hooks/use-settings'
 import { getTheme, getThemeVariant, isDarkTheme, setTheme as setThemeFamily } from '@/lib/theme'
+import { t } from '@/lib/i18n'
 
 type OverflowItem = {
   icon: typeof File01Icon
@@ -24,17 +25,17 @@ type OverflowItem = {
 }
 
 const SYSTEM_ITEMS: Array<OverflowItem> = [
-  { icon: File01Icon, label: 'Files', to: '/files' },
-  { icon: ComputerTerminal01Icon, label: 'Terminal', to: '/terminal' },
-  { icon: BrainIcon, label: 'Memory', to: '/memory' },
+  { icon: File01Icon, label: t('nav.files'), to: '/files' },
+  { icon: ComputerTerminal01Icon, label: t('nav.terminal'), to: '/terminal' },
+  { icon: BrainIcon, label: t('nav.memory'), to: '/memory' },
 ]
 
 const CLAUDE_ITEMS: Array<OverflowItem> = [
-  { icon: MessageMultiple01Icon, label: 'Chat', to: '/chat' },
-  { icon: PuzzleIcon, label: 'Skills', to: '/skills' },
-  { icon: McpServerIcon, label: 'MCP', to: '/mcp' },
-  { icon: UserGroupIcon, label: 'Profiles', to: '/profiles' },
-  { icon: Settings01Icon, label: 'Settings', to: '/settings' },
+  { icon: MessageMultiple01Icon, label: t('nav.chat'), to: '/chat' },
+  { icon: PuzzleIcon, label: t('nav.skills'), to: '/skills' },
+  { icon: McpServerIcon, label: t('nav.mcp'), to: '/mcp' },
+  { icon: UserGroupIcon, label: t('nav.profiles'), to: '/profiles' },
+  { icon: Settings01Icon, label: t('nav.settings'), to: '/settings' },
 ]
 
 type Props = {
@@ -106,8 +107,8 @@ export function DashboardOverflowPanel({ open, onClose }: Props) {
     : 'claude-nous'
   const isDark = !currentDataTheme.endsWith('-light')
   const themeIcon = isDark ? Sun02Icon : Moon02Icon
-  const themeLabel = isDark ? 'Light mode' : 'Dark mode'
-  const nextTheme = isDark ? 'light mode' : 'dark mode'
+  const themeLabel = isDark ? t('overflow.lightMode') : t('overflow.darkMode')
+  const nextTheme = isDark ? t('overflow.lightMode').toLowerCase() : t('overflow.darkMode').toLowerCase()
 
   function toggleThemeWithinFamily() {
     const current = getTheme()
@@ -122,7 +123,7 @@ export function DashboardOverflowPanel({ open, onClose }: Props) {
       <button
         type="button"
         className="absolute inset-0 bg-black/40 animate-in fade-in duration-200"
-        aria-label="Close overflow panel"
+        aria-label={t('overflow.closeAria')}
         onClick={onClose}
       />
 
@@ -131,7 +132,7 @@ export function DashboardOverflowPanel({ open, onClose }: Props) {
         <div className="space-y-4">
           <section>
             <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-primary-500">
-              Quick Menu
+              {t('overflow.quickMenu')}
             </h3>
             <button
               type="button"
@@ -145,17 +146,17 @@ export function DashboardOverflowPanel({ open, onClose }: Props) {
                 <span className="font-medium">{themeLabel}</span>
               </span>
               <span className="text-xs text-primary-500">
-                Tap for {nextTheme}
+                {t('overflow.tapForNext', { mode: nextTheme })}
               </span>
             </button>
           </section>
           <OverflowGrid
-            title="System"
+            title={t('overflow.system')}
             items={SYSTEM_ITEMS}
             onSelect={handleSelect}
           />
           <OverflowGrid
-            title="Hermes Agent"
+            title={t('overflow.hermesAgent')}
             items={CLAUDE_ITEMS}
             onSelect={handleSelect}
           />
