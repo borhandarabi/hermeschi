@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { ClaudeTask, CreateTaskInput, TaskColumn, TaskPriority, TaskAssignee } from '@/lib/tasks-api'
 import { COLUMN_LABELS, COLUMN_ORDER } from '@/lib/tasks-api'
 
@@ -90,31 +91,31 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className={labelClass}>Title *</label>
+              <label className={labelClass}>{t('tasks.new.title')} *</label>
               <input
                 className={inputClass}
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                placeholder="What needs to be done?"
+                placeholder={t('tasks.new.titlePlaceholder')}
                 required
                 autoFocus
               />
             </div>
 
             <div>
-              <label className={labelClass}>Description</label>
+              <label className={labelClass}>{t('tasks.new.description')}</label>
               <textarea
                 className={cn(inputClass, 'resize-none')}
                 rows={3}
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                placeholder="Optional details..."
+                placeholder={t('tasks.new.descriptionPlaceholder')}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>Column</label>
+                <label className={labelClass}>{t('tasks.new.column')}</label>
                 <select
                   className={inputClass}
                   style={{ colorScheme: 'dark' }}
@@ -127,40 +128,40 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Priority</label>
+                <label className={labelClass}>{t('tasks.new.priority')}</label>
                 <select
                   className={inputClass}
                   style={{ colorScheme: 'dark' }}
                   value={priority}
                   onChange={e => setPriority(e.target.value as TaskPriority)}
                 >
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
+                  <option value="high">{t('tasks.priorityHigh')}</option>
+                  <option value="medium">{t('tasks.priorityMedium')}</option>
+                  <option value="low">{t('tasks.priorityLow')}</option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>Assignee</label>
+                <label className={labelClass}>{t('tasks.new.assignee')}</label>
                 <select
                   className={inputClass}
                   style={{ colorScheme: 'dark' }}
                   value={assignee}
                   onChange={e => setAssignee(e.target.value)}
                 >
-                  <option value="">Unassigned</option>
+                  <option value="">{t('tasks.filter.unassigned')}</option>
                   {assignees.map(({ id, label }) => (
                     <option key={id} value={id}>{label}</option>
                   ))}
                 </select>
                 <p className="mt-1 text-[10px] text-[var(--theme-muted)]">
-                  Assignee is separate from status. Dragging a card changes its column only.
+                  {t('tasks.subtitle')}
                 </p>
               </div>
               <div>
-                <label className={labelClass}>Due Date</label>
+                <label className={labelClass}>{t('tasks.new.dueDate')}</label>
                 <input
                   type="date"
                   className={inputClass}
@@ -172,7 +173,7 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
             </div>
 
             <div>
-              <label className={labelClass}>Tags (comma-separated)</label>
+              <label className={labelClass}>{t('skills.tags')}</label>
               <input
                 className={inputClass}
                 value={tags}

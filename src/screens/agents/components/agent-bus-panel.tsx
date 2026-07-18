@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { getLocale } from '@/lib/i18n'
 
 type AgentBusSummary = {
   total?: number
@@ -61,7 +62,7 @@ function formatDate(value?: string): string {
   if (!value) return 'no readings'
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(getLocale(), {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',

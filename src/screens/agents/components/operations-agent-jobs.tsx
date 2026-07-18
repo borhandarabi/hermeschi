@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast'
 import { toggleCronJob, upsertCronJob } from '@/lib/cron-api'
 import { formatRelativeTime } from '@/screens/dashboard/lib/formatters'
+import { getLocale } from '@/lib/i18n'
 
 function displayJobName(job: CronJob, agentId: string): string {
   const prefix = `ops:${agentId}:`
@@ -149,10 +150,10 @@ export function OperationsAgentJobs({
                   </p>
                   <p className="mt-1">
                     {job.nextRunAt
-                      ? `Next ${new Date(job.nextRunAt).toLocaleString()}`
+                      ? `${new Date(job.nextRunAt).toLocaleString(getLocale())}`
                       : lastRunAt
-                        ? `Last ${formatRelativeTime(lastRunAt)}`
-                        : 'No runs yet'}
+                        ? formatRelativeTime(lastRunAt)
+                        : '—'}
                   </p>
                 </div>
               </div>
