@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type ToastType = 'info' | 'success' | 'warning' | 'error'
 
@@ -77,21 +78,22 @@ export function Toaster() {
 
   return createPortal(
     <div className="pointer-events-none fixed left-2 right-2 z-[9999] flex flex-col gap-2 top-[calc(var(--titlebar-h,0px)+1rem)] sm:left-auto sm:right-4 sm:w-auto">
-      {toasts.map((t) => (
+      {toasts.map((toastItem) => (
         <div
-          key={t.id}
+          key={toastItem.id}
           className={cn(
             'pointer-events-auto flex w-full max-w-[calc(100vw-1rem)] items-start gap-2.5 rounded-xl px-4 py-3 text-sm font-medium shadow-lg backdrop-blur-sm animate-in slide-in-from-right-5 fade-in duration-200 sm:w-auto',
-            typeStyles[t.type],
+            typeStyles[toastItem.type],
           )}
         >
-          <span className="text-base">{t.icon ?? defaultIcons[t.type]}</span>
-          <span className="min-w-0 break-words">{t.message}</span>
+          <span className="text-base">{toastItem.icon ?? defaultIcons[toastItem.type]}</span>
+          <span className="min-w-0 break-words">{toastItem.message}</span>
           <button
             type="button"
             onClick={() =>
-              setToasts((prev) => prev.filter((x) => x.id !== t.id))
+              setToasts((prev) => prev.filter((x) => x.id !== toastItem.id))
             }
+            aria-label={t('common.close')}
             className="ml-2 shrink-0 rounded-full p-0.5 opacity-70 transition-opacity hover:opacity-100"
           >
             ✕
