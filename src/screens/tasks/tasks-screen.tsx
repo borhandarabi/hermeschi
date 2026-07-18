@@ -11,6 +11,7 @@ import { TaskDialog } from './task-dialog'
 import type { ClaudeTask, CreateTaskInput, TaskAssignee, TaskColumn } from '@/lib/tasks-api'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import {
   COLUMN_COLORS,
   COLUMN_LABELS,
@@ -186,7 +187,7 @@ export function TasksScreen() {
       <header className="rounded-2xl border border-primary-200 bg-primary-50/85 p-4 backdrop-blur-xl">
         <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <h1 className="text-2xl font-medium text-ink">Tasks</h1>
+          <h1 className="text-2xl font-medium text-ink">{t('tasks.title')}</h1>
           {assigneeFilter && (
             <div className="flex items-center gap-2 text-xs text-[var(--theme-muted)]">
               <span>Filtered by: <span className="capitalize" style={{ color: '#f59e0b' }}>{assigneeFilter}</span></span>

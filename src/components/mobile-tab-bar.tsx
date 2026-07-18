@@ -22,6 +22,7 @@ import {
   useState,
 } from 'react'
 import type { TouchEvent } from 'react'
+import { t, type TranslationKey } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { hapticTap } from '@/lib/haptics'
 import { useSettings } from '@/hooks/use-settings'
@@ -43,6 +44,23 @@ type TabItem = {
   icon: typeof Chat01Icon
   to: string
   match: (path: string) => boolean
+}
+
+// Maps each tab id to its translation key. Labels are resolved via t()
+// at render time so they update reactively when the user switches locale.
+const TAB_LABEL_KEYS: Record<string, TranslationKey> = {
+  dashboard: 'nav.dashboard',
+  chat: 'nav.chat',
+  playground: 'nav.playground',
+  files: 'nav.files',
+  terminal: 'nav.terminal',
+  jobs: 'nav.jobs',
+  swarm: 'nav.swarm',
+  memory: 'nav.memory',
+  skills: 'nav.skills',
+  mcp: 'nav.mcp',
+  profiles: 'nav.profiles',
+  settings: 'nav.settings',
 }
 
 export const MOBILE_NAV_TABS: Array<TabItem> = [
@@ -294,7 +312,7 @@ export function MobileTabBar() {
                   }
                 }}
                 aria-current={isActive ? 'page' : undefined}
-                aria-label={tab.label}
+                aria-label={t(TAB_LABEL_KEYS[tab.id] ?? 'nav.dashboard')}
                 className={cn(
                   // 40x40 touch target (slightly smaller to fit 5 tabs)
                   'flex items-center justify-center',
