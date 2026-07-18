@@ -129,16 +129,18 @@ export function AnalyticsChartCard({
                 className="text-[11px] font-semibold uppercase tracking-[0.18em]"
                 style={{ color: 'var(--theme-text)' }}
               >
-                Usage trend · {period}d
+                {t('dashboard.chart.usageTrend', { days: period })}
               </h3>
               <p
                 className="font-mono text-[10px] uppercase tracking-[0.1em]"
                 style={{ color: 'var(--theme-muted)' }}
               >
-                {formatTokens(analytics.totalTokens)} tokens ·{' '}
-                {analytics.totalApiCalls.toLocaleString()} calls ·{' '}
-                {formatCost(analytics.estimatedCostUsd ?? 0)}
-                {loading ? ' · refreshing…' : ''}
+                {t('dashboard.analyticsHero.summary', {
+                  tokens: formatTokens(analytics.totalTokens),
+                  calls: analytics.totalApiCalls.toLocaleString(),
+                  cost: formatCost(analytics.estimatedCostUsd ?? 0),
+                })}
+                {loading ? t('dashboard.chart.refreshing') : ''}
               </p>
             </div>
           </div>
@@ -157,7 +159,7 @@ export function AnalyticsChartCard({
                   color: 'var(--theme-muted)',
                 }}
               >
-                Expand →
+                {t('dashboard.widget.expandArrow')}
               </button>
             ) : null}
           </div>
@@ -268,7 +270,7 @@ export function AnalyticsChartCard({
                 <Area
                   type="monotone"
                   dataKey="cache"
-                  name="cache"
+                  name={t('dashboard.legend.cache')}
                   stroke="var(--theme-accent-secondary)"
                   fill="url(#acache)"
                   strokeWidth={1}
@@ -277,7 +279,7 @@ export function AnalyticsChartCard({
                 <Area
                   type="monotone"
                   dataKey="tokens"
-                  name="tokens"
+                  name={t('dashboard.label.tokens')}
                   stroke="var(--theme-accent)"
                   fill="url(#atok)"
                   strokeWidth={1.6}
@@ -294,16 +296,16 @@ export function AnalyticsChartCard({
               color: 'var(--theme-muted)',
             }}
           >
-            No analytics usage in the last {analytics.windowDays}d.
+            {t('dashboard.chart.noUsage', { days: analytics.windowDays })}
           </div>
         )}
 
         {hasData ? (
           <div className="flex items-center gap-4 text-[10px]">
-            <Legend tone="var(--theme-accent)" label="tokens (in+out)" />
+            <Legend tone="var(--theme-accent)" label={t('dashboard.legend.tokensInOut')} />
             <Legend
               tone="var(--theme-accent-secondary)"
-              label="cache reads"
+              label={t('dashboard.legend.cacheReads')}
             />
           </div>
         ) : null}
@@ -333,7 +335,7 @@ function PeriodSwitch({
       className="inline-flex items-center overflow-hidden rounded border"
       style={{ borderColor: 'var(--theme-border)' }}
       role="tablist"
-      aria-label="Analytics period"
+      aria-label={t('dashboard.chart.periodAria')}
     >
       {PERIODS.map((p) => {
         const active = p === value
@@ -412,22 +414,24 @@ function AnalyticsModal({
               className="text-sm font-semibold uppercase tracking-[0.18em]"
               style={{ color: 'var(--theme-text)' }}
             >
-              Usage trend · last {period}d
+              {t('dashboard.chart.usageTrendModal', { days: period })}
             </h2>
             <p
               className="font-mono text-[10px] uppercase tracking-[0.1em]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              {formatTokens(analytics.totalTokens)} tokens ·{' '}
-              {analytics.totalSessions.toLocaleString()} sessions ·{' '}
-              {analytics.totalApiCalls.toLocaleString()} calls ·{' '}
-              {formatCost(analytics.estimatedCostUsd ?? 0)}
+              {t('dashboard.analyticsHero.modalSummary', {
+                tokens: formatTokens(analytics.totalTokens),
+                sessions: analytics.totalSessions.toLocaleString(),
+                calls: analytics.totalApiCalls.toLocaleString(),
+                cost: formatCost(analytics.estimatedCostUsd ?? 0),
+              })}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('common.close')}
             className="rounded p-1 hover:bg-[var(--theme-card)]/80"
           >
             <HugeiconsIcon
@@ -445,7 +449,7 @@ function AnalyticsModal({
               className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              Daily token mix
+              {t('dashboard.analyticsHero.dailyTokenMix')}
             </h3>
             <div className="h-[260px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -486,21 +490,21 @@ function AnalyticsModal({
                   />
                   <Bar
                     dataKey="input"
-                    name="input"
+                    name={t('dashboard.legend.input')}
                     stackId="t"
                     fill="var(--theme-accent)"
                     radius={[2, 2, 0, 0]}
                   />
                   <Bar
                     dataKey="output"
-                    name="output"
+                    name={t('dashboard.legend.output')}
                     stackId="t"
                     fill="var(--theme-success)"
                     radius={[2, 2, 0, 0]}
                   />
                   <Bar
                     dataKey="reasoning"
-                    name="reasoning"
+                    name={t('dashboard.legend.reasoning')}
                     stackId="t"
                     fill="var(--theme-warning)"
                     radius={[2, 2, 0, 0]}
@@ -509,9 +513,9 @@ function AnalyticsModal({
               </ResponsiveContainer>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-4 text-[10px]">
-              <Legend tone="var(--theme-accent)" label="input" />
-              <Legend tone="var(--theme-success)" label="output" />
-              <Legend tone="var(--theme-warning)" label="reasoning" />
+              <Legend tone="var(--theme-accent)" label={t('dashboard.legend.input')} />
+              <Legend tone="var(--theme-success)" label={t('dashboard.legend.output')} />
+              <Legend tone="var(--theme-warning)" label={t('dashboard.legend.reasoning')} />
             </div>
           </div>
 
@@ -520,7 +524,7 @@ function AnalyticsModal({
               className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              Models · ranked by tokens
+              {t('dashboard.analyticsHero.modelsRanked')}
             </h3>
             <div className="space-y-2">
               {analytics.topModels.map((m, i) => (
@@ -558,19 +562,19 @@ function AnalyticsModal({
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-[10px]">
                     <span style={{ color: 'var(--theme-muted)' }}>
-                      sessions{' '}
+                      {t('dashboard.label.sessions')}{' '}
                       <span style={{ color: 'var(--theme-text)' }}>
                         {m.sessions.toLocaleString()}
                       </span>
                     </span>
                     <span style={{ color: 'var(--theme-muted)' }}>
-                      calls{' '}
+                      {t('dashboard.label.calls')}{' '}
                       <span style={{ color: 'var(--theme-text)' }}>
                         {m.calls.toLocaleString()}
                       </span>
                     </span>
                     <span style={{ color: 'var(--theme-muted)' }}>
-                      cost{' '}
+                      {t('dashboard.label.cost')}{' '}
                       <span style={{ color: 'var(--theme-text)' }}>
                         {formatCost(m.cost)}
                       </span>

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
+import { t } from '@/lib/i18n'
 
 export type SessionRowData = {
   key: string
@@ -54,11 +55,11 @@ function sessionGlyph(
 function relativeTime(ms: number | null): string {
   if (!ms) return '—'
   const diff = Date.now() - ms
-  if (diff < 0) return 'just now'
-  if (diff < 60_000) return '<1m ago'
-  if (diff < 3_600_000) return `${Math.round(diff / 60_000)}m ago`
-  if (diff < 86_400_000) return `${Math.round(diff / 3_600_000)}h ago`
-  return `${Math.round(diff / 86_400_000)}d ago`
+  if (diff < 0) return t('dashboard.common.justNow')
+  if (diff < 60_000) return t('dashboard.common.underMinAgo')
+  if (diff < 3_600_000) return t('dashboard.common.minutesAgo', { n: Math.round(diff / 60_000) })
+  if (diff < 86_400_000) return t('dashboard.common.hoursAgo', { n: Math.round(diff / 3_600_000) })
+  return t('dashboard.common.daysAgo', { n: Math.round(diff / 86_400_000) })
 }
 
 function formatTokens(n: number): string {
@@ -69,10 +70,10 @@ function formatTokens(n: number): string {
 }
 
 function shortTitle(s: SessionRowData): string {
-  const t = s.title?.trim()
-  if (t && t.length > 0 && t !== s.key) return t
+  const title = s.title?.trim()
+  if (title && title.length > 0 && title !== s.key) return title
   // Fall back to friendly slug from the key
-  return `Session ${s.key.slice(0, 8)}`
+  return t('dashboard.sessionsIntelligence.sessionFallback', { key: s.key.slice(0, 8) })
 }
 
 type SessionBadge = {
@@ -91,30 +92,30 @@ function buildBadges(s: SessionRowData): Array<SessionBadge> {
     s.status !== 'ended'
   ) {
     badges.push({
-      label: 'hot',
+      label: t('dashboard.badge.hot'),
       tone: 'var(--theme-success)',
-      title: 'Active in last 5 minutes',
+      title: t('dashboard.sessionsIntelligence.activeInLast5m'),
     })
   }
   if (s.toolCallCount >= 20) {
     badges.push({
-      label: 'tool-heavy',
+      label: t('dashboard.badge.toolHeavy'),
       tone: 'var(--theme-accent)',
-      title: `${s.toolCallCount} tool calls`,
+      title: t('dashboard.sessionsIntelligence.toolCallsTitle', { count: s.toolCallCount }),
     })
   }
   if (s.tokenCount >= 50_000) {
     badges.push({
-      label: 'high-token',
+      label: t('dashboard.badge.highToken'),
       tone: 'var(--theme-accent-secondary)',
-      title: `${formatTokens(s.tokenCount)} tokens`,
+      title: t('dashboard.sessionsIntelligence.tokensTitle', { count: formatTokens(s.tokenCount) }),
     })
   }
   if (s.status?.toLowerCase() === 'error' || s.status?.toLowerCase() === 'failed') {
     badges.push({
-      label: 'error',
+      label: t('dashboard.badge.error'),
       tone: 'var(--theme-danger)',
-      title: 'Session ended in an error state',
+      title: t('dashboard.sessionsIntelligence.errorTitle'),
     })
   }
   if (
@@ -123,9 +124,9 @@ function buildBadges(s: SessionRowData): Array<SessionBadge> {
     s.status !== 'ended'
   ) {
     badges.push({
-      label: 'stale',
+      label: t('dashboard.badge.stale'),
       tone: 'var(--theme-muted)',
-      title: 'No activity in over 7 days',
+      title: t('dashboard.sessionsIntelligence.staleTitle'),
     })
   }
   return badges
@@ -192,14 +193,14 @@ export function SessionsIntelligenceCard({
           className="text-[11px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Sessions intelligence
+          {t('dashboard.sessionsIntelligence.title')}
         </h3>
         <div className="flex items-center gap-2">
           <span
             className="font-mono text-[10px] uppercase tracking-[0.15em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            {sessions.length} recent
+            {t('dashboard.sessionsIntelligence.recentCount', { count: sessions.length })}
           </span>
           <button
             type="button"
@@ -215,7 +216,7 @@ export function SessionsIntelligenceCard({
               color: 'var(--theme-muted)',
             }}
           >
-            Open chat →
+            {t('dashboard.sessionsIntelligence.openChat')}
           </button>
         </div>
       </div>
@@ -228,7 +229,7 @@ export function SessionsIntelligenceCard({
             color: 'var(--theme-muted)',
           }}
         >
-          No sessions yet — start a chat.
+          {t('dashboard.sessionsIntelligence.noSessions')}
         </div>
       ) : (
         // Iter 013: bumped from 8 → 14 rows. The card is now the
@@ -306,12 +307,12 @@ export function SessionsIntelligenceCard({
                           {formatModelName(s.model)}
                         </span>
                       ) : null}
-                      <span>{s.messageCount} msgs</span>
+                      <span>{t('dashboard.sessionsIntelligence.msgs', { count: s.messageCount })}</span>
                       {s.toolCallCount > 0 ? (
-                        <span>{s.toolCallCount} tools</span>
+                        <span>{t('dashboard.sessionsIntelligence.tools', { count: s.toolCallCount })}</span>
                       ) : null}
                       {s.tokenCount > 0 ? (
-                        <span>{formatTokens(s.tokenCount)} tok</span>
+                        <span>{t('dashboard.sessionsIntelligence.tok', { count: formatTokens(s.tokenCount) })}</span>
                       ) : null}
                       <span className="ml-auto">
                         {relativeTime(s.updatedAt ?? s.startedAt)}

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (!n || n <= 0) return '0'
@@ -148,13 +149,13 @@ export function ProviderMixCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Provider mix
+          {t('dashboard.providerMix.title')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {analytics ? `${analytics.windowDays}d` : ''} · {buckets.length} fam
+          {analytics ? t('dashboard.providerMix.summary', { days: `${analytics.windowDays}d`, count: buckets.length }) : ''}
         </span>
       </div>
 
@@ -199,7 +200,7 @@ export function ProviderMixCard({
                 key={b.key}
                 className="flex items-center justify-between gap-2 text-[10px]"
                 style={{ color: 'var(--theme-muted)' }}
-                title={`${b.sessions} sessions \u00b7 ${formatTokens(b.tokens)} tokens`}
+                title={t('dashboard.providerMix.legendTitle', { sessions: b.sessions, tokens: formatTokens(b.tokens) })}
               >
                 <span className="flex min-w-0 items-center gap-1.5 truncate">
                   <span
@@ -225,7 +226,7 @@ export function ProviderMixCard({
               className="text-[9px] font-mono uppercase tracking-[0.1em]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              +{buckets.length - 4} more
+              {t('dashboard.providerMix.moreFamilies', { count: buckets.length - 4 })}
             </li>
           ) : null}
         </ul>

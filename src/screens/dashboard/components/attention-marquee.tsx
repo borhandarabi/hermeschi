@@ -3,6 +3,7 @@ import type {
   DashboardIncident,
   DashboardOverview,
 } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 const SOURCE_GLYPH: Record<DashboardIncident['source'], string> = {
   cron: '⏰',
@@ -51,7 +52,7 @@ export function AttentionMarquee({
         borderColor:
           'color-mix(in srgb, var(--theme-warning) 35%, transparent)',
       }}
-      title={`${items.length} item${items.length === 1 ? '' : 's'} need attention`}
+      title={t('dashboard.attentionMarquee.tooltip', { count: items.length, s: items.length === 1 ? '' : 's' })}
     >
       <span
         className="z-10 shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em]"
@@ -61,7 +62,7 @@ export function AttentionMarquee({
           color: 'var(--theme-warning)',
         }}
       >
-        ⚠️ Attention · {items.length}
+        ⚠️ {t('dashboard.attentionMarquee.title', { count: items.length })}
       </span>
 
       {/* Fade mask on right edge for "ticker continues" feel. */}

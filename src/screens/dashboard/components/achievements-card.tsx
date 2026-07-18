@@ -5,6 +5,7 @@ import type {
   DashboardAchievementUnlock,
   DashboardOverview,
 } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 const TIER_COLORS: Record<string, string> = {
   Copper: '#b45309',
@@ -22,10 +23,10 @@ function tierColor(tier: string | null): string {
 function relativeTime(unlockedAtSeconds: number | null): string {
   if (!unlockedAtSeconds) return ''
   const diff = Date.now() / 1000 - unlockedAtSeconds
-  if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86_400) return `${Math.floor(diff / 3600)}h ago`
-  return `${Math.floor(diff / 86_400)}d ago`
+  if (diff < 60) return t('dashboard.common.justNow')
+  if (diff < 3600) return t('dashboard.common.minutesAgo', { n: Math.floor(diff / 60) })
+  if (diff < 86_400) return t('dashboard.common.hoursAgo', { n: Math.floor(diff / 3600) })
+  return t('dashboard.common.daysAgo', { n: Math.floor(diff / 86_400) })
 }
 
 function AchievementRow({
@@ -118,7 +119,7 @@ export function AchievementsCard({
       const data = (await res.json()) as DashboardOverview
       setAllUnlocks(data.achievements?.recentUnlocks ?? [])
     } catch (err) {
-      setAllError(err instanceof Error ? err.message : 'failed to load')
+      setAllError(err instanceof Error ? err.message : t('dashboard.common.loadFailed'))
     } finally {
       setLoadingAll(false)
     }
@@ -154,7 +155,7 @@ export function AchievementsCard({
               className="text-[10px] font-semibold uppercase tracking-[0.18em]"
               style={{ color: 'var(--theme-text)' }}
             >
-              Achievements
+              {t('dashboard.card.achievements')}
             </h3>
           </div>
           <button
@@ -163,7 +164,7 @@ export function AchievementsCard({
             className="font-mono text-[9px] uppercase tracking-[0.15em] transition-colors hover:text-[var(--theme-accent)]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            {achievements.totalUnlocked} unlocked · view all →
+            {t('dashboard.achievements.unlockedViewAll', { count: achievements.totalUnlocked })}
           </button>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -172,7 +173,7 @@ export function AchievementsCard({
               className="py-3 text-center text-[11px]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              No unlocks yet — keep working.
+              {t('dashboard.achievements.noUnlocks')}
             </div>
           ) : (
             // Render every unlock the aggregator returns so the card
@@ -205,12 +206,12 @@ export function AchievementsCard({
                 className="text-sm font-semibold uppercase tracking-[0.15em]"
                 style={{ color: 'var(--theme-text)' }}
               >
-                Achievement Ribbon
+                {t('dashboard.achievements.ribbon')}
               </h2>
               <button
                 type="button"
                 onClick={() => setShowAll(false)}
-                aria-label="Close"
+                aria-label={t('common.close')}
                 className="rounded p-1 hover:bg-[var(--theme-card)]/80"
               >
                 <HugeiconsIcon
@@ -227,7 +228,7 @@ export function AchievementsCard({
                   className="py-8 text-center text-[11px]"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  Loading…
+                  {t('dashboard.achievements.loading')}
                 </div>
               ) : allError ? (
                 <div

@@ -10,6 +10,7 @@ import {
 // no `TerminalIcon`. Aliasing keeps call sites readable.
 const TerminalIcon = ConsoleIcon
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 const ERROR_RX = /\b(error|exception|traceback|failed|fatal)\b/i
 const WARN_RX = /\b(warn|warning|deprecated)\b/i
@@ -62,7 +63,7 @@ export function LogsTailCard({
               className="text-[10px] font-semibold uppercase tracking-[0.15em]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              Logs · {logs.file}
+              {t('dashboard.logsTail.title', { file: logs.file })}
             </h3>
           </div>
           <div className="flex items-center gap-2 text-[10px]">
@@ -92,7 +93,7 @@ export function LogsTailCard({
                   color: 'var(--theme-warning)',
                 }}
               >
-                {logs.warnCount} warn
+                {t('dashboard.logsTail.warn', { count: logs.warnCount })}
               </span>
             ) : null}
             <button
@@ -104,7 +105,7 @@ export function LogsTailCard({
                 color: 'var(--theme-muted)',
               }}
             >
-              Tail →
+              {t('dashboard.widget.tailArrow')}
             </button>
           </div>
         </div>
@@ -120,7 +121,7 @@ export function LogsTailCard({
         >
           {previewLines.length === 0 ? (
             <span style={{ color: 'var(--theme-muted)' }}>
-              no recent log lines.
+              {t('dashboard.logsTail.noRecent')}
             </span>
           ) : (
             previewLines.map((line, i) => (
@@ -216,44 +217,51 @@ function LogsModal({
                 className="text-sm font-semibold uppercase tracking-[0.18em]"
                 style={{ color: 'var(--theme-text)' }}
               >
-                Live tail · {logs.file}
+                {t('dashboard.logsTail.modalTitle', { file: logs.file })}
               </h2>
               <p
                 className="font-mono text-[10px] uppercase tracking-[0.1em]"
                 style={{ color: 'var(--theme-muted)' }}
               >
-                {logs.lines.length} lines · {logs.errorCount} errors ·{' '}
-                {logs.warnCount} warns
-                {loading ? ' · refreshing…' : ''}
+                {t('dashboard.logsTail.modalSummary', { lines: logs.lines.length, errors: logs.errorCount, warns: logs.warnCount })}
+                {loading ? t('dashboard.logsTail.refreshing') : ''}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {(['all', 'errors', 'warns'] as const).map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => setFilter(opt)}
-                className="rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors"
-                style={{
-                  borderColor: 'var(--theme-border)',
-                  background:
-                    filter === opt
-                      ? 'color-mix(in srgb, var(--theme-accent) 18%, transparent)'
-                      : 'transparent',
-                  color:
-                    filter === opt
-                      ? 'var(--theme-accent)'
-                      : 'var(--theme-muted)',
-                }}
-              >
-                {opt}
-              </button>
-            ))}
+            {(['all', 'errors', 'warns'] as const).map((opt) => {
+              const label =
+                opt === 'all'
+                  ? t('dashboard.logsTail.filterAll')
+                  : opt === 'errors'
+                    ? t('dashboard.logsTail.filterErrors')
+                    : t('dashboard.logsTail.filterWarns')
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setFilter(opt)}
+                  className="rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors"
+                  style={{
+                    borderColor: 'var(--theme-border)',
+                    background:
+                      filter === opt
+                        ? 'color-mix(in srgb, var(--theme-accent) 18%, transparent)'
+                        : 'transparent',
+                    color:
+                      filter === opt
+                        ? 'var(--theme-accent)'
+                        : 'var(--theme-muted)',
+                  }}
+                >
+                  {label}
+                </button>
+              )
+            })}
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t('common.close')}
               className="rounded p-1 hover:bg-[var(--theme-card)]/80"
             >
               <HugeiconsIcon
@@ -277,7 +285,7 @@ function LogsModal({
               className="py-6 text-center text-[11px]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              No matching log lines.
+              {t('dashboard.logsTail.noMatching')}
             </div>
           ) : (
             filtered.map((line, i) => (

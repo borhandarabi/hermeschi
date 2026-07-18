@@ -61,10 +61,10 @@ type HugeIcon = typeof Settings02Icon
 
 function timeAgo(ts: number): string {
   const diff = Date.now() / 1000 - ts
-  if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  return `${Math.floor(diff / 86400)}d ago`
+  if (diff < 60) return t('dashboard.common.justNow')
+  if (diff < 3600) return t('dashboard.common.minutesAgo', { n: Math.floor(diff / 60) })
+  if (diff < 86400) return t('dashboard.common.hoursAgo', { n: Math.floor(diff / 3600) })
+  return t('dashboard.common.daysAgo', { n: Math.floor(diff / 86400) })
 }
 
 function formatNumber(n: number): string {
@@ -366,11 +366,11 @@ function ActivityChart({
       <div className="mt-2 flex items-center gap-5 text-[10px] text-muted">
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full" style={{ background: palette.accent }} />
-          Sessions
+          {t('dashboard.screen.sessionsLegend')}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full" style={{ background: palette.success }} />
-          Messages
+          {t('dashboard.screen.messagesLegend')}
         </span>
       </div>
     </GlassCard>
@@ -445,13 +445,13 @@ function SkillsWidget({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          Skills
+          {t('dashboard.screen.skills')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          manage →
+          {t('dashboard.screen.skillsManage')}
         </span>
       </div>
       <div
@@ -465,10 +465,10 @@ function SkillsWidget({
         style={{ color: 'var(--theme-muted)' }}
       >
         {installed === 0
-          ? 'no skills installed'
+          ? t('dashboard.screen.noSkillsInstalled')
           : usedThisWindow !== null && usedThisWindow > 0
-            ? `${enabled} enabled · ${usedThisWindow} used · top: ${topName}`
-            : `${enabled} enabled · top: ${topName}`}
+            ? t('dashboard.screen.skillsEnabledUsed', { enabled, used: usedThisWindow, top: topName })
+            : t('dashboard.screen.skillsEnabledTop', { enabled, top: topName })}
       </div>
     </button>
   )
@@ -612,9 +612,9 @@ function SessionRow({
             {session.model}
           </span>
         )}
-        <span>{msgs} msgs</span>
-        {tools > 0 && <span>{tools} tools</span>}
-        {tokens > 0 && <span>{formatNumber(tokens)} tok</span>}
+        <span>{t('dashboard.sessionsIntelligence.msgs', { count: msgs })}</span>
+        {tools > 0 && <span>{t('dashboard.sessionsIntelligence.tools', { count: tools })}</span>}
+        {tokens > 0 && <span>{t('dashboard.sessionsIntelligence.tok', { count: formatNumber(tokens) })}</span>}
       </div>
       <div className="h-[3px] rounded-full w-full bg-[var(--theme-border)] overflow-hidden">
         <div
@@ -837,7 +837,7 @@ export function DashboardScreen() {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-2 h-12" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <button
           type="button"
-          aria-label="Open navigation menu"
+          aria-label={t('dashboard.screen.openNav')}
           onClick={openHamburgerMenu}
           className="flex items-center justify-center w-11 h-11 rounded-xl active:bg-white/10 transition-colors touch-manipulation"
         >
@@ -847,7 +847,7 @@ export function DashboardScreen() {
         </button>
         <button
           type="button"
-          aria-label="Toggle theme"
+          aria-label={t('dashboard.screen.toggleTheme')}
           onClick={() => {
             const LIGHT_DARK_PAIRS: Record<string, string> = {
               'claude-nous': 'claude-nous-light',
@@ -901,7 +901,7 @@ export function DashboardScreen() {
           >
             <img
               src="/claude-avatar.webp"
-              alt="Hermes Workspace logo"
+              alt={t('dashboard.screen.logoAlt')}
               className="size-8 rounded-md"
               style={{ background: 'transparent' }}
             />
@@ -921,7 +921,7 @@ export function DashboardScreen() {
                 lineHeight: 1.1,
               }}
             >
-              Hermes Workspace
+              {t('dashboard.screen.hermesWorkspace')}
             </h1>
           </div>
         </div>
@@ -957,15 +957,15 @@ export function DashboardScreen() {
               size={16}
               strokeWidth={1.8}
             />
-            <span>New Chat</span>
+            <span>{t('dashboard.screen.newChat')}</span>
           </button>
           <SecondaryAction
-            label="Terminal"
+            label={t('dashboard.screen.terminal')}
             icon={ConsoleIcon}
             onClick={() => navigate({ to: '/terminal' })}
           />
           <SecondaryAction
-            label="Skills"
+            label={t('dashboard.screen.skills')}
             icon={PuzzleIcon}
             onClick={() => navigate({ to: '/skills' })}
             disabled={!skillsAvailable}
@@ -975,8 +975,8 @@ export function DashboardScreen() {
               hidden widgets. Persisted to localStorage. */}
           <button
             type="button"
-            aria-label={layout.editMode ? 'Done editing layout' : 'Edit layout'}
-            title={layout.editMode ? 'Done editing layout' : 'Edit layout'}
+            aria-label={layout.editMode ? t('dashboard.screen.doneEditing') : t('dashboard.screen.editLayout')}
+            title={layout.editMode ? t('dashboard.screen.doneEditing') : t('dashboard.screen.editLayout')}
             onClick={layout.toggleEdit}
             className="inline-flex size-9 items-center justify-center rounded-lg border transition-all hover:scale-[1.05] hover:bg-[var(--theme-card)]/70"
             style={{
@@ -999,8 +999,8 @@ export function DashboardScreen() {
           </button>
           <button
             type="button"
-            aria-label="Settings"
-            title="Settings"
+            aria-label={t('dashboard.screen.settings')}
+            title={t('dashboard.screen.settings')}
             onClick={() => navigate({ to: '/settings', search: {} })}
             className="inline-flex size-9 items-center justify-center rounded-lg border transition-all hover:scale-[1.05] hover:bg-[var(--theme-card)]/70 hover:text-[var(--theme-text)]"
             style={{

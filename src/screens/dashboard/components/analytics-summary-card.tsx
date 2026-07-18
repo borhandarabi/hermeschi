@@ -2,6 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ChartLineData01Icon } from '@hugeicons/core-free-icons'
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
@@ -50,7 +51,7 @@ export function AnalyticsSummaryCard({
             className="text-[10px] font-semibold uppercase tracking-[0.15em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            Top Models · {analytics.windowDays}d
+            {t('dashboard.analyticsSummary.topModelsDays', { days: analytics.windowDays })}
           </h3>
         </div>
         <div className="text-right">
@@ -58,7 +59,7 @@ export function AnalyticsSummaryCard({
             className="text-[11px] font-mono"
             style={{ color: 'var(--theme-text)' }}
           >
-            {formatTokens(analytics.totalTokens)} tok
+            {t('dashboard.analyticsSummary.tok', { count: formatTokens(analytics.totalTokens) })}
           </div>
           {analytics.estimatedCostUsd !== null ? (
             <div
@@ -75,7 +76,7 @@ export function AnalyticsSummaryCard({
           className="flex items-center justify-center py-3 text-[11px]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          No usage in the last {analytics.windowDays}d.
+          {t('dashboard.analyticsSummary.noUsage', { days: analytics.windowDays })}
         </div>
       ) : null}
       <div className="space-y-1.5">
@@ -94,7 +95,7 @@ export function AnalyticsSummaryCard({
                   className="font-mono text-[10px]"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  {formatTokens(m.tokens)} · {m.calls.toLocaleString()} calls
+                  {t('dashboard.analyticsSummary.calls', { tokens: formatTokens(m.tokens), calls: m.calls.toLocaleString() })}
                 </span>
               </div>
               <div

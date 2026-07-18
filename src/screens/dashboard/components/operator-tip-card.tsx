@@ -3,17 +3,18 @@ import { useNavigate } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Idea01Icon, Refresh01Icon } from '@hugeicons/core-free-icons'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 type Tip = {
   id: string
   /** When this tip is most relevant. Highest score wins. */
   score: (overview: DashboardOverview | null) => number
-  title: string
-  body: string
+  title: () => string
+  body: () => string
   /** Optional internal route the CTA jumps to. */
   href?: string
   /** Optional CTA label. Defaults to "Open" when href is set. */
-  cta?: string
+  cta?: () => string
   /** Visual tone. */
   tone?: 'info' | 'positive' | 'warn'
 }
@@ -33,10 +34,10 @@ type Tip = {
 const TIPS: ReadonlyArray<Tip> = [
   {
     id: 'cache-low',
-    title: 'Cache hit rate is low',
-    body: "Reusable system prompts get cached on most providers. Pin shared scaffolding (skills, persona, tools) into a stable preamble so the next request hits cache instead of paying for fresh input.",
+    title: () => t('dashboard.tip.cacheLow.title'),
+    body: () => t('dashboard.tip.cacheLow.body'),
     tone: 'warn',
-    cta: 'Open analytics',
+    cta: () => t('dashboard.tip.cacheLow.cta'),
     href: '/analytics',
     score: (o) => {
       const a = o?.analytics
@@ -49,8 +50,8 @@ const TIPS: ReadonlyArray<Tip> = [
   },
   {
     id: 'cache-high',
-    title: 'Cache hit rate looks great',
-    body: "Cache reads are doing the heavy lifting. Worth checking if any *cold* sessions are skipping your shared preamble — those usually represent untapped savings.",
+    title: () => t('dashboard.tip.cacheHigh.title'),
+    body: () => t('dashboard.tip.cacheHigh.body'),
     tone: 'positive',
     score: (o) => {
       const a = o?.analytics
@@ -63,10 +64,10 @@ const TIPS: ReadonlyArray<Tip> = [
   },
   {
     id: 'stale-cron',
-    title: 'You have stale cron jobs',
-    body: "Cron jobs that haven't run in 7+ days are usually a sign of a paused integration or a misconfigured schedule. Worth a quick triage so you don't lose silent automation.",
+    title: () => t('dashboard.tip.staleCron.title'),
+    body: () => t('dashboard.tip.staleCron.body'),
     tone: 'warn',
-    cta: 'Open jobs',
+    cta: () => t('dashboard.tip.staleCron.cta'),
     href: '/jobs',
     score: (o) => {
       const cron = o?.cron
@@ -82,10 +83,10 @@ const TIPS: ReadonlyArray<Tip> = [
   },
   {
     id: 'config-drift',
-    title: 'Gateway config has drift',
-    body: "There are pending diffs between your local gateway config and the latest committed version. Apply or reject them so your live behavior matches what the repo says.",
+    title: () => t('dashboard.tip.configDrift.title'),
+    body: () => t('dashboard.tip.configDrift.body'),
     tone: 'warn',
-    cta: 'Open settings',
+    cta: () => t('dashboard.tip.configDrift.cta'),
     href: '/settings',
     score: (o) => {
       const s = o?.status
@@ -102,19 +103,19 @@ const TIPS: ReadonlyArray<Tip> = [
   },
   {
     id: 'restart-pending',
-    title: 'Gateway restart pending',
-    body: "Some config or plugin change wants a gateway restart to take effect. Best to do it during a quiet window — long-running sessions handle it gracefully.",
+    title: () => t('dashboard.tip.restartPending.title'),
+    body: () => t('dashboard.tip.restartPending.body'),
     tone: 'warn',
-    cta: 'Open settings',
+    cta: () => t('dashboard.tip.restartPending.cta'),
     href: '/settings',
     score: (o) => (o?.status?.restartRequested ? 75 : 0),
   },
   {
     id: 'achievements-momentum',
-    title: 'Achievement momentum',
-    body: "You unlocked something recently — keep going. The Hermes achievements track real workflows, so the next tier usually drops out of normal usage rather than grinding.",
+    title: () => t('dashboard.tip.achievementsMomentum.title'),
+    body: () => t('dashboard.tip.achievementsMomentum.body'),
     tone: 'positive',
-    cta: 'View all',
+    cta: () => t('dashboard.tip.achievementsMomentum.cta'),
     score: (o) => {
       const ach = o?.achievements
       if (!ach || ach.recentUnlocks.length === 0) return 0
@@ -126,10 +127,10 @@ const TIPS: ReadonlyArray<Tip> = [
   },
   {
     id: 'sessions-low',
-    title: 'Things have been quiet',
-    body: "Session count is below the prior period — could be intentional, could be silent breakage. Worth scanning recent logs and reviewing your cron / heartbeat schedule.",
+    title: () => t('dashboard.tip.sessionsLow.title'),
+    body: () => t('dashboard.tip.sessionsLow.body'),
     tone: 'info',
-    cta: 'Open sessions',
+    cta: () => t('dashboard.tip.sessionsLow.cta'),
     href: '/sessions',
     score: (o) => {
       const a = o?.analytics
@@ -146,10 +147,10 @@ const TIPS: ReadonlyArray<Tip> = [
   },
   {
     id: 'top-model-share',
-    title: 'One model is doing all the work',
-    body: "Concentration risk: if your top model is handling >70% of calls, an outage or pricing change hits hard. Worth setting up a fallback even if you never use it.",
+    title: () => t('dashboard.tip.topModelShare.title'),
+    body: () => t('dashboard.tip.topModelShare.body'),
     tone: 'info',
-    cta: 'Open models',
+    cta: () => t('dashboard.tip.topModelShare.cta'),
     href: '/models',
     score: (o) => {
       const a = o?.analytics
@@ -165,26 +166,26 @@ const TIPS: ReadonlyArray<Tip> = [
   // nothing context-specific is more relevant.
   {
     id: 'edit-mode',
-    title: 'Customize this dashboard',
-    body: "Use the pencil icon in the header to enter edit mode. You can hide widgets you don't care about and reveal extras (Provider Mix, Velocity, Cost Ledger, Live Logs) from the picker.",
+    title: () => t('dashboard.tip.editMode.title'),
+    body: () => t('dashboard.tip.editMode.body'),
     tone: 'info',
     score: () => 5,
   },
   {
     id: 'skills-shortcut',
-    title: 'Skills are first-class',
-    body: "Hermes loads skills into context on demand. Click any row in Skills Usage to jump to that skill's page and edit its SKILL.md — every change is hot-reloaded.",
+    title: () => t('dashboard.tip.skillsShortcut.title'),
+    body: () => t('dashboard.tip.skillsShortcut.body'),
     tone: 'info',
-    cta: 'Open skills',
+    cta: () => t('dashboard.tip.skillsShortcut.cta'),
     href: '/skills',
     score: () => 4,
   },
   {
     id: 'new-chat',
-    title: "Pick the right model up-front",
-    body: "Hitting New Chat without a model in mind is fine, but Hermes routes faster when you set a default in Settings → Models for your common task types.",
+    title: () => t('dashboard.tip.newChat.title'),
+    body: () => t('dashboard.tip.newChat.body'),
     tone: 'info',
-    cta: 'New chat',
+    cta: () => t('dashboard.tip.newChat.cta'),
     href: '/chat/new',
     score: () => 3,
   },
@@ -290,7 +291,7 @@ export function OperatorTipCard({
             className="font-mono text-[9px] uppercase tracking-[0.18em]"
             style={{ color: tone }}
           >
-            Tip · {index + 1}/{ranked.length}
+            {t('dashboard.tip.label', { index: index + 1, total: ranked.length })}
           </span>
           <div className="flex items-center gap-1.5">
             {tip.href ? (
@@ -303,14 +304,14 @@ export function OperatorTipCard({
                   color: 'var(--theme-text)',
                 }}
               >
-                {tip.cta ?? 'Open'} →
+                {t('dashboard.tip.ctaArrow', { cta: tip.cta ? tip.cta() : t('dashboard.tip.defaultCta') })}
               </button>
             ) : null}
             <button
               type="button"
               onClick={handleNext}
-              aria-label="Next tip"
-              title="Next tip"
+              aria-label={t('dashboard.tip.nextTip')}
+              title={t('dashboard.tip.nextTip')}
               className="inline-flex size-6 items-center justify-center rounded-full border transition-all hover:scale-[1.05] hover:bg-[var(--theme-card)]/70"
               style={{
                 borderColor: 'var(--theme-border)',
@@ -329,13 +330,13 @@ export function OperatorTipCard({
           className="text-[12px] font-semibold leading-tight"
           style={{ color: 'var(--theme-text)' }}
         >
-          {tip.title}
+          {tip.title()}
         </h3>
         <p
           className="text-[11px] leading-snug"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {tip.body}
+          {tip.body()}
         </p>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (!n || n <= 0) return '0'
@@ -47,28 +48,28 @@ export function TokenMixHourCard({
     if (!analytics || analytics.source !== 'analytics') return []
     return [
       {
-        label: 'cache',
+        label: t('dashboard.legend.cache'),
         value: analytics.cacheReadTokens,
         tone: 'var(--theme-accent-secondary)',
-        hint: 'Cache read tokens.',
+        hint: t('dashboard.tokenMixHour.hintCache'),
       },
       {
-        label: 'input',
+        label: t('dashboard.legend.input'),
         value: analytics.inputTokens,
         tone: 'var(--theme-accent)',
-        hint: 'Prompt tokens sent to the model.',
+        hint: t('dashboard.tokenMixHour.hintInput'),
       },
       {
-        label: 'output',
+        label: t('dashboard.legend.output'),
         value: analytics.outputTokens,
         tone: 'var(--theme-success)',
-        hint: 'Completion tokens emitted.',
+        hint: t('dashboard.tokenMixHour.hintOutput'),
       },
       {
-        label: 'reasoning',
+        label: t('dashboard.legend.reasoning'),
         value: analytics.reasoningTokens,
         tone: 'var(--theme-warning)',
-        hint: 'Thinking tokens (when supported).',
+        hint: t('dashboard.tokenMixHour.hintReasoning'),
       },
     ]
   }, [analytics])
@@ -113,17 +114,16 @@ export function TokenMixHourCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Mix &amp; rhythm
-          {analytics ? ` · ${analytics.windowDays}d` : ''}
+          {analytics ? t('dashboard.tokenMixHour.titleDays', { days: analytics.windowDays }) : t('dashboard.tokenMixHour.title')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {totalTokens > 0 ? `out/in ${ratio.toFixed(1)}%` : ''}
+          {totalTokens > 0 ? t('dashboard.tokenMixHour.outIn', { ratio: ratio.toFixed(1) }) : ''}
           {totalTokens > 0 && totalSessions > 0 ? ' · ' : ''}
           {totalSessions > 0
-            ? `peak ${formatHour(peakHour)} · ${totalSessions} sess`
+            ? t('dashboard.tokenMixHour.peakSessions', { hour: formatHour(peakHour), count: totalSessions })
             : ''}
         </span>
       </div>
@@ -145,7 +145,7 @@ export function TokenMixHourCard({
                 <div
                   key={s.label}
                   style={{ width: `${widthPct}%`, background: s.tone }}
-                  title={`${s.label}: ${formatTokens(s.value)} (${widthPct.toFixed(1)}%)`}
+              title={t('dashboard.tokenMixHour.cellTitle', { label: s.label, tokens: formatTokens(s.value), pct: widthPct.toFixed(1) })}
                 />
               )
             })}
@@ -211,7 +211,7 @@ export function TokenMixHourCard({
                       count === 0 ? 4 : `${Math.max(8, heightPct)}%`,
                     minHeight: 4,
                   }}
-                  title={`${formatHour(hour)} · ${count} session${count === 1 ? '' : 's'}`}
+                  title={t('dashboard.tokenMixHour.hourCellTitle', { hour: formatHour(hour), count, s: count === 1 ? '' : 's' })}
                 />
               )
             })}
@@ -220,11 +220,11 @@ export function TokenMixHourCard({
             className="flex justify-between font-mono text-[8px] uppercase tracking-[0.1em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            <span>12a</span>
-            <span>6a</span>
-            <span>12p</span>
-            <span>6p</span>
-            <span>12a</span>
+            <span>{t('dashboard.hourOfDay.12a')}</span>
+            <span>{t('dashboard.hourOfDay.6a')}</span>
+            <span>{t('dashboard.hourOfDay.12p')}</span>
+            <span>{t('dashboard.hourOfDay.6p')}</span>
+            <span>{t('dashboard.hourOfDay.12a')}</span>
           </div>
         </div>
       ) : null}
