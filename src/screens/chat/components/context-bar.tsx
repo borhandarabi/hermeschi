@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import {
   PreviewCard,
   PreviewCardPopup,
@@ -123,7 +124,9 @@ function ContextBarComponent({
           type="button"
           className="absolute inset-x-0 -top-2 -bottom-2 z-10"
           onClick={() => setShowLabel((prev) => !prev)}
-          aria-label={`Context: ${Math.round(clampedPct)}% used`}
+          aria-label={t('chat.contextBar.ariaLabel', {
+            percent: Math.round(clampedPct),
+          })}
         />
         {/* Bar — always 3px, never moves */}
         <div className={cn('w-full h-[3px]', barBg)}>
@@ -178,7 +181,7 @@ function ContextBarComponent({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-medium text-primary-900">
-              Context Window
+              {t('chat.contextBar.window')}
             </span>
             <span
               className={cn(
@@ -201,7 +204,7 @@ function ContextBarComponent({
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-primary-500 tabular-nums">
               {formatTokens(ctx.usedTokens)} / {formatTokens(ctx.maxTokens)}{' '}
-              tokens
+              {t('chat.contextBar.tokensSuffix')}
             </span>
             {ctx.model && (
               <span className="text-[10px] text-primary-400 truncate max-w-[100px]">
@@ -211,7 +214,7 @@ function ContextBarComponent({
           </div>
           {isCritical && (
             <p className="text-[10px] text-red-600 font-medium">
-              Context almost full — consider starting a new chat
+              {t('chat.contextBar.almostFull')}
             </p>
           )}
         </div>

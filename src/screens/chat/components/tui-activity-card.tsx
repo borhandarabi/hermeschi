@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 /**
  * TUI-style activity card.
@@ -124,9 +125,10 @@ function ToolRow({
   const outputText = section.outputText || section.errorText || ''
   const outputSummary = isPending
     ? isStreamingActive
-      ? 'running…'
-      : 'pending'
-    : summarizeOutput(outputText) || (isDone ? 'done' : 'failed')
+      ? t('chat.tui.running')
+      : t('chat.tui.pending')
+    : summarizeOutput(outputText) ||
+      (isDone ? t('chat.tui.done') : t('chat.tui.failed'))
 
   const dot = statusDot(section.state, isStreamingActive)
   const color = statusColor(section.state, isStreamingActive)
@@ -210,7 +212,7 @@ function ToolRow({
                 className="mb-0.5 font-sans text-[9px] uppercase tracking-widest opacity-50"
                 style={{ color: 'var(--theme-muted)' }}
               >
-                Input
+                {t('chat.tui.input')}
               </div>
               <pre
                 className="max-h-32 overflow-auto whitespace-pre-wrap break-words rounded font-mono text-[10px]"
@@ -230,7 +232,7 @@ function ToolRow({
                     : 'var(--theme-muted)',
                 }}
               >
-                {isError ? 'Error' : 'Output'}
+                {isError ? t('chat.tui.error') : t('chat.tui.output')}
               </div>
               <pre
                 className="max-h-48 overflow-auto whitespace-pre-wrap break-words rounded font-mono text-[10px]"
@@ -266,7 +268,7 @@ function ThinkingRow({
     if (expandAll) setOpen(true)
   }, [expandAll])
 
-  const summary = summarizeOutput(thinking) || 'thinking…'
+  const summary = summarizeOutput(thinking) || t('chat.tui.thinkingFallback')
 
   return (
     <div className="font-mono text-[12px] leading-relaxed">
@@ -280,7 +282,7 @@ function ThinkingRow({
           className="shrink-0 font-semibold"
           style={{ color: 'var(--theme-text)' }}
         >
-          Thinking
+          {t('chat.tui.thinking')}
         </span>
         <span className="flex-1" />
         {isStreaming && elapsedSeconds > 0 ? (
@@ -337,8 +339,8 @@ function TuiActivityCardComponent({
   const hasThinking = !!(thinking && thinking.trim().length > 0)
   const hasTools = toolSections.length > 0
 
-  const summary = useMemo(() => {
-    if (!hasTools) return null
+  const { summary, summaryVariant } = useMemo(() => {
+    if (!hasTools) return { summary: null, summaryVariant: 'success' as const }
     const total = toolSections.length
     const errors = toolSections.filter((s) => s.state === 'output-error').length
     const running = toolSections.filter(
@@ -346,15 +348,29 @@ function TuiActivityCardComponent({
     ).length
     const done = total - errors - running
 
-    if (errors > 0) return `${errors} failed · ${done} done`
-    if (running > 0) return `${running} running · ${done} done`
-    return `${total} ${total === 1 ? 'tool' : 'tools'} · done`
+    if (errors > 0)
+      return {
+        summary: t('chat.tui.summaryFailed', { errors, done }),
+        summaryVariant: 'failed' as const,
+      }
+    if (running > 0)
+      return {
+        summary: t('chat.tui.summaryRunning', { running, done }),
+        summaryVariant: 'running' as const,
+      }
+    return {
+      summary:
+        total === 1
+          ? t('chat.tui.summaryDoneOne', { total })
+          : t('chat.tui.summaryDoneMany', { total }),
+      summaryVariant: 'success' as const,
+    }
   }, [toolSections, hasTools])
 
   const summaryColor =
-    summary?.includes('failed')
+    summaryVariant === 'failed'
       ? 'var(--theme-danger, #ef4444)'
-      : summary?.includes('running')
+      : summaryVariant === 'running'
         ? 'var(--theme-accent, #6366f1)'
         : 'var(--theme-success, #22c55e)'
 
@@ -387,7 +403,7 @@ function TuiActivityCardComponent({
           className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {isStreaming ? '⚡ Working' : 'Activity'}
+          {isStreaming ? t('chat.tui.working') : t('chat.tui.activity')}
         </span>
         <span className="flex-1" />
         {summary ? (
@@ -433,9 +449,9 @@ function TuiActivityCardComponent({
               className="size-1.5 rounded-full animate-pulse"
               style={{ background: 'var(--theme-accent, #6366f1)' }}
             />
-            <span className="opacity-80">working…</span>
+            <span className="opacity-80">{t('chat.tui.workingStub')}</span>
             <span className="opacity-50 text-[10px]">
-              tool activity will appear after the run
+              {t('chat.tui.workingStubHint')}
             </span>
           </div>
         ) : null}

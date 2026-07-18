@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Alert02Icon, WifiDisconnected01Icon } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type ConnectionStatusMessageProps = {
   state: 'checking' | 'error'
@@ -24,9 +25,9 @@ function classifyConnectionError(
 
   if (!normalizedError && !status) {
     return {
-      title: 'Not connected',
-      description: "Hermes Workspace can't reach Hermes Agent.",
-      action: 'Check that Hermes is running, then try again.',
+      title: t('chat.connectionStatus.notConnected'),
+      description: t('chat.connectionStatus.notConnectedDesc'),
+      action: t('chat.connectionStatus.notConnectedAction'),
     }
   }
 
@@ -37,9 +38,9 @@ function classifyConnectionError(
     lower.includes('unauthorized')
   ) {
     return {
-      title: 'Authentication required',
-      description: 'Hermes Agent rejected the connection token.',
-      action: 'Go to Settings -> Advanced -> Hermes Agent to update your token.',
+      title: t('chat.connectionStatus.authRequired'),
+      description: t('chat.connectionStatus.authRequiredDesc'),
+      action: t('chat.connectionStatus.authRequiredAction'),
     }
   }
 
@@ -49,17 +50,17 @@ function classifyConnectionError(
     lower.includes('not paired')
   ) {
     return {
-      title: 'Pairing required',
-      description: "This device isn't paired with Hermes Agent yet.",
-      action: 'Check Hermes Agent connection.',
+      title: t('chat.connectionStatus.pairingRequired'),
+      description: t('chat.connectionStatus.pairingRequiredDesc'),
+      action: t('chat.connectionStatus.pairingRequiredAction'),
     }
   }
 
   if (lower.includes('econnrefused') && lower.includes('8642')) {
     return {
-      title: 'Hermes Agent gateway not running',
-      description: 'The Hermes Agent gateway is not running on port 8642.',
-      action: 'Run the official Hermes installer, then start the gateway with: hermes gateway run',
+      title: t('chat.connectionStatus.gatewayNotRunning'),
+      description: t('chat.connectionStatus.gatewayNotRunningDesc'),
+      action: t('chat.connectionStatus.gatewayNotRunningAction'),
     }
   }
 
@@ -71,16 +72,16 @@ function classifyConnectionError(
     lower.includes('timeout')
   ) {
     return {
-      title: 'Hermes Agent unreachable',
-      description: "Can't connect to Hermes Agent at the configured URL.",
-      action: 'Make sure Hermes is running and the URL is correct.',
+      title: t('chat.connectionStatus.unreachable'),
+      description: t('chat.connectionStatus.unreachableDesc'),
+      action: t('chat.connectionStatus.unreachableAction'),
     }
   }
 
   return {
-    title: 'Connection error',
-    description: normalizedError || 'Something went wrong.',
-    action: 'Try refreshing or check Settings -> Advanced -> Hermes.',
+    title: t('chat.connectionStatus.error'),
+    description: normalizedError || t('chat.connectionStatus.errorDefault'),
+    action: t('chat.connectionStatus.errorAction'),
   }
 }
 
@@ -133,7 +134,9 @@ export function ConnectionStatusMessage({
         />
         <div className="flex-1 text-xs">
           <p className="font-medium">
-            {isChecking ? 'Connecting to Hermes Agent...' : errorInfo.title}
+            {isChecking
+              ? t('chat.connectionStatus.connecting')
+              : errorInfo.title}
           </p>
           {!isChecking ? (
             <>
@@ -150,7 +153,7 @@ export function ConnectionStatusMessage({
             onClick={onRetry}
             className="shrink-0 rounded-md border border-amber-300 bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-200 dark:hover:bg-amber-900/30"
           >
-            Retry
+            {t('chat.connection.retry')}
           </button>
         )}
       </div>

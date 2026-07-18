@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/preview-card'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type ContextMeterProps = {
   usedTokens?: number
@@ -29,7 +30,10 @@ function ContextMeterComponent({ usedTokens, maxTokens }: ContextMeterProps) {
       n >= 1000 ? `${(n / 1000).toFixed(0)}K` : String(n)
     return {
       percentage: pct,
-      usedLabel: `${fmt(usedTokens)} / ${fmt(maxTokens)} tokens used`,
+      usedLabel: t('chat.contextMeter.tokensUsed', {
+        used: fmt(usedTokens),
+        max: fmt(maxTokens),
+      }),
       leftPercentage: Math.max(0, 100 - pct),
     }
   }, [usedTokens, maxTokens])
@@ -75,9 +79,14 @@ function ContextMeterComponent({ usedTokens, maxTokens }: ContextMeterProps) {
       </PreviewCardTrigger>
       <PreviewCardPopup align="end" sideOffset={8} className="w-52 px-2 py-1">
         <div className="space-y-0.5 text-xs text-primary-900">
-          <div className="text-primary-950 font-[450]">Context window:</div>
+          <div className="text-primary-950 font-[450]">
+            {t('chat.contextMeter.contextWindow')}
+          </div>
           <div className="tabular-nums text-primary-700">
-            {percentage.toFixed(0)}% used ({leftPercentage.toFixed(0)}% left)
+            {t('chat.contextMeter.usage', {
+              used: percentage.toFixed(0),
+              left: leftPercentage.toFixed(0),
+            })}
           </div>
           <div className="tabular-nums text-primary-700">{usedLabel}</div>
         </div>
