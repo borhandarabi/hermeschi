@@ -19,6 +19,7 @@ import { DialogContent, DialogRoot, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type ProfileSummary = {
   name: string
@@ -314,7 +315,7 @@ export function ProfilesScreen() {
         <div>
           <div className="flex items-center gap-2">
             <HugeiconsIcon icon={UserGroupIcon} size={22} strokeWidth={1.7} />
-            <h1 className="text-lg font-semibold text-primary-900">Profiles</h1>
+            <h1 className="text-lg font-semibold text-primary-900">{t('profiles.profiles')}</h1>
           </div>
           <p className="mt-1 text-sm text-primary-600">
             Browse and manage Hermes profiles stored under{' '}

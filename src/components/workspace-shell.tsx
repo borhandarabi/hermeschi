@@ -23,6 +23,7 @@ import {
 import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { fetchClaudeAuthStatus, type AuthStatus } from '@/lib/claude-auth'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import { ConnectionStartupScreen } from '@/components/connection-startup-screen'
 import { ChatSidebar } from '@/screens/chat/components/chat-sidebar'
 import { useChatSessions } from '@/screens/chat/hooks/use-chat-sessions'
@@ -411,7 +412,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
               }}
             >
               {isMobile && isOnTerminalRoute && (
-                <MobilePageHeader title="Terminal" />
+                <MobilePageHeader title={t('nav.terminal')} />
               )}
               <div className="flex-1 min-h-0 overflow-hidden">
                 <Suspense fallback={null}>
