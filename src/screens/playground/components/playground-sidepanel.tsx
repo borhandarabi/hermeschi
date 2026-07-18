@@ -6,6 +6,7 @@ import type {
   PlaygroundWorldId,
 } from '../lib/playground-rpg'
 import type { PlaygroundRpgState } from '../hooks/use-playground-rpg'
+import { t } from '@/lib/i18n'
 
 type TabId = 'inventory' | 'skills' | 'quests' | 'worlds' | 'settings'
 
@@ -30,18 +31,18 @@ type Props = {
 }
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
-  { id: 'inventory', label: 'Inventory', icon: '🎒' },
-  { id: 'skills', label: 'Skills', icon: '✨' },
-  { id: 'quests', label: 'Quests', icon: '📜' },
-  { id: 'worlds', label: 'Worlds', icon: '🗺️' },
-  { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'inventory', label: t('playground.sidepanel.tabInventory'), icon: '🎒' },
+  { id: 'skills', label: t('playground.sidepanel.tabSkills'), icon: '✨' },
+  { id: 'quests', label: t('playground.sidepanel.tabQuests'), icon: '📜' },
+  { id: 'worlds', label: t('playground.sidepanel.tabWorlds'), icon: '🗺️' },
+  { id: 'settings', label: t('playground.sidepanel.tabSettings'), icon: '⚙️' },
 ]
 
 const SLOT_LABELS: Array<{ slot: EquipmentSlot; label: string }> = [
-  { slot: 'weapon', label: 'Weapon' },
-  { slot: 'cloak', label: 'Cloak' },
-  { slot: 'head', label: 'Head' },
-  { slot: 'artifact', label: 'Artifact' },
+  { slot: 'weapon', label: t('playground.sidepanel.slotWeapon') },
+  { slot: 'cloak', label: t('playground.sidepanel.slotCloak') },
+  { slot: 'head', label: t('playground.sidepanel.slotHead') },
+  { slot: 'artifact', label: t('playground.sidepanel.slotArtifact') },
 ]
 
 const EMPTY_SLOT_ICONS: Record<EquipmentSlot, string> = {
@@ -63,8 +64,8 @@ const INVENTORY_SECTIONS: Array<{
   id: 'inventory' | 'founders-vault'
   label: string
 }> = [
-  { id: 'inventory', label: 'Inventory' },
-  { id: 'founders-vault', label: "Founders' Vault" },
+  { id: 'inventory', label: t('playground.sidepanel.sectionInventory') },
+  { id: 'founders-vault', label: t('playground.sidepanel.sectionFoundersVault') },
 ]
 
 function getFoundersVaultUnclaimedCount() {
@@ -125,8 +126,8 @@ export function PlaygroundSidePanel({
           }}
         >
           <div className="mb-1 flex items-center justify-between">
-            <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/55">Quest Tracker</span>
-            <button type="button" onClick={() => setQuestRailOpen(false)} className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white/55">Hide</button>
+            <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/55">{t('playground.sidepanel.questTracker')}</span>
+            <button type="button" onClick={() => setQuestRailOpen(false)} className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white/55">{t('playground.sidepanel.hide')}</button>
           </div>
           <div className="flex items-start gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-lg">
@@ -141,7 +142,7 @@ export function PlaygroundSidePanel({
               </div>
               {tutorialStep && (
                 <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
-                  Step {tutorialStep} of 5
+                  {t('playground.sidepanel.stepOf', { step: tutorialStep })}
                 </div>
               )}
             </div>
@@ -170,9 +171,9 @@ export function PlaygroundSidePanel({
           type="button"
           onClick={() => setQuestRailOpen(true)}
           className="pointer-events-auto fixed right-3 top-[356px] z-[76] rounded-full border border-amber-200/35 bg-black/70 px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-amber-100 shadow-xl backdrop-blur-xl"
-          title="Open quest tracker"
+          title={t('playground.sidepanel.openQuestTracker')}
         >
-          📜 Quest
+          {t('playground.sidepanel.questButton')}
         </button>
       )}
 
@@ -185,14 +186,14 @@ export function PlaygroundSidePanel({
         >
           <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 md:hidden">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
-              HermesWorld Menu
+              {t('playground.sidepanel.menuHeader')}
             </div>
             <button
               type="button"
               onClick={() => onOpenChange?.(false)}
               className="rounded-md border border-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-white/60"
             >
-              Close
+              {t('playground.sidepanel.close')}
             </button>
           </div>
           <div className="flex items-center justify-between gap-1 border-b border-white/10 px-1.5 py-1.5">
@@ -350,7 +351,7 @@ function InventoryTab({
         <>
           <div>
             <div className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/55">
-              Equipped
+              {t('playground.sidepanel.equipped')}
             </div>
             <div className="grid grid-cols-2 gap-2">
               {SLOT_LABELS.map(({ slot, label }) => {
@@ -371,7 +372,7 @@ function InventoryTab({
                       outlineOffset: '-4px',
                     }}
                     title={
-                      item ? `Unequip ${item.name}` : `Empty ${label} slot`
+                      item ? t('playground.sidepanel.unequipItem', { name: item.name }) : t('playground.sidepanel.emptySlotLabel', { label })
                     }
                   >
                     <div className="text-[9px] uppercase tracking-[0.12em] text-white/45">
@@ -385,12 +386,12 @@ function InventoryTab({
                       </span>
                       <div className="min-w-0">
                         <div className="truncate text-[10px] font-semibold">
-                          {item?.name || 'Empty'}
+                          {item?.name || t('playground.sidepanel.empty')}
                         </div>
                         <div className="text-[8px] text-white/45">
                           {item?.stat
                             ? `${item.stat.label} +${item.stat.value}`
-                            : 'Click item below to equip'}
+                            : t('playground.sidepanel.clickToEquip')}
                         </div>
                       </div>
                     </div>
@@ -402,7 +403,7 @@ function InventoryTab({
 
           <div>
             <div className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/55">
-              Inventory
+              {t('playground.sidepanel.inventoryLabel')}
             </div>
             <div className="grid grid-cols-4 gap-2">
               {Array.from({ length: 24 }).map((_, index) => {
@@ -411,7 +412,7 @@ function InventoryTab({
                 const isEquipped = id
                   ? Object.values(equipped).includes(id)
                   : false
-                const slotLabel = item && item.slot ? 'Equip' : item?.rarity
+                const slotLabel = item && item.slot ? t('playground.sidepanel.equip') : item?.rarity
                 return (
                   <button
                     key={index}
@@ -421,7 +422,7 @@ function InventoryTab({
                       if (!id) return
                       onEquipItem(id)
                     }}
-                    title={item ? item.description : 'Empty slot'}
+                    title={item ? item.description : t('playground.sidepanel.emptySlotTitle')}
                     className="flex h-16 flex-col items-center justify-center rounded-lg border border-white/10 bg-black/35 text-center transition hover:border-white/30 disabled:cursor-default"
                   >
                     {item ? (
@@ -431,7 +432,7 @@ function InventoryTab({
                           {item.name}
                         </div>
                         <div className="text-[7px] uppercase tracking-[0.1em] text-white/45">
-                          {isEquipped ? 'Equipped' : slotLabel}
+                          {isEquipped ? t('playground.sidepanel.equippedTag') : slotLabel}
                         </div>
                       </>
                     ) : (
@@ -472,14 +473,13 @@ function FoundersVaultPlaceholder({
             className="text-[9px] font-bold uppercase tracking-[0.18em]"
             style={{ color: FOUNDERS_PALETTE.gold }}
           >
-            Founders' Vault
+            {t('playground.sidepanel.sectionFoundersVault')}
           </div>
           <div className="mt-1 text-[14px] font-semibold text-white">
-            Locked for v0.3 preview
+            {t('playground.sidepanel.vaultLockedTitle')}
           </div>
           <div className="mt-1 text-[10px] leading-relaxed text-white/72">
-            Early supporters will receive claimable gifts here once
-            server-authoritative granting ships in v0.4.
+            {t('playground.sidepanel.vaultLockedDesc')}
           </div>
         </div>
         <div
@@ -496,10 +496,10 @@ function FoundersVaultPlaceholder({
 
       <div className="mt-3 grid grid-cols-2 gap-2 text-[9px]">
         {[
-          'Founder cosmetics',
-          'Soft currency grants',
-          'Title + flair rewards',
-          'Companion unlocks',
+          t('playground.sidepanel.vaultBenefit1'),
+          t('playground.sidepanel.vaultBenefit2'),
+          t('playground.sidepanel.vaultBenefit3'),
+          t('playground.sidepanel.vaultBenefit4'),
         ].map((label) => (
           <div
             key={label}
@@ -522,8 +522,7 @@ function FoundersVaultPlaceholder({
           color: FOUNDERS_PALETTE.gold,
         }}
       >
-        {foundersVaultUnclaimed} unclaimed founder gift queued • claiming
-        disabled in v0.3
+        {t('playground.sidepanel.vaultStatus', { count: foundersVaultUnclaimed })}
       </div>
     </div>
   )
@@ -532,28 +531,28 @@ function FoundersVaultPlaceholder({
 function SkillsTab({ state }: { state: PlaygroundRpgState }) {
   const entries = [
     {
-      label: 'Power',
+      label: t('playground.sidepanel.skillPower'),
       value: state.playerProfile.equipped.weapon
         ? (itemById(state.playerProfile.equipped.weapon)?.stat?.value ?? 0)
         : 0,
       color: '#fb7185',
     },
     {
-      label: 'Guard',
+      label: t('playground.sidepanel.skillGuard'),
       value: state.playerProfile.equipped.cloak
         ? (itemById(state.playerProfile.equipped.cloak)?.stat?.value ?? 0)
         : 0,
       color: '#22d3ee',
     },
     {
-      label: 'Command',
+      label: t('playground.sidepanel.skillCommand'),
       value: state.playerProfile.equipped.head
         ? (itemById(state.playerProfile.equipped.head)?.stat?.value ?? 0)
         : 0,
       color: '#facc15',
     },
     {
-      label: 'Recall',
+      label: t('playground.sidepanel.skillRecall'),
       value: state.playerProfile.equipped.artifact
         ? (itemById(state.playerProfile.equipped.artifact)?.stat?.value ?? 0)
         : 0,
@@ -620,7 +619,7 @@ function QuestsTab({
                 className="text-[9px]"
                 style={{ color: done ? '#10b981' : accent }}
               >
-                {done ? 'DONE' : quest.optional ? 'BONUS' : '...'}
+                {done ? t('playground.sidepanel.questDone') : quest.optional ? t('playground.sidepanel.questBonus') : t('playground.sidepanel.questPending')}
               </div>
             </div>
             <div className="mt-0.5 text-[9px] leading-tight text-white/55">
@@ -688,7 +687,7 @@ function WorldsTab({
             <div>
               <div className="text-[11px] font-semibold">{world.name}</div>
               <div className="text-[9px] text-white/45">
-                {unlocked ? world.tagline : 'Locked'}
+                {unlocked ? world.tagline : t('playground.sidepanel.worldLocked')}
               </div>
             </div>
             <div className="text-sm">
@@ -698,8 +697,7 @@ function WorldsTab({
         )
       })}
       <div className="pt-1 text-[9px] uppercase tracking-[0.12em] text-white/40">
-        {Math.min(state.unlockedWorlds.length, worlds.length)} / {worlds.length}{' '}
-        unlocked
+        {t('playground.sidepanel.worldsUnlocked', { count: Math.min(state.unlockedWorlds.length, worlds.length), total: worlds.length })}
       </div>
     </div>
   )
@@ -716,17 +714,14 @@ function SettingsTab({
     <div className="space-y-2 text-[10px] text-white/70">
       <div>
         <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/55">
-          Controls
+          {t('playground.sidepanel.controlsHeader')}
         </div>
         <ul className="mt-1 space-y-0.5">
-          <li>WASD move · Shift sprint</li>
-          <li>E talk · T chat · J journal · M world map · C avatar</li>
-          <li>Drag with mouse to rotate camera · wheel to zoom</li>
-          <li>Arrow keys still orbit view · 1 Strike · 2 Dash · 3 Bolt</li>
-          <li>
-            <strong>F focus mode</strong> (hide rail) · Esc closes panels +
-            focus
-          </li>
+          <li>{t('playground.sidepanel.controlLine1')}</li>
+          <li>{t('playground.sidepanel.controlLine2')}</li>
+          <li>{t('playground.sidepanel.controlLine3')}</li>
+          <li>{t('playground.sidepanel.controlLine4')}</li>
+          <li dangerouslySetInnerHTML={{ __html: t('playground.sidepanel.controlLine5') }} />
         </ul>
       </div>
       {onReset && (
@@ -734,7 +729,7 @@ function SettingsTab({
           onClick={onReset}
           className="rounded-lg border border-rose-400/35 bg-rose-500/10 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-rose-100 hover:bg-rose-500/20"
         >
-          Reset local profile
+          {t('playground.sidepanel.resetProfile')}
         </button>
       )}
       {onReplayTutorial && (
@@ -742,7 +737,7 @@ function SettingsTab({
           onClick={onReplayTutorial}
           className="w-full rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-cyan-100 hover:bg-cyan-400/20"
         >
-          Replay tutorial
+          {t('playground.sidepanel.replayTutorial')}
         </button>
       )}
     </div>

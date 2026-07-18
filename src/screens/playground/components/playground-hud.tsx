@@ -3,6 +3,7 @@ import { Toast, rarityForPlaygroundToast } from './toast'
 import type { PlaygroundRpgState, RewardToast } from '../hooks/use-playground-rpg'
 import type { PlaygroundWorldId } from '../lib/playground-rpg'
 import { useWorkspaceStore } from '@/stores/workspace-store'
+import { t } from '@/lib/i18n'
 
 type HudProps = {
   state: PlaygroundRpgState
@@ -80,7 +81,7 @@ export function PlaygroundHud({
   const chromeLeft = isPublicPlayRoute ? MOCKUP_LEFT : sidebarCollapsed ? 'min(120px, 9vw)' : '320px'
   const hudAccent = currentWorld === 'agora' ? HUD.gold : worldAccent
   const coinCount = 128
-  const title = playerProfile.titlesUnlocked.at(-1) || (currentWorld === 'agora' ? 'Agora Initiate' : 'Training Grounds')
+  const title = playerProfile.titlesUnlocked.at(-1) || (currentWorld === 'agora' ? t('playground.hud.titleAgoraInitiate') : t('playground.hud.titleTrainingGrounds'))
   const panelBg = `linear-gradient(180deg, rgba(15,22,34,.92), rgba(10,13,18,.84)), radial-gradient(circle at 20% 0%, ${hudAccent}2b, transparent 58%), radial-gradient(circle at 100% 100%, ${HUD.verdigris}35, transparent 62%)`
   const panelShadow = `0 18px 42px rgba(0,0,0,.58), 0 0 0 1px ${HUD.obsidian}, 0 0 28px ${hudAccent}30, inset 0 1px 0 rgba(244,233,211,.18)`
 
@@ -119,8 +120,8 @@ export function PlaygroundHud({
         style={{ left: chromeLeft, top: MOCKUP_TOP }}
       >
         <div className="relative flex items-center gap-2">
-          <ResourceOrb label="HP" v={state.hp} m={state.hpMax} color="#B03A30" fillA="#E05745" fillB="#6C1518" />
-          <ResourceOrb label="MP" v={state.mp} m={state.mpMax} color="#2E6A63" fillA="#5EB8AB" fillB="#133D47" />
+          <ResourceOrb label={t('playground.hud.orbHp')} v={state.hp} m={state.hpMax} color="#B03A30" fillA="#E05745" fillB="#6C1518" />
+          <ResourceOrb label={t('playground.hud.orbMp')} v={state.mp} m={state.mpMax} color="#2E6A63" fillA="#5EB8AB" fillB="#133D47" />
         </div>
         <div
           className="hermes-hud-rune-frame relative mt-1 min-w-[184px] rounded-[24px] border px-3 py-2 backdrop-blur-xl"
@@ -142,7 +143,7 @@ export function PlaygroundHud({
               >
                 <img
                   src={`/avatars/${playerProfile.avatarConfig.portrait || 'hermes'}.png`}
-                  alt="Your avatar"
+                  alt={t('playground.hud.avatarAlt')}
                   loading="lazy"
                   decoding="async"
                   className="h-full w-full object-cover"
@@ -162,7 +163,7 @@ export function PlaygroundHud({
             </div>
             <div className="min-w-0 leading-tight">
               <div className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: HUD.parchment }}>
-                {playerProfile.displayName || 'Builder'}
+                {playerProfile.displayName || t('playground.player.defaultName')}
               </div>
               <div className="mt-1 max-w-[126px] truncate text-[9px] uppercase tracking-[0.18em]" style={{ color: HUD.stone }}>{title}</div>
               <div className="mt-2 flex items-center gap-2">
@@ -189,7 +190,7 @@ export function PlaygroundHud({
           <div
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border"
             style={{ borderColor: `${hudAccent}99`, background: `linear-gradient(180deg, ${HUD.obsidian}, ${HUD.slate})`, boxShadow: `0 0 14px ${hudAccent}3d, inset 0 0 0 1px rgba(244,233,211,.08)` }}
-            title={arrowDeg != null ? 'Pointing toward objective' : 'Objective'}
+            title={arrowDeg != null ? t('playground.hud.pointingTitle') : t('playground.hud.objectiveTitle')}
           >
             <span
               className="text-[18px] leading-none"
@@ -204,7 +205,7 @@ export function PlaygroundHud({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: HUD.stone }}>Quest</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: HUD.stone }}>{t('playground.hud.questLabel')}</span>
               <span className="truncate text-[12px] font-black" style={{ color: hudAccent }}>{activeQuestTitle}</span>
             </div>
             <div className="truncate text-[11px] leading-snug" style={{ color: HUD.parchment }}>{objectiveLabel}</div>

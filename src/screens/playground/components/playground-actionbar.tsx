@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { t } from '@/lib/i18n'
 
 export type ActionSlot = {
   id: string
@@ -16,62 +17,62 @@ const ACTIONS: Array<ActionSlot> = [
   {
     id: 'strike',
     key: '1',
-    label: 'Strike',
+    label: t('playground.action.strikeLabel'),
     icon: '◇',
     cost: 0,
     cooldownMs: 900,
-    description: 'Basic melee attack for nearby targets.',
+    description: t('playground.action.strikeDesc'),
     color: '#F1C56D',
   },
   {
     id: 'dash',
     key: '2',
-    label: 'Dash',
+    label: t('playground.action.dashLabel'),
     icon: '↟',
     cost: 8,
     cooldownMs: 4000,
-    description: 'Short movement burst. Costs 8 MP.',
+    description: t('playground.action.dashDesc'),
     color: '#2E6A63',
   },
   {
     id: 'bolt',
     key: '3',
-    label: 'Bolt',
+    label: t('playground.action.boltLabel'),
     icon: '⌁',
     cost: 15,
     cooldownMs: 5200,
-    description: 'Ranged bolt that hits the test enemy from a distance.',
+    description: t('playground.action.boltDesc'),
     color: '#B8862B',
   },
   {
     id: 'summon',
     key: '4',
-    label: 'Summon',
+    label: t('playground.action.summonLabel'),
     icon: '✦',
     cost: 20,
     cooldownMs: 30000,
-    description: 'Summon a temporary Hermes familiar that walks beside you for 60s. (Hermes Summoning skill)',
+    description: t('playground.action.summonDesc'),
     color: '#F4E9D3',
   },
   {
     id: 'sigil',
     key: '5',
-    label: 'Sigil',
+    label: t('playground.action.sigilLabel'),
     icon: '☤',
     cost: 0,
     cooldownMs: 1,
-    description: 'Hermes sigil focus slot. Unlocks in Agora.',
+    description: t('playground.action.sigilDesc'),
     color: '#F1C56D',
     locked: true,
   },
   {
     id: 'scroll',
     key: '6',
-    label: 'Scroll',
+    label: t('playground.action.scrollLabel'),
     icon: '▱',
     cost: 0,
     cooldownMs: 1,
-    description: 'Reserved scroll slot for quests and lore.',
+    description: t('playground.action.scrollDesc'),
     color: '#F4E9D3',
     locked: true,
   },
@@ -140,9 +141,9 @@ export function PlaygroundActionBar({ onCast, hp, hpMax, mp, mpMax, sp, spMax }:
       }}
     >
       <div className="mr-2 hidden flex-col gap-1.5 md:flex">
-        <Pip label="HP" v={hp} m={hpMax} c="#B03A30" />
-        <Pip label="MP" v={mp} m={mpMax} c="#2E6A63" />
-        <Pip label="SP" v={sp} m={spMax} c="#F1C56D" />
+        <Pip label={t('playground.action.pipHp')} v={hp} m={hpMax} c="#B03A30" />
+        <Pip label={t('playground.action.pipMp')} v={mp} m={mpMax} c="#2E6A63" />
+        <Pip label={t('playground.action.pipSp')} v={sp} m={spMax} c="#F1C56D" />
       </div>
       {ACTIONS.map((action) => {
         const cdEnd = cooldowns[action.id] ?? 0
@@ -205,7 +206,7 @@ export function PlaygroundActionBar({ onCast, hp, hpMax, mp, mpMax, sp, spMax }:
                   {action.label}
                 </div>
                 <div className="opacity-80">{action.description}</div>
-                {noMp && <div className="mt-1 text-[#F1C56D]">Not enough MP</div>}
+                {noMp && <div className="mt-1 text-[#F1C56D]">{t('playground.action.notEnoughMp')}</div>}
               </div>
             )}
           </div>

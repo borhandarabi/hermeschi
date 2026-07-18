@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { itemById, PLAYGROUND_QUESTS } from '../lib/playground-rpg'
 import type { PlaygroundRpgState } from '../hooks/use-playground-rpg'
+import { t } from '@/lib/i18n'
 
 export function PlaygroundJournal({
   open,
@@ -28,7 +29,7 @@ export function PlaygroundJournal({
     () => Array.from(grouped.keys()),
     [grouped],
   )
-  const activeChapter = activeQuest?.chapter ?? chapters[0] ?? 'Training Grounds Tutorial'
+  const activeChapter = activeQuest?.chapter ?? chapters[0] ?? t('playground.journal.defaultChapter')
   const [selectedChapter, setSelectedChapter] = useState(activeChapter)
   const chapter = chapters.includes(selectedChapter) ? selectedChapter : activeChapter
   const quests = grouped.get(chapter) ?? []
@@ -57,11 +58,11 @@ export function PlaygroundJournal({
         <div className="border-b border-white/10 bg-black/25 p-4 md:border-b-0 md:border-r">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-lg font-bold">Quest Journal</div>
-              <div className="text-[11px] uppercase tracking-[0.16em] text-white/45">Press J to toggle</div>
+              <div className="text-lg font-bold">{t('playground.journal.title')}</div>
+              <div className="text-[11px] uppercase tracking-[0.16em] text-white/45">{t('playground.journal.toggleHint')}</div>
             </div>
             <button onClick={onClose} className="rounded px-2 py-1 text-[11px] uppercase tracking-[0.12em] text-white/55 hover:bg-white/10">
-              Close
+              {t('playground.journal.close')}
             </button>
           </div>
           <div className="mt-4 space-y-2">
@@ -82,7 +83,7 @@ export function PlaygroundJournal({
                 >
                   <div className="text-[12px] font-semibold">{entry}</div>
                   <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-white/45">
-                    {completeCount}/{(grouped.get(entry) ?? []).length} complete{hasActive ? ' · active' : ''}
+                    {t('playground.journal.chapterCount', { done: completeCount, total: (grouped.get(entry) ?? []).length, active: hasActive ? t('playground.journal.activeSuffix') : '' })}
                   </div>
                 </button>
               )
@@ -95,7 +96,7 @@ export function PlaygroundJournal({
             <div>
               <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-300">{chapter}</div>
               <div className="mt-1 text-sm text-white/65">
-                Completed rewards: +{completedRewards.xp} XP
+                {t('playground.journal.completedRewards', { xp: completedRewards.xp })}
                 {completedRewards.items.length ? ` · ${completedRewards.items.join(', ')}` : ''}
               </div>
             </div>
@@ -120,7 +121,7 @@ export function PlaygroundJournal({
                       {quest.title}
                     </div>
                     <div className="text-[10px] uppercase tracking-[0.16em] text-white/45">
-                      {done ? 'complete' : active ? 'active' : quest.optional ? 'bonus' : 'pending'}
+                      {done ? t('playground.journal.statusComplete') : active ? t('playground.journal.statusActive') : quest.optional ? t('playground.journal.statusBonus') : t('playground.journal.statusPending')}
                     </div>
                   </div>
                   <div className="mt-1 text-[13px] text-white/70">{quest.description}</div>
@@ -128,13 +129,13 @@ export function PlaygroundJournal({
                     <div className="mt-3 grid gap-2 rounded-xl border border-cyan-300/15 bg-cyan-300/5 p-3 text-[12px] md:grid-cols-2">
                       {quest.lesson && (
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200/80">Hermes lesson</div>
+                          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200/80">{t('playground.journal.hermesLesson')}</div>
                           <div className="mt-1 text-white/72">{quest.lesson}</div>
                         </div>
                       )}
                       {quest.payoff && (
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-200/80">Why it matters</div>
+                          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-200/80">{t('playground.journal.whyItMatters')}</div>
                           <div className="mt-1 text-white/72">{quest.payoff}</div>
                         </div>
                       )}
@@ -159,12 +160,12 @@ export function PlaygroundJournal({
                   </div>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
                     <div className="text-emerald-300/80">
-                      Reward: +{quest.reward.xp} XP
+                      {t('playground.journal.rewardLine', { xp: quest.reward.xp })}
                       {quest.reward.items?.length ? ` · ${quest.reward.items.map((itemId) => itemById(itemId)?.name ?? itemId).join(', ')}` : ''}
-                      {quest.reward.unlockWorlds?.length ? ` · unlocks ${quest.reward.unlockWorlds.join(', ')}` : ''}
+                      {quest.reward.unlockWorlds?.length ? ` · ${t('playground.journal.unlocksWorlds', { worlds: quest.reward.unlockWorlds.join(', ') })}` : ''}
                     </div>
                     <div className="rounded-full border border-white/10 bg-black/25 px-2 py-1 text-white/50">
-                      {done ? 'Completed' : active ? 'Selected automatically — complete the highlighted step in-world' : 'Unlocks after prior quest'}
+                      {done ? t('playground.journal.statusDone') : active ? t('playground.journal.statusSelectedAuto') : t('playground.journal.statusUnlocksAfter')}
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { botsFor } from '../lib/playground-bots'
 import type { PlaygroundWorldId } from '../lib/playground-rpg'
+import { t } from '@/lib/i18n'
 
 const NPC_POSITIONS: Record<PlaygroundWorldId, Array<{ x: number; z: number; color: string }>> = {
   training: [
@@ -150,8 +151,8 @@ export function PlaygroundMinimap({ worldId, worldName, worldAccent }: Props) {
         />
       </div>
       <div className="mt-1 flex justify-between px-1 text-[8px] uppercase tracking-[0.12em] text-[#F4E9D3]/45">
-        <span>● You</span>
-        <span style={{ color: frameAccent }}>○ Portal</span>
+        <span>{t('playground.minimap.you')}</span>
+        <span style={{ color: frameAccent }}>{t('playground.minimap.portal')}</span>
       </div>
     </div>
   )

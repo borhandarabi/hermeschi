@@ -18,6 +18,7 @@
  *   - offline:   red dot, "offline"
  */
 import { useEffect, useState } from 'react'
+import { t } from '@/lib/i18n'
 
 type Stats = {
   online: number
@@ -100,12 +101,12 @@ export function PlaygroundOnlineChip({ accent = '#34d399' }: { accent?: string }
     switch (transport) {
       case 'both':
       case 'ws':
-        return { color: '#34d399', label: 'live' }
+        return { color: '#34d399', label: t('playground.onlineChip.live') }
       case 'broadcast':
-        return { color: '#facc15', label: 'local-only' }
+        return { color: '#facc15', label: t('playground.onlineChip.localOnly') }
       case 'offline':
       default:
-        return { color: '#94a3b8', label: 'connecting…' }
+        return { color: '#94a3b8', label: t('playground.onlineChip.connecting') }
     }
   })()
 
@@ -113,11 +114,11 @@ export function PlaygroundOnlineChip({ accent = '#34d399' }: { accent?: string }
     ? Object.entries(stats.byWorld).filter(([, v]) => v > 0)
     : []
   const tooltip = [
-    stats?.peakToday ? `Peak today: ${stats.peakToday}` : null,
+    stats?.peakToday ? t('playground.onlineChip.peakToday', { count: stats.peakToday }) : null,
     byWorldEntries.length
       ? byWorldEntries.map(([w, v]) => `${w}: ${v}`).join(' · ')
       : null,
-    `Status: ${status.label}`,
+    t('playground.onlineChip.statusLine', { status: status.label }),
   ]
     .filter(Boolean)
     .join(' \u2022 ')
@@ -140,10 +141,10 @@ export function PlaygroundOnlineChip({ accent = '#34d399' }: { accent?: string }
           animation: status.color === '#34d399' ? 'pulse-online 2s ease-in-out infinite' : undefined,
         }}
       />
-      <span>Players online</span>
+      <span>{t('playground.onlineChip.playersOnline')}</span>
       <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] text-white/80">{displayCount}</span>
       {stats?.peakToday && stats.peakToday > 0 && (
-        <span className="text-white/45">· peak {stats.peakToday}</span>
+        <span className="text-white/45">{t('playground.onlineChip.peak', { count: stats.peakToday })}</span>
       )}
       <style>{`
         @keyframes pulse-online {
