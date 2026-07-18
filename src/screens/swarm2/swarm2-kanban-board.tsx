@@ -80,10 +80,10 @@ function isLoopbackDashboardUrl(value: string | null | undefined): boolean {
 export function getKanbanBackendPresentation(backend: KanbanBackendMeta | null | undefined): KanbanBackendPresentation {
   if (!backend) {
     return {
-      badgeLabel: 'Detecting board',
+      badgeLabel: t('swarm.kanban.detectingBoard'),
       badgeTone: 'unknown',
-      toastTitle: 'Detecting Swarm Board backend',
-      toastBody: 'Checking Hermes Kanban before falling back locally.',
+      toastTitle: t('swarm.kanban.detectingToastTitle'),
+      toastBody: t('swarm.kanban.detectingToastBody'),
       title: undefined,
     }
   }
@@ -99,43 +99,42 @@ export function getKanbanBackendPresentation(backend: KanbanBackendMeta | null |
         ? `${backend.path.replace(/\/+$/, '')}/kanban`
         : undefined
     return {
-      badgeLabel: 'Synced • Hermes',
+      badgeLabel: t('swarm.kanban.syncedHermes'),
       badgeTone: 'hermes-proxy',
-      toastTitle: 'Synced with Hermes Dashboard',
-      toastBody:
-        'Cards and status changes round-trip through the Hermes Dashboard kanban plugin. Single source of truth, dispatcher-aware.',
+      toastTitle: t('swarm.kanban.syncedToastTitle'),
+      toastBody: t('swarm.kanban.syncedToastBody'),
       title:
         backend.details ??
         backend.path ??
-        'Hermes Dashboard kanban plugin detected',
+        t('swarm.kanban.hermesDetected'),
       dashboardUrl,
     }
   }
   if (backend.id === 'claude' && backend.detected) {
     return {
-      badgeLabel: 'Shared board',
+      badgeLabel: t('swarm.kanban.sharedBoard'),
       badgeTone: 'claude',
-      toastTitle: 'Board connected',
-      toastBody: 'Cards and status changes are using the canonical Kanban store.',
-      title: backend.details ?? backend.path ?? 'Canonical Kanban store detected',
+      toastTitle: t('swarm.kanban.boardConnectedToastTitle'),
+      toastBody: t('swarm.kanban.boardConnectedToastBody'),
+      title: backend.details ?? backend.path ?? t('swarm.kanban.canonicalDetected'),
     }
   }
   return {
-    badgeLabel: 'Local fallback',
+    badgeLabel: t('swarm.kanban.localFallback'),
     badgeTone: 'local',
-    toastTitle: 'Using local Swarm Board',
-    toastBody: backend.details || 'Hermes Kanban is not available yet. Cards stay local and the board will switch automatically when Hermes storage is detected.',
-    title: backend.details ?? backend.path ?? 'Local Swarm Board fallback',
+    toastTitle: t('swarm.kanban.localToastTitle'),
+    toastBody: backend.details || t('swarm.kanban.localToastBody'),
+    title: backend.details ?? backend.path ?? t('swarm.kanban.localFallbackTitle'),
   }
 }
 
 const LANES: Array<{ id: KanbanLane; label: string; hint: string }> = [
-  { id: 'backlog', label: 'Backlog', hint: 'Captured, not committed' },
-  { id: 'ready', label: 'Ready', hint: 'Spec clear, safe to dispatch' },
-  { id: 'running', label: 'Running', hint: 'Worker executing' },
-  { id: 'review', label: 'Review', hint: 'Needs peer/human check' },
-  { id: 'blocked', label: 'Blocked', hint: 'Needs input or dependency' },
-  { id: 'done', label: 'Done', hint: 'Accepted / archived' },
+  { id: 'backlog', label: t('swarm.kanban.lane.backlog'), hint: t('swarm.kanban.hint.backlog') },
+  { id: 'ready', label: t('swarm.kanban.lane.ready'), hint: t('swarm.kanban.hint.ready') },
+  { id: 'running', label: t('swarm.kanban.lane.running'), hint: t('swarm.kanban.hint.running') },
+  { id: 'review', label: t('swarm.kanban.lane.review'), hint: t('swarm.kanban.hint.review') },
+  { id: 'blocked', label: t('swarm.kanban.lane.blocked'), hint: t('swarm.kanban.hint.blocked') },
+  { id: 'done', label: t('swarm.kanban.lane.done'), hint: t('swarm.kanban.hint.done') },
 ]
 
 const LANE_TONE: Record<KanbanLane, string> = {
@@ -240,7 +239,7 @@ function formatElapsedSince(timestamp: number): string {
 }
 
 function workerLabel(workers: Array<KanbanWorker>, workerId: string | null): string {
-  if (!workerId) return 'Unassigned'
+  if (!workerId) return t('swarm.kanban.unassigned')
   const worker = workers.find((item) => item.id === workerId)
   return worker?.displayName || workerId
 }
@@ -372,14 +371,14 @@ export function Swarm2KanbanBoard({
     <section className={cn('rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-4 shadow-[0_24px_80px_var(--theme-shadow)]', className)}>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">Manual planning</div>
-          <h2 className="mt-1 text-lg font-semibold text-[var(--theme-text)]">Swarm Board</h2>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">{t('swarm.kanban.manualPlanning')}</div>
+          <h2 className="mt-1 text-lg font-semibold text-[var(--theme-text)]">{t('swarm.kanban.swarmBoard')}</h2>
           <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--theme-muted-2)]">
-            Auto-detects the shared Kanban store by default; if it is unavailable, cards stay in a local fallback. Dispatch stays explicit through Router.
+            {t('swarm.kanban.swarmBoardDesc')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--theme-muted)]">
-          <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1">{total} cards</span>
+          <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1">{t('swarm.kanban.cardsCount', { count: total })}</span>
           {backendPresentation.dashboardUrl ? (
             <a
               href={backendPresentation.dashboardUrl}
@@ -389,7 +388,7 @@ export function Swarm2KanbanBoard({
                 'inline-flex items-center gap-1.5 rounded-full border px-2 py-1 font-medium transition-colors',
                 'border-emerald-400/40 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20',
               )}
-              title={`${backendPresentation.title ?? ''}\nOpen in Hermes Dashboard ↗`}
+              title={`${backendPresentation.title ?? ''}\n${t('swarm.kanban.openDashboard')}`}
               aria-live="polite"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -428,8 +427,8 @@ export function Swarm2KanbanBoard({
               {backendPresentation.badgeLabel}
             </span>
           )}
-          <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1">{reviewCount} review</span>
-          <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1">{blockedCount} blocked</span>
+          <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1">{t('swarm.kanban.reviewCount', { count: reviewCount })}</span>
+          <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1">{t('swarm.kanban.blockedCount', { count: blockedCount })}</span>
           <button
             type="button"
             onClick={() => {
@@ -439,7 +438,7 @@ export function Swarm2KanbanBoard({
             }}
             className="rounded-full bg-[var(--theme-accent)] px-3 py-1.5 font-semibold text-primary-950 hover:bg-[var(--theme-accent-strong)]"
           >
-            New card
+            {t('swarm.kanban.newCard')}
           </button>
         </div>
       </div>
@@ -456,7 +455,7 @@ export function Swarm2KanbanBoard({
                 : 'border-[var(--theme-border)] bg-[var(--theme-bg)] text-[var(--theme-muted)] hover:text-[var(--theme-text)]',
             )}
           >
-            All labels
+            {t('swarm.kanban.allLabels')}
           </button>
           {labelOptions.map(({ key, label }) => (
             <button
@@ -498,58 +497,58 @@ export function Swarm2KanbanBoard({
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-[var(--theme-border2)] bg-[var(--theme-card)] p-5 shadow-[0_30px_100px_var(--theme-shadow)]">
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">Manual planning</div>
-                <h3 className="mt-1 text-lg font-semibold text-[var(--theme-text)]">New board card</h3>
-                <p className="mt-1 text-xs text-[var(--theme-muted-2)]">Spec work before routing it to an agent. Dispatch stays explicit through Router.</p>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">{t('swarm.kanban.manualPlanning')}</div>
+                <h3 className="mt-1 text-lg font-semibold text-[var(--theme-text)]">{t('swarm.kanban.newBoardCard')}</h3>
+                <p className="mt-1 text-xs text-[var(--theme-muted-2)]">{t('swarm.kanban.newBoardCardDesc')}</p>
               </div>
-              <button type="button" onClick={() => setComposerOpen(false)} className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card2)] px-3 py-1.5 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-text)]">Close</button>
+              <button type="button" onClick={() => setComposerOpen(false)} className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card2)] px-3 py-1.5 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-text)]">{t('common.close')}</button>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <label className="block text-xs md:col-span-2">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Title</span>
-                <input value={draftTitle} onChange={(event) => setDraftTitle(event.target.value)} placeholder="e.g. Review board UX safety" className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.title')}</span>
+                <input value={draftTitle} onChange={(event) => setDraftTitle(event.target.value)} placeholder={t('swarm.kanban.field.titlePlaceholder')} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
               </label>
               <label className="block text-xs md:col-span-2">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Spec</span>
-                <textarea value={draftSpec} onChange={(event) => setDraftSpec(event.target.value)} rows={4} placeholder="Short task spec / context" className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.spec')}</span>
+                <textarea value={draftSpec} onChange={(event) => setDraftSpec(event.target.value)} rows={4} placeholder={t('swarm.kanban.field.specPlaceholder')} className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
               </label>
               <label className="block text-xs md:col-span-2">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Acceptance criteria</span>
-                <textarea value={draftCriteria} onChange={(event) => setDraftCriteria(event.target.value)} rows={3} placeholder="One per line" className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.acceptance')}</span>
+                <textarea value={draftCriteria} onChange={(event) => setDraftCriteria(event.target.value)} rows={3} placeholder={t('swarm.kanban.field.acceptancePlaceholder')} className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
               </label>
               <label className="block text-xs">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Assigned worker</span>
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.assignedWorker')}</span>
                 <select value={draftWorker} onChange={(event) => setDraftWorker(event.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none">
-                  <option value="">Unassigned</option>
+                  <option value="">{t('swarm.kanban.unassigned')}</option>
                   {workers.map((worker) => <option key={worker.id} value={worker.id}>{worker.displayName || worker.id}</option>)}
                 </select>
               </label>
               <label className="block text-xs">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Reviewer</span>
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.reviewer')}</span>
                 <select value={draftReviewer} onChange={(event) => setDraftReviewer(event.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none">
-                  <option value="">Unassigned</option>
+                  <option value="">{t('swarm.kanban.unassigned')}</option>
                   {workers.map((worker) => <option key={worker.id} value={worker.id}>{worker.displayName || worker.id}</option>)}
                 </select>
               </label>
               <label className="block text-xs">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Status</span>
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.status')}</span>
                 <select value={draftStatus} onChange={(event) => setDraftStatus(event.target.value as KanbanLane)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none">
                   {LANES.map((lane) => <option key={lane.id} value={lane.id}>{lane.label}</option>)}
                 </select>
               </label>
               <label className="block text-xs md:col-span-2">
-                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">Labels</span>
-                <input value={draftLabels} onChange={(event) => setDraftLabels(event.target.value)} placeholder="label:Hermes/Workspace, priority:high" className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
-                <span className="mt-1 block text-[10px] text-[var(--theme-muted)]">Use label:Business/Sub-scope for the two-tier board filter.</span>
+                <span className="mb-1 block font-semibold text-[var(--theme-muted)]">{t('swarm.kanban.field.labels')}</span>
+                <input value={draftLabels} onChange={(event) => setDraftLabels(event.target.value)} placeholder={t('swarm.kanban.field.labelsPlaceholder')} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-sm text-[var(--theme-text)] outline-none" />
+                <span className="mt-1 block text-[10px] text-[var(--theme-muted)]">{t('swarm.kanban.field.labelsHint')}</span>
               </label>
               <label className="flex items-center gap-2 self-end rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-xs text-[var(--theme-muted)]">
                 <input type="checkbox" checked={linkLatestMission} disabled={!latestMission} onChange={(event) => setLinkLatestMission(event.target.checked)} />
-                Link latest mission{latestMission ? `: ${latestMission.title}` : ''}
+                {latestMission ? t('swarm.kanban.linkLatestMissionWith', { title: latestMission.title }) : t('swarm.kanban.linkLatestMission')}
               </label>
               {createMutation.error ? <div className="rounded-xl border border-red-400/40 bg-red-500/10 px-3 py-2 text-xs text-red-700 md:col-span-2">{createMutation.error.message}</div> : null}
               <div className="flex justify-end gap-2 md:col-span-2">
-                <button type="button" onClick={() => setComposerOpen(false)} className="rounded-xl border border-[var(--theme-border)] px-3 py-2 text-xs font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)]">Cancel</button>
-                <button type="button" disabled={!draftTitle.trim() || createMutation.isPending} onClick={() => void createMutation.mutateAsync()} className="rounded-xl bg-[var(--theme-accent)] px-3 py-2 text-xs font-semibold text-primary-950 disabled:opacity-50">{createMutation.isPending ? 'Saving…' : 'Create card'}</button>
+                <button type="button" onClick={() => setComposerOpen(false)} className="rounded-xl border border-[var(--theme-border)] px-3 py-2 text-xs font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)]">{t('common.cancel')}</button>
+                <button type="button" disabled={!draftTitle.trim() || createMutation.isPending} onClick={() => void createMutation.mutateAsync()} className="rounded-xl bg-[var(--theme-accent)] px-3 py-2 text-xs font-semibold text-primary-950 disabled:opacity-50">{createMutation.isPending ? t('swarm.modal.saving') : t('swarm.kanban.createCard')}</button>
               </div>
             </div>
           </div>
@@ -557,10 +556,10 @@ export function Swarm2KanbanBoard({
       ) : null}
 
       {query.isError ? (
-        <div className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-700">Kanban failed to load: {query.error.message}</div>
+        <div className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-700">{t('swarm.kanban.failedToLoad', { message: query.error.message })}</div>
       ) : query.isPending ? (
         <div className="mb-3 rounded-2xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-muted)]">
-          Loading board cards and backend source…
+          {t('swarm.kanban.loadingBoard')}
         </div>
       ) : null}
 
@@ -580,9 +579,9 @@ export function Swarm2KanbanBoard({
               </div>
               <div className="space-y-2">
                 {query.isPending ? (
-                  <div className="rounded-xl border border-dashed border-[var(--theme-border)] p-3 text-xs text-[var(--theme-muted)]">Waiting for source…</div>
+                  <div className="rounded-xl border border-dashed border-[var(--theme-border)] p-3 text-xs text-[var(--theme-muted)]">{t('swarm.kanban.waitingForSource')}</div>
                 ) : laneCards.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-[var(--theme-border)] p-3 text-xs text-[var(--theme-muted)]">Empty</div>
+                  <div className="rounded-xl border border-dashed border-[var(--theme-border)] p-3 text-xs text-[var(--theme-muted)]">{t('swarm.kanban.emptyColumn')}</div>
                 ) : laneCards.map((card) => (
                   <article key={card.id} className="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-3 text-left shadow-sm">
                     <div className="text-sm font-semibold leading-snug text-[var(--theme-text)]">{card.title}</div>
@@ -590,7 +589,7 @@ export function Swarm2KanbanBoard({
                     {card.acceptanceCriteria.length ? (
                       <ul className="mt-2 space-y-1 text-[11px] text-[var(--theme-muted)]">
                         {card.acceptanceCriteria.slice(0, 3).map((item, index) => <li key={`${card.id}-ac-${index}`}>✓ {item}</li>)}
-                        {card.acceptanceCriteria.length > 3 ? <li>+{card.acceptanceCriteria.length - 3} more</li> : null}
+                        {card.acceptanceCriteria.length > 3 ? <li>{t('swarm.kanban.moreCount', { count: card.acceptanceCriteria.length - 3 })}</li> : null}
                       </ul>
                     ) : null}
                     {card.tags?.length ? (
@@ -609,25 +608,25 @@ export function Swarm2KanbanBoard({
                     ) : null}
                     {card.status === 'running' || card.latestRun ? (
                       <div className="mt-2 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-2 py-1.5 text-[10px] text-emerald-700">
-                        <div className="font-semibold">{card.status === 'running' ? `Running for ${formatElapsedSince(card.updatedAt)}` : 'Latest run'}</div>
+                        <div className="font-semibold">{card.status === 'running' ? t('swarm.kanban.runningFor', { duration: formatElapsedSince(card.updatedAt) }) : t('swarm.kanban.latestRun')}</div>
                         {card.latestRun?.summary ? <div className="mt-0.5 line-clamp-2">{card.latestRun.summary}</div> : null}
                         {card.latestRun && (card.latestRun.status || card.latestRun.outcome) ? <div className="mt-0.5 opacity-75">{[card.latestRun.status, card.latestRun.outcome].filter(Boolean).join(' · ')}</div> : null}
                       </div>
                     ) : null}
                     <div className="mt-3 space-y-1 text-[10px] text-[var(--theme-muted)]">
-                      <div>Owner: <span className="font-semibold text-[var(--theme-text)]">{workerLabel(workers, card.assignedWorker)}</span></div>
-                      <div>Reviewer: <span className="font-semibold text-[var(--theme-text)]">{workerLabel(workers, card.reviewer)}</span></div>
-                      {card.missionId ? <div className="truncate" title={card.missionId}>Mission: {card.missionId}</div> : null}
-                      {card.reportPath ? <div className="truncate" title={card.reportPath}>Report: {card.reportPath}</div> : null}
+                      <div>{t('swarm.kanban.ownerLabel')}: <span className="font-semibold text-[var(--theme-text)]">{workerLabel(workers, card.assignedWorker)}</span></div>
+                      <div>{t('swarm.kanban.reviewerLabel')}: <span className="font-semibold text-[var(--theme-text)]">{workerLabel(workers, card.reviewer)}</span></div>
+                      {card.missionId ? <div className="truncate" title={card.missionId}>{t('swarm.kanban.missionLabel')}: {card.missionId}</div> : null}
+                      {card.reportPath ? <div className="truncate" title={card.reportPath}>{t('swarm.kanban.reportLabel')}: {card.reportPath}</div> : null}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {card.assignedWorker ? (
-                        <button type="button" onClick={() => onSelectWorker?.(card.assignedWorker!)} className="rounded-full border border-[var(--theme-border)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]">Open worker</button>
+                        <button type="button" onClick={() => onSelectWorker?.(card.assignedWorker!)} className="rounded-full border border-[var(--theme-border)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]">{t('swarm.kanban.openWorker')}</button>
                       ) : null}
-                      {card.status !== 'running' ? <button type="button" onClick={() => updateMutation.mutate({ id: card.id, updates: { status: 'running' } })} className="rounded-full border border-[var(--theme-border)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]">Run</button> : null}
+                      {card.status !== 'running' ? <button type="button" onClick={() => updateMutation.mutate({ id: card.id, updates: { status: 'running' } })} className="rounded-full border border-[var(--theme-border)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]">{t('swarm.kanban.runAction')}</button> : null}
                       {card.status !== 'review' ? <button type="button" onClick={() => updateMutation.mutate({ id: card.id, updates: { status: 'review' } })} className="rounded-full border border-[var(--theme-border)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]">{t('swarm.column.review')}</button> : null}
                       {card.status !== 'done' ? <button type="button" onClick={() => updateMutation.mutate({ id: card.id, updates: { status: 'done' } })} className="rounded-full border border-[var(--theme-border)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]">{t('swarm.column.done')}</button> : null}
-                      {onOpenRouter ? <button type="button" onClick={onOpenRouter} className="rounded-full border border-[var(--theme-accent)] bg-[var(--theme-accent-soft)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-accent-strong)]">Router</button> : null}
+                      {onOpenRouter ? <button type="button" onClick={onOpenRouter} className="rounded-full border border-[var(--theme-accent)] bg-[var(--theme-accent-soft)] px-2 py-1 text-[10px] font-semibold text-[var(--theme-accent-strong)]">{t('swarm.kanban.routerAction')}</button> : null}
                     </div>
                   </article>
                 ))}

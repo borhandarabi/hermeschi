@@ -10,7 +10,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import { ChatComposer } from '@/screens/chat/components/chat-composer'
 import { cn } from '@/lib/utils'
-import { getLocale } from '@/lib/i18n'
+import { t, getLocale } from '@/lib/i18n'
 import { useSwarmChat, type SwarmChatMessage } from '@/hooks/use-swarm-chat'
 
 type Swarm2LiveChatProps = {
@@ -83,11 +83,11 @@ function MessageBubble({
   const isTool = message.role === 'tool'
   const isError = message.role === 'error'
   const label = isUser
-    ? 'You'
+    ? t('chat.message.you')
     : isAssistant
       ? workerId
       : isTool
-        ? 'tool'
+        ? t('swarm.liveChat.tool')
         : message.role
   const todoSummary = parseTodoSummary(message.content)
   const toolMarker = parseToolMarker(message.content)
@@ -131,7 +131,7 @@ function MessageBubble({
             {isError ? (
               <HugeiconsIcon icon={AlertCircleIcon} size={9} />
             ) : null}
-            {renderAsToolCard ? 'tool' : label}
+            {renderAsToolCard ? t('swarm.liveChat.tool') : label}
           </span>
         )}
         {message.timestamp && !message.pending ? (
@@ -143,21 +143,21 @@ function MessageBubble({
       </div>
         {todoSummary ? (
           <div className="space-y-2">
-            <div className="text-[11px] font-medium text-[var(--theme-text)]">Task snapshot</div>
+            <div className="text-[11px] font-medium text-[var(--theme-text)]">{t('swarm.liveChat.taskSnapshot')}</div>
             <div className="flex flex-wrap gap-1.5 text-[10px] text-[var(--theme-muted-2)]">
-              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{todoSummary.total} total</span>
-              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{todoSummary.pending} pending</span>
-              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{todoSummary.inProgress} in progress</span>
-              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{todoSummary.completed} completed</span>
+              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{t('swarm.liveChat.taskCount', { count: todoSummary.total })}</span>
+              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{t('swarm.liveChat.taskPending', { count: todoSummary.pending })}</span>
+              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{t('swarm.liveChat.taskInProgress', { count: todoSummary.inProgress })}</span>
+              <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{t('swarm.liveChat.taskCompleted', { count: todoSummary.completed })}</span>
               {todoSummary.cancelled > 0 ? (
-                <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{todoSummary.cancelled} cancelled</span>
+                <span className="rounded-full border border-[var(--theme-border)] px-1.5 py-0.5">{t('swarm.liveChat.taskCancelled', { count: todoSummary.cancelled })}</span>
               ) : null}
             </div>
           </div>
         ) : renderAsToolCard ? (
           <div className="space-y-1">
             <div className="text-[11px] font-medium text-[var(--theme-text)]">
-              {toolMarker ? `Used ${toolMarker}` : 'Tool result'}
+              {toolMarker ? t('swarm.liveChat.usedTool', { tool: toolMarker }) : t('swarm.liveChat.toolResult')}
             </div>
             {!toolMarker && message.content ? (
               <pre className="whitespace-pre-wrap break-words font-sans text-[11px] leading-snug text-[var(--theme-muted-2)]">
@@ -170,7 +170,7 @@ function MessageBubble({
             'whitespace-pre-wrap break-words font-sans text-[12px] leading-snug',
             message.pending && isAssistant && 'animate-pulse',
           )}>
-            {message.content || '(empty)'}
+            {message.content || t('swarm.liveChat.empty')}
           </pre>
         )}
       </div>
@@ -284,7 +284,7 @@ export function Swarm2LiveChat({
       extra.push({
         id: `local-assistant-${localPending.sentAt}`,
         role: 'assistant',
-        content: 'Thinking…',
+        content: t('swarm.liveChat.thinking'),
         timestamp: localPending.sentAt,
         origin: 'optimistic',
         pending: true,
@@ -330,8 +330,8 @@ export function Swarm2LiveChat({
     >
       {!nativeStyle ? (
         <header className="flex items-center justify-between gap-2 border-b border-[var(--theme-border)]/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]/85">
-          <span>Chat</span>
-          <span className="text-[9px] normal-case tracking-normal">{source === 'state.db' ? 'live' : 'no session'}</span>
+          <span>{t('swarm.liveChat.title')}</span>
+          <span className="text-[9px] normal-case tracking-normal">{source === 'state.db' ? t('swarm.liveChat.live') : t('swarm.liveChat.noSession')}</span>
         </header>
       ) : null}
 
@@ -344,11 +344,11 @@ export function Swarm2LiveChat({
       >
         {isLoading ? (
           <p className="text-center text-[11px] text-[var(--theme-muted)]">
-            Loading session…
+            {t('swarm.liveChat.loadingSession')}
           </p>
         ) : previewMessages.length === 0 ? (
           <p className="text-center text-[11px] text-[var(--theme-muted)]">
-            No messages yet for {workerId}. Send a prompt below.
+            {t('swarm.liveChat.emptyMessages', { workerId })}
           </p>
         ) : (
           previewMessages.map((m) => (
@@ -400,7 +400,7 @@ export function Swarm2LiveChat({
                   }
                 }}
                 disabled={isSending}
-                placeholder={`Message ${workerId}…`}
+                placeholder={t('swarm.liveChat.placeholder', { workerId })}
                 className="flex-1 resize-none bg-transparent px-1.5 text-[12px] text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)]"
               />
               <button
@@ -415,7 +415,7 @@ export function Swarm2LiveChat({
                 )}
               >
                 <HugeiconsIcon icon={SentIcon} size={11} />
-                {isSending ? '…' : 'Send'}
+                {isSending ? '…' : t('swarm.liveChat.send')}
               </button>
             </div>
 

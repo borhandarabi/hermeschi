@@ -124,12 +124,12 @@ type WorkerReportCard = {
 }
 
 const STATE_FILTERS: Array<{ id: ReportState; label: string }> = [
-  { id: 'all', label: 'All' },
-  { id: 'needs_review', label: 'Needs review' },
-  { id: 'ready', label: 'Ready' },
-  { id: 'blocked', label: 'Blocked' },
-  { id: 'artifact', label: 'Artifacts' },
-  { id: 'in_progress', label: 'In progress' },
+  { id: 'all', label: t('swarm.reports.all') },
+  { id: 'needs_review', label: t('swarm.reports.needsReview') },
+  { id: 'ready', label: t('swarm.reports.ready') },
+  { id: 'blocked', label: t('swarm.reports.blocked') },
+  { id: 'artifact', label: t('swarm.reports.artifacts') },
+  { id: 'in_progress', label: t('swarm.reports.inProgress') },
 ]
 
 function clean(value: string | null | undefined, fallback = '—'): string {
@@ -139,7 +139,7 @@ function clean(value: string | null | undefined, fallback = '—'): string {
 
 function compact(value: string | null | undefined, max = 180): string {
   const text = clean(value, '')
-  if (!text) return 'No report body published yet.'
+  if (!text) return t('swarm.reports.noBody')
   return text.length > max ? `${text.slice(0, max - 1)}…` : text
 }
 
@@ -185,15 +185,15 @@ function stateForRuntime(entry: RuntimeReportEntry): Exclude<ReportState, 'all'>
 function stateLabel(state: Exclude<ReportState, 'all'>): string {
   switch (state) {
     case 'needs_review':
-      return 'Needs review'
+      return t('swarm.reports.needsReview')
     case 'ready':
-      return 'Ready'
+      return t('swarm.reports.ready')
     case 'blocked':
-      return 'Blocked'
+      return t('swarm.reports.blocked')
     case 'artifact':
-      return 'Artifact'
+      return t('swarm.reports.artifact')
     case 'in_progress':
-      return 'In progress'
+      return t('swarm.reports.inProgress')
   }
 }
 
@@ -209,7 +209,7 @@ export function buildSwarm2ReportRows({
 
   for (const mission of missions) {
     for (const assignment of mission.assignments ?? []) {
-      const workerId = clean(assignment.workerId, 'unknown')
+      const workerId = clean(assignment.workerId, t('swarm.reports.unknownWorker'))
       const runtime = runtimeByWorker.get(workerId)
       const checkpoint = assignment.checkpoint
       if (!checkpoint && !assignment.state) continue
@@ -235,14 +235,14 @@ export function buildSwarm2ReportRows({
         reviewedAt: assignment.reviewedAt ?? null,
         reviewedBy: assignment.reviewedBy ?? null,
         details: [
-          { label: 'Task', value: clean(assignment.task) },
-          { label: 'Result', value: clean(checkpoint?.result) },
-          { label: 'Files changed', value: clean(checkpoint?.filesChanged) },
-          { label: 'Commands run', value: clean(checkpoint?.commandsRun) },
-          { label: 'Blocker', value: clean(checkpoint?.blocker) },
-          { label: 'Next action', value: clean(checkpoint?.nextAction) },
-          { label: 'Checkpoint', value: clean(checkpoint?.checkpointStatus ?? checkpoint?.stateLabel) },
-          { label: 'Reviewer', value: clean(assignment.reviewedBy) },
+          { label: t('swarm.reports.detail.task'), value: clean(assignment.task) },
+          { label: t('swarm.reports.detail.result'), value: clean(checkpoint?.result) },
+          { label: t('swarm.reports.detail.filesChanged'), value: clean(checkpoint?.filesChanged) },
+          { label: t('swarm.reports.detail.commandsRun'), value: clean(checkpoint?.commandsRun) },
+          { label: t('swarm.reports.detail.blocker'), value: clean(checkpoint?.blocker) },
+          { label: t('swarm.reports.detail.nextAction'), value: clean(checkpoint?.nextAction) },
+          { label: t('swarm.reports.detail.checkpoint'), value: clean(checkpoint?.checkpointStatus ?? checkpoint?.stateLabel) },
+          { label: t('swarm.reports.detail.reviewer'), value: clean(assignment.reviewedBy) },
         ],
         artifacts: inferredArtifacts.length ? inferredArtifacts : runtime?.artifacts ?? [],
         previews: runtime?.previews ?? [],
@@ -265,7 +265,7 @@ export function buildSwarm2ReportRows({
     rows.push({
       id: `runtime:${runtime.workerId}:${runtime.lastOutputAt ?? runtime.lastSessionStartedAt ?? 'latest'}`,
       kind: (runtime.artifacts?.length ?? 0) > 0 || (runtime.previews?.length ?? 0) > 0 ? 'artifact' : 'runtime',
-      title: clean(runtime.currentTask ?? runtime.lastRealSummary ?? runtime.lastSummary ?? runtime.lastRealResult ?? runtime.lastResult, 'Runtime output'),
+      title: clean(runtime.currentTask ?? runtime.lastRealSummary ?? runtime.lastSummary ?? runtime.lastRealResult ?? runtime.lastResult, t('swarm.reports.runtimeOutput')),
       missionId: null,
       missionTitle: null,
       assignmentId: null,
@@ -282,14 +282,14 @@ export function buildSwarm2ReportRows({
       reviewedAt: null,
       reviewedBy: null,
       details: [
-        { label: 'Current task', value: clean(runtime.currentTask) },
-        { label: 'Summary', value: clean(runtime.lastSummary) },
-        { label: 'Real summary', value: clean(runtime.lastRealSummary) },
-        { label: 'Result', value: clean(runtime.lastResult) },
-        { label: 'Real result', value: clean(runtime.lastRealResult) },
-        { label: 'Blocked reason', value: clean(runtime.blockedReason) },
-        { label: 'Checkpoint status', value: clean(runtime.checkpointStatus) },
-        { label: 'Recent log tail', value: compact(runtime.recentLogTail, 900) },
+        { label: t('swarm.reports.detail.currentTask'), value: clean(runtime.currentTask) },
+        { label: t('swarm.reports.detail.summary'), value: clean(runtime.lastSummary) },
+        { label: t('swarm.reports.detail.realSummary'), value: clean(runtime.lastRealSummary) },
+        { label: t('swarm.reports.detail.result'), value: clean(runtime.lastResult) },
+        { label: t('swarm.reports.detail.realResult'), value: clean(runtime.lastRealResult) },
+        { label: t('swarm.reports.detail.blockedReason'), value: clean(runtime.blockedReason) },
+        { label: t('swarm.reports.detail.checkpointStatus'), value: clean(runtime.checkpointStatus) },
+        { label: t('swarm.reports.detail.recentLogTail'), value: compact(runtime.recentLogTail, 900) },
       ],
       artifacts: runtime.artifacts ?? [],
       previews: runtime.previews ?? [],
@@ -320,14 +320,14 @@ export function buildSwarm2InboxLanes({
 }
 
 function formatAge(value: number | null): string {
-  if (!value) return 'unknown age'
+  if (!value) return t('swarm.reports.unknownAge')
   const diff = Math.max(0, Date.now() - value)
   const minutes = Math.floor(diff / 60_000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 1) return t('time.justNow')
+  if (minutes < 60) return t('time.minutesAgo', { count: minutes })
   const hours = Math.floor(minutes / 60)
-  if (hours < 48) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
+  if (hours < 48) return t('time.hoursAgo', { count: hours })
+  return t('time.daysAgo', { count: Math.floor(hours / 24) })
 }
 
 function toneClass(state: Exclude<ReportState, 'all'>): string {
@@ -370,17 +370,17 @@ function roleFromWorkerId(workerId: string): string {
   const number = workerId.replace(/\D/g, '')
   switch (number) {
     case '4':
-      return 'Research'
+      return t('swarm.worker.roleResearch')
     case '5':
     case '10':
-      return 'Builder'
+      return t('swarm.worker.roleBuilder')
     case '6':
     case '11':
-      return 'Reviewer'
+      return t('swarm.worker.roleReviewer')
     case '9':
-      return 'Lab'
+      return t('swarm.worker.roleLab')
     default:
-      return 'Worker'
+      return t('swarm.worker.roleWorker')
   }
 }
 
@@ -447,10 +447,10 @@ export function extractPullRequestUrl(row: Swarm2ReportRow): string | null {
   const sources = [
     row.summary,
     row.title,
-    cleanDetail(detailValue(row, 'Result')),
-    cleanDetail(detailValue(row, 'Real result')),
-    cleanDetail(detailValue(row, 'Summary')),
-    cleanDetail(detailValue(row, 'Real summary')),
+    cleanDetail(detailValue(row, t('swarm.reports.detail.result'))),
+    cleanDetail(detailValue(row, t('swarm.reports.detail.realResult'))),
+    cleanDetail(detailValue(row, t('swarm.reports.detail.summary'))),
+    cleanDetail(detailValue(row, t('swarm.reports.detail.realSummary'))),
   ].filter(Boolean) as Array<string>
   for (const source of sources) {
     const match = source.match(/https?:\/\/\S+\/pull\/\d+\S*/i)
@@ -485,9 +485,9 @@ export async function markInboxItemReadyForEric(input: { missionId: string; assi
 
 function buildReplyPrefill(row: Swarm2InboxItem): string {
   return [
-    `Worker: ${row.workerId}`,
-    `Prior blocker: ${cleanDetail(row.blocker) ?? 'none'}`,
-    `Latest next action: ${cleanDetail(row.nextAction) ?? 'none'}`,
+    t('swarm.reports.guidancePrefillWorker', { workerId: row.workerId }),
+    t('swarm.reports.guidancePrefillBlocker', { blocker: cleanDetail(row.blocker) ?? t('swarm.runtime.none') }),
+    t('swarm.reports.guidancePrefillNextAction', { action: cleanDetail(row.nextAction) ?? t('swarm.runtime.none') }),
     '',
   ].join('\n')
 }
@@ -556,7 +556,7 @@ export function Swarm2ReportsView({
   async function sendGuidance(row: Swarm2InboxItem) {
     const guidance = cleanDetail(replyDrafts[row.id])
     if (!guidance) {
-      setReplyErrors((current) => ({ ...current, [row.id]: 'Add guidance before sending.' }))
+      setReplyErrors((current) => ({ ...current, [row.id]: t('swarm.reports.addGuidanceError') }))
       return
     }
     setBusyId(`reply:${row.id}`)
@@ -568,11 +568,11 @@ export function Swarm2ReportsView({
       await refreshData()
       setReplyDrafts((current) => ({ ...current, [row.id]: buildReplyPrefill(row) }))
       setExpandedId(null)
-      showToast(`Sent to ${row.workerId}`)
+      showToast(t('swarm.reports.toast.sentTo', { workerId: row.workerId }))
     } catch (error) {
       setReplyErrors((current) => ({
         ...current,
-        [row.id]: error instanceof Error ? error.message : 'Failed to send guidance.',
+        [row.id]: error instanceof Error ? error.message : t('swarm.reports.failedSendGuidance'),
       }))
     } finally {
       setBusyId(null)
@@ -587,11 +587,11 @@ export function Swarm2ReportsView({
       })
       await refreshData()
       onRouteToReviewer?.(row)
-      showToast(`Sent to swarm6 for ${row.workerId}`)
+      showToast(t('swarm.reports.toast.sentToReviewer', { workerId: row.workerId }))
     } catch (error) {
       setReplyErrors((current) => ({
         ...current,
-        [row.id]: error instanceof Error ? error.message : 'Failed to route reviewer.',
+        [row.id]: error instanceof Error ? error.message : t('swarm.reports.failedRouteReviewer'),
       }))
     } finally {
       setBusyId(null)
@@ -604,11 +604,11 @@ export function Swarm2ReportsView({
     try {
       await markInboxItemReadyForEric({ missionId: row.missionId, assignmentId: row.assignmentId })
       await refreshData()
-      showToast(`Marked ${row.workerId} ready for Eric merge`)
+      showToast(t('swarm.reports.toast.markedReady', { workerId: row.workerId }))
     } catch (error) {
       setReplyErrors((current) => ({
         ...current,
-        [row.id]: error instanceof Error ? error.message : 'Failed to mark ready for Eric.',
+        [row.id]: error instanceof Error ? error.message : t('swarm.reports.failedMarkReady'),
       }))
     } finally {
       setBusyId(null)
@@ -634,7 +634,7 @@ export function Swarm2ReportsView({
     return (
       <div className="mt-3 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-3">
         <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-muted)]" htmlFor={`guidance-${row.id}`}>
-          Guidance for {row.workerId}
+          {t('swarm.reports.guidanceFor', { workerId: row.workerId })}
         </label>
         <textarea
           id={`guidance-${row.id}`}
@@ -650,7 +650,7 @@ export function Swarm2ReportsView({
             onClick={() => setExpandedId(null)}
             className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-1.5 text-xs font-medium text-[var(--theme-muted)]"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -658,7 +658,7 @@ export function Swarm2ReportsView({
             onClick={() => void sendGuidance(row)}
             className="rounded-lg bg-[var(--theme-accent)] px-3 py-1.5 text-xs font-semibold text-primary-950 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {disabled ? 'Sending…' : 'Send guidance'}
+            {disabled ? t('swarm.reports.sending') : t('swarm.reports.sendGuidance')}
           </button>
         </div>
       </div>
@@ -672,26 +672,26 @@ export function Swarm2ReportsView({
       : 'rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] px-2.5 py-1.5 text-xs font-medium text-[var(--theme-text)] hover:border-[var(--theme-accent)]'
     return (
       <div className="mt-2 flex flex-wrap gap-1.5">
-        <button type="button" aria-label={`Open ${row.workerId} worker`} onClick={() => openWorker(row)} className={buttonClass}>
+        <button type="button" aria-label={t('swarm.reports.openWorkerAria', { workerId: row.workerId })} onClick={() => openWorker(row)} className={buttonClass}>
           ↗
         </button>
         {row.state === 'blocked' ? (
           <button type="button" onClick={() => openReply(row)} className={buttonClass}>
-            Guide worker
+            {t('swarm.reports.guideWorker')}
           </button>
         ) : null}
         {row.state === 'needs_review' ? (
           <button type="button" onClick={() => void routeToReviewer(row)} className={cn(buttonClass, 'border-amber-400/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15')}>
-            Route to reviewer
+            {t('swarm.reports.routeToReviewer')}
           </button>
         ) : null}
         {row.state === 'ready' && prUrl ? (
           <>
             <a href={prUrl} target="_blank" rel="noreferrer" className={cn(buttonClass, 'border-emerald-400/40 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15')}>
-              Open PR
+              {t('swarm.reports.openPR')}
             </a>
             <button type="button" onClick={() => void markReady(row)} className={cn(buttonClass, 'border-emerald-400/40 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15')}>
-              Mark ready for Eric merge
+              {t('swarm.reports.markReadyEric')}
             </button>
           </>
         ) : null}
@@ -738,15 +738,15 @@ export function Swarm2ReportsView({
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">{t('swarm.reports.title')}</div>
-          <h2 className="mt-1 text-lg font-semibold text-[var(--theme-text)]">Worker reports</h2>
+          <h2 className="mt-1 text-lg font-semibold text-[var(--theme-text)]">{t('swarm.reports.workerReports')}</h2>
           <p className="mt-1 max-w-3xl text-xs text-[var(--theme-muted-2)]">
-            Board for queues, Cards for worker-level scanning, List for dense detail.
+            {t('swarm.reports.reportsDesc')}
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center text-[10px] uppercase tracking-[0.12em] text-[var(--theme-muted)]">
-          <span className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-2 py-1">Review {counts.needs_review}</span>
-          <span className="rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-2 py-1">Ready {counts.ready}</span>
-          <span className="rounded-xl border border-red-400/40 bg-red-500/10 px-2 py-1">Blocked {counts.blocked}</span>
+          <span className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-2 py-1">{t('swarm.reports.reviewCount', { count: counts.needs_review })}</span>
+          <span className="rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-2 py-1">{t('swarm.reports.readyCount', { count: counts.ready })}</span>
+          <span className="rounded-xl border border-red-400/40 bg-red-500/10 px-2 py-1">{t('swarm.reports.blockedCount', { count: counts.blocked })}</span>
         </div>
       </div>
 
@@ -767,18 +767,18 @@ export function Swarm2ReportsView({
           </button>
         ))}
         <select value={workerFilter} onChange={(event) => setWorkerFilter(event.target.value)} className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-1.5 text-xs text-[var(--theme-muted)] outline-none">
-          <option value="all">All workers</option>
+          <option value="all">{t('swarm.reports.allWorkers')}</option>
           {workers.map((worker) => <option key={worker} value={worker}>{worker}</option>)}
         </select>
         <select value={missionFilter} onChange={(event) => setMissionFilter(event.target.value)} className="max-w-xs rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-1.5 text-xs text-[var(--theme-muted)] outline-none">
-          <option value="all">All missions</option>
+          <option value="all">{t('swarm.reports.allMissions')}</option>
           {missionOptions.map((mission) => <option key={mission.id} value={mission.id}>{mission.label}</option>)}
         </select>
         <div className="ml-auto flex rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] p-1">
           {([
-            ['board', 'Board'],
-            ['cards', 'Cards'],
-            ['list', 'List'],
+            ['board', t('swarm.reports.layout.board')],
+            ['cards', t('swarm.reports.layout.cards')],
+            ['list', t('swarm.reports.layout.list')],
           ] as const).map(([id, label]) => (
             <button
               key={id}
@@ -799,9 +799,9 @@ export function Swarm2ReportsView({
 
       {layout === 'board' ? (
         <div className="grid gap-3 xl:grid-cols-3">
-          {renderInboxLane('needs_review', 'Needs review', inboxLanes.needs_review, 'Reviewer lane is clear. Route the next completed worker output through swarm6.')}
-          {renderInboxLane('blocked', 'Blocked / needs input', inboxLanes.blocked, 'No blockers waiting on human input.')}
-          {renderInboxLane('ready', 'Ready', inboxLanes.ready, 'Nothing is ready yet.')}
+          {renderInboxLane('needs_review', t('swarm.reports.needsReview'), inboxLanes.needs_review, t('swarm.reports.inbox.needsReviewEmpty'))}
+          {renderInboxLane('blocked', t('swarm.reports.inbox.blockedNeedsInput'), inboxLanes.blocked, t('swarm.reports.inbox.blockedEmpty'))}
+          {renderInboxLane('ready', t('swarm.reports.ready'), inboxLanes.ready, t('swarm.reports.inbox.readyEmpty'))}
         </div>
       ) : layout === 'cards' ? (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -843,7 +843,7 @@ export function Swarm2ReportsView({
                       onClick={() => setExpandedId(expanded ? null : `worker:${card.workerId}`)}
                       className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] px-2.5 py-1.5 text-[11px] font-medium text-[var(--theme-text)] hover:border-[var(--theme-accent)]"
                     >
-                      {expanded ? 'Hide reports' : `Open reports (${card.rows.length})`}
+                      {expanded ? t('swarm.reports.hideReports') : t('swarm.reports.openReports', { count: card.rows.length })}
                     </button>
                     {card.prUrl ? (
                       <a
@@ -861,7 +861,7 @@ export function Swarm2ReportsView({
                         onClick={() => onRouteToReviewer?.(card)}
                         className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] px-2.5 py-1.5 text-[11px] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
                       >
-                        Steer
+                        {t('swarm.reports.steer')}
                       </button>
                     ) : null}
                   </div>
@@ -871,10 +871,10 @@ export function Swarm2ReportsView({
                 <p className="mt-1 text-center text-[11px] text-[var(--theme-muted)]">{card.latest.summary}</p>
 
                 <div className="mt-4 flex flex-wrap gap-1.5 text-center text-[9px] uppercase tracking-[0.12em] text-[var(--theme-muted)]">
-                  <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-1.5 py-0.5">Review {card.reviewCount}</div>
-                  <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-1.5 py-0.5">Ready {card.readyCount}</div>
-                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-1.5 py-0.5">Blocked {card.blockedCount}</div>
-                  <div className="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-1.5 py-0.5">Files {card.artifactCount}</div>
+                  <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-1.5 py-0.5">{t('swarm.reports.reviewCount', { count: card.reviewCount })}</div>
+                  <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-1.5 py-0.5">{t('swarm.reports.readyCount', { count: card.readyCount })}</div>
+                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-1.5 py-0.5">{t('swarm.reports.blockedCount', { count: card.blockedCount })}</div>
+                  <div className="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-1.5 py-0.5">{t('swarm.reports.filesCount', { count: card.artifactCount })}</div>
                 </div>
 
                 {expandedId === `reply:${latestInboxItem.id}` ? renderReplyComposer(latestInboxItem) : null}
@@ -908,7 +908,7 @@ export function Swarm2ReportsView({
             )
           }) : (
             <div className="col-span-full rounded-2xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-bg)] p-8 text-center text-sm text-[var(--theme-muted)]">
-              No worker reports match these filters yet.
+              {t('swarm.reports.noMatches')}
             </div>
           )}
         </div>
@@ -936,8 +936,8 @@ export function Swarm2ReportsView({
                         <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]', toneClass(row.state))}>{row.stateLabel}</span>
                         <span className="text-[11px] text-[var(--theme-muted)]">{row.kind}</span>
                         {row.checkpointStatus ? <span className="text-[11px] text-[var(--theme-muted)]">{row.checkpointStatus}</span> : null}
-                        {row.reviewRequired ? <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700">swarm6 gate</span> : null}
-                        {row.reviewedBy ? <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">reviewed by {row.reviewedBy}</span> : null}
+                        {row.reviewRequired ? <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700">{t('swarm.reports.gateSwarm6')}</span> : null}
+                        {row.reviewedBy ? <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">{t('swarm.reports.reviewedBy', { name: row.reviewedBy })}</span> : null}
                         <span className="text-[11px] text-[var(--theme-muted)]">{formatAge(row.updatedAt)}</span>
                       </div>
                       <h3 className="mt-2 truncate text-sm font-semibold text-[var(--theme-text)]">{row.title}</h3>
@@ -950,11 +950,11 @@ export function Swarm2ReportsView({
                         </button>
                         {row.state === 'needs_review' ? (
                           <button type="button" onClick={(event) => { event.stopPropagation(); onRouteToReviewer?.({ ...row, lane: 'needs_review' }) }} className="rounded-lg border border-amber-400/40 bg-amber-500/10 px-2 py-1 font-medium text-amber-700 hover:bg-amber-500/15">
-                            Route swarm6
+                            {t('swarm.reports.routeSwarm6')}
                           </button>
                         ) : null}
                       </div>
-                      <div className="mt-1 max-w-[14rem] truncate">{row.missionTitle ?? 'runtime output'}</div>
+                      <div className="mt-1 max-w-[14rem] truncate">{row.missionTitle ?? t('swarm.reports.runtimeOutputFallback')}</div>
                     </div>
                   </div>
                 </div>
@@ -971,16 +971,16 @@ export function Swarm2ReportsView({
                     </dl>
                     {(row.artifacts.length > 0 || row.previews.length > 0) ? (
                       <div className="mt-3 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-3 py-2">
-                        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-muted)]">Artifacts</div>
+                        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-muted)]">{t('swarm.reports.artifactsLabel')}</div>
                         <div className="flex flex-wrap gap-1.5">
                           {row.artifacts.map((artifact) => (
                             <span key={artifact.id} title={artifact.path ?? artifact.label} className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-1 text-[10px] text-[var(--theme-muted-2)]">
-                              {artifact.kind}: {artifact.label}
+                              {t('swarm.reports.artifactKind', { kind: artifact.kind, label: artifact.label })}
                             </span>
                           ))}
                           {row.previews.map((preview) => (
                             <a key={preview.id} href={preview.url} target="_blank" rel="noreferrer" className="rounded-full border border-[var(--theme-accent)]/40 bg-[var(--theme-accent-soft)] px-2 py-1 text-[10px] text-[var(--theme-accent-strong)]">
-                              preview: {preview.label}
+                              {t('swarm.reports.previewLabel', { label: preview.label })}
                             </a>
                           ))}
                         </div>

@@ -30,7 +30,7 @@ import { RouterChat } from '@/components/swarm/router-chat'
 import { SwarmTerminal } from '@/components/swarm/swarm-terminal'
 import { WorkflowHelpModal } from '@/components/workflow-help-modal'
 import { cn } from '@/lib/utils'
-import { t } from '@/lib/i18n'
+import { t, getLocale } from '@/lib/i18n'
 
 const SWARM2_ROOM_STORAGE_KEY = 'claude-swarm2-room-v1'
 
@@ -387,9 +387,9 @@ function useUpdatedAgo(fetchedAt: number | null): string {
         return
       }
       const diff = Math.floor((Date.now() - fetchedAt) / 1000)
-      if (diff < 5) setLabel('just now')
-      else if (diff < 60) setLabel(`${diff}s ago`)
-      else setLabel(`${Math.floor(diff / 60)}m ago`)
+      if (diff < 5) setLabel(t('time.justNow'))
+      else if (diff < 60) setLabel(t('time.secondsAgo', { count: diff }))
+      else setLabel(t('time.minutesAgo', { count: Math.floor(diff / 60) }))
     }
 
     update()
@@ -425,7 +425,7 @@ export function commandForRuntime(
   const shellCommand = (): RuntimeCommand => ({
     command: ['zsh', '-lc', cwd ? `cd "${cwd}" && exec zsh -l` : 'exec zsh -l'],
     kind: 'shell',
-    label: cwd ? 'shell @ cwd' : 'shell',
+    label: cwd ? t('swarm.runtime.shellAtCwd') : t('swarm.runtime.shell'),
   })
   const logCommand = (): RuntimeCommand | null =>
     runtime?.logPath
@@ -593,12 +593,12 @@ function scheduleScrollContextToTop(anchor: HTMLElement | null) {
 }
 
 function relativeTime(ts: number | null | undefined): string {
-  if (!ts) return 'never'
+  if (!ts) return t('swarm.runtime.never')
   const diff = Date.now() - ts
-  if (diff < 60_000) return `${Math.max(1, Math.floor(diff / 1000))}s ago`
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`
-  return `${Math.floor(diff / 86_400_000)}d ago`
+  if (diff < 60_000) return t('time.secondsAgo', { count: Math.max(1, Math.floor(diff / 1000)) })
+  if (diff < 3_600_000) return t('time.minutesAgo', { count: Math.floor(diff / 60_000) })
+  if (diff < 86_400_000) return t('time.hoursAgo', { count: Math.floor(diff / 3_600_000) })
+  return t('time.daysAgo', { count: Math.floor(diff / 86_400_000) })
 }
 
 function progressForRuntime(runtime: RuntimeEntry | undefined): number {
@@ -614,7 +614,7 @@ function progressForRuntime(runtime: RuntimeEntry | undefined): number {
   return 58
 }
 
-function cleanSwarmLabel(rawValue: string, fallback = 'Ready for task', maxLength = 64): string {
+function cleanSwarmLabel(rawValue: string, fallback = t('swarm.runtime.readyForTask'), maxLength = 64): string {
   const raw = rawValue.trim()
   if (!raw) return fallback
   const lines = raw.split('\n').map((line) => line.trim()).filter(Boolean)
@@ -636,9 +636,9 @@ function cleanSwarmLabel(rawValue: string, fallback = 'Ready for task', maxLengt
 }
 
 function displayTaskTitle(runtime: RuntimeEntry | undefined, fallback: string): string {
-  const realSummary = runtime?.lastRealSummary ?? null
-  const realResult = runtime?.lastRealResult ?? null
-  return cleanSwarmLabel(runtime?.blockedReason || runtime?.currentTask || realSummary || runtime?.lastSummary || realResult || runtime?.lastResult || fallback || '', 'Ready for task', 64)
+  const realSummary = (runtime as RuntimeEntry & { lastRealSummary?: string | null }).lastRealSummary ?? null
+  const realResult = (runtime as RuntimeEntry & { lastRealResult?: string | null }).lastRealResult ?? null
+  return cleanSwarmLabel(runtime?.blockedReason || runtime?.currentTask || realSummary || runtime?.lastSummary || realResult || runtime?.lastResult || fallback || '', t('swarm.runtime.readyForTask'), 64)
 }
 
 
@@ -651,7 +651,7 @@ function formatAssignedModel(model?: string | null, provider?: string | null): s
   if (value.includes('gpt-5.3')) return 'GPT-5.3'
   if (model && model !== 'unknown') return model
   if (provider && provider !== 'unknown') return provider.replace(/^custom:/, '').replace(/[-_]/g, ' ')
-  return 'Worker'
+  return t('swarm.runtime.workerFallback')
 }
 
 type ControlPlaneStageProps = {
@@ -830,7 +830,7 @@ function ControlPlaneStage({
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 min-[1680px]:grid-cols-3">
               {members.length === 0 ? (
                 <div className="col-span-full rounded-[1.5rem] border border-dashed border-[var(--theme-border)] bg-[var(--theme-card)] p-8 text-sm text-[var(--theme-muted)]">
-                  No swarm workers discovered from crew status yet.
+                  {t('swarm.empty.noWorkersDiscovered')}
                 </div>
               ) : (
                 members.map((member) => {
@@ -845,7 +845,7 @@ function ControlPlaneStage({
                       runtimeState={runtime?.state ?? null}
                       recentLines={recentLines(runtime)}
                       recentOutputAt={runtime?.lastOutputAt ?? runtime?.lastSessionStartedAt ?? null}
-                      recentSummary={runtime?.lastRealSummary ?? runtime?.lastRealResult ?? runtime?.lastSummary ?? runtime?.lastResult ?? runtime?.blockedReason ?? null}
+                      recentSummary={(runtime as RuntimeEntry & { lastRealSummary?: string | null; lastRealResult?: string | null }).lastRealSummary ?? (runtime as RuntimeEntry & { lastRealSummary?: string | null; lastRealResult?: string | null }).lastRealResult ?? runtime?.lastSummary ?? runtime?.lastResult ?? runtime?.blockedReason ?? null}
                       artifacts={runtime?.artifacts ?? []}
                       previews={runtime?.previews ?? []}
                       inRoom={roomIds.includes(member.id)}
@@ -864,18 +864,18 @@ function ControlPlaneStage({
           <div className={cn('relative z-10 flex flex-col gap-3', viewMode === 'runtime' ? 'block' : 'hidden')}>
             {!tmuxAvailable ? (
               <div className="rounded-xl border border-amber-300/40 bg-amber-300/10 px-4 py-2.5 text-xs text-amber-100">
-                <div className="font-semibold text-amber-50">tmux not installed on this host</div>
-                <div className="mt-1 text-amber-100/80">Spawning a Hermes swarm worker requires tmux. Without it, the worker can start but cannot dispatch tasks (you'll see &lsquo;can't find pane: swarm-&lt;id&gt;&rsquo; errors). Install tmux:</div>
+                <div className="font-semibold text-amber-50">{t('swarm.tmux.bannerTitle')}</div>
+                <div className="mt-1 text-amber-100/80">{t('swarm.tmux.bannerBody')}</div>
                 <code className="mt-1 inline-block rounded bg-black/30 px-2 py-0.5 text-[10px] text-amber-100">brew install tmux</code>{' '}
-                <span className="text-amber-100/60">(macOS) or</span>{' '}
+                <span className="text-amber-100/60">{t('swarm.tmux.macosOr')}</span>{' '}
                 <code className="inline-block rounded bg-black/30 px-2 py-0.5 text-[10px] text-amber-100">apt install tmux</code>{' '}
-                <span className="text-amber-100/60">(Ubuntu/Debian).</span>
+                <span className="text-amber-100/60">{t('swarm.tmux.ubuntuDebian')}</span>
               </div>
             ) : null}
             {focusedRuntimeWorkerId ? (
               <div className="flex items-center justify-between rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-4 py-2 text-xs text-[var(--theme-muted)]">
                 <span>
-                  Focus mode on{' '}
+                  {t('swarm.runtime.focusModeOn')}{' '}
                   <span className="font-semibold text-[var(--theme-text)]">
                     {members.find((member) => member.id === focusedRuntimeWorkerId)?.displayName || focusedRuntimeWorkerId}
                   </span>
@@ -885,14 +885,14 @@ function ControlPlaneStage({
                   onClick={onClearFocusedRuntimeWorker}
                   className="rounded-full border border-[var(--theme-border)] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]"
                 >
-                  Exit focus
+                  {t('swarm.runtime.exitFocus')}
                 </button>
               </div>
             ) : null}
             <div className={cn('grid grid-cols-1 gap-3', focusedRuntimeWorkerId ? '' : '2xl:grid-cols-2')}>
               {terminalTargets.length === 0 ? (
                 <div className="rounded-[1.5rem] border border-dashed border-[var(--theme-border)] bg-[var(--theme-card)] p-8 text-sm text-[var(--theme-muted)]">
-                  No active workers detected. Select a worker or wire it into the room to mount its terminal.
+                  {t('swarm.empty.noActiveWorkersTerminal')}
                 </div>
               ) : (
                 terminalTargets.map((member) => {
@@ -917,20 +917,20 @@ function ControlPlaneStage({
                         <div className="ml-auto flex items-center gap-1">
                           {runtime?.tmuxAttachable ? (
                             <>
-                              <button type="button" onClick={() => onScrollTmuxSession(member.id, 'up', runtime.tmuxSession)} className="rounded-full border border-transparent px-1.5 py-0.5 text-[12px] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-border)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]" title={`Scroll up in ${runtime.tmuxSession ?? `swarm-${member.id}`}`}>↑</button>
-                              <button type="button" onClick={() => onScrollTmuxSession(member.id, 'down', runtime.tmuxSession)} className="rounded-full border border-transparent px-1.5 py-0.5 text-[12px] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-border)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]" title={`Scroll down in ${runtime.tmuxSession ?? `swarm-${member.id}`}`}>↓</button>
-                              <button type="button" onClick={() => onToggleFocusedRuntimeWorker(member.id)} className="rounded-full border border-transparent px-1.5 py-0.5 text-[12px] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-border)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]" title={focusedRuntimeWorkerId === member.id ? `Exit focus for swarm-${member.id}` : `Focus swarm-${member.id}`}>
+                              <button type="button" onClick={() => onScrollTmuxSession(member.id, 'up', runtime.tmuxSession)} className="rounded-full border border-transparent px-1.5 py-0.5 text-[12px] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-border)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]" title={t('swarm.runtime.scrollUpIn', { session: runtime.tmuxSession ?? `swarm-${member.id}` })}>↑</button>
+                              <button type="button" onClick={() => onScrollTmuxSession(member.id, 'down', runtime.tmuxSession)} className="rounded-full border border-transparent px-1.5 py-0.5 text-[12px] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-border)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]" title={t('swarm.runtime.scrollDownIn', { session: runtime.tmuxSession ?? `swarm-${member.id}` })}>↓</button>
+                              <button type="button" onClick={() => onToggleFocusedRuntimeWorker(member.id)} className="rounded-full border border-transparent px-1.5 py-0.5 text-[12px] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-border)] hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]" title={focusedRuntimeWorkerId === member.id ? t('swarm.runtime.exitFocusFor', { id: member.id }) : t('swarm.runtime.focusSwarm', { id: member.id })}>
                                 {focusedRuntimeWorkerId === member.id ? '⛶' : '⤢'}
                               </button>
                             </>
                           ) : (
-                            <button type="button" disabled={pendingTmux.has(member.id) || !tmuxAvailable} onClick={() => onStartAgentSession(member.id)} className={cn('rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] transition-colors', 'border-[var(--theme-accent)] bg-[var(--theme-accent-soft)] text-[var(--theme-accent-strong)] hover:opacity-90', (pendingTmux.has(member.id) || !tmuxAvailable) && 'cursor-not-allowed opacity-50')} title={tmuxAvailable ? `Start a live agent session in tmux (swarm-${member.id})` : 'tmux is not installed on this host'}>
-                              {pendingTmux.has(member.id) ? 'Starting…' : 'Start agent'}
+                            <button type="button" disabled={pendingTmux.has(member.id) || !tmuxAvailable} onClick={() => onStartAgentSession(member.id)} className={cn('rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] transition-colors', 'border-[var(--theme-accent)] bg-[var(--theme-accent-soft)] text-[var(--theme-accent-strong)] hover:opacity-90', (pendingTmux.has(member.id) || !tmuxAvailable) && 'cursor-not-allowed opacity-50')} title={tmuxAvailable ? t('swarm.runtime.startSessionTmux', { id: member.id }) : t('swarm.runtime.tmuxNotInstalledHost')}>
+                              {pendingTmux.has(member.id) ? t('swarm.runtime.starting') : t('swarm.runtime.startAgent')}
                             </button>
                           )}
                         </div>
                         <span className={cn('inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] uppercase tracking-[0.14em]', kindBadgeClass)} title={cmd.command.join(' ')}>
-                          {cmd.kind === 'tmux' ? 'tmux' : cmd.kind === 'log-tail' ? 'logs' : 'shell'}
+                          {cmd.kind === 'tmux' ? t('swarm.runtime.tmux') : cmd.kind === 'log-tail' ? t('swarm.runtime.logs') : t('swarm.runtime.shell')}
                         </span>
                       </div>
                       <SwarmTerminal workerId={member.id} command={cmd.command} cwd={runtime?.cwd ?? undefined} height={420} active={viewMode === 'runtime'} />
@@ -1054,28 +1054,15 @@ export function Swarm2Screen() {
           try { parsed = JSON.parse(text) } catch {}
           const msg = parsed.error || text || `HTTP ${res.status}`
           if (msg.includes('tmux not installed')) {
-            toast({
-              title: 'tmux not installed',
-              description:
-                `Swarm worker ${workerId} couldn't start because tmux is not installed on this host. Install tmux (‘brew install tmux’ or ‘apt install tmux’) and try again. See #244.`,
-              variant: 'destructive',
-            })
+            toast(t('swarm.toast.tmuxNotInstalledDesc', { workerId }), { type: 'error' })
           } else {
-            toast({
-              title: `Failed to start ${workerId}`,
-              description: msg,
-              variant: 'destructive',
-            })
+            toast(t('swarm.toast.failedToStart', { workerId }), { type: 'error' })
           }
           // eslint-disable-next-line no-console
           console.error('[swarm2] start session failed:', res.status, text)
         }
       } catch (err) {
-        toast({
-          title: `Failed to start ${workerId}`,
-          description: err instanceof Error ? err.message : String(err),
-          variant: 'destructive',
-        })
+        toast(t('swarm.toast.failedToStart', { workerId }), { type: 'error' })
       } finally {
         setPendingTmux((prev) => {
           const next = new Set(prev)
@@ -1166,7 +1153,7 @@ export function Swarm2Screen() {
       .map((worker) => ({
         id: worker.id,
         displayName: worker.name || worker.id,
-        role: worker.role || 'Worker',
+        role: worker.role || t('swarm.runtime.workerFallback'),
         profileFound: false,
         gatewayState: 'unknown',
         processAlive: false,
@@ -1230,7 +1217,7 @@ export function Swarm2Screen() {
   const selectedMember = selectedId
     ? members.find((member) => member.id === selectedId)
     : null
-  const selectedLabel = selectedMember?.displayName || selectedId || 'none'
+  const selectedLabel = selectedMember?.displayName || selectedId || t('swarm.runtime.none')
   const tmuxAvailable = runtimeQuery.data?.tmuxAvailable ?? true
 
   // Runtime tab auto-mount priority:
@@ -1257,7 +1244,7 @@ export function Swarm2Screen() {
   const rosterLanes = useMemo(() => {
     const map = new Map<string, { role: string; count: number; active: number }>()
     for (const member of members) {
-      const role = member.role || 'Worker'
+      const role = member.role || t('swarm.runtime.workerFallback')
       const existing = map.get(role) ?? { role, count: 0, active: 0 }
       existing.count += 1
       if (isRuntimeActive(runtimeByWorker.get(member.id))) existing.active += 1
@@ -1273,7 +1260,7 @@ export function Swarm2Screen() {
     const firstTask = assignments.find((assignment) => assignment.task?.trim())?.task ?? ''
     return {
       id: mission.id,
-      title: cleanSwarmLabel(genericTitle ? firstTask : mission.title, 'Swarm mission', 72),
+      title: cleanSwarmLabel(genericTitle ? firstTask : mission.title, t('swarm.runtime.swarmMission'), 72),
       state: mission.state,
       assignmentCount: assignments.length,
       checkpointedCount: assignments.filter((assignment) => ['checkpointed', 'done'].includes(assignment.state)).length,
@@ -1299,8 +1286,8 @@ export function Swarm2Screen() {
         return {
           workerId: member.id,
           workerName: member.displayName || member.id,
-          role: member.role || runtime?.role || 'Worker',
-          task: displayTaskTitle(runtime, 'Awaiting checkpoint'),
+          role: member.role || runtime?.role || t('swarm.runtime.workerFallback'),
+          task: displayTaskTitle(runtime, t('swarm.runtime.awaitingCheckpoint')),
           progress: progressForRuntime(runtime),
           state,
           age: relativeTime(ts),
@@ -1361,7 +1348,7 @@ export function Swarm2Screen() {
       ...inboxLanes.needs_review.map((item) => ({
         id: `review-${item.id}`,
         workerId: item.workerId,
-        title: `${item.workerName} · Needs review`,
+        title: t('swarm.notifications.needsReview', { name: item.workerName }),
         body: item.summary,
         age: relativeTime(item.updatedAt),
         actionable: true,
@@ -1369,7 +1356,7 @@ export function Swarm2Screen() {
       ...inboxLanes.blocked.map((item) => ({
         id: `blocked-${item.id}`,
         workerId: item.workerId,
-        title: `${item.workerName} · Needs input`,
+        title: t('swarm.notifications.needsInput', { name: item.workerName }),
         body: item.blocker ?? item.summary,
         age: relativeTime(item.updatedAt),
         actionable: true,
@@ -1377,7 +1364,7 @@ export function Swarm2Screen() {
       ...inboxLanes.ready.map((item) => ({
         id: `ready-${item.id}`,
         workerId: item.workerId,
-        title: `${item.workerName} · Ready`,
+        title: t('swarm.notifications.ready', { name: item.workerName }),
         body: item.summary,
         age: relativeTime(item.updatedAt),
         actionable: true,
@@ -1387,8 +1374,8 @@ export function Swarm2Screen() {
       laneItems.unshift({
         id: `mission-${latestMission.id}`,
         workerId: '',
-        title: `Mission ${latestMission.state}`,
-        body: `${latestMission.checkpointedCount}/${latestMission.assignmentCount} checkpointed · ${latestMission.title}`,
+        title: t('swarm.notifications.missionState', { state: latestMission.state }),
+        body: t('swarm.notifications.missionBody', { checkpointed: latestMission.checkpointedCount, assignments: latestMission.assignmentCount, title: latestMission.title }),
         age: latestMission.id,
         actionable: latestMission.checkpointedCount < latestMission.assignmentCount,
       })
@@ -1402,7 +1389,8 @@ export function Swarm2Screen() {
       .map((member) => {
         const runtime = runtimeByWorker.get(member.id)
         const ts = runtime?.lastOutputAt ?? runtime?.lastSessionStartedAt ?? member.lastSessionAt ?? null
-        const rawText = runtime?.lastRealSummary ?? runtime?.lastRealResult ?? runtime?.lastSummary ?? runtime?.lastResult ?? runtime?.blockedReason ?? runtime?.currentTask ?? member.lastSessionTitle ?? `Ready in ${member.role || 'worker'} lane`
+        const runtimeWithReal = runtime as RuntimeEntry & { lastRealSummary?: string | null; lastRealResult?: string | null }
+        const rawText = runtimeWithReal.lastRealSummary ?? runtimeWithReal.lastRealResult ?? runtime?.lastSummary ?? runtime?.lastResult ?? runtime?.blockedReason ?? runtime?.currentTask ?? member.lastSessionTitle ?? t('swarm.runtime.readyInLane', { role: member.role || t('swarm.runtime.workerFallback').toLowerCase() })
         const state = (runtime?.phase || runtime?.currentTask || '').toLowerCase()
         const tone: 'idle' | 'active' | 'warning' = runtime?.blockedReason
           ? 'warning'
@@ -1459,7 +1447,7 @@ export function Swarm2Screen() {
           role: newWorkerRole.trim(),
           specialty: newWorkerSpecialty.trim() || preset?.specialty || '',
           model: newWorkerModel.trim(),
-          mission: newWorkerMission.trim() || preset?.mission || 'Awaiting orchestrator dispatch.',
+          mission: newWorkerMission.trim() || preset?.mission || t('swarm.modal.awaitingDispatch'),
           systemPrompt: preset?.systemPrompt ?? null,
           skills: preset?.skills ?? [],
         }),
@@ -1471,7 +1459,7 @@ export function Swarm2Screen() {
       await rosterQuery.refetch()
       setAddSwarmOpen(false)
     } catch (error) {
-      setAddSwarmError(error instanceof Error ? error.message : 'Failed to save swarm agent')
+      setAddSwarmError(error instanceof Error ? error.message : t('swarm.toast.failedToSaveSwarmAgent'))
     } finally {
       setAddSwarmSaving(false)
     }
@@ -1494,12 +1482,14 @@ export function Swarm2Screen() {
               </div>
               <div className="min-w-0">
                 <h1 className="truncate text-base font-semibold text-primary-900">
-                  Swarm
+                  {t('swarm.title')}
                 </h1>
                 <p className="truncate text-xs text-[var(--theme-muted-2)]">
                   {members.length > 0
-                    ? `Detected ${members.length} worker${members.length === 1 ? '' : 's'} for planning, routing, reports, and reviewer-gated execution.`
-                    : 'Detected Hermes profiles and roster workers for planning, routing, reports, and reviewer-gated execution.'}
+                    ? (members.length === 1
+                        ? t('swarm.header.detectedWorkersSingular', { count: members.length })
+                        : t('swarm.header.detectedWorkers', { count: members.length }))
+                    : t('swarm.header.detectedProfiles')}
                 </p>
               </div>
             </div>
@@ -1507,28 +1497,28 @@ export function Swarm2Screen() {
             <div className="relative flex shrink-0 items-center gap-2 text-sm text-[var(--theme-muted)]">
               <WorkflowHelpModal
                 compact
-                eyebrow="Swarm"
-                title="How Swarm works"
+                eyebrow={t('swarm.header.eyebrow')}
+                title={t('swarm.header.howSwarmWorks')}
                 sections={[
                   {
-                    title: 'What this surface does',
+                    title: t('swarm.help.whatSurfaceDoes'),
                     bullets: [
-                      'Swarm turns a group of workers into one coordinated execution surface.',
-                      'Use it to route tasks, monitor state, and keep parallel work moving without losing context.',
+                      t('swarm.help.bullet1'),
+                      t('swarm.help.bullet2'),
                     ],
                   },
                   {
-                    title: 'Typical flow',
+                    title: t('swarm.help.typicalFlow'),
                     bullets: [
-                      'Review worker state, then dispatch or reroute work from the orchestration controls.',
-                      'Use reports, inbox, and runtime signals to spot blockers and pull workers back on track.',
+                      t('swarm.help.flowBullet1'),
+                      t('swarm.help.flowBullet2'),
                     ],
                   },
                   {
-                    title: 'FAQ',
+                    title: t('swarm.help.faq'),
                     bullets: [
-                      'If a worker is missing setup or model config, fix that in Operations first.',
-                      'Swarm2 is the operational coordination layer, not the first-time setup screen.',
+                      t('swarm.help.faqBullet1'),
+                      t('swarm.help.faqBullet2'),
                     ],
                   },
                 ]}
@@ -1538,7 +1528,7 @@ export function Swarm2Screen() {
                 onClick={() => setNotificationsOpen((open) => !open)}
                 className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] text-base shadow-sm hover:bg-[var(--theme-card2)]"
                 aria-label={t('swarm.title')}
-                title="Swarm notifications"
+                title={t('swarm.notifications.title')}
               >
                 <HugeiconsIcon icon={AlarmClockIcon} size={17} strokeWidth={1.8} />
                 {actionableNotificationCount > 0 ? (
@@ -1552,9 +1542,9 @@ export function Swarm2Screen() {
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <div>
                       <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--theme-muted)]">{t('swarm.activity.title')}</div>
-                      <div className="text-xs text-[var(--theme-muted-2)]">Actionable state from canonical mission checkpoints and durable report lanes.</div>
+                      <div className="text-xs text-[var(--theme-muted-2)]">{t('swarm.notifications.subtitle')}</div>
                     </div>
-                    <button type="button" onClick={() => setNotificationsOpen(false)} className="rounded-lg px-2 py-1 text-xs hover:bg-[var(--theme-card2)]">Close</button>
+                    <button type="button" onClick={() => setNotificationsOpen(false)} className="rounded-lg px-2 py-1 text-xs hover:bg-[var(--theme-card2)]">{t('common.close')}</button>
                   </div>
                   <div className="max-h-80 space-y-2 overflow-y-auto">
                     {swarmNotifications.length ? swarmNotifications.map((item) => (
@@ -1578,7 +1568,7 @@ export function Swarm2Screen() {
                         <div className="mt-1 truncate text-xs text-[var(--theme-muted-2)]">{item.body}</div>
                       </button>
                     )) : (
-                      <div className="rounded-xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-3 text-xs text-[var(--theme-muted)]">No active swarm updates.</div>
+                      <div className="rounded-xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-3 text-xs text-[var(--theme-muted)]">{t('swarm.empty.noActiveSwarmUpdates')}</div>
                     )}
                   </div>
                 </div>
@@ -1589,7 +1579,7 @@ export function Swarm2Screen() {
                 className="inline-flex items-center gap-2 rounded-lg bg-[var(--theme-accent)] px-4 py-2 text-sm font-medium text-primary-950 shadow-sm hover:bg-[var(--theme-accent-strong)]"
               >
                 <HugeiconsIcon icon={MessageMultiple01Icon} size={13} />
-                Add Swarm
+                {t('swarm.button.addSwarm')}
               </button>
             </div>
           </div>
@@ -1663,20 +1653,20 @@ export function Swarm2Screen() {
           <div className="w-full max-w-2xl rounded-3xl border border-[var(--theme-border2)] bg-[var(--theme-card)] p-6 shadow-[0_30px_100px_var(--theme-shadow)]">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold text-[var(--theme-text)]">Add Swarm Agent</h2>
-                <p className="mt-1 text-sm text-[var(--theme-muted-2)]">Create a new swarm roster entry and configure its identity.</p>
+                <h2 className="text-xl font-semibold text-[var(--theme-text)]">{t('swarm.modal.addSwarmAgent')}</h2>
+                <p className="mt-1 text-sm text-[var(--theme-muted-2)]">{t('swarm.modal.addSwarmDesc')}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setAddSwarmOpen(false)}
                 className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card2)] px-3 py-1.5 text-[var(--theme-muted)] hover:text-[var(--theme-text)]"
               >
-                Close
+                {t('common.close')}
               </button>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <label className="block text-sm md:col-span-2">
-                <span className="mb-1 block text-[var(--theme-muted)]">Role preset</span>
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.modal.rolePreset')}</span>
                 <select
                   value={newWorkerRole}
                   onChange={(e) => {
@@ -1696,27 +1686,27 @@ export function Swarm2Screen() {
                   ))}
                 </select>
                 <p className="mt-1 text-xs text-[var(--theme-muted-2)]">
-                  Presets auto-fill specialty, mission, system prompt, and skill stack. Pick “Custom” for a blank slate.
+                  {t('swarm.modal.rolePresetHint')}
                 </p>
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block text-[var(--theme-muted)]">Worker ID</span>
-                <input value={newWorkerId} onChange={(e) => setNewWorkerId(e.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder="swarmN" />
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.modal.workerId')}</span>
+                <input value={newWorkerId} onChange={(e) => setNewWorkerId(e.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder={t('swarm.modal.workerIdPlaceholder')} />
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block text-[var(--theme-muted)]">Display name</span>
-                <input value={newWorkerName} onChange={(e) => setNewWorkerName(e.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder="e.g. Mirror, Builder" />
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.modal.displayName')}</span>
+                <input value={newWorkerName} onChange={(e) => setNewWorkerName(e.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder={t('swarm.modal.displayNamePlaceholder')} />
               </label>
               <label className="block text-sm md:col-span-2">
                 <span className="mb-1 flex items-center justify-between text-[var(--theme-muted)]">
-                  <span>Model</span>
-                  <span className="text-[10px] text-[var(--theme-muted-2)]">{availableModels.length > 0 ? `${availableModels.length} available` : modelsQuery.isLoading ? 'loading…' : '0 found'}</span>
+                  <span>{t('swarm.modal.model')}</span>
+                  <span className="text-[10px] text-[var(--theme-muted-2)]">{availableModels.length > 0 ? t('swarm.modal.modelCount', { count: availableModels.length }) : modelsQuery.isLoading ? t('swarm.modal.modelLoading') : t('swarm.modal.modelZeroFound')}</span>
                 </span>
                 <input
                   value={newWorkerModel}
                   onChange={(e) => setNewWorkerModel(e.target.value)}
                   list="swarm-add-models"
-                  placeholder={availableModels.length ? 'Search or pick a detected model…' : modelsQuery.isLoading ? 'Loading detected models…' : 'No models detected'}
+                  placeholder={availableModels.length ? t('swarm.modal.modelPlaceholderSearch') : modelsQuery.isLoading ? t('swarm.modal.modelPlaceholderLoading') : t('swarm.modal.modelPlaceholderEmpty')}
                   className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none"
                 />
                 <datalist id="swarm-add-models">
@@ -1725,30 +1715,30 @@ export function Swarm2Screen() {
                   ))}
                 </datalist>
                 <p className="mt-1 text-xs text-[var(--theme-muted-2)]">
-                  Searchable picker backed by /api/models, the same source as chat. {modelsQuery.isError ? 'Model discovery errored, so this is empty until refresh.' : 'Start typing to see every detected model from the user’s Hermes config and local providers.'}
+                  {t('swarm.modal.modelHint')} {modelsQuery.isError ? t('swarm.modal.modelHintError') : t('swarm.modal.modelHintOk')}
                 </p>
               </label>
               <label className="block text-sm md:col-span-2">
-                <span className="mb-1 block text-[var(--theme-muted)]">Specialty</span>
-                <input value={newWorkerSpecialty} onChange={(e) => setNewWorkerSpecialty(e.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder={ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.specialty || 'short focus area'} />
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.modal.specialty')}</span>
+                <input value={newWorkerSpecialty} onChange={(e) => setNewWorkerSpecialty(e.target.value)} className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder={ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.specialty || t('swarm.modal.specialtyPlaceholder')} />
               </label>
               <label className="block text-sm md:col-span-2">
-                <span className="mb-1 block text-[var(--theme-muted)]">Mission</span>
-                <textarea value={newWorkerMission} onChange={(e) => setNewWorkerMission(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder={ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.mission || 'standing mission for this worker'} />
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.modal.mission')}</span>
+                <textarea value={newWorkerMission} onChange={(e) => setNewWorkerMission(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none" placeholder={ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.mission || t('swarm.modal.missionFieldPlaceholder')} />
               </label>
               {ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.systemPrompt ? (
                 <div className="md:col-span-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card2)] px-3 py-2 text-xs text-[var(--theme-muted-2)]">
-                  <div className="mb-1 font-semibold text-[var(--theme-muted)]">System prompt (embedded with role)</div>
+                  <div className="mb-1 font-semibold text-[var(--theme-muted)]">{t('swarm.modal.systemPrompt')}</div>
                   <div className="whitespace-pre-wrap leading-relaxed">{ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.systemPrompt}</div>
-                  <div className="mt-2 font-semibold text-[var(--theme-muted)]">Skills loaded</div>
+                  <div className="mt-2 font-semibold text-[var(--theme-muted)]">{t('swarm.modal.skillsLoaded')}</div>
                   <div className="font-mono">{(ROLE_PRESETS.find((p) => p.role === newWorkerRole)?.skills ?? []).join(', ') || '—'}</div>
                 </div>
               ) : null}
             </div>
             {addSwarmError ? <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{addSwarmError}</div> : null}
             <div className="mt-4 flex items-center justify-end gap-3">
-              <button type="button" onClick={() => setAddSwarmOpen(false)} className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] px-4 py-2 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-text)]">Cancel</button>
-              <button type="button" disabled={addSwarmSaving || !newWorkerId.trim() || !newWorkerName.trim()} onClick={() => void saveAddSwarm()} className="rounded-lg bg-[var(--theme-accent)] px-4 py-2 text-sm font-medium text-primary-950 disabled:opacity-50">{addSwarmSaving ? 'Saving…' : 'Save swarm agent'}</button>
+              <button type="button" onClick={() => setAddSwarmOpen(false)} className="rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] px-4 py-2 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-text)]">{t('common.cancel')}</button>
+              <button type="button" disabled={addSwarmSaving || !newWorkerId.trim() || !newWorkerName.trim()} onClick={() => void saveAddSwarm()} className="rounded-lg bg-[var(--theme-accent)] px-4 py-2 text-sm font-medium text-primary-950 disabled:opacity-50">{addSwarmSaving ? t('swarm.modal.saving') : t('swarm.modal.saveSwarmAgent')}</button>
             </div>
           </div>
         </div>

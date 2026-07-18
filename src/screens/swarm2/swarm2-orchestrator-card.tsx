@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils'
 import { t } from '@/lib/i18n'
 
 const ORCHESTRATOR_NAME_KEY = 'swarm2:orchestrator:name'
-const DEFAULT_NAME = 'Main Agent'
 
 type SwarmCardMode = 'cards' | 'office'
 type AgentLens = 'all' | 'working' | 'reviewing' | 'blocked' | 'ready'
@@ -28,11 +27,11 @@ type AgentLens = 'all' | 'working' | 'reviewing' | 'blocked' | 'ready'
 const AGENT_PAGE_SIZE = 12
 
 const AGENT_LENSES: Array<{ id: AgentLens; label: string }> = [
-  { id: 'all', label: 'All' },
-  { id: 'working', label: 'Run' },
-  { id: 'reviewing', label: 'Review' },
-  { id: 'blocked', label: 'Blocked' },
-  { id: 'ready', label: 'Ready' },
+  { id: 'all', label: t('swarm.orchestrator.lens.all') },
+  { id: 'working', label: t('swarm.orchestrator.lens.run') },
+  { id: 'reviewing', label: t('swarm.orchestrator.lens.review') },
+  { id: 'blocked', label: t('swarm.orchestrator.lens.blocked') },
+  { id: 'ready', label: t('swarm.orchestrator.lens.ready') },
 ]
 
 export type Swarm2OrchestratorCardProps = {
@@ -96,8 +95,8 @@ export function Swarm2OrchestratorCard({
   const [agentLens, setAgentLens] = useState<AgentLens>('all')
   const [agentPage, setAgentPage] = useState(0)
   const [name, setName] = useState(() => {
-    if (typeof window === 'undefined') return DEFAULT_NAME
-    return window.localStorage.getItem(ORCHESTRATOR_NAME_KEY) || DEFAULT_NAME
+    if (typeof window === 'undefined') return t('swarm.orchestrator.defaultName')
+    return window.localStorage.getItem(ORCHESTRATOR_NAME_KEY) || t('swarm.orchestrator.defaultName')
   })
   const [draftName, setDraftName] = useState(name)
   const anchorCallbackRef = useCallback(
@@ -113,7 +112,7 @@ export function Swarm2OrchestratorCard({
   }
 
   function saveSettings() {
-    const next = draftName.trim() || DEFAULT_NAME
+    const next = draftName.trim() || t('swarm.orchestrator.defaultName')
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(ORCHESTRATOR_NAME_KEY, next)
     }
@@ -167,10 +166,10 @@ export function Swarm2OrchestratorCard({
         <div className="relative flex flex-col items-center gap-3 text-center">
           <div className="absolute left-0 top-0 flex shrink-0 items-center gap-1 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-1 shadow-sm">
             {([
-              ['cards', 'Control'],
-              ['kanban', 'Board'],
-              ['reports', 'Inbox'],
-              ['runtime', 'Runtime'],
+              ['cards', t('swarm.orchestrator.modeCards')],
+              ['kanban', t('swarm.orchestrator.modeBoard')],
+              ['reports', t('swarm.orchestrator.modeInbox')],
+              ['runtime', t('swarm.orchestrator.modeRuntime')],
             ] as const).map(([mode, label]) => (
               <button
                 key={mode}
@@ -199,14 +198,14 @@ export function Swarm2OrchestratorCard({
                 size={13}
                 strokeWidth={1.8}
               />
-              Router
+              {t('swarm.orchestrator.router')}
             </button>
             <button
               type="button"
               onClick={openSettings}
               className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
               aria-label={t('swarm.role.orchestrator')}
-              title="Orchestrator settings"
+              title={t('swarm.orchestrator.settingsTitle')}
             >
               <HugeiconsIcon
                 icon={Settings01Icon}
@@ -244,16 +243,16 @@ export function Swarm2OrchestratorCard({
                   'h-2 w-2 shrink-0 rounded-full bg-emerald-500',
                   isActive && 'animate-pulse',
                 )}
-                aria-label="Active"
-                title={isActive ? 'Active' : 'Idle'}
+                aria-label={t('swarm.orchestrator.active')}
+                title={isActive ? t('swarm.orchestrator.active') : t('swarm.orchestrator.idle')}
               />
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-[var(--theme-muted)]">
               <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2.5 py-1">
-                {totalWorkers} workers
+                {t('swarm.orchestrator.workersCount', { count: totalWorkers })}
               </span>
               <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2.5 py-1">
-                {activeRuntimeCount} live
+                {t('swarm.orchestrator.liveCount', { count: activeRuntimeCount })}
               </span>
             </div>
             {/* Reviewer gate text removed — reviewer routing should be derived from roster/config, not pinned in hero chrome. */}
@@ -302,14 +301,14 @@ export function Swarm2OrchestratorCard({
                   onClick={() => setSwarmCardMode('cards')}
                   className={cn('rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em]', swarmCardMode === 'cards' ? 'bg-[var(--theme-accent)] text-primary-950' : 'text-[var(--theme-muted)] hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]')}
                 >
-                  Active Swarm
+                  {t('swarm.orchestrator.activeSwarm')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setSwarmCardMode('office')}
                   className={cn('rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em]', swarmCardMode === 'office' ? 'bg-[var(--theme-accent)] text-primary-950' : 'text-[var(--theme-muted)] hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]')}
                 >
-                  Office
+                  {t('swarm.orchestrator.office')}
                 </button>
               </div>
               <div className={cn('flex items-center justify-center gap-1 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-1 justify-self-center md:justify-self-end', swarmCardMode === 'office' && 'opacity-40')}>
@@ -318,11 +317,11 @@ export function Swarm2OrchestratorCard({
                   onClick={() => cycleAgentPage(-1)}
                   disabled={filteredAgents.length <= AGENT_PAGE_SIZE}
                   className="inline-flex size-7 items-center justify-center rounded-lg text-[var(--theme-muted)] hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)] disabled:cursor-not-allowed disabled:opacity-35"
-                  aria-label="Previous agent page"
+                  aria-label={t('swarm.orchestrator.prevAgentPage')}
                 >
                   ←
                 </button>
-                <div className="flex items-center gap-1 px-1" aria-label={`Agent page ${Math.min(agentPage + 1, agentPageCount)} of ${agentPageCount}`}>
+                <div className="flex items-center gap-1 px-1" aria-label={t('swarm.orchestrator.agentPage', { current: Math.min(agentPage + 1, agentPageCount), total: agentPageCount })}>
                   {Array.from({ length: Math.min(agentPageCount, 5) }).map((_, index) => (
                     <span
                       key={index}
@@ -338,7 +337,7 @@ export function Swarm2OrchestratorCard({
                   onClick={() => cycleAgentPage(1)}
                   disabled={filteredAgents.length <= AGENT_PAGE_SIZE}
                   className="inline-flex size-7 items-center justify-center rounded-lg text-[var(--theme-muted)] hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)] disabled:cursor-not-allowed disabled:opacity-35"
-                  aria-label="Next agent page"
+                  aria-label={t('swarm.orchestrator.nextAgentPage')}
                 >
                   →
                 </button>
@@ -377,7 +376,15 @@ export function Swarm2OrchestratorCard({
                             <div className="truncate text-[11px] font-semibold text-[var(--theme-text)]">{agent.workerName}</div>
                             <div className="shrink-0 text-[9px] text-[var(--theme-muted)]">{agent.age}</div>
                           </div>
-                          <div className="mt-0.5 truncate text-[9px] uppercase tracking-[0.12em] text-[var(--theme-muted)]">{agent.state}</div>
+                          <div className="mt-0.5 truncate text-[9px] uppercase tracking-[0.12em] text-[var(--theme-muted)]">{
+                            agent.state === 'working'
+                              ? t('swarm.orchestrator.stateLabel.working')
+                              : agent.state === 'reviewing'
+                                ? t('swarm.orchestrator.stateLabel.reviewing')
+                                : agent.state === 'blocked'
+                                  ? t('swarm.orchestrator.stateLabel.blocked')
+                                  : t('swarm.orchestrator.stateLabel.ready')
+                          }</div>
                         </div>
                       </div>
                       <div className="mt-2 line-clamp-3 text-[10px] leading-snug text-[var(--theme-muted-2)]" title={agent.task}>{agent.task}</div>
@@ -390,7 +397,7 @@ export function Swarm2OrchestratorCard({
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-card)] px-3 py-2 text-[11px] text-[var(--theme-muted)]">
-                {activeAgents.length ? `No ${AGENT_LENSES[lensIndex]?.label.toLowerCase() ?? 'matching'} agents right now.` : 'Dispatch a mission to see each worker appear here with progress.'}
+                {activeAgents.length ? t('swarm.orchestrator.noMatchingAgents', { lens: (AGENT_LENSES[lensIndex]?.label ?? t('swarm.orchestrator.lens.all')).toLowerCase() }) : t('swarm.orchestrator.dispatchToSee')}
               </div>
             )}
           </div>
@@ -424,10 +431,10 @@ export function Swarm2OrchestratorCard({
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-[var(--theme-text)]">
-                    Orchestrator Settings
+                    {t('swarm.orchestrator.settingsModalTitle')}
                   </h2>
                   <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-                    Update the display name for the hub.
+                    {t('swarm.orchestrator.settingsModalDesc')}
                   </p>
                 </div>
               </div>
@@ -447,12 +454,12 @@ export function Swarm2OrchestratorCard({
 
             <label className="mt-6 block space-y-2">
               <span className="text-sm font-medium text-[var(--theme-text)]">
-                Display name
+                {t('swarm.orchestrator.displayNameLabel')}
               </span>
               <input
                 value={draftName}
                 onChange={(event) => setDraftName(event.target.value)}
-                placeholder={DEFAULT_NAME}
+                placeholder={t('swarm.orchestrator.defaultName')}
                 className="w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none focus:border-[var(--theme-accent)]"
               />
             </label>
@@ -463,10 +470,10 @@ export function Swarm2OrchestratorCard({
                 variant="secondary"
                 onClick={() => setSettingsOpen(false)}
               >
-                Close
+                {t('common.close')}
               </Button>
               <Button type="button" onClick={saveSettings}>
-                Save
+                {t('common.save')}
               </Button>
             </div>
           </div>
