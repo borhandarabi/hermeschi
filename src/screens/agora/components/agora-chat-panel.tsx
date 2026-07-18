@@ -29,7 +29,7 @@ export function AgoraChatPanel({ self, others, messages, onSend }: AgoraChatPane
   function nameFor(userId: string) {
     if (userId === self.profile.id) return self.profile.displayName
     const u = others.find((o) => o.profile.id === userId)
-    return u?.profile.displayName ?? 'Stranger'
+    return u?.profile.displayName ?? t('agora.stranger')
   }
 
   return (
@@ -41,12 +41,12 @@ export function AgoraChatPanel({ self, others, messages, onSend }: AgoraChatPane
       }}
     >
       <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: 'var(--theme-border)' }}>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-70">Room Chat</span>
-        <span className="text-[10px] opacity-50">{messages.length} msg</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-70">{t('agora.roomChat')}</span>
+        <span className="text-[10px] opacity-50">{t('agora.msgCountShort', { count: messages.length })}</span>
       </div>
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-3 py-2 text-[12px] leading-snug">
         {messages.length === 0 ? (
-          <div className="opacity-50 text-center mt-6 text-[11px]">No messages yet — say hi 👋</div>
+          <div className="opacity-50 text-center mt-6 text-[11px]">{t('agora.noMessagesYetGreeting')}</div>
         ) : (
           messages.map((m) => (
             <div key={m.id} className="mb-1.5">
@@ -85,7 +85,7 @@ export function AgoraChatPanel({ self, others, messages, onSend }: AgoraChatPane
             color: 'var(--theme-bg)',
           }}
         >
-          Send
+          {t('agora.send')}
         </button>
       </form>
     </div>

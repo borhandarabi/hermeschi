@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import {
   emitFeedEvent,
   onFeedEvent,
@@ -88,12 +89,12 @@ function sessionName(session: SessionRecord): string {
 
 function relativeTime(ts: number, now: number): string {
   const s = Math.max(0, Math.floor((now - ts) / 1000))
-  if (s < 5) return 'just now'
-  if (s < 60) return `${s}s ago`
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-  if (s < 604800) return `${Math.floor(s / 86400)}d ago`
-  return `${Math.floor(s / 604800)}w ago`
+  if (s < 5) return t('time.justNow')
+  if (s < 60) return t('time.secondsAgo', { count: s })
+  if (s < 3600) return t('time.minutesAgo', { count: Math.floor(s / 60) })
+  if (s < 86400) return t('time.hoursAgo', { count: Math.floor(s / 3600) })
+  if (s < 604800) return t('time.daysAgo', { count: Math.floor(s / 86400) })
+  return t('time.weeksAgo', { count: Math.floor(s / 604800) })
 }
 
 function eventSeverity(event: FeedRow): EventSeverity {
@@ -146,9 +147,17 @@ function severityTimestampClass(severity: EventSeverity): string {
   return 'text-neutral-700 dark:text-neutral-400'
 }
 
+function translateFilter(filter: FilterTab): string {
+  if (filter === 'Activity') return t('gateway.feed.filter.activity')
+  if (filter === 'Tasks') return t('gateway.feed.filter.tasks')
+  if (filter === 'Agents') return t('gateway.feed.filter.agents')
+  if (filter === 'System') return t('gateway.feed.filter.system')
+  return filter
+}
+
 function placeholderLabel(activeFilter: FilterTab): string {
-  if (activeFilter === 'Activity') return 'No events yet'
-  return `No events yet in ${activeFilter}`
+  if (activeFilter === 'Activity') return t('gateway.feed.empty')
+  return t('gateway.feed.noEventsIn', { filter: translateFilter(activeFilter) })
 }
 
 export function LiveFeedPanel() {
@@ -209,12 +218,12 @@ export function LiveFeedPanel() {
         if (previous) {
           next.forEach((name, id) => {
             if (!previous.has(id)) {
-              emitFeedEvent({ type: 'agent_spawned', message: `Session started: ${name}`, agentName: name })
+              emitFeedEvent({ type: 'agent_spawned', message: t('gateway.feed.sessionStarted', { name }), agentName: name })
             }
           })
           previous.forEach((name, id) => {
             if (!next.has(id)) {
-              emitFeedEvent({ type: 'agent_killed', message: `Session ended: ${name}`, agentName: name || id })
+              emitFeedEvent({ type: 'agent_killed', message: t('gateway.feed.sessionEnded', { name: name || id }), agentName: name || id })
             }
           })
         }
@@ -229,7 +238,7 @@ export function LiveFeedPanel() {
   }, [])
 
   useEffect(() => {
-    const emit = () => emitFeedEvent({ type: 'gateway_health', message: 'Gateway health check' })
+    const emit = () => emitFeedEvent({ type: 'gateway_health', message: t('gateway.feed.healthCheck') })
     emit()
     const interval = window.setInterval(emit, 30_000)
     return () => window.clearInterval(interval)
@@ -250,7 +259,7 @@ export function LiveFeedPanel() {
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex shrink-0 items-center justify-between border-b border-neutral-200 px-4 py-2.5 dark:border-neutral-800">
         <h2 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-          Live Feed
+          {t('gateway.feed.title')}
         </h2>
         <div className="flex items-center gap-2">
           {events.length > 0 ? (
@@ -259,7 +268,7 @@ export function LiveFeedPanel() {
               onClick={() => setEvents([])}
               className="rounded px-1.5 py-0.5 text-[10px] text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
             >
-              Clear
+              {t('gateway.feed.clear')}
             </button>
           ) : null}
           {/* Animated LIVE badge */}
@@ -268,7 +277,7 @@ export function LiveFeedPanel() {
               <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500/60" />
               <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
             </span>
-            LIVE
+            {t('gateway.feed.live')}
           </span>
         </div>
       </div>
@@ -287,7 +296,7 @@ export function LiveFeedPanel() {
                 : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 dark:text-neutral-600 dark:hover:bg-neutral-900 dark:hover:text-neutral-300',
             )}
           >
-            {tab}
+            {translateFilter(tab)}
           </button>
         ))}
       </div>

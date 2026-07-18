@@ -5,6 +5,7 @@
 import { motion, AnimatePresence } from 'motion/react'
 import { useEffect, useState } from 'react'
 import type { AgoraAvatarId, AgoraProfile, AgoraStatus, AgoraUser } from '../lib/agora-types'
+import { t } from '@/lib/i18n'
 
 const ALL_AVATARS: { id: AgoraAvatarId; label: string; tier: 'greek' | 'emoji' }[] = [
   { id: 'hermes', label: 'Hermes', tier: 'greek' },
@@ -28,6 +29,13 @@ const ALL_AVATARS: { id: AgoraAvatarId; label: string; tier: 'greek' | 'emoji' }
 ]
 
 const STATUS_OPTIONS: AgoraStatus[] = ['online', 'away', 'busy']
+
+function statusLabel(status: AgoraStatus): string {
+  if (status === 'online') return t('agora.statusOnline')
+  if (status === 'away') return t('agora.statusAway')
+  if (status === 'busy') return t('agora.statusBusy')
+  return status
+}
 
 interface AgoraProfileDrawerProps {
   open: boolean
@@ -84,12 +92,12 @@ export function AgoraProfileDrawer({
             }}
           >
             <div className="flex items-start justify-between mb-4">
-              <h2 className="text-base font-semibold">{isSelf ? 'Your Profile' : user.profile.displayName}</h2>
+              <h2 className="text-base font-semibold">{isSelf ? t('agora.yourProfileTitle') : user.profile.displayName}</h2>
               <button
                 type="button"
                 onClick={onClose}
                 className="opacity-60 hover:opacity-100 text-lg leading-none"
-                aria-label="Close"
+                aria-label={t('agora.ariaClose')}
               >
                 ×
               </button>
@@ -112,7 +120,7 @@ export function AgoraProfileDrawer({
                   <input
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    onBlur={() => onSaveProfile({ displayName: editName.slice(0, 32) || 'Builder' })}
+                    onBlur={() => onSaveProfile({ displayName: editName.slice(0, 32) || t('agora.displayNameFallback') })}
                     className="w-full rounded-md px-2 py-1 text-sm font-semibold outline-none"
                     style={{
                       background: 'var(--theme-card)',
@@ -132,7 +140,7 @@ export function AgoraProfileDrawer({
 
             {/* Status */}
             <section className="mb-5">
-              <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">Status</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">{t('agora.status')}</div>
               {isSelf ? (
                 <div className="flex gap-2">
                   {STATUS_OPTIONS.map((s) => (
@@ -153,24 +161,24 @@ export function AgoraProfileDrawer({
                         border: '1px solid var(--theme-border)',
                       }}
                     >
-                      {s}
+                      {statusLabel(s)}
                     </button>
                   ))}
                 </div>
               ) : (
-                <div className="text-[12px] capitalize opacity-80">{user.profile.status}</div>
+                <div className="text-[12px] capitalize opacity-80">{statusLabel(user.profile.status)}</div>
               )}
             </section>
 
             {/* Bio */}
             <section className="mb-5">
-              <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">Bio</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">{t('agora.bio')}</div>
               {isSelf ? (
                 <textarea
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
                   onBlur={() => onSaveProfile({ bio: editBio.slice(0, 240) })}
-                  placeholder="Say something about yourself…"
+                  placeholder={t('agora.bioPlaceholder')}
                   rows={3}
                   maxLength={240}
                   className="w-full rounded-md px-2 py-1.5 text-[12px] outline-none resize-none"
@@ -181,14 +189,14 @@ export function AgoraProfileDrawer({
                   }}
                 />
               ) : (
-                <div className="text-[12px] opacity-80 whitespace-pre-wrap">{user.profile.bio || 'No bio.'}</div>
+                <div className="text-[12px] opacity-80 whitespace-pre-wrap">{user.profile.bio || t('agora.noBio')}</div>
               )}
             </section>
 
             {/* Avatar picker (self only) */}
             {isSelf && (
               <section className="mb-5">
-                <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">Avatar</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">{t('agora.avatar')}</div>
                 <div className="grid grid-cols-6 gap-2">
                   {ALL_AVATARS.map((a) => (
                     <button
@@ -235,7 +243,7 @@ export function AgoraProfileDrawer({
                     color: 'var(--theme-bg)',
                   }}
                 >
-                  👋 Wave
+                  {t('agora.wave')}
                 </button>
               </div>
             )}

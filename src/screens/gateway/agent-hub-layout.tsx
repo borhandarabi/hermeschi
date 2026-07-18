@@ -2,6 +2,7 @@ import { useMemo, type CSSProperties } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { fetchSessions, type GatewaySession } from '@/lib/gateway-api'
+import { t } from '@/lib/i18n'
 import type { AgentWorkingRow } from './components/agents-working-panel'
 import { OfficeView } from './components/office-view'
 import type { AgentHubLayoutProps } from './components/hub-constants'
@@ -33,7 +34,7 @@ function readTimestamp(value: unknown): number {
 }
 
 function getSessionLabel(session: GatewaySession): string {
-  return readText(session.label) || readText(session.title) || readText(session.friendlyId) || readText(session.key) || 'Untitled'
+  return readText(session.label) || readText(session.title) || readText(session.friendlyId) || readText(session.key) || t('gateway.agentHub.untitled')
 }
 
 function deriveAgentRows(agents: AgentHubLayoutProps['agents'], sessions: GatewaySession[]): AgentWorkingRow[] {
@@ -55,7 +56,7 @@ function deriveAgentRows(agents: AgentHubLayoutProps['agents'], sessions: Gatewa
         name: agent.name,
         modelId: readText(session?.model) || 'auto',
         status,
-        lastLine: readText(session?.task) || 'Waiting for work…',
+        lastLine: readText(session?.task) || t('gateway.agentHub.waitingForWork'),
         lastAt: updatedAt || undefined,
         taskCount: 0,
         roleDescription: agent.role,
@@ -71,9 +72,9 @@ function deriveAgentRows(agents: AgentHubLayoutProps['agents'], sessions: Gatewa
 
   if (recent.length === 0) {
     return [
-      { id: 'placeholder-1', name: 'Nova', modelId: 'auto', status: 'idle' as const, lastLine: 'Waiting for first mission…', taskCount: 0, roleDescription: 'Worker' },
-      { id: 'placeholder-2', name: 'Pixel', modelId: 'auto', status: 'idle' as const, lastLine: 'Standing by…', taskCount: 0, roleDescription: 'Worker' },
-      { id: 'placeholder-3', name: 'Blaze', modelId: 'auto', status: 'idle' as const, lastLine: 'Ready to build.', taskCount: 0, roleDescription: 'Worker' },
+      { id: 'placeholder-1', name: 'Nova', modelId: 'auto', status: 'idle' as const, lastLine: t('gateway.agentHub.waitingFirstMission'), taskCount: 0, roleDescription: t('gateway.agentHub.worker') },
+      { id: 'placeholder-2', name: 'Pixel', modelId: 'auto', status: 'idle' as const, lastLine: t('gateway.agentHub.standingBy'), taskCount: 0, roleDescription: t('gateway.agentHub.worker') },
+      { id: 'placeholder-3', name: 'Blaze', modelId: 'auto', status: 'idle' as const, lastLine: t('gateway.agentHub.readyToBuild'), taskCount: 0, roleDescription: t('gateway.agentHub.worker') },
     ]
   }
 
@@ -93,7 +94,7 @@ function deriveAgentRows(agents: AgentHubLayoutProps['agents'], sessions: Gatewa
       lastLine: readText(session.task) || getSessionLabel(session),
       lastAt: updatedAt || undefined,
       taskCount: 0,
-      roleDescription: readText(session.label) || 'Worker',
+      roleDescription: readText(session.label) || t('gateway.agentHub.worker'),
       sessionKey: readText(session.key) || undefined,
     }
   })
@@ -122,7 +123,7 @@ export function AgentHubLayout({ agents }: AgentHubLayoutProps) {
             onViewOutput={() => void navigate({ to: '/conductor' })}
             onNewMission={() => void navigate({ to: '/conductor' })}
             processType="parallel"
-            companyName="Agent Office"
+            companyName={t('gateway.agentHub.agentOffice')}
             containerHeight={520}
           />
         </section>

@@ -7,6 +7,7 @@ import {
   steerAgent,
   type SessionHistoryMessage,
 } from '@/lib/gateway-api'
+import { t, getLocale } from '@/lib/i18n'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -93,7 +94,7 @@ export function AgentChatPanel({
         setError(res.error)
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load history')
+      setError(e instanceof Error ? e.message : t('gateway.agentChat.loadHistoryFailed'))
     } finally {
       setLoading(false)
     }
@@ -196,7 +197,7 @@ export function AgentChatPanel({
       // Reload history to get agent's response
       setTimeout(() => void loadHistory(), 1500)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to send')
+      setError(e instanceof Error ? e.message : t('gateway.agentChat.sendFailed'))
     } finally {
       setSending(false)
     }
@@ -227,11 +228,11 @@ export function AgentChatPanel({
             />
             <div>
               <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                Chat with {agentName}
+                {t('gateway.agentChat.chatWith', { name: agentName })}
               </p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                {isRunning ? 'Running — messages sent as directives' : 'Idle — direct conversation'}
-                {sessionKey ? ` · ${sessionKey.slice(0, 24)}…` : ' · No session'}
+                {isRunning ? t('gateway.agentChat.runningDirectives') : t('gateway.agentChat.idleDirect')}
+                {sessionKey ? ` · ${sessionKey.slice(0, 24)}…` : t('gateway.agentChat.noSession')}
               </p>
             </div>
           </div>
@@ -242,7 +243,7 @@ export function AgentChatPanel({
               disabled={loading}
               className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
             >
-              {loading ? '↻' : '↻ Refresh'}
+              {loading ? '↻' : t('gateway.agentChat.refresh')}
             </button>
             <button
               type="button"
@@ -261,19 +262,19 @@ export function AgentChatPanel({
         >
           {!sessionKey && (
             <div className="flex items-center justify-center py-12 text-sm text-neutral-500">
-              No active session for this agent. Start a mission first.
+              {t('gateway.agentChat.noActiveSession')}
             </div>
           )}
 
           {sessionKey && messages.length === 0 && !loading && (
             <div className="flex items-center justify-center py-12 text-sm text-neutral-500">
-              No messages yet. Send one to start a conversation.
+              {t('gateway.agentChat.noMessagesYet')}
             </div>
           )}
 
           {loading && messages.length === 0 && (
             <div className="flex items-center justify-center py-12 text-sm text-neutral-500">
-              Loading conversation…
+              {t('gateway.agentChat.loadingConversation')}
             </div>
           )}
 
@@ -308,7 +309,7 @@ export function AgentChatPanel({
                 )}
                 {msg.timestamp && (
                   <p className="mt-1 text-[10px] opacity-50">
-                    {new Date(msg.timestamp).toLocaleTimeString()}
+                    {new Date(msg.timestamp).toLocaleTimeString(getLocale())}
                   </p>
                 )}
               </div>
@@ -325,10 +326,10 @@ export function AgentChatPanel({
               onChange={(e) => setDraft(e.target.value)}
               placeholder={
                 !sessionKey
-                  ? 'No session available…'
+                  ? t('gateway.agentChat.noSessionPlaceholder')
                   : isRunning
-                    ? 'Send a directive to the running agent…'
-                    : 'Send a message…'
+                    ? t('gateway.agentChat.directivePlaceholder')
+                    : t('gateway.agentChat.messagePlaceholder')
               }
               disabled={!sessionKey || sending}
               className="flex-1 resize-none rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:ring-1 focus:ring-accent-400 disabled:opacity-50 dark:border-neutral-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-neutral-500"
@@ -349,13 +350,13 @@ export function AgentChatPanel({
                 'bg-accent-500 hover:bg-accent-600 disabled:opacity-40 disabled:cursor-not-allowed',
               )}
             >
-              {sending ? '…' : isRunning ? 'Steer ⌘↵' : 'Send ⌘↵'}
+              {sending ? '…' : isRunning ? t('gateway.agentChat.sterSend') : t('gateway.agentChat.sendWithShortcut')}
             </button>
           </div>
           <p className="mt-1.5 text-[10px] text-neutral-400">
             {isRunning
-              ? 'Agent is running. Messages are sent as steering directives.'
-              : 'Agent is idle. Messages start a new conversation turn.'}
+              ? t('gateway.agentChat.runningHint')
+              : t('gateway.agentChat.idleHint')}
           </p>
         </div>
       </div>

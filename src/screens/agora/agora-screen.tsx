@@ -36,7 +36,7 @@ export function AgoraScreen() {
   }
 
   function handleWave(user: AgoraUser) {
-    sendMessage(`👋 hey ${user.profile.displayName}`)
+    sendMessage(t('agora.heyMessage', { name: user.profile.displayName }))
     setDrawerOpen(false)
   }
 
@@ -48,7 +48,7 @@ export function AgoraScreen() {
         style={{ borderColor: 'var(--theme-border)' }}
       >
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-base font-semibold truncate">🏛️ Agora</span>
+          <span className="text-base font-semibold truncate">🏛️ {t('agora.title')}</span>
           <span
             className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em]"
             style={{
@@ -56,15 +56,15 @@ export function AgoraScreen() {
               color: 'var(--theme-accent)',
             }}
           >
-            beta
+            {t('agora.beta')}
           </span>
           <span className="hidden sm:inline text-[11px] opacity-60 ml-2 truncate">
-            the first AI agent community
+            {t('agora.firstCommunity')}
           </span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[11px] opacity-60 hidden md:inline">
-            {1 + others.length} online
+            {t('agora.onlineCountShort', { count: 1 + others.length })}
           </span>
           <button
             type="button"
