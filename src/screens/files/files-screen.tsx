@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Markdown } from '@/components/prompt-kit/markdown'
+import { t, getLocale } from '@/lib/i18n'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Types
@@ -40,6 +41,7 @@ type FilesListResponse = {
 export const FILE_BROWSER_MODE_LABEL = 'Server workspace'
 export const FILE_BROWSER_REMOTE_HELP =
   'Files are loaded from the Workspace server via /api/files, so remote deployments show files created by the agent.'
+// i18n keys: files.serverWorkspaceLabel / files.serverWorkspaceHelp
 
 type FileReadResponse = {
   type: 'text' | 'image'
@@ -140,7 +142,7 @@ function formatBytes(bytes: number): string {
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
-  return d.toLocaleString(undefined, {
+  return d.toLocaleString(getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -428,24 +430,24 @@ function DiffModal({
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-primary-200 dark:border-neutral-800 px-5 py-3">
             <div className="min-w-0">
               <DialogTitle className="text-sm font-semibold text-primary-900 dark:text-neutral-100 truncate">
-                Review changes — {fileName}
+                {t('files.reviewChanges', { fileName })}
               </DialogTitle>
               <DialogDescription className="mt-0.5 text-xs text-primary-500 dark:text-neutral-400">
                 <span className="text-emerald-600 font-medium">
-                  +{addedCount} added
+                  {t('files.addedCount', { count: addedCount })}
                 </span>
                 {' · '}
                 <span className="text-red-600 font-medium">
-                  −{removedCount} removed
+                  {t('files.removedCount', { count: removedCount })}
                 </span>
               </DialogDescription>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Button variant="outline" size="sm" onClick={onCancel}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button size="sm" onClick={onSave}>
-                Save anyway
+                {t('files.saveAnyway')}
               </Button>
             </div>
           </div>
@@ -455,7 +457,7 @@ function DiffModal({
             {/* Left — original */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
               <div className="shrink-0 px-3 py-1.5 text-[11px] font-semibold text-primary-500 dark:text-neutral-400 bg-primary-100/60 dark:bg-neutral-900/60 border-b border-primary-200 dark:border-neutral-800 uppercase tracking-wide">
-                Original
+                {t('files.originalColumn')}
               </div>
               <div className="flex-1 overflow-auto">
                 <div className="font-mono text-[11px] leading-relaxed">
@@ -501,7 +503,7 @@ function DiffModal({
             {/* Right — new */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
               <div className="shrink-0 px-3 py-1.5 text-[11px] font-semibold text-primary-500 dark:text-neutral-400 bg-primary-100/60 dark:bg-neutral-900/60 border-b border-primary-200 dark:border-neutral-800 uppercase tracking-wide">
-                New
+                {t('files.newColumn')}
               </div>
               <div className="flex-1 overflow-auto">
                 <div className="font-mono text-[11px] leading-relaxed">
@@ -646,7 +648,7 @@ function Breadcrumb({ path }: { path: string }) {
   const parts = path ? path.split('/').filter(Boolean) : []
   return (
     <div className="flex items-center gap-1 truncate text-xs text-primary-500 dark:text-neutral-400 min-w-0">
-      <span className="shrink-0">workspace</span>
+      <span className="shrink-0">{t('files.workspaceLabel')}</span>
       {parts.map((part, i) => (
         <span key={i} className="flex items-center gap-1 min-w-0">
           <span className="shrink-0 text-primary-300 dark:text-neutral-600">
@@ -794,7 +796,7 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
         <div className="flex h-full items-center justify-center text-center text-primary-400 dark:text-neutral-600">
           <div>
             <div className="text-5xl mb-3 opacity-40">📂</div>
-            <p className="text-sm">Select a file to preview or edit</p>
+            <p className="text-sm">{t('files.selectToPreview')}</p>
           </div>
         </div>
       </>
@@ -810,7 +812,7 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
             <div className="text-5xl mb-3 opacity-40">📁</div>
             <p className="text-sm font-medium">{selectedEntry.name}</p>
             <p className="text-xs mt-1 opacity-70">
-              Select a file inside to preview
+              {t('files.selectInsideToPreview')}
             </p>
           </div>
         </div>
@@ -835,7 +837,13 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
             variant="outline"
             onClick={() => setRawMode((v) => !v)}
           >
-            {rawMode ? (isHtml ? 'Preview HTML' : 'Preview') : (isHtml ? 'Raw HTML' : 'Raw')}
+            {rawMode
+              ? isHtml
+                ? t('files.previewHtml')
+                : t('files.preview')
+              : isHtml
+                ? t('files.rawHtml')
+                : t('files.raw')}
           </Button>
         )}
         {isEditable && (
@@ -845,7 +853,11 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
             disabled={!dirty || saving}
             onClick={handleSave}
           >
-            {saving ? 'Saving…' : savedOk ? '✓ Saved' : 'Save'}
+            {saving
+              ? t('common.saving')
+              : savedOk
+                ? t('files.savedCheck')
+                : t('common.save')}
           </Button>
         )}
       </div>
@@ -858,10 +870,10 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
         <span>{formatBytes(selectedEntry.size)}</span>
       )}
       {selectedEntry.modifiedAt && (
-        <span>Modified {formatDate(selectedEntry.modifiedAt)}</span>
+        <span>{t('files.modifiedAt', { time: formatDate(selectedEntry.modifiedAt) })}</span>
       )}
       {dirty && (
-        <span className="text-accent-500 font-medium">Unsaved changes</span>
+        <span className="text-accent-500 font-medium">{t('common.unsavedChanges')}</span>
       )}
     </div>
   )
@@ -875,7 +887,7 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
         <div className="flex h-full flex-col">
           {header}
           <div className="flex flex-1 items-center justify-center text-sm text-primary-400 dark:text-neutral-500">
-            Loading…
+            {t('files.loading')}
           </div>
           {footer}
         </div>
@@ -914,7 +926,7 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
                 className="max-h-full max-w-full rounded-lg border border-primary-200 dark:border-neutral-800 shadow-sm object-contain"
               />
             ) : (
-              <div className="text-sm text-primary-400">No preview</div>
+              <div className="text-sm text-primary-400">{t('files.noPreview')}</div>
             )}
           </div>
           {footer}
@@ -958,7 +970,7 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
           {header}
           <div className="min-h-0 flex-1 bg-white">
             <iframe
-              title={`HTML preview: ${selectedEntry.name}`}
+              title={t('files.htmlPreviewTitle', { name: selectedEntry.name })}
               srcDoc={content}
               sandbox="allow-same-origin"
               className="h-full w-full border-0 bg-white"
@@ -1033,7 +1045,7 @@ function FilePanel({ selectedEntry }: FilePanelProps) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 export function FilesScreen() {
-  usePageTitle('Files')
+  usePageTitle(t('files.title'))
 
   const [entries, setEntries] = useState<Array<FileEntry>>([])
   const [treeLoading, setTreeLoading] = useState(false)
@@ -1064,9 +1076,7 @@ export function FilesScreen() {
       setEntries(Array.isArray(data.entries) ? data.entries : [])
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
-        setTreeError(
-          'Could not load files — request timed out. Check that HERMES_WORKSPACE_DIR is set.',
-        )
+        setTreeError(t('files.loadTimeout'))
       } else {
         setTreeError(err instanceof Error ? err.message : String(err))
       }
@@ -1216,7 +1226,7 @@ export function FilesScreen() {
             <button
               type="button"
               onClick={openNewFolderPrompt}
-              title="New folder"
+              title={t('files.newFolder')}
               className="rounded p-1 text-sm text-primary-400 hover:bg-primary-200 dark:hover:bg-neutral-800 hover:text-primary-600 dark:hover:text-neutral-300 transition-colors leading-none"
             >
               📁+
@@ -1224,7 +1234,7 @@ export function FilesScreen() {
             <button
               type="button"
               onClick={() => void loadTree()}
-              title="Refresh"
+              title={t('common.refresh')}
               className="rounded p-1 text-lg text-primary-400 hover:bg-primary-200 dark:hover:bg-neutral-800 hover:text-primary-600 dark:hover:text-neutral-300 transition-colors leading-none"
             >
               ↺
@@ -1237,24 +1247,24 @@ export function FilesScreen() {
           <ScrollAreaViewport className="px-1 py-1">
             <div className="mx-2 mb-2 rounded-md border border-primary-200 bg-white/70 px-2 py-1.5 text-[11px] text-primary-500 dark:border-neutral-800 dark:bg-neutral-950/40 dark:text-neutral-400">
               <span className="font-medium text-primary-700 dark:text-neutral-200">
-                {FILE_BROWSER_MODE_LABEL}
+                {t('files.serverWorkspaceLabel')}
               </span>{' '}
-              · {FILE_BROWSER_REMOTE_HELP}
+              · {t('files.serverWorkspaceHelp')}
             </div>
             {treeLoading ? (
               <div className="px-3 py-2 text-xs text-primary-400 dark:text-neutral-500">
-                Loading server workspace…
+                {t('files.loadingServerWorkspace')}
               </div>
             ) : treeError ? (
               <div className="space-y-1 px-3 py-2 text-xs text-red-500">
                 <div>{treeError}</div>
                 <div className="text-primary-400 dark:text-neutral-500">
-                  Check the server workspace catalog or HERMES_WORKSPACE_DIR; this browser no longer needs local folder access.
+                  {t('files.serverCatalogHint')}
                 </div>
               </div>
             ) : entries.length === 0 ? (
               <div className="px-3 py-2 text-xs text-primary-400 dark:text-neutral-500">
-                Server workspace is empty. Agent-created files will appear here after they are written to the configured workspace path.
+                {t('files.serverWorkspaceEmpty')}
               </div>
             ) : (
               entries
@@ -1306,7 +1316,7 @@ export function FilesScreen() {
               setContextMenu(null)
             }}
           >
-            ✏️ Rename
+            ✏️ {t('files.contextRename')}
           </button>
           {contextMenu.entry.type === 'folder' ? (
             <button
@@ -1320,7 +1330,7 @@ export function FilesScreen() {
                 setContextMenu(null)
               }}
             >
-              📁 New folder inside
+              📁 {t('files.newFolderInside')}
             </button>
           ) : (
             <button
@@ -1330,7 +1340,7 @@ export function FilesScreen() {
                 setContextMenu(null)
               }}
             >
-              ⬇️ Download
+              ⬇️ {t('files.downloadAction')}
             </button>
           )}
           <button
@@ -1340,7 +1350,7 @@ export function FilesScreen() {
               setContextMenu(null)
             }}
           >
-            🗑️ Delete
+            🗑️ {t('files.deleteAction')}
           </button>
         </div>
       ) : null}
@@ -1355,12 +1365,14 @@ export function FilesScreen() {
         <DialogContent>
           <div className="p-5 space-y-3">
             <DialogTitle>
-              {promptState?.mode === 'rename' ? 'Rename' : 'New Folder'}
+              {promptState?.mode === 'rename'
+                ? t('files.renameTitle')
+                : t('files.newFolderTitle')}
             </DialogTitle>
             <DialogDescription>
               {promptState?.mode === 'rename'
-                ? 'Enter a new name.'
-                : 'Enter a folder name to create.'}
+                ? t('files.renameDesc')
+                : t('files.newFolderPromptDesc')}
             </DialogDescription>
             <input
               value={promptValue}
@@ -1372,8 +1384,8 @@ export function FilesScreen() {
               autoFocus
             />
             <div className="flex justify-end gap-2 pt-2">
-              <DialogClose render={<Button variant="outline">Cancel</Button>} />
-              <Button onClick={() => void handlePromptSubmit()}>Save</Button>
+              <DialogClose render={<Button variant="outline">{t('files.cancel')}</Button>} />
+              <Button onClick={() => void handlePromptSubmit()}>{t('files.save')}</Button>
             </div>
           </div>
         </DialogContent>
@@ -1389,22 +1401,24 @@ export function FilesScreen() {
         <DialogContent>
           <div className="p-5 space-y-3">
             <DialogTitle>
-              Delete {deleteConfirm?.type === 'folder' ? 'Folder' : 'File'}
+              {deleteConfirm?.type === 'folder'
+                ? t('files.deleteFolderTitle')
+                : t('files.deleteFileTitle')}
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete{' '}
+              {t('files.deletePromptText', { name: deleteConfirm?.name ?? '' })}{' '}
               <strong>{deleteConfirm?.name}</strong>?
               {deleteConfirm?.type === 'folder' &&
-                ' This will delete all contents inside.'}{' '}
-              This action cannot be undone.
+                ` ${t('files.deleteFolderContents')}`}{' '}
+              {t('files.cannotBeUndone')}
             </DialogDescription>
             <div className="flex justify-end gap-2 pt-2">
-              <DialogClose render={<Button variant="outline">Cancel</Button>} />
+              <DialogClose render={<Button variant="outline">{t('files.cancel')}</Button>} />
               <Button
                 variant="destructive"
                 onClick={() => void handleDeleteConfirmed()}
               >
-                Delete
+                {t('files.delete')}
               </Button>
             </div>
           </div>

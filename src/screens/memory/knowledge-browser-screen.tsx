@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 
 type WikiPageMeta = {
   path: string
@@ -110,7 +111,7 @@ function formatDate(value?: string): string | null {
   if (!value) return null
   const parsed = Date.parse(value)
   if (Number.isNaN(parsed)) return value
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -436,7 +437,7 @@ export function KnowledgeBrowserScreen() {
               <input
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                placeholder="Search knowledge"
+                placeholder={t('memory.searchKnowledge')}
                 className="w-full rounded-xl py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent-500"
                 style={{
                   border: '1px solid var(--theme-border)',
@@ -458,7 +459,7 @@ export function KnowledgeBrowserScreen() {
             }}
           >
             <HugeiconsIcon icon={Link01Icon} size={16} strokeWidth={1.7} />
-            Graph view
+            {t('memory.graphView')}
           </button>
 
           <DialogRoot open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -469,10 +470,10 @@ export function KnowledgeBrowserScreen() {
                 backgroundColor: 'var(--theme-card)',
                 color: 'var(--theme-text)',
               }}
-              title="Knowledge base settings"
+              title={t('memory.knowledgeSettings')}
             >
               <HugeiconsIcon icon={Settings01Icon} size={16} strokeWidth={1.7} />
-              <span className="hidden sm:inline">Settings</span>
+              <span className="hidden sm:inline">{t('common.edit')}</span>
             </DialogTrigger>
             <DialogContent
               className="sm:max-w-md"
@@ -485,15 +486,15 @@ export function KnowledgeBrowserScreen() {
               <div className="space-y-4">
                 <div>
                   <DialogTitle className="text-base font-semibold">
-                    Knowledge Base Settings
+                    {t('memory.knowledgeSettingsTitle')}
                   </DialogTitle>
                   <DialogDescription className="mt-1 text-sm" style={{ color: 'var(--theme-muted)' }}>
-                    Choose where your knowledge base is located. Changes take effect immediately.
+                    {t('memory.knowledgeSettingsDesc')}
                   </DialogDescription>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Source type</label>
+                  <label className="text-sm font-medium">{t('memory.sourceType')}</label>
                   <div className="flex gap-3">
                     <button
                       type="button"
@@ -517,7 +518,7 @@ export function KnowledgeBrowserScreen() {
                       }}
                     >
                       <HugeiconsIcon icon={Folder01Icon} size={16} strokeWidth={1.7} />
-                      Local folder
+                      {t('memory.localFolder')}
                     </button>
                     <button
                       type="button"
@@ -543,7 +544,7 @@ export function KnowledgeBrowserScreen() {
                       }}
                     >
                       <HugeiconsIcon icon={CodeIcon} size={16} strokeWidth={1.7} />
-                      GitHub repo
+                      {t('memory.githubRepo')}
                     </button>
                   </div>
                 </div>
@@ -551,7 +552,7 @@ export function KnowledgeBrowserScreen() {
                 {settingsSource?.type === 'local' && (
                   <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="kb-local-path">
-                      Folder path
+                      {t('memory.folderPath')}
                     </label>
                     <input
                       id="kb-local-path"
@@ -564,7 +565,7 @@ export function KnowledgeBrowserScreen() {
                             : prev,
                         )
                       }
-                      placeholder="~/my-wiki or /absolute/path"
+                      placeholder={t('memory.folderPathPlaceholder')}
                       className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
                       style={{
                         borderColor: 'var(--theme-border)',
@@ -579,7 +580,7 @@ export function KnowledgeBrowserScreen() {
                   <div className="space-y-3">
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium" htmlFor="kb-gh-repo">
-                        Repository
+                        {t('memory.repository')}
                       </label>
                       <input
                         id="kb-gh-repo"
@@ -592,7 +593,7 @@ export function KnowledgeBrowserScreen() {
                               : prev,
                           )
                         }
-                        placeholder="owner/repo (e.g. dontcallmejames/my-wiki)"
+                        placeholder={t('memory.repositoryPlaceholder')}
                         className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
                         style={{
                           borderColor: 'var(--theme-border)',
@@ -604,7 +605,7 @@ export function KnowledgeBrowserScreen() {
                     <div className="flex gap-3">
                       <div className="flex-1 space-y-1.5">
                         <label className="text-sm font-medium" htmlFor="kb-gh-branch">
-                          Branch
+                          {t('memory.branch')}
                         </label>
                         <input
                           id="kb-gh-branch"
@@ -617,7 +618,7 @@ export function KnowledgeBrowserScreen() {
                                 : prev,
                             )
                           }
-                          placeholder="main"
+                          placeholder={t('memory.branchPlaceholder')}
                           className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
                           style={{
                             borderColor: 'var(--theme-border)',
@@ -628,7 +629,7 @@ export function KnowledgeBrowserScreen() {
                       </div>
                       <div className="flex-1 space-y-1.5">
                         <label className="text-sm font-medium" htmlFor="kb-gh-path">
-                          Sub-folder
+                          {t('memory.subFolder')}
                         </label>
                         <input
                           id="kb-gh-path"
@@ -641,7 +642,7 @@ export function KnowledgeBrowserScreen() {
                                 : prev,
                             )
                           }
-                          placeholder="wiki (optional)"
+                          placeholder={t('memory.subFolderPlaceholder')}
                           className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
                           style={{
                             borderColor: 'var(--theme-border)',
@@ -684,7 +685,7 @@ export function KnowledgeBrowserScreen() {
                           }
                         } catch (err) {
                           setSyncError(
-                            err instanceof Error ? err.message : 'Sync failed',
+                            err instanceof Error ? err.message : t('memory.syncFailed'),
                           )
                         } finally {
                           setSyncing(false)
@@ -697,7 +698,7 @@ export function KnowledgeBrowserScreen() {
                         color: 'var(--theme-text)',
                       }}
                     >
-                      {syncing ? 'Syncing…' : 'Sync now'}
+                      {syncing ? t('memory.syncing') : t('memory.syncNow')}
                     </button>
                   )}
                   <button
@@ -723,7 +724,7 @@ export function KnowledgeBrowserScreen() {
                     }}
                     className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-600"
                   >
-                    Save
+                    {t('common.save')}
                   </button>
                 </div>
               </div>
@@ -740,7 +741,7 @@ export function KnowledgeBrowserScreen() {
             onClick={() => setMobileTreeOpen((value) => !value)}
           >
             <span className="text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-neutral-400">
-              Knowledge Pages ({filteredPages.length})
+              {t('memory.knowledgePages', { count: filteredPages.length })}
             </span>
             <span className="text-primary-500 dark:text-neutral-400 md:hidden">
               <HugeiconsIcon
@@ -758,13 +759,13 @@ export function KnowledgeBrowserScreen() {
           ) : searchTerm ? (
             <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
               <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-primary-400 dark:text-neutral-500">
-                Search Results
+                {t('memory.searchResults')}
               </div>
               <div className="space-y-1">
                 {searchQuery.isLoading ? (
-                  <StateBox label="Searching knowledge..." />
+                  <StateBox label={t('memory.searchingKnowledge')} />
                 ) : searchResults.length === 0 ? (
-                  <StateBox label="No matches found" />
+                  <StateBox label={t('memory.noMatchesFound')} />
                 ) : (
                   searchResults.map((result, index) => (
                     <button
@@ -809,11 +810,11 @@ export function KnowledgeBrowserScreen() {
               <div className="space-y-3 overflow-y-auto pr-1 md:h-full">
                 <section className="rounded-xl border border-primary-200 bg-primary-50/80 p-2 dark:border-neutral-800 dark:bg-neutral-900/60">
                   <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-primary-400 dark:text-neutral-500">
-                    Tags
+                    {t('memory.tags')}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     <TagPill
-                      label="All"
+                      label={t('memory.all')}
                       count={pages.length}
                       active={selectedTag == null}
                       onClick={() => setSelectedTag(null)}
@@ -832,15 +833,15 @@ export function KnowledgeBrowserScreen() {
 
                 <section className="rounded-xl border border-primary-200 bg-primary-50/80 p-1 dark:border-neutral-800 dark:bg-neutral-900/60">
                   {listQuery.isLoading ? (
-                    <StateBox label="Loading knowledge pages..." />
+                    <StateBox label={t('memory.loadingKnowledgePages')} />
                   ) : listQuery.error instanceof Error ? (
                     <StateBox label={listQuery.error.message} error />
                   ) : filteredPages.length === 0 ? (
                     <StateBox
                       label={
                         selectedTag
-                          ? 'No pages match this tag'
-                          : 'No markdown pages found'
+                          ? t('memory.noPagesMatchTag')
+                          : t('memory.noMarkdownPages')
                       }
                     />
                   ) : (
@@ -860,7 +861,7 @@ export function KnowledgeBrowserScreen() {
           <div className="flex items-center justify-between border-b border-primary-200 px-3 py-2 dark:border-neutral-800">
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-primary-900 dark:text-neutral-100">
-                {page?.title || selectedPath || 'Select a page'}
+                {page?.title || selectedPath || t('memory.selectPage')}
               </div>
               {page ? (
                 <div className="text-xs text-primary-400 dark:text-neutral-500">
@@ -879,26 +880,26 @@ export function KnowledgeBrowserScreen() {
                   size={14}
                   strokeWidth={1.7}
                 />
-                Ask agent about this
+                {t('memory.askAgentAboutThis')}
               </a>
             ) : null}
           </div>
 
           <div className="h-full overflow-auto p-2 md:p-3">
             {listQuery.isLoading ? (
-              <StateBox label="Loading knowledge base..." />
+              <StateBox label={t('memory.loadingKnowledgeBase')} />
             ) : listQuery.error instanceof Error ? (
               <StateBox label={listQuery.error.message} error />
             ) : !knowledgeExists ? (
               <EmptyKnowledgeState knowledgeRoot={knowledgeRoot} />
             ) : !selectedPath ? (
-              <StateBox label="Select a page to start browsing" />
+              <StateBox label={t('memory.selectPageToBrowse')} />
             ) : readQuery.isLoading ? (
-              <StateBox label="Loading page..." />
+              <StateBox label={t('memory.loadingPage')} />
             ) : readQuery.error instanceof Error ? (
               <StateBox label={readQuery.error.message} error />
             ) : !page ? (
-              <StateBox label="Page not found" error />
+              <StateBox label={t('memory.pageNotFound')} error />
             ) : (
               <div
                 className="rounded-xl"
@@ -912,7 +913,7 @@ export function KnowledgeBrowserScreen() {
                     {focusedResult && focusedResult.path === page.path ? (
                       <div className="rounded-xl border border-yellow-300/40 bg-yellow-300/10 px-3 py-2 text-sm text-primary-900 dark:text-yellow-50">
                         <div className="font-medium">
-                          Search hit at line {focusLine}
+                          {t('memory.searchHitLine', { line: focusLine ?? 0 })}
                         </div>
                         <div className="mt-1 text-xs opacity-80">
                           {focusedResult.text}
@@ -976,11 +977,11 @@ export function KnowledgeBrowserScreen() {
                           size={16}
                           strokeWidth={1.7}
                         />
-                        Backlinks
+                        {t('memory.backlinks')}
                       </div>
                       {backlinks.length === 0 ? (
                         <div className="text-sm text-primary-500 dark:text-neutral-400">
-                          No pages link here yet.
+                          {t('memory.noBacklinks')}
                         </div>
                       ) : (
                         <div className="flex flex-wrap gap-2">
@@ -1004,26 +1005,26 @@ export function KnowledgeBrowserScreen() {
                   </div>
 
                   <aside className="space-y-3">
-                    <MetadataCard label="Type" value={page.type} />
-                    <MetadataCard label="Domain" value={page.domain} />
-                    <MetadataCard label="Status" value={page.status} />
+                    <MetadataCard label={t('memory.metadataType')} value={page.type} />
+                    <MetadataCard label={t('memory.metadataDomain')} value={page.domain} />
+                    <MetadataCard label={t('memory.metadataStatus')} value={page.status} />
                     <MetadataCard
-                      label="Created"
+                      label={t('memory.metadataCreated')}
                       value={formatDate(page.created)}
                     />
                     <MetadataCard
-                      label="Updated"
+                      label={t('memory.metadataUpdated')}
                       value={formatDate(page.updated || page.modified)}
                     />
-                    <MetadataCard label="Size" value={formatBytes(page.size)} />
+                    <MetadataCard label={t('memory.metadataSize')} value={formatBytes(page.size)} />
                     <div className="rounded-xl border border-primary-200 bg-primary-50/70 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
                       <div className="text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-neutral-400">
-                        Tags
+                        {t('memory.tags')}
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {page.tags.length === 0 ? (
                           <span className="text-sm text-primary-500 dark:text-neutral-400">
-                            No tags
+                            {t('memory.noTags')}
                           </span>
                         ) : (
                           page.tags.map((tag) => (
@@ -1046,11 +1047,11 @@ export function KnowledgeBrowserScreen() {
                           size={14}
                           strokeWidth={1.7}
                         />
-                        Wikilinks
+                        {t('memory.wikilinks')}
                       </div>
                       {page.wikilinks.length === 0 ? (
                         <div className="text-sm text-primary-500 dark:text-neutral-400">
-                          No outbound links
+                          {t('memory.noOutboundLinks')}
                         </div>
                       ) : (
                         <div className="flex flex-wrap gap-2">
@@ -1081,19 +1082,18 @@ export function KnowledgeBrowserScreen() {
       <DialogRoot open={graphOpen} onOpenChange={setGraphOpen}>
         <DialogContent className="w-[min(980px,94vw)] max-w-none p-0">
           <div className="border-b border-primary-200 px-5 py-4 dark:border-neutral-800">
-            <DialogTitle>Knowledge graph</DialogTitle>
+            <DialogTitle>{t('memory.knowledgeGraph')}</DialogTitle>
             <DialogDescription>
-              Page relationships from wiki links. Click any node to open that
-              page.
+              {t('memory.knowledgeGraphDesc')}
             </DialogDescription>
           </div>
           <div className="p-5">
             {graphQuery.isLoading ? (
-              <StateBox label="Loading graph..." />
+              <StateBox label={t('memory.loadingGraph')} />
             ) : graphQuery.error instanceof Error ? (
               <StateBox label={graphQuery.error.message} error />
             ) : (graphQuery.data?.nodes?.length ?? 0) === 0 ? (
-              <StateBox label="No graph data yet" />
+              <StateBox label={t('memory.noGraphData')} />
             ) : (
               <GraphCanvas
                 nodes={graphQuery.data?.nodes ?? []}
@@ -1240,10 +1240,10 @@ function EmptyKnowledgeState({ knowledgeRoot }: { knowledgeRoot: string }) {
   return (
     <div className="flex min-h-32 flex-col justify-center rounded-xl border border-primary-200 bg-primary-50 px-4 py-5 text-sm text-primary-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-300">
       <div className="text-base font-semibold text-primary-900 dark:text-neutral-100">
-        No knowledge base found
+        {t('memory.noKnowledgeBase')}
       </div>
       <p className="mt-2 text-pretty">
-        Create markdown files in <code>{knowledgeRoot}</code> to get started.
+        {t('memory.createMarkdown', { root: knowledgeRoot })}
       </p>
       <a
         href="https://karpathy.ai/"
@@ -1252,7 +1252,7 @@ function EmptyKnowledgeState({ knowledgeRoot }: { knowledgeRoot: string }) {
         className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary-900 underline decoration-primary-300 underline-offset-4 hover:decoration-primary-500 dark:text-neutral-100"
       >
         <HugeiconsIcon icon={Link01Icon} size={14} strokeWidth={1.7} />
-        See the Karpathy LLM wiki pattern
+        {t('memory.karpathyPattern')}
       </a>
     </div>
   )

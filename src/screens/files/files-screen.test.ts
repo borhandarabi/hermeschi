@@ -10,7 +10,7 @@ describe('FilesScreen remote workspace mode', () => {
 
     expect(source).toContain('Server workspace')
     expect(source).toContain('Files are loaded from the Workspace server via /api/files')
-    expect(source).toContain('Agent-created files will appear here')
+    expect(source).toContain("t('files.serverWorkspaceEmpty')")
     expect(source).not.toContain('showDirectoryPicker')
     expect(source).not.toContain('No workspace selected')
   })
