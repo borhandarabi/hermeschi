@@ -3,7 +3,7 @@ import {
   confirmReservation,
   createSupabaseReservationStore,
   ReservationValidationError,
-} from '@/server/name-reservations'
+} from '@/modules/hermesworld/server/name-reservations'
 import { safeErrorMessage } from '@/server/rate-limit'
 
 export const Route = createFileRoute('/api/hermesworld/reservations/confirm')({

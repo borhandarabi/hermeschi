@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { t, type TranslationKey } from '@/lib/i18n'
+import { GAME_BUILD_ENABLED } from '@/lib/game-flag'
 
 export type SettingsNavId =
   | 'connection'
@@ -12,6 +13,7 @@ export type SettingsNavId =
   | 'chat'
   | 'notifications'
   | 'language'
+  | 'game'
 
 type NavItem = { id: SettingsNavId; labelKey: TranslationKey }
 
@@ -25,6 +27,8 @@ export const SETTINGS_NAV_ITEMS: Array<NavItem> = [
   { id: 'chat', labelKey: 'settingsSidebar.chat' },
   { id: 'notifications', labelKey: 'settingsSidebar.notifications' },
   { id: 'language', labelKey: 'settingsSidebar.language' },
+  // Game section only shows when build-time flag is enabled
+  ...(GAME_BUILD_ENABLED ? [{ id: 'game' as const, labelKey: 'settingsSidebar.game' as TranslationKey }] : []),
 ]
 
 type ItemRendererArgs = {

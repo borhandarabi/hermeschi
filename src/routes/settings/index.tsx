@@ -34,6 +34,7 @@ import { Switch } from '@/components/ui/switch'
 import { useSettings } from '@/hooks/use-settings'
 import { LOCALE_LABELS, setLocale, t, type TranslationKey } from '@/lib/i18n'
 import { useLocaleDirection } from '@/hooks/use-locale-direction'
+import { GAME_BUILD_ENABLED, isGameRuntimeEnabled, setGameRuntimeEnabled } from '@/lib/game-flag'
 import { THEMES, getTheme, isDarkTheme, setTheme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
 import {
@@ -541,6 +542,10 @@ function SettingsRoute() {
                 </select>
               </SettingsRow>
             </SettingsSection>
+          )}
+
+          {GAME_BUILD_ENABLED && activeSection === ('game' as SettingsSectionId) && (
+            <GameSection />
           )}
 
           {activeSection === 'notifications' && (
@@ -3011,6 +3016,31 @@ function ConnectionSection() {
         <code>API_SERVER_HOST=0.0.0.0</code>{' '}
         {t('settings.connection.tailscaleTipBody4')}
       </div>
+    </SettingsSection>
+  )
+}
+
+function GameSection() {
+  const [gameEnabled, setGameEnabled] = useState(isGameRuntimeEnabled())
+  return (
+    <SettingsSection
+      title={t('settings.game.title')}
+      description={t('settings.game.desc')}
+      icon={Settings02Icon}
+    >
+      <SettingsRow
+        label={t('settings.game.enable')}
+        description={t('settings.game.enableDesc')}
+      >
+        <Switch
+          checked={gameEnabled}
+          onCheckedChange={(checked) => {
+            setGameEnabled(checked)
+            setGameRuntimeEnabled(checked)
+          }}
+          aria-label={t('settings.game.enable')}
+        />
+      </SettingsRow>
     </SettingsSection>
   )
 }

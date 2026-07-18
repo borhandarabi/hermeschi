@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { usePageTitle } from '@/hooks/use-page-title'
-import { t } from '@/lib/i18n'
-import { HermesWorldLanding } from '@/screens/playground/hermes-world-landing'
+import { lazy, Suspense } from 'react'
+import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
+
+const HermesWorldLanding = GAME_BUILD_ENABLED
+  ? lazy(() => import('@/modules/hermesworld/screens/playground/hermes-world-landing').then((m) => ({ default: m.HermesWorldLanding })))
+  : null
 
 export const Route = createFileRoute('/world')({
   ssr: false,
@@ -9,6 +12,12 @@ export const Route = createFileRoute('/world')({
 })
 
 function WorldRoute() {
-  usePageTitle(t('hermesWorld.title'))
-  return <HermesWorldLanding />
+  if (!GAME_BUILD_ENABLED || !isGameRuntimeEnabled()) {
+    return <main className="flex h-full items-center justify-center p-8" />
+  }
+  return (
+    <Suspense fallback={null}>
+      <HermesWorldLanding! />
+    </Suspense>
+  )
 }

@@ -38,6 +38,7 @@ import { SidebarSessions } from './sidebar/sidebar-sessions'
 import type { ChatOpenSettingsDetail } from '../chat-events'
 import type { SessionMeta } from '../types'
 import { t } from '@/lib/i18n'
+import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 import { SettingsDialog } from '@/components/settings-dialog'
 import {
   TooltipContent,
@@ -1050,10 +1051,8 @@ function ChatSidebarComponent({
         </div>
       )}
 
-      {/* ── HermesWorld featured link (gold castle, NEW badge) ────── */}
-      {/* Hide when VITE_HERMESWORLD_ENABLED is explicitly '0' */}
-      {!isVisuallyCollapsed &&
-        (import.meta as any).env?.VITE_HERMESWORLD_ENABLED !== '0' && (
+      {/* ── HermesWorld featured link (only when game build is enabled) ── */}
+      {GAME_BUILD_ENABLED && isGameRuntimeEnabled() && !isVisuallyCollapsed && (
         <div className="px-2 pb-2">
           <Link
             to="/playground"
@@ -1075,7 +1074,7 @@ function ChatSidebarComponent({
             />
             <span>{t('chat.sidebar.hermesWorld')}</span>
             <span
-              className="ml-auto inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold leading-none"
+              className="ms-auto inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold leading-none"
               style={{
                 background:
                   'linear-gradient(180deg, #fde68a 0%, #fbbf24 50%, #d4a017 100%)',
