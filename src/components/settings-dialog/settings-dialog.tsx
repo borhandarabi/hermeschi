@@ -376,7 +376,7 @@ function HermesContent() {
   }, [])
 
   useEffect(() => {
-    fetch('/api/hermes-config')
+    fetch('/api/hermeschi-config')
       .then((r) => r.json())
       .then((d: any) => {
         setActiveProvider(d.activeProvider || '')
@@ -407,7 +407,7 @@ function HermesContent() {
   }, [])
 
   const refreshConfig = async () => {
-    const ref = await fetch('/api/hermes-config')
+    const ref = await fetch('/api/hermeschi-config')
     const d = await ref.json()
     setDefaultProvider(d.activeProvider || '')
     setDefaultModelId(d.activeModel || '')
@@ -434,7 +434,7 @@ function HermesContent() {
     setSaving(true)
     setMsg(null)
     try {
-      const res = await fetch('/api/hermes-config', {
+      const res = await fetch('/api/hermeschi-config', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -2093,7 +2093,7 @@ function AgentBehaviorContent() {
   const [msg, setMsg] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/hermes-config')
+    fetch('/api/hermeschi-config')
       .then((r) => r.json())
       .then((d: any) => {
         setConfig((d.config?.agent as Record<string, unknown>) || {})
@@ -2104,7 +2104,7 @@ function AgentBehaviorContent() {
   const save = async (key: string, value: unknown) => {
     setMsg(null)
     try {
-      await fetch('/api/hermes-config', {
+      await fetch('/api/hermeschi-config', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: { agent: { [key]: value } } }),
@@ -2183,7 +2183,7 @@ function VoiceContent() {
   const [msg, setMsg] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/hermes-config')
+    fetch('/api/hermeschi-config')
       .then((r) => r.json())
       .then((d: any) => {
         setTts((d.config?.tts as Record<string, unknown>) || {})
@@ -2195,7 +2195,7 @@ function VoiceContent() {
   const saveTts = async (key: string, value: unknown) => {
     setMsg(null)
     try {
-      await fetch('/api/hermes-config', {
+      await fetch('/api/hermeschi-config', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: { tts: { [key]: value } } }),
@@ -2211,7 +2211,7 @@ function VoiceContent() {
   const saveStt = async (key: string, value: unknown) => {
     setMsg(null)
     try {
-      await fetch('/api/hermes-config', {
+      await fetch('/api/hermeschi-config', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: { stt: { [key]: value } } }),
@@ -2353,7 +2353,7 @@ function DisplayContent() {
   const [msg, setMsg] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/hermes-config')
+    fetch('/api/hermeschi-config')
       .then((r) => r.json())
       .then((d: any) => {
         setConfig((d.config?.display as Record<string, unknown>) || {})
@@ -2364,7 +2364,7 @@ function DisplayContent() {
   const save = async (key: string, value: unknown) => {
     setMsg(null)
     try {
-      await fetch('/api/hermes-config', {
+      await fetch('/api/hermeschi-config', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: { display: { [key]: value } } }),
@@ -2526,7 +2526,7 @@ export function SettingsDialog({
                 Settings
               </DialogTitle>
               <DialogDescription className="sr-only">
-                Configure Hermes Workspace
+                Configure HermesChi
               </DialogDescription>
             </div>
             <DialogClose

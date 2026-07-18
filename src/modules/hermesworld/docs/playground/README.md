@@ -19,8 +19,8 @@ So **Hermes turns onboarding into a multiplayer RPG world**. You don't read abou
 ## Try it
 
 ```bash
-git clone https://github.com/outsourc-e/hermes-workspace
-cd hermes-workspace
+git clone https://github.com/outsourc-e/hermeschi
+cd hermeschi
 pnpm install
 pnpm dev
 # open http://localhost:3001/playground in two browser tabs
@@ -31,7 +31,7 @@ For real cross-device multiplayer (no setup, hosted hub):
 ```bash
 # Just run pnpm dev. The .env already wires VITE_PLAYGROUND_WS_URL to a
 # Cloudflare Worker + Durable Object hub at:
-#   wss://hermes-playground-ws.myaurora-agi.workers.dev/playground
+#   wss://hermeschi-playground-ws.myaurora-agi.workers.dev/playground
 # Open /playground in two devices on different networks — they'll meet there.
 pnpm dev
 ```
@@ -67,7 +67,7 @@ VITE_PLAYGROUND_WS_URL=ws://localhost:8787 pnpm dev
 
 ## Hackathon Submission
 
-Hermes Playground turns agent onboarding into a social RPG loop. Instead of reading a wall of docs, builders walk a shared world, meet Hermes-themed NPCs, learn movement, gear, chat, memory, and build rituals, then step through the Forge Gate into a live multiplayer builder realm. It frames Hermes Workspace as a place you inhabit, not just a tool you open.
+Hermes Playground turns agent onboarding into a social RPG loop. Instead of reading a wall of docs, builders walk a shared world, meet Hermes-themed NPCs, learn movement, gear, chat, memory, and build rituals, then step through the Forge Gate into a live multiplayer builder realm. It frames HermesChi as a place you inhabit, not just a tool you open.
 
 ### 30-60 second demo script
 
@@ -181,10 +181,10 @@ Deploy options for the WS relay are listed in `memory/goals/2026-05-03-playgroun
 
 ## Credits
 
-- Built on [Hermes Workspace](https://github.com/outsourc-e/hermes-workspace) and [Hermes Agent](https://github.com/NousResearch/hermes-agent).
+- Built on [HermesChi](https://github.com/outsourc-e/hermeschi) and [Hermes Agent](https://github.com/NousResearch/hermes-agent).
 - Inspired by RuneScape, PlayROHAN, Lost Ark, and Skyrim. No assets copied — everything is original primitives + Hermes Greek-mythology theming.
 - Hackathon: Nous Research × Kimi 2026.
 
 ## License
 
-MIT. Same as Hermes Workspace.
+MIT. Same as HermesChi.

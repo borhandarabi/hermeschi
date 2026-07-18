@@ -1,7 +1,7 @@
 # Iteration 008 — 3002 loading-loop handoff for Opus
 
 Date: 2026-05-04 01:13 EDT
-Repo: `/Users/aurora/hermes-workspace`
+Repo: `/Users/aurora/hermeschi`
 Current branch: `main`
 Current main head at handoff: `cb2ecec5f`
 
@@ -59,7 +59,7 @@ This was likely wrong for comparing HermesWorld behavior.
 
 ### 2. Changed local main `.env`
 Edited:
-- `/Users/aurora/hermes-workspace/.env`
+- `/Users/aurora/hermeschi/.env`
 
 Changed:
 - `HERMES_API_URL=http://127.0.0.1:8645` → `http://127.0.0.1:8642`

@@ -14,12 +14,12 @@ async function makeDir(...parts: Array<string>) {
 }
 
 beforeEach(async () => {
-  tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hermes-workspace-route-'))
+  tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hermeschi-route-'))
   process.env = { ...originalEnv }
   process.env.HERMES_HOME = path.join(tempRoot, '.hermes')
-  delete process.env.HERMES_WORKSPACE_DIR
+  delete process.env.HERMESCHI_WORKSPACE_DIR
   delete process.env.CLAUDE_WORKSPACE_DIR
-  delete process.env.HERMES_WEBUI_DEFAULT_WORKSPACE
+  delete process.env.HERMESCHI_WEBUI_DEFAULT_WORKSPACE
   await fs.mkdir(process.env.HERMES_HOME, { recursive: true })
 })
 
@@ -126,7 +126,7 @@ describe('workspace API catalog semantics', () => {
   it('persists the selected workspace in profile-local Web UI state', async () => {
     const homeProject = await makeDir(tempRoot, 'workspace')
     const selectedProject = await makeDir(tempRoot, 'client-app')
-    process.env.HERMES_WEBUI_DEFAULT_WORKSPACE = homeProject
+    process.env.HERMESCHI_WEBUI_DEFAULT_WORKSPACE = homeProject
 
     const saved = await saveWorkspaceSelection({
       path: selectedProject,

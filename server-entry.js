@@ -55,21 +55,21 @@ function isNonLoopbackHost(h) {
 }
 
 if (isNonLoopbackHost(host)) {
-  // Honor HERMES_PASSWORD (current name) with CLAUDE_PASSWORD as a back-compat
+  // Honor HERMESCHI_PASSWORD (current name) with CLAUDE_PASSWORD as a back-compat
   // fallback for deployments configured pre-rename.
   const password = (
-    process.env.HERMES_PASSWORD ||
+    process.env.HERMESCHI_PASSWORD ||
     process.env.CLAUDE_PASSWORD ||
     ''
   ).trim()
   if (!password) {
     console.error(
       '\n[workspace] refusing to start.\n' +
-        `  HOST is set to "${host}" (non-loopback), but HERMES_PASSWORD is unset.\n` +
+        `  HOST is set to "${host}" (non-loopback), but HERMESCHI_PASSWORD is unset.\n` +
         '  This would expose a high-privilege control plane (terminals, files, agents)\n' +
         '  to anyone who can reach the port. Either:\n' +
         '    • set HOST=127.0.0.1 for local-only access, or\n' +
-        '    • set HERMES_PASSWORD=<strong-secret> to enable workspace auth, or\n' +
+        '    • set HERMESCHI_PASSWORD=<strong-secret> to enable workspace auth, or\n' +
         '    • set HERMES_ALLOW_INSECURE_REMOTE=1 to bypass this check (not recommended).\n' +
         '  See #122 for context.\n',
     )
@@ -290,7 +290,7 @@ async function requestHandler(req, res) {
 function listenOn(bindHost) {
   const httpServer = createServer(requestHandler)
   httpServer.listen(port, bindHost, () => {
-    console.log(`Hermes Workspace running at http://${bindHost}:${port}`)
+    console.log(`HermesChi running at http://${bindHost}:${port}`)
   })
   return httpServer
 }

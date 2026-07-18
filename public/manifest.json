@@ -1,8 +1,8 @@
 {
-  "name": "Hermes Workspace",
-  "short_name": "Hermes",
-  "description": "Installable control surface for Hermes Agent chat, tools, files, memory, jobs, and agent workflows.",
-  "id": "/?app=hermes-workspace",
+  "name": "HermesChi",
+  "short_name": "HermesChi",
+  "description": "Installable control surface for HermesChi chat, tools, files, memory, jobs, and agent workflows.",
+  "id": "/?app=hermeschi",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",

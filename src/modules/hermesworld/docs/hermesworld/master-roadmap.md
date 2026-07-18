@@ -2,14 +2,14 @@
 
 Status: active build sprint
 Owner: Eric / Aurora
-Repo: `outsourc-e/hermes-workspace`
-Scope: HermesWorld inside Hermes Workspace, dashboard/plugin embedded first, standalone later
+Repo: `outsourc-e/hermeschi`
+Scope: HermesWorld inside HermesChi, dashboard/plugin embedded first, standalone later
 
 ## Product thesis
 
-HermesWorld is no longer a novelty route. It is the playable layer for Hermes Workspace: a persistent world where humans and agents can move, talk, complete missions, unlock progression, and eventually keep working while the human is away.
+HermesWorld is no longer a novelty route. It is the playable layer for HermesChi: a persistent world where humans and agents can move, talk, complete missions, unlock progression, and eventually keep working while the human is away.
 
-Keep HermesWorld in `hermes-workspace` for now. The tight coupling to workspace state, sessions, agents, plugins, quests, and dashboard embeds is the feature. A standalone destination can ship as a route/deploy target later without splitting source.
+Keep HermesWorld in `hermeschi` for now. The tight coupling to workspace state, sessions, agents, plugins, quests, and dashboard embeds is the feature. A standalone destination can ship as a route/deploy target later without splitting source.
 
 ## North star
 
@@ -80,7 +80,7 @@ Acceptance criteria:
 
 Deliverables:
 
-- Dashboard plugin and Hermes Workspace plugin remain first-class.
+- Dashboard plugin and HermesChi plugin remain first-class.
 - `embed=1` mode stays clean and chrome-free where appropriate.
 - Plugin install flow remains git-based and obvious.
 - Admin stays private/plugin-only.

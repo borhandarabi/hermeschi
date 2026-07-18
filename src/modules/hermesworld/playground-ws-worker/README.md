@@ -50,7 +50,7 @@ VITE_PLAYGROUND_STATS_URL=https://hermes-playground-ws.<your-subdomain>.workers.
 
 ```bash
 pnpm wrangler dev            # hot-reload on http://localhost:8787
-# In hermes-workspace:
+# In hermeschi:
 VITE_PLAYGROUND_WS_URL=ws://localhost:8787/playground pnpm dev
 ```
 

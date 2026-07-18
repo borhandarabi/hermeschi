@@ -12,7 +12,7 @@
  *   1. Runtime override saved via setGatewayUrl() / setDashboardUrl()
  *      (persisted to ~/.hermes/workspace-overrides.json) — set from the UI
  *      so remote / Tailscale users can relocate without a restart (#101).
- *   2. process.env.HERMES_API_URL / HERMES_DASHBOARD_URL at process start.
+ *   2. process.env.HERMES_API_URL / HERMESCHI_DASHBOARD_URL at process start.
  *   3. Default localhost (8642 / 9119).
  */
 
@@ -67,7 +67,7 @@ export let CLAUDE_API = normalizeUrl(
 )
 export let CLAUDE_DASHBOARD_URL = normalizeUrl(
   _initialOverrides.claudeDashboardUrl ||
-    process.env.HERMES_DASHBOARD_URL ||
+    process.env.HERMESCHI_DASHBOARD_URL ||
     process.env.CLAUDE_DASHBOARD_URL ||
     'http://127.0.0.1:9119',
 )
@@ -109,7 +109,7 @@ export function setDashboardUrl(input: string | null | undefined): string {
   } else {
     delete overrides.claudeDashboardUrl
     CLAUDE_DASHBOARD_URL = normalizeUrl(
-      process.env.HERMES_DASHBOARD_URL || process.env.CLAUDE_DASHBOARD_URL || 'http://127.0.0.1:9119',
+      process.env.HERMESCHI_DASHBOARD_URL || process.env.CLAUDE_DASHBOARD_URL || 'http://127.0.0.1:9119',
     )
   }
   writeOverrides(overrides)
@@ -137,7 +137,7 @@ export const CLAUDE_UPGRADE_INSTRUCTIONS =
   'For full features, install Hermes Agent from source (`git clone https://github.com/NousResearch/hermes-agent && cd hermes-agent && pip install -e .`), then start the gateway on :8642 (`hermes gateway run`). For the extended APIs (Sessions, Skills, Config, Jobs) also start the dashboard on :9119 (`hermes dashboard`).'
 
 export const DASHBOARD_REQUIRED_INSTRUCTIONS =
-  'Hermes gateway core APIs are healthy, but dashboard-backed APIs are unavailable. Start the dashboard on :9119 (`hermes dashboard`) or point HERMES_DASHBOARD_URL at the running dashboard service.'
+  'Hermes gateway core APIs are healthy, but dashboard-backed APIs are unavailable. Start the dashboard on :9119 (`hermes dashboard`) or point HERMESCHI_DASHBOARD_URL at the running dashboard service.'
 
 export const SESSIONS_API_UNAVAILABLE_MESSAGE = `Your Hermes backend does not support the sessions API. ${CLAUDE_UPGRADE_INSTRUCTIONS}`
 
@@ -791,14 +791,14 @@ async function autoDetectGatewayUrl(): Promise<void> {
 
 async function autoDetectDashboardUrl(): Promise<void> {
   // Mirror autoDetectGatewayUrl: skip discovery when the dashboard URL was set
-  // explicitly. HERMES_DASHBOARD_URL is the documented primary var (see the
+  // explicitly. HERMESCHI_DASHBOARD_URL is the documented primary var (see the
   // resolution order at the top of this file); CLAUDE_DASHBOARD_URL is the
   // legacy alias. Probing only the hard-coded :9119 candidate when
-  // HERMES_DASHBOARD_URL points elsewhere lets a co-located dashboard on the
+  // HERMESCHI_DASHBOARD_URL points elsewhere lets a co-located dashboard on the
   // default port silently override the operator's explicit choice — e.g. in a
   // multi-user setup it attaches to another user's dashboard and leaks their
   // session list. Honor both vars so an explicit setting always wins.
-  if (process.env.HERMES_DASHBOARD_URL || process.env.CLAUDE_DASHBOARD_URL) return
+  if (process.env.HERMESCHI_DASHBOARD_URL || process.env.CLAUDE_DASHBOARD_URL) return
 
   const candidates = ['http://127.0.0.1:9119']
   for (const candidate of candidates) {

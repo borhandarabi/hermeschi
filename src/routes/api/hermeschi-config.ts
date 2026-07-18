@@ -8,7 +8,7 @@ import {
   handleHermesConfigPatch,
 } from '../../server/hermes-config-route'
 
-export const Route = createFileRoute('/api/hermes-config')({
+export const Route = createFileRoute('/api/hermeschi-config')({
   server: {
     handlers: {
       GET: handleHermesConfigGet,

@@ -490,12 +490,12 @@ Acceptance: one Swarm route, no duplicates, all swarm tests green, docs/README/n
 
 Execution contract for this mission:
 - Context, memory, and handoffs come from `/Users/aurora/.openclaw/workspace`
-- Swarm2 code, git, build, and tests run in `/Users/aurora/hermes-workspace`
+- Swarm2 code, git, build, and tests run in `/Users/aurora/hermeschi`
 - Do not use legacy workspace aliases
 - Before any build/test/git loop, run:
 
 ```bash
-cd /Users/aurora/hermes-workspace &&
+cd /Users/aurora/hermeschi &&
 pwd &&
 test -f package.json &&
 jq -r .name package.json

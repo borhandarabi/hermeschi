@@ -1,17 +1,17 @@
-# NixOS module: services.hermes-workspace
+# NixOS module: services.hermeschi
 #
-# Runs the hermes-workspace web server as a systemd service.
+# Runs the hermeschi web server as a systemd service.
 # The companion hermes-agent gateway must be running separately
 # (see https://github.com/NousResearch/hermes-agent).
 #
 # Minimal NixOS configuration example:
 #
-#   services.hermes-workspace = {
+#   services.hermeschi = {
 #     enable = true;
 #     hermesApiUrl = "http://127.0.0.1:8642";
 #     # For remote access, set a password and open the port:
 #     host = "0.0.0.0";
-#     passwordFile = config.sops.secrets."hermes-workspace-password".path;
+#     passwordFile = config.sops.secrets."hermeschi-password".path;
 #   };
 #   networking.firewall.allowedTCPPorts = [ 3000 ];
 {
@@ -22,7 +22,7 @@
 }:
 
 let
-  cfg = config.services.hermes-workspace;
+  cfg = config.services.hermeschi;
   inherit (lib)
     mkEnableOption
     mkIf
@@ -32,10 +32,10 @@ let
     ;
 in
 {
-  options.services.hermes-workspace = {
-    enable = mkEnableOption "Hermes Workspace — web UI for Hermes Agent";
+  options.services.hermeschi = {
+    enable = mkEnableOption "HermesChi — web UI for Hermes Agent";
 
-    package = mkPackageOption pkgs "hermes-workspace" { };
+    package = mkPackageOption pkgs "hermeschi" { };
 
     port = mkOption {
       type = types.port;
@@ -134,19 +134,19 @@ in
 
     user = mkOption {
       type = types.str;
-      default = "hermes-workspace";
+      default = "hermeschi";
       description = "System user to run the service as.";
     };
 
     group = mkOption {
       type = types.str;
-      default = "hermes-workspace";
+      default = "hermeschi";
       description = "System group to run the service as.";
     };
 
     dataDir = mkOption {
       type = types.path;
-      default = "/var/lib/hermes-workspace";
+      default = "/var/lib/hermeschi";
       description = ''
         State directory for the workspace (sessions, runtime data).
         The service user must have write access.
@@ -160,14 +160,14 @@ in
       group = cfg.group;
       home = cfg.dataDir;
       createHome = true;
-      description = "Hermes Workspace service user";
+      description = "HermesChi service user";
     };
 
     users.groups.${cfg.group} = lib.mkDefault { };
 
-    systemd.services.hermes-workspace = {
-      description = "Hermes Workspace Web Server";
-      documentation = [ "https://github.com/outsourc-e/hermes-workspace" ];
+    systemd.services.hermeschi = {
+      description = "HermesChi Web Server";
+      documentation = [ "https://github.com/outsourc-e/hermeschi" ];
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 
@@ -177,7 +177,7 @@ in
           PORT = toString cfg.port;
           HOST = cfg.host;
           HERMES_API_URL = cfg.hermesApiUrl;
-          HERMES_DASHBOARD_URL = cfg.hermesDashboardUrl;
+          HERMESCHI_DASHBOARD_URL = cfg.hermesDashboardUrl;
           VITE_HERMESWORLD_ENABLED = if cfg.hermesWorldEnabled then "1" else "0";
           TRUST_PROXY = if cfg.trustProxy then "1" else "0";
           HERMES_ALLOW_INSECURE_REMOTE = if cfg.allowInsecureRemote then "1" else "0";
@@ -198,7 +198,7 @@ in
         ExecStart = "${lib.getExe cfg.package}";
 
         # Load the password file as an env file when specified.
-        # The file must contain: HERMES_PASSWORD=<value>
+        # The file must contain: HERMESCHI_PASSWORD=<value>
         EnvironmentFile = lib.optional (cfg.passwordFile != null) cfg.passwordFile
           ++ lib.optional (cfg.environmentFile != null) cfg.environmentFile;
 
@@ -209,9 +209,9 @@ in
         StartLimitBurst = "5";
 
         # Runtime directories
-        RuntimeDirectory = "hermes-workspace";
+        RuntimeDirectory = "hermeschi";
         StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
-        LogsDirectory = "hermes-workspace";
+        LogsDirectory = "hermeschi";
 
         # Security hardening (balanced against PTY + terminal needs)
         NoNewPrivileges = true;

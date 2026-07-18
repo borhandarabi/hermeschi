@@ -63,7 +63,7 @@ export function useLocaleDirection(): LocaleDirection {
     // propagate to this one. The pre-hydration themeScript does NOT
     // dispatch a locale-change event, so cross-tab sync requires this.
     const handleStorage = (event: StorageEvent) => {
-      if (event.key === 'hermes-workspace-locale') {
+      if (event.key === 'hermeschi-locale') {
         setLocaleState(getLocale())
       }
     }

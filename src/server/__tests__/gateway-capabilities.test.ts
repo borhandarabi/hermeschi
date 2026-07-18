@@ -39,8 +39,8 @@ beforeEach(() => {
   delete process.env.CLAUDE_API_URL
   delete process.env.HERMES_API_URL
   delete process.env.CLAUDE_DASHBOARD_URL
-  delete process.env.HERMES_DASHBOARD_URL
-  delete process.env.HERMES_DASHBOARD_TOKEN
+  delete process.env.HERMESCHI_DASHBOARD_URL
+  delete process.env.HERMESCHI_DASHBOARD_TOKEN
   delete process.env.CLAUDE_DASHBOARD_TOKEN
   delete process.env.HOST
 })
@@ -138,14 +138,14 @@ describe('gateway-capabilities', () => {
     expect(mod.CLAUDE_API).toBe('http://localhost:9000')
   })
 
-  it('does not let dashboard auto-detect override an explicit HERMES_DASHBOARD_URL', async () => {
+  it('does not let dashboard auto-detect override an explicit HERMESCHI_DASHBOARD_URL', async () => {
     // Regression: autoDetectDashboardUrl() only skipped discovery when
     // CLAUDE_DASHBOARD_URL was set, ignoring the documented primary var
-    // HERMES_DASHBOARD_URL. With a co-located dashboard answering on the
+    // HERMESCHI_DASHBOARD_URL. With a co-located dashboard answering on the
     // hard-coded :9119 candidate, the probe overwrote the operator's explicit
     // URL — in multi-user setups attaching to another user's dashboard and
     // leaking their session list. The explicit URL must always win.
-    process.env.HERMES_DASHBOARD_URL = 'http://127.0.0.1:9120'
+    process.env.HERMESCHI_DASHBOARD_URL = 'http://127.0.0.1:9120'
     // A default-port dashboard is up and would answer the auto-detect probe.
     fetchMock.mockImplementation(async (url: string) => {
       if (url === 'http://127.0.0.1:9119/api/status') {
@@ -189,7 +189,7 @@ describe('gateway-capabilities', () => {
     })
 
     it('ignores copied dashboard token env vars and scrapes the current token instead', async () => {
-      process.env.HERMES_DASHBOARD_TOKEN = 'stale-token'
+      process.env.HERMESCHI_DASHBOARD_TOKEN = 'stale-token'
       fetchMock.mockResolvedValue({
         ok: true,
         status: 200,

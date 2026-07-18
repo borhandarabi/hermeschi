@@ -2,7 +2,7 @@
 
 Date: 2026-05-05 14:22 EDT
 Owner: Eric / Aurora
-Repo: `/Users/aurora/hermes-workspace`
+Repo: `/Users/aurora/hermeschi`
 Status: local-only, uncommitted, handoff for next Opus session
 
 ## What landed this session
@@ -90,9 +90,9 @@ Touched:
 Removed more workspace-local carryover text from the landing.
 
 Examples changed:
-- `Hermes Workspace Experiment // Persistent Agent World`
+- `HermesChi Experiment // Persistent Agent World`
   → `HermesWorld Preview // Persistent Agent World`
-- `Hermes Workspace Connected`
+- `HermesChi Connected`
   → `Live World Build`
 
 ### 8. Local preview/dev process debugging happened repeatedly

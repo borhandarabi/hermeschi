@@ -1036,7 +1036,7 @@ export function ChatScreen({
     queryKey: ['hermes-config', 'reasoning-effort'],
     queryFn: async () => {
       try {
-        const res = await fetch('/api/hermes-config')
+        const res = await fetch('/api/hermeschi-config')
         if (!res.ok) return 'low'
         const data = await res.json() as { config?: Record<string, unknown> }
         const agentSection = data?.config?.agent
@@ -1706,7 +1706,7 @@ export function ChatScreen({
   // Memory, etc.), the component re-mounts. If a response finished while we
   // were away, the initial refetch may hit stale data. A delayed re-refetch
   // ensures we pick up responses that were persisted shortly after the first
-  // fetch. See: https://github.com/outsourc-e/hermes-workspace/issues/43
+  // fetch. See: https://github.com/outsourc-e/hermeschi/issues/43
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void historyQuery.refetch()

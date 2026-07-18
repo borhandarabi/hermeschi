@@ -38,7 +38,7 @@ function ReserveRoute() {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/hermesworld/reservations', { cache: 'no-store' })
+    fetch('/api/hermeschiworld/reservations', { cache: 'no-store' })
       .then(async (response) => {
         const payload = await response.json()
         if (!response.ok) throw new Error(payload.error || 'Failed to load counter')
@@ -63,7 +63,7 @@ function ReserveRoute() {
     event.preventDefault()
     setSubmitState({ status: 'submitting', message: null })
     try {
-      const response = await fetch('/api/hermesworld/reservations', {
+      const response = await fetch('/api/hermeschiworld/reservations', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',

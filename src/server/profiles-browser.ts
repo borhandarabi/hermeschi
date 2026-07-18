@@ -194,7 +194,7 @@ function extractSystemPrompt(
 // ---------------------------------------------------------------------------
 
 function getDashboardUrl(): string | undefined {
-  const url = process.env.HERMES_DASHBOARD_URL?.trim()
+  const url = process.env.HERMESCHI_DASHBOARD_URL?.trim()
   return url || undefined
 }
 
@@ -275,7 +275,7 @@ async function fetchDashboardProfiles(): Promise<{
 
 /**
  * List profiles with dashboard API fallback for split-host deployments.
- * When HERMES_DASHBOARD_URL is set and reachable, fetches from the dashboard
+ * When HERMESCHI_DASHBOARD_URL is set and reachable, fetches from the dashboard
  * API. Falls back to filesystem reads for colocated deployments.
  */
 export async function listProfilesWithFallback(): Promise<{

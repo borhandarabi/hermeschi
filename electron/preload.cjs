@@ -2,10 +2,10 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 const updateListenerMap = new Map()
 
-contextBridge.exposeInMainWorld('hermesDesktop', {
+contextBridge.exposeInMainWorld('hermeschiDesktop', {
   bootstrap: {
     status: () => ipcRenderer.invoke('desktop:status'),
-    installHermes: () => ipcRenderer.invoke('desktop:install-hermes'),
+    installHermes: () => ipcRenderer.invoke('desktop:install-hermeschi'),
     startBackend: () => ipcRenderer.invoke('desktop:start-backend'),
     openLogs: () => ipcRenderer.invoke('desktop:open-logs'),
   },

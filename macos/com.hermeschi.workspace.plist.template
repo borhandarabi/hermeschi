@@ -3,7 +3,7 @@
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>com.hermes.workspace</string>
+    <string>com.hermeschi.workspace</string>
     <key>ProgramArguments</key>
     <array>
       <string>{{NODE_BIN}}</string>
@@ -40,8 +40,8 @@
     <key>ThrottleInterval</key>
     <integer>5</integer>
     <key>StandardOutPath</key>
-    <string>/tmp/hermes-workspace.out.log</string>
+    <string>/tmp/hermeschi.out.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/hermes-workspace.err.log</string>
+    <string>/tmp/hermeschi.err.log</string>
   </dict>
 </plist>

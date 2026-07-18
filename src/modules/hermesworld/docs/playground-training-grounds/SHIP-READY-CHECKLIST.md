@@ -22,15 +22,15 @@ Latest commit: `13bc6e234`.
    - `tailscale serve --bg http://localhost:3005` → use the printed `https://aurora.tail***.ts.net` URL.
    - Or just use the public WS hub directly: anyone running their own copy of Playground will already meet you in the same shared world (the WS hub is global, the dev server is local-only).
 3. With the `.env` we just wrote, both clients connect to:
-   `wss://hermes-playground-ws.myaurora-agi.workers.dev/playground`
+   `wss://hermeschi-playground-ws.myaurora-agi.workers.dev/playground`
 4. Verify in the browser console: you should see one WebSocket connection to that URL and **no fallback to BroadcastChannel-only** (transport indicator shows "ws" or "both").
 
 ### Verify hub health from CLI
 ```bash
-curl https://hermes-playground-ws.myaurora-agi.workers.dev/health
+curl https://hermeschi-playground-ws.myaurora-agi.workers.dev/health
 # → {"ok":true,"online":N,"ts":...}
 
-curl https://hermes-playground-ws.myaurora-agi.workers.dev/stats
+curl https://hermeschi-playground-ws.myaurora-agi.workers.dev/stats
 # → {"online":N,"byWorld":{...},"peakToday":N,"peakDay":"..."}
 ```
 

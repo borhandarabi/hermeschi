@@ -1,12 +1,12 @@
 # Docker
 
-Hermes Workspace + Hermes Agent in containers.
+HermesChi + Hermes Agent in containers.
 
 ## TL;DR (single-host, localhost-only)
 
 ```bash
-git clone https://github.com/outsourc-e/hermes-workspace
-cd hermes-workspace
+git clone https://github.com/outsourc-e/hermeschi
+cd hermeschi
 cp .env.example .env
 # add at least one provider key (e.g. OPENROUTER_API_KEY=...)
 docker compose up -d
@@ -16,7 +16,7 @@ open http://localhost:3000
 That's it. The repo's `docker-compose.yml` runs:
 
 - `hermes-agent` (port `8642`, internal only)
-- `hermes-workspace` (port `3000`, bound to `127.0.0.1`)
+- `hermeschi` (port `3000`, bound to `127.0.0.1`)
 
 The workspace waits for the agent's `/health` to return `200` before starting (via `depends_on: condition: service_healthy`). On a fresh laptop this takes about 15 seconds.
 
@@ -42,8 +42,8 @@ In `.env`:
 ```bash
 HERMES_API_URL=http://<agent-host-or-service>:8642
 HERMES_API_TOKEN=<the same value as API_SERVER_KEY>
-HERMES_DASHBOARD_URL=http://<agent-host-or-service>:9119
-HERMES_DASHBOARD_TOKEN=<same key, or set CLAUDE_DASHBOARD_TOKEN>
+HERMESCHI_DASHBOARD_URL=http://<agent-host-or-service>:9119
+HERMESCHI_DASHBOARD_TOKEN=<same key, or set CLAUDE_DASHBOARD_TOKEN>
 ```
 
 Inside docker compose on the same host, `<agent-host-or-service>` is the service name from your compose file (e.g. `hermes-agent`). On a Synology NAS with a separate workspace stack, it's the LAN IP (e.g. `192.168.1.78`).
@@ -53,7 +53,7 @@ Inside docker compose on the same host, `<agent-host-or-service>` is the service
 The workspace bind is non-loopback in Docker (`0.0.0.0:3000`). It refuses to start in production mode without a password to prevent accidental open exposure:
 
 ```bash
-HERMES_PASSWORD=<a long random string different from API_SERVER_KEY>
+HERMESCHI_PASSWORD=<a long random string different from API_SERVER_KEY>
 ```
 
 If you publish the workspace behind HTTPS (reverse proxy, Tailscale Funnel, Cloudflare Tunnel), also set `COOKIE_SECURE=1` so session cookies get the `Secure` flag.
@@ -65,7 +65,7 @@ If the workspace shows "**Disconnected**" or "**Missing Hermes APIs detected**" 
 ### Step 1 — Verify the agent is reachable from inside the workspace container
 
 ```bash
-docker compose exec hermes-workspace sh
+docker compose exec hermeschi sh
 # inside the workspace container:
 curl -fsS http://hermes-agent:8642/health
 curl -fsS -H "Authorization: Bearer $HERMES_API_TOKEN" http://hermes-agent:8642/v1/models | head -c 200
@@ -77,7 +77,7 @@ If `/health` returns a JSON `{"status": "ok"}`, the agent is alive on the docker
 ### Step 2 — Confirm the workspace's environment
 
 ```bash
-docker compose exec hermes-workspace env | grep -E "HERMES_API|API_SERVER"
+docker compose exec hermeschi env | grep -E "HERMES_API|API_SERVER"
 ```
 
 You should see:
@@ -100,7 +100,7 @@ This re-runs the probe and returns the fresh capability map. If it now reads `mo
 The workspace logs the full capability summary on every probe. Look for the `[gateway]` line:
 
 ```bash
-docker compose logs hermes-workspace 2>&1 | grep '\[gateway\]' | tail -3
+docker compose logs hermeschi 2>&1 | grep '\[gateway\]' | tail -3
 ```
 
 A healthy log looks like:
@@ -131,7 +131,7 @@ If your workspace and agent are on **different stacks** on the same NAS (or diff
 ```bash
 HERMES_API_URL=http://192.168.1.78:8642
 HERMES_API_TOKEN=<API_SERVER_KEY>
-HERMES_DASHBOARD_URL=http://192.168.1.78:9119
+HERMESCHI_DASHBOARD_URL=http://192.168.1.78:9119
 ```
 
 3. The agent to bind on `0.0.0.0`:
@@ -145,11 +145,11 @@ API_SERVER_KEY=<long random>
 
 If you bind the agent to `0.0.0.0` on a NAS without `API_SERVER_KEY`, the agent will refuse to start. This is intentional — open-internet exposure of the agent's chat endpoint without auth would be a footgun.
 
-## Hermes Workspace + Hermes Agent: why two containers?
+## HermesChi + Hermes Agent: why two containers?
 
 The workspace is the **UI**. The agent is the **engine**. Splitting them lets you:
 
-- Update either independently (`docker compose pull hermes-workspace` etc.)
+- Update either independently (`docker compose pull hermeschi` etc.)
 - Run multiple workspaces against one agent (different ports)
 - Run the workspace on a tablet/phone while the agent stays on a beefy machine
 
@@ -157,10 +157,10 @@ The default compose colocates them for simplicity. The split-host setup above is
 
 ## Filing bugs
 
-If your setup matches the playbook above and still breaks, file an issue at <https://github.com/outsourc-e/hermes-workspace/issues> with:
+If your setup matches the playbook above and still breaks, file an issue at <https://github.com/outsourc-e/hermeschi/issues> with:
 
 1. Your `docker-compose.yml` (redact secrets)
-2. The output of `docker compose logs hermes-workspace 2>&1 | grep '\[gateway\]' | tail -5`
+2. The output of `docker compose logs hermeschi 2>&1 | grep '\[gateway\]' | tail -5`
 3. The output of `curl -fsS http://<workspace-host>:3000/api/gateway-reprobe -X POST` (also redact)
 
 That gets us to the actual cause within a couple of comments instead of a long back-and-forth.

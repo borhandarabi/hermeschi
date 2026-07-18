@@ -1,11 +1,11 @@
-# Overnight PR/Issue Shakedown — hermes-workspace
+# Overnight PR/Issue Shakedown — hermeschi
 
-**Mission:** Work through the open PRs and issues on `outsourc-e/hermes-workspace`, test/fix/shake them down LOCALLY, and consolidate everything safe into ONE integration PR. Run autonomously overnight. Quality over quantity — never break `main`.
+**Mission:** Work through the open PRs and issues on `outsourc-e/hermeschi`, test/fix/shake them down LOCALLY, and consolidate everything safe into ONE integration PR. Run autonomously overnight. Quality over quantity — never break `main`.
 
 ## Environment
-- Working clone (USE THIS, never touch /Users/aurora/hermes-workspace — it has uncommitted local work):
-  `/Users/aurora/hermes-workspace-swarm`
-- Repo: `outsourc-e/hermes-workspace`. `gh` authed as `outsourc-e` (ADMIN). pnpm. Node 22.
+- Working clone (USE THIS, never touch /Users/aurora/hermeschi — it has uncommitted local work):
+  `/Users/aurora/hermeschi-swarm`
+- Repo: `outsourc-e/hermeschi`. `gh` authed as `outsourc-e` (ADMIN). pnpm. Node 22.
 - Build: `pnpm build` · Test: `pnpm test` · Lint: `pnpm lint` · Typecheck: `pnpm check`
 - 46 open PRs, 27 open issues at start (2026-06-05 03:32 EDT). `gh pr list --state open`, `gh issue list --state open`.
 
@@ -24,14 +24,14 @@
 5. Map issues → PRs: if a PR fixes an open issue, note "fixes #<issue>" in the PR body.
 
 ## Priority signal (fix these issue areas if PRs exist or you can safely patch)
-- Build/ship blockers for desktop + local site: #594 React DOM crash on navigation, #579/#500/#588 Windows desktop, #573 session list React crash, #570 /api/hermes-tasks returns HTML, #572 double chat responses, #561 stuck Thinking, #552 scroll auto-jump.
+- Build/ship blockers for desktop + local site: #594 React DOM crash on navigation, #579/#500/#588 Windows desktop, #573 session list React crash, #570 /api/hermeschi-tasks returns HTML, #572 double chat responses, #561 stuck Thinking, #552 scroll auto-jump.
 - Security: #553 path traversal (validate carefully, it's good to land).
 - Model picker / providers: #583 Google provider, #569 config.yaml providers, #586 MiniMax M3.
 - Skip for now unless trivial: huge i18n PR #563 (934 strings), draft prototypes (#578 LeseWerk, #557 company-os).
 
 ## Hard rules
 - NEVER merge directly to main. Only push the integration branch + open the consolidated PR.
-- NEVER force-push main. NEVER touch /Users/aurora/hermes-workspace.
+- NEVER force-push main. NEVER touch /Users/aurora/hermeschi.
 - Keep main buildable: the integration branch must pass `pnpm build` + `pnpm test` before each push.
 - Idempotent: if re-run, continue from where the branch is (don't duplicate).
 - Document everything in the PR body + append a short status to this file each cycle.

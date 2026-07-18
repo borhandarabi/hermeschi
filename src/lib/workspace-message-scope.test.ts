@@ -9,12 +9,12 @@ describe('buildWorkspaceScopedTextMessage', () => {
   it('prepends an explicit active workspace directive to plain text chat messages', () => {
     expect(
       buildWorkspaceScopedTextMessage('Run the tests', {
-        path: '/Users/eric/projects/hermes-workspace',
-        folderName: 'hermes-workspace',
+        path: '/Users/eric/projects/hermeschi',
+        folderName: 'hermeschi',
         isValid: true,
       }),
     ).toBe(
-      '<workspace_context active="true" name="hermes-workspace" path="/Users/eric/projects/hermes-workspace" />\n\nRun the tests',
+      '<workspace_context active="true" name="hermeschi" path="/Users/eric/projects/hermeschi" />\n\nRun the tests',
     )
   })
 

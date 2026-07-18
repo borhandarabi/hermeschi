@@ -9,6 +9,6 @@
   },
   "vars": {
     "HERMES_PUBLIC_DEPLOY": "1",
-    "VITE_PLAYGROUND_STATS_URL": "https://hermes-playground-ws.myaurora-agi.workers.dev/stats"
+    "VITE_PLAYGROUND_STATS_URL": "https://hermeschi-playground-ws.myaurora-agi.workers.dev/stats"
   }
 }

@@ -1070,7 +1070,7 @@ export function FilesScreen() {
       })
       if (!res.ok)
         throw new Error(
-          `HTTP ${res.status} — check that HERMES_WORKSPACE_DIR is set`,
+          `HTTP ${res.status} — check that HERMESCHI_WORKSPACE_DIR is set`,
         )
       const data = (await res.json()) as FilesListResponse
       setEntries(Array.isArray(data.entries) ? data.entries : [])

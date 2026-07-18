@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { sanitizeConductorMissionGoal } from './conductor-mission-sanitize'
 
 describe('sanitizeConductorMissionGoal', () => {
-  it('removes public hermes-workspace self URLs', () => {
+  it('removes public hermes-workspace self URLs (legacy domain)', () => {
     const result = sanitizeConductorMissionGoal(
       'Research this via https://hermes-workspace.illuwa.click/conductor and summarize.',
     )
@@ -12,8 +12,19 @@ describe('sanitizeConductorMissionGoal', () => {
     )
     expect(result.removedSelfWorkspaceUrls).toBe(true)
     expect(result.warnings).toContain(
-      'Removed public hermes-workspace URL(s) from the mission goal to avoid self-fetching through Cloudflare Access.',
+      'Removed public HermesChi URL(s) from the mission goal to avoid self-fetching through Cloudflare Access.',
     )
+  })
+
+  it('removes public hermeschi self URLs', () => {
+    const result = sanitizeConductorMissionGoal(
+      'Research this via https://hermeschi.illuwa.click/conductor and summarize.',
+    )
+
+    expect(result.goal).toBe(
+      'Research this via [workspace public URL removed] and summarize.',
+    )
+    expect(result.removedSelfWorkspaceUrls).toBe(true)
   })
 
   it('strips embedded Cloudflare 5xx HTML pages', () => {

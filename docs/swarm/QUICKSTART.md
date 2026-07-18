@@ -1,6 +1,6 @@
 # Swarm Mode Quickstart
 
-This quickstart gets a local Hermes Workspace checkout running, confirms profile auto-detection, starts a tmux-backed Hermes Agent, dispatches a first task, and shows where to review the result.
+This quickstart gets a local HermesChi checkout running, confirms profile auto-detection, starts a tmux-backed Hermes Agent, dispatches a first task, and shows where to review the result.
 
 ## 0. Prerequisites
 
@@ -17,8 +17,8 @@ The workspace can still render without tmux, but tmux is what makes the worker s
 ## 1. Clone the workspace
 
 ```bash
-git clone https://github.com/outsourc-e/hermes-workspace.git
-cd hermes-workspace
+git clone https://github.com/outsourc-e/hermeschi.git
+cd hermeschi
 ```
 
 ## 2. Install dependencies

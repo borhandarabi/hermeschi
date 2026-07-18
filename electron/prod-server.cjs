@@ -45,12 +45,12 @@ async function loadServerBuild() {
 
 async function main() {
   process.env.NODE_ENV = process.env.NODE_ENV || 'production'
-  process.env.HERMES_WORKSPACE_DESKTOP =
-    process.env.HERMES_WORKSPACE_DESKTOP || '1'
+  process.env.HERMESCHI_DESKTOP =
+    process.env.HERMESCHI_DESKTOP || '1'
   process.env.HERMES_API_URL =
     process.env.HERMES_API_URL || 'http://127.0.0.1:8642'
-  process.env.HERMES_DASHBOARD_URL =
-    process.env.HERMES_DASHBOARD_URL || 'http://127.0.0.1:9119'
+  process.env.HERMESCHI_DASHBOARD_URL =
+    process.env.HERMESCHI_DASHBOARD_URL || 'http://127.0.0.1:9119'
 
   const serverBuild = await loadServerBuild()
 
@@ -117,7 +117,7 @@ async function main() {
       }
       res.end()
     } catch (error) {
-      console.error('[Hermes Workspace desktop] SSR error:', error)
+      console.error('[HermesChi desktop] SSR error:', error)
       res.writeHead(500, { 'Content-Type': 'text/plain' })
       res.end('Internal Server Error')
     }
@@ -125,13 +125,13 @@ async function main() {
 
   server.listen(PORT, '127.0.0.1', () => {
     console.log(
-      `[Hermes Workspace desktop] server listening on http://127.0.0.1:${PORT}`,
+      `[HermesChi desktop] server listening on http://127.0.0.1:${PORT}`,
     )
     if (process.send) process.send({ type: 'ready', port: PORT })
   })
 }
 
 main().catch((error) => {
-  console.error('[Hermes Workspace desktop] fatal:', error)
+  console.error('[HermesChi desktop] fatal:', error)
   process.exit(1)
 })

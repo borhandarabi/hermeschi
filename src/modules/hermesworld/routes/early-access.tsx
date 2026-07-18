@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { t } from '@/lib/i18n'
 
-const HERMES_REPO_URL = 'https://github.com/outsourc-e/hermes-workspace'
+const HERMES_REPO_URL = 'https://github.com/outsourc-e/hermeschi'
 const HERMES_DISCORD_URL = 'https://discord.com/invite/agentd'
 
 export const Route = createFileRoute('/early-access')({
