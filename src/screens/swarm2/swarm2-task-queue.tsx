@@ -9,6 +9,7 @@ import {
   ViewIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type WorkerTask = {
   id: string
@@ -177,15 +178,15 @@ export function Swarm2TaskQueue({
         <div className="mb-2">
           <div className="flex items-center justify-between gap-2 text-[10px] font-semibold tracking-[0.02em] text-[var(--theme-muted)]">
             <span className="text-[10px] uppercase tracking-[0.16em] text-[var(--theme-muted)]/80">
-              Tasks
+              {t('swarm.tasks.title')}
             </span>
             <span className="text-[10px] normal-case tracking-normal text-[var(--theme-muted)]/80">
-              {activeTasks.length} active · {doneCount} done
+              {t('swarm.tasks.activeDone', { active: activeTasks.length, done: doneCount })}
             </span>
             <button
               type="button"
-              aria-label={composerOpen ? 'Close add task' : 'Add task'}
-              title={composerOpen ? 'Close add task' : 'Add task'}
+              aria-label={composerOpen ? t('swarm.tasks.closeAddTask') : t('swarm.tasks.addTask')}
+              title={composerOpen ? t('swarm.tasks.closeAddTask') : t('swarm.tasks.addTask')}
               onClick={() => setComposerOpen((value) => !value)}
               className="inline-flex h-5 w-5 items-center justify-center rounded-md text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
             >
@@ -194,8 +195,8 @@ export function Swarm2TaskQueue({
             {hasOverflow ? (
               <button
                 type="button"
-                aria-label={detailsOpen ? 'Collapse task details' : 'Expand task details'}
-                title={detailsOpen ? 'Collapse task details' : 'Expand task details'}
+                aria-label={detailsOpen ? t('swarm.tasks.collapseDetails') : t('swarm.tasks.expandDetails')}
+                title={detailsOpen ? t('swarm.tasks.collapseDetails') : t('swarm.tasks.expandDetails')}
                 onClick={() => setDetailsOpen((value) => !value)}
                 className="inline-flex h-5 w-5 items-center justify-center rounded-md text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
               >
@@ -212,25 +213,25 @@ export function Swarm2TaskQueue({
           <input
             value={draftTitle}
             onChange={(event) => setDraftTitle(event.target.value)}
-            placeholder="Add a task for this agent…"
+            placeholder={t('swarm.tasks.placeholderTitle')}
             className="w-full rounded-md border border-[var(--theme-border)] bg-transparent px-2 py-1.5 text-[12px] text-[var(--theme-text)] outline-none"
           />
           <textarea
             value={draftDescription}
             onChange={(event) => setDraftDescription(event.target.value)}
             rows={2}
-            placeholder="Optional notes"
+            placeholder={t('swarm.tasks.placeholderNotes')}
             className="w-full resize-none rounded-md border border-[var(--theme-border)] bg-transparent px-2 py-1.5 text-[12px] text-[var(--theme-text)] outline-none"
           />
           <div className="flex items-center justify-between gap-2 text-[10px] text-[var(--theme-muted)]">
-            <span>Assigns directly to {workerId}</span>
+            <span>{t('swarm.tasks.assignsTo', { workerId })}</span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setComposerOpen(false)}
                 className="rounded-md border border-[var(--theme-border)] px-2 py-1 hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -238,7 +239,7 @@ export function Swarm2TaskQueue({
                 onClick={() => void createMutation.mutateAsync()}
                 className="rounded-md bg-[var(--theme-accent)] px-2 py-1 font-semibold text-primary-950 disabled:opacity-40"
               >
-                {createMutation.isPending ? 'Adding…' : 'Add task'}
+                {createMutation.isPending ? t('swarm.tasks.adding') : t('swarm.tasks.addTaskButton')}
               </button>
             </div>
           </div>
@@ -247,9 +248,9 @@ export function Swarm2TaskQueue({
 
       <div className={cn('flex-1', centered && 'flex flex-col justify-center')}>
       {query.isPending ? (
-        <p className="pt-2 text-[11px] text-[var(--theme-muted)] text-center">Loading…</p>
+        <p className="pt-2 text-[11px] text-[var(--theme-muted)] text-center">{t('swarm.tasks.loading')}</p>
       ) : totalVisible === 0 ? (
-        <p className="pt-2 text-[11px] text-[var(--theme-muted)] text-center">No tracked tasks yet.</p>
+        <p className="pt-2 text-[11px] text-[var(--theme-muted)] text-center">{t('swarm.tasks.noTracked')}</p>
       ) : (
         <div className="mx-auto max-w-xl space-y-1 text-center">
           {summaryTask ? (
@@ -276,7 +277,7 @@ export function Swarm2TaskQueue({
                       </span>
                       {prioCls ? (
                         <span className={cn('shrink-0 rounded-full border px-1 text-[9px] font-semibold uppercase tracking-[0.16em]', prioCls)}>
-                          {String(task.priority).toUpperCase() === 'HIGH' ? 'P0' : String(task.priority).toUpperCase() === 'MEDIUM' ? 'P1' : 'P2'}
+                          {String(task.priority).toUpperCase() === 'HIGH' ? t('swarm.tasks.priorityP0') : String(task.priority).toUpperCase() === 'MEDIUM' ? t('swarm.tasks.priorityP1') : t('swarm.tasks.priorityP2')}
                         </span>
                       ) : null}
                       <span className="max-w-full truncate text-[11px] text-[var(--theme-text)]" title={task.title || task.description || task.id}>
@@ -322,7 +323,7 @@ export function Swarm2TaskQueue({
               onClick={() => setDetailsOpen((value) => !value)}
               className="w-full rounded-md border border-dashed border-[var(--theme-border)]/70 bg-transparent px-2 py-1 text-center text-[10px] uppercase tracking-[0.18em] text-[var(--theme-muted)] hover:bg-[color:rgba(255,255,255,0.03)] hover:text-[var(--theme-text)]"
             >
-              {detailsOpen ? 'Less' : 'More'}
+              {detailsOpen ? t('common.less') : t('common.more')}
             </button>
           ) : null}
         </div>

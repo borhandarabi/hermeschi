@@ -19,6 +19,7 @@ import { Swarm2TaskQueue } from './swarm2-task-queue'
 import type { CrewMember } from '@/hooks/use-crew-status'
 import { getOnlineStatus } from '@/hooks/use-crew-status'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type WorkerState =
   | 'active'
@@ -46,29 +47,29 @@ function roleFromId(id: string): string {
   const n = m ? m[1] : ''
   switch (n) {
     case '1':
-      return 'PR / Issues'
+      return t('swarm.worker.rolePrIssues')
     case '2':
-      return 'Qwen PC1'
+      return t('swarm.worker.roleQwenPc1')
     case '3':
-      return 'BenchLoop'
+      return t('swarm.worker.roleBenchLoop')
     case '4':
-      return 'Research'
+      return t('swarm.worker.roleResearch')
     case '5':
     case '10':
-      return 'Builder'
+      return t('swarm.worker.roleBuilder')
     case '6':
     case '11':
-      return 'Reviewer'
+      return t('swarm.worker.roleReviewer')
     case '7':
-      return 'Docs'
+      return t('swarm.worker.roleDocs')
     case '8':
-      return 'Ops'
+      return t('swarm.worker.roleOps')
     case '9':
-      return 'Hackathon'
+      return t('swarm.worker.roleHackathon')
     case '12':
-      return 'PR / Issues'
+      return t('swarm.worker.rolePrIssues')
     default:
-      return 'Worker'
+      return t('swarm.worker.roleWorker')
   }
 }
 
@@ -110,30 +111,30 @@ function deriveWorkerState(
 
 function statusStyles(state: WorkerState) {
   if (state === 'error') {
-    return { dot: 'bg-red-500', ring: 'text-red-500', label: 'Error', progress: 'failed' as const, avatar: 'failed' as const }
+    return { dot: 'bg-red-500', ring: 'text-red-500', label: t('swarm.worker.stateError'), progress: 'failed' as const, avatar: 'failed' as const }
   }
   if (state === 'offline') {
-    return { dot: 'bg-primary-300', ring: 'text-primary-300', label: 'Offline', progress: 'queued' as const, avatar: 'idle' as const }
+    return { dot: 'bg-primary-300', ring: 'text-primary-300', label: t('swarm.worker.stateOffline'), progress: 'queued' as const, avatar: 'idle' as const }
   }
   if (state === 'idle') {
-    return { dot: 'bg-primary-300', ring: 'text-primary-300', label: 'Idle', progress: 'queued' as const, avatar: 'idle' as const }
+    return { dot: 'bg-primary-300', ring: 'text-primary-300', label: t('swarm.worker.stateIdle'), progress: 'queued' as const, avatar: 'idle' as const }
   }
   if (state === 'waiting') {
-    return { dot: 'bg-amber-500', ring: 'text-amber-500', label: 'Waiting', progress: 'queued' as const, avatar: 'idle' as const }
+    return { dot: 'bg-amber-500', ring: 'text-amber-500', label: t('swarm.worker.stateWaiting'), progress: 'queued' as const, avatar: 'idle' as const }
   }
   if (state === 'thinking') {
-    return { dot: 'bg-emerald-500', ring: 'text-emerald-500', label: 'Thinking', progress: 'thinking' as const, avatar: 'thinking' as const }
+    return { dot: 'bg-emerald-500', ring: 'text-emerald-500', label: t('swarm.worker.stateThinking'), progress: 'thinking' as const, avatar: 'thinking' as const }
   }
-  return { dot: 'bg-emerald-500', ring: 'text-emerald-500', label: 'Active', progress: 'running' as const, avatar: 'running' as const }
+  return { dot: 'bg-emerald-500', ring: 'text-emerald-500', label: t('swarm.worker.stateActive'), progress: 'running' as const, avatar: 'running' as const }
 }
 
 function relativeOutputTime(ts: number | null | undefined): string {
-  if (!ts) return 'no runtime output yet'
+  if (!ts) return t('swarm.worker.noRuntimeOutput')
   const diff = Date.now() - ts
-  if (diff < 60_000) return 'output just now'
-  if (diff < 3_600_000) return `output ${Math.floor(diff / 60_000)}m ago`
-  if (diff < 86_400_000) return `output ${Math.floor(diff / 3_600_000)}h ago`
-  return `output ${Math.floor(diff / 86_400_000)}d ago`
+  if (diff < 60_000) return t('swarm.worker.outputJustNow')
+  if (diff < 3_600_000) return t('swarm.worker.outputMinutesAgo', { count: Math.floor(diff / 60_000) })
+  if (diff < 86_400_000) return t('swarm.worker.outputHoursAgo', { count: Math.floor(diff / 3_600_000) })
+  return t('swarm.worker.outputDaysAgo', { count: Math.floor(diff / 86_400_000) })
 }
 
 function isLivePulse(ts: number | null | undefined): boolean {
@@ -172,7 +173,7 @@ function formatAssignedModel(model?: string | null, provider?: string | null): s
   if (value.includes('gpt-5.3')) return 'GPT-5.3'
   if (model && model !== 'unknown') return model
   if (provider && provider !== 'unknown') return provider.replace(/^custom:/, '').replace(/[-_]/g, ' ')
-  return 'Worker'
+  return t('swarm.worker.roleWorker')
 }
 
 type WorkerCardSettings = {
@@ -184,17 +185,17 @@ type WorkerCardSettings = {
 
 const SETTINGS_STORAGE_PREFIX = 'claude-swarm2-card-settings:'
 const ROLE_OPTIONS = [
-  'Profile',
-  'PR / Issues',
-  'Builder',
-  'Reviewer',
-  'BenchLoop',
-  'Research',
-  'Docs',
-  'Ops',
-  'Qwen PC1',
-  'Hackathon',
-  'Worker',
+  t('swarm.worker.roleProfile'),
+  t('swarm.worker.rolePrIssues'),
+  t('swarm.worker.roleBuilder'),
+  t('swarm.worker.roleReviewer'),
+  t('swarm.worker.roleBenchLoop'),
+  t('swarm.worker.roleResearch'),
+  t('swarm.worker.roleDocs'),
+  t('swarm.worker.roleOps'),
+  t('swarm.worker.roleQwenPc1'),
+  t('swarm.worker.roleHackathon'),
+  t('swarm.worker.roleWorker'),
 ]
 const MODEL_OPTIONS = [
   'GPT-5.5',
@@ -206,7 +207,7 @@ const MODEL_OPTIONS = [
   'MiniMax',
   'Qwen3 8B',
   'Qwen3 14B',
-  'Worker',
+  t('swarm.worker.roleWorker'),
 ]
 const AVATAR_OPTIONS = ['','🤖','🧠','🛠️','📊','🧪','📝','⚙️','🔬','🚀']
 
@@ -290,23 +291,23 @@ export function OperationalWorkerCard({
     }> = [
       {
         key: 'tasks',
-        label: 'Tasks',
-        meta: `${activeCount} active lanes`,
-        helper: 'Tracked work for this agent lives here.',
+        label: t('swarm.worker.tasks'),
+        meta: t('swarm.worker.tasksActiveLanes', { count: activeCount }),
+        helper: t('swarm.worker.tasksHelper'),
       },
       {
         key: 'output',
-        label: 'Output',
-        meta: `${artifacts.length} artifacts · ${previews.length} previews`,
-        helper: 'Published runtime artifacts, previews, and reports.',
+        label: t('swarm.worker.output'),
+        meta: t('swarm.worker.outputMeta', { artifacts: artifacts.length, previews: previews.length }),
+        helper: t('swarm.worker.outputHelper'),
       },
     ]
     if (cardChangedFiles.length > 0) {
       panels.push({
         key: 'files',
-        label: 'Files',
-        meta: `${cardChangedFiles.length} changed`,
-        helper: 'Git-inferred file changes until runtime artifacts replace them.',
+        label: t('swarm.worker.files'),
+        meta: t('swarm.worker.filesChanged', { count: cardChangedFiles.length }),
+        helper: t('swarm.worker.filesHelper'),
       })
     }
     return panels
@@ -386,7 +387,7 @@ export function OperationalWorkerCard({
             {modelLabel}
           </span>
           <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-1.5 py-0.5">
-            {projectBranch || projectName || (hasPreview ? 'preview' : 'main')}
+            {projectBranch || projectName || (hasPreview ? t('swarm.worker.preview') : t('swarm.worker.main'))}
           </span>
         </div>
         <div className="order-1 flex w-full justify-center px-2 md:order-none md:px-28">
@@ -406,10 +407,10 @@ export function OperationalWorkerCard({
               {livePulse ? (
                 <span
                   className="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-1.5 py-[1px] text-[9px] font-semibold uppercase tracking-[0.16em] text-emerald-200"
-                  title="Output within the last 90 seconds"
+                  title={t('swarm.worker.outputFreshnessTitle')}
                 >
                   <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
-                  live
+                  {t('swarm.worker.live')}
                 </span>
               ) : null}
             </span>
@@ -425,8 +426,8 @@ export function OperationalWorkerCard({
           </span>
           <button
             type="button"
-            aria-label={`Settings for ${displayName}`}
-            title={`Settings for ${displayName}`}
+            aria-label={t('swarm.worker.settingsFor', { name: displayName })}
+            title={t('swarm.worker.settingsFor', { name: displayName })}
             onClick={(event) => {
               event.stopPropagation()
               setSettingsOpen(true)
@@ -463,7 +464,7 @@ export function OperationalWorkerCard({
 
       {!member.profileFound ? (
         <div className="mb-2 rounded-xl border border-amber-400/35 bg-amber-500/10 px-3 py-2 text-center text-[11px] text-amber-200">
-          Roster-only agent, not provisioned yet. Configure now, bootstrap profile later.
+          {t('swarm.worker.rosterOnly')}
         </div>
       ) : null}
 
@@ -491,15 +492,15 @@ export function OperationalWorkerCard({
           <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-muted)]">
             <button
               type="button"
-              aria-label="Previous panel"
-              title="Previous panel"
+              aria-label={t('swarm.worker.previousPanel')}
+              title={t('swarm.worker.previousPanel')}
               onClick={() => cycleFocusPanel(-1)}
               className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[var(--theme-border)] bg-[var(--theme-bg)] text-[var(--theme-muted)] transition-colors hover:text-[var(--theme-text)]"
             >
               <HugeiconsIcon icon={ArrowLeft01Icon} size={11} />
             </button>
             <div className="min-w-0 flex-1 text-center">
-              <div className="truncate">{activeFocusPanel?.label ?? 'Panel'}</div>
+              <div className="truncate">{activeFocusPanel?.label ?? t('swarm.worker.panel')}</div>
               <div className="truncate text-[10px] font-medium normal-case tracking-normal text-[var(--theme-muted)]/80">
                 {activeFocusPanel?.meta ?? outputFreshness}
               </div>
@@ -508,8 +509,8 @@ export function OperationalWorkerCard({
               {focusPanel === 'tasks' ? (
                 <button
                   type="button"
-                  aria-label={taskComposerOpen ? 'Close add task' : 'Add task'}
-                  title={taskComposerOpen ? 'Close add task' : 'Add task'}
+                  aria-label={taskComposerOpen ? t('swarm.tasks.closeAddTask') : t('swarm.tasks.addTask')}
+                  title={taskComposerOpen ? t('swarm.tasks.closeAddTask') : t('swarm.tasks.addTask')}
                   onClick={() => setTaskComposerOpen((value) => !value)}
                   className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[var(--theme-border)] bg-[var(--theme-bg)] text-[var(--theme-muted)] transition-colors hover:text-[var(--theme-text)]"
                 >
@@ -518,8 +519,8 @@ export function OperationalWorkerCard({
               ) : null}
               <button
                 type="button"
-                aria-label="Next panel"
-                title="Next panel"
+                aria-label={t('swarm.worker.nextPanel')}
+                title={t('swarm.worker.nextPanel')}
                 onClick={() => cycleFocusPanel(1)}
                 className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[var(--theme-border)] bg-[var(--theme-bg)] text-[var(--theme-muted)] transition-colors hover:text-[var(--theme-text)]"
               >
@@ -529,7 +530,7 @@ export function OperationalWorkerCard({
           </div>
 
           <p className="mb-2 mx-auto max-w-2xl text-center text-[11px] leading-relaxed text-[var(--theme-muted)]">
-            {activeFocusPanel?.helper ?? 'Worker details'}
+            {activeFocusPanel?.helper ?? t('swarm.worker.workerDetails')}
           </p>
 
           {focusPanel === 'tasks' ? (
@@ -581,11 +582,11 @@ export function OperationalWorkerCard({
         <button
           type="button"
           onClick={onOpenTasks}
-          title={`Route work to ${member.displayName || member.id}`}
+          title={t('swarm.worker.routeWorkTo', { name: member.displayName || member.id })}
           className="inline-flex items-center gap-1 rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2.5 py-1 text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]"
         >
           <HugeiconsIcon icon={CheckListIcon} size={11} />
-          Route to agent
+          {t('swarm.worker.routeToAgent')}
         </button>
         <button
           type="button"
@@ -593,7 +594,7 @@ export function OperationalWorkerCard({
           className="inline-flex items-center gap-1 rounded-full border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2.5 py-1 text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-card2)] hover:text-[var(--theme-text)]"
         >
           <HugeiconsIcon icon={ComputerTerminal01Icon} size={11} />
-          Open terminal
+          {t('swarm.worker.openTerminal')}
         </button>
       </div>
       </>
@@ -612,8 +613,8 @@ export function OperationalWorkerCard({
           >
             <div className="mb-3 flex items-center justify-between">
               <div>
-                <h4 className="text-sm font-semibold text-[var(--theme-text)]">Agent settings</h4>
-                <p className="text-[11px] text-[var(--theme-muted)]">Local card overrides for now, native worker settings next.</p>
+                <h4 className="text-sm font-semibold text-[var(--theme-text)]">{t('swarm.worker.agentSettings')}</h4>
+                <p className="text-[11px] text-[var(--theme-muted)]">{t('swarm.worker.agentSettingsDesc')}</p>
               </div>
               <button
                 type="button"
@@ -625,7 +626,7 @@ export function OperationalWorkerCard({
             </div>
             <div className="space-y-3 text-[12px]">
               <label className="block">
-                <span className="mb-1 block text-[var(--theme-muted)]">Name</span>
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.worker.name')}</span>
                 <input
                   value={draftName}
                   onChange={(event) => setDraftName(event.target.value)}
@@ -634,13 +635,13 @@ export function OperationalWorkerCard({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-[var(--theme-muted)]">Avatar glyph</span>
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.worker.avatarGlyph')}</span>
                 <select
                   value={draftAvatar}
                   onChange={(event) => setDraftAvatar(event.target.value)}
                   className="w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-[var(--theme-text)] outline-none"
                 >
-                  <option value="">None</option>
+                  <option value="">{t('swarm.worker.none')}</option>
                   {AVATAR_OPTIONS.filter(Boolean).map((option) => (
                     <option key={option} value={option}>
                       {option}
@@ -649,7 +650,7 @@ export function OperationalWorkerCard({
                 </select>
               </label>
               <label className="block">
-                <span className="mb-1 block text-[var(--theme-muted)]">Role</span>
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.worker.role')}</span>
                 <select
                   value={draftRole}
                   onChange={(event) => setDraftRole(event.target.value)}
@@ -663,7 +664,7 @@ export function OperationalWorkerCard({
                 </select>
               </label>
               <label className="block">
-                <span className="mb-1 block text-[var(--theme-muted)]">Model label</span>
+                <span className="mb-1 block text-[var(--theme-muted)]">{t('swarm.worker.modelLabel')}</span>
                 <select
                   value={draftModel}
                   onChange={(event) => setDraftModel(event.target.value)}
@@ -692,7 +693,7 @@ export function OperationalWorkerCard({
                   setSettingsOpen(false)
                 }}
               >
-                Reset
+                {t('common.reset')}
               </button>
               <div className="flex items-center gap-2">
                 <button
@@ -700,7 +701,7 @@ export function OperationalWorkerCard({
                   className="rounded-xl border border-[var(--theme-border)] px-3 py-2 text-[11px] text-[var(--theme-muted)] hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
                   onClick={() => setSettingsOpen(false)}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="button"
@@ -721,7 +722,7 @@ export function OperationalWorkerCard({
                     setSettingsOpen(false)
                   }}
                 >
-                  Save
+                  {t('common.save')}
                 </button>
               </div>
             </div>
