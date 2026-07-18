@@ -2,6 +2,7 @@ import {
   WIDGET_CATALOG,
   type DashboardLayout,
 } from '@/screens/dashboard/lib/use-dashboard-layout'
+import { t } from '@/lib/i18n'
 
 /**
  * Edit-mode banner. Renders only when `layout.editMode` is true.
@@ -42,13 +43,13 @@ export function EditModePanel({ layout }: { layout: DashboardLayout }) {
               color: 'var(--theme-accent)',
             }}
           >
-            Edit mode
+            {t('dashboard.editMode')}
           </span>
           <span
             className="font-mono text-[10px] uppercase tracking-[0.15em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            {layout.counts.visible} of {layout.counts.total} widgets shown
+            {layout.counts.visible} / {layout.counts.total}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -61,9 +62,9 @@ export function EditModePanel({ layout }: { layout: DashboardLayout }) {
               borderColor: 'var(--theme-border)',
               color: 'var(--theme-text)',
             }}
-            title="Show every widget again"
+            title={t('dashboard.editModeReset')}
           >
-            Reset
+            {t('dashboard.editModeReset')}
           </button>
           <button
             type="button"
@@ -74,16 +75,16 @@ export function EditModePanel({ layout }: { layout: DashboardLayout }) {
                 'linear-gradient(135deg, var(--theme-accent), color-mix(in srgb, var(--theme-accent) 60%, transparent))',
               color: 'var(--theme-on-accent, white)',
             }}
-            title="Exit edit mode"
+            title={t('dashboard.editModeDone')}
           >
-            Done
+            {t('dashboard.editModeDone')}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <Group title="Main column" layout={layout} widgets={main} />
-        <Group title="Side rail" layout={layout} widgets={rail} />
+        <Group title={t('dashboard.editMode')} layout={layout} widgets={main} />
+        <Group title={t('dashboard.editMode')} layout={layout} widgets={rail} />
       </div>
     </div>
   )
@@ -128,7 +129,7 @@ function Group({
                   ? 'var(--theme-success)'
                   : 'var(--theme-muted)',
               }}
-              title={w.description}
+              title={w.descKey ? t(w.descKey) : undefined}
             >
               <span
                 className="inline-block size-1.5 rounded-full"
@@ -138,7 +139,7 @@ function Group({
                     : 'var(--theme-muted)',
                 }}
               />
-              {w.label}
+              {t(w.labelKey)}
             </button>
           )
         })}

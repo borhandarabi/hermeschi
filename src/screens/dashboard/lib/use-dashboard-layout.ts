@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 const STORAGE_KEY = 'dashboard.layout.v1'
 
@@ -26,8 +27,10 @@ export type WidgetId =
 
 export type WidgetMeta = {
   id: WidgetId
-  label: string
-  description: string
+  /** i18n key for the widget's display label. */
+  labelKey: TranslationKey
+  /** i18n key for the widget's description (shown in edit-mode tooltip). */
+  descKey: TranslationKey
   column: 'main' | 'rail'
   /** Defaults to true; widgets opt-in to being hideable explicitly so
    *  we can keep "Attention" mandatory if we want, etc. */
@@ -37,91 +40,85 @@ export type WidgetMeta = {
 export const WIDGET_CATALOG: ReadonlyArray<WidgetMeta> = [
   {
     id: 'analytics_chart',
-    label: 'Analytics chart',
-    description: 'Tokens/sessions/calls trend with period switcher.',
+    labelKey: 'dashboard.card.analyticsChart',
+    descKey: 'dashboard.card.analyticsChartDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'top_models',
-    label: 'Top models',
-    description: 'Routing share by model in the analytics window.',
+    labelKey: 'dashboard.card.topModels',
+    descKey: 'dashboard.card.topModelsDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'provider_mix',
-    label: 'Provider mix',
-    description:
-      'Token share by provider family (anthropic / openai / local / etc).',
+    labelKey: 'dashboard.card.providerMix',
+    descKey: 'dashboard.card.providerMixDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'cache_efficiency',
-    label: 'Cache efficiency',
-    description:
-      'Cache-hit rate with daily sparkline. Higher = lower cost.',
+    labelKey: 'dashboard.card.cacheEfficiency',
+    descKey: 'dashboard.card.cacheEfficiencyDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'velocity',
-    label: 'Velocity',
-    description:
-      'Sessions/day average + delta vs prior period + sparkline.',
+    labelKey: 'dashboard.card.velocity',
+    descKey: 'dashboard.card.velocityDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'cost_ledger',
-    label: 'Cost ledger',
-    description:
-      'Per-model cost split between paid providers and subscription/local.',
+    labelKey: 'dashboard.card.costLedger',
+    descKey: 'dashboard.card.costLedgerDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'sessions_intelligence',
-    label: 'Sessions intelligence',
-    description: 'Recent sessions with token / tool / status badges.',
+    labelKey: 'dashboard.card.sessionsIntelligence',
+    descKey: 'dashboard.card.sessionsIntelligenceDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'logs_tail',
-    label: 'Live logs',
-    description:
-      'Tail of the gateway log stream. Off by default in iter 006 — enable here when triaging.',
+    labelKey: 'dashboard.card.logsTail',
+    descKey: 'dashboard.card.logsTailDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'operator_tip',
-    label: 'Operator tip',
-    description:
-      'Context-aware tip that adapts to the live overview (cache, cron, drift, etc.).',
+    labelKey: 'dashboard.card.operatorTips',
+    descKey: 'dashboard.card.operatorTipsDesc',
     column: 'main',
     hideable: true,
   },
   {
     id: 'skills_usage',
-    label: 'Skills usage',
-    description: 'Top-5 used skills as a bar chart.',
+    labelKey: 'dashboard.card.skillsUsage',
+    descKey: 'dashboard.card.skillsUsageDesc',
     column: 'rail',
     hideable: true,
   },
   {
     id: 'achievements',
-    label: 'Achievements',
-    description: 'Recent unlocks & progress.',
+    labelKey: 'dashboard.card.achievements',
+    descKey: 'dashboard.card.achievementsDesc',
     column: 'rail',
     hideable: true,
   },
   {
     id: 'mix_rhythm',
-    label: 'Mix & rhythm',
-    description: 'Token mix + hour-of-day activity strip.',
+    labelKey: 'dashboard.card.tokenMixHour',
+    descKey: 'dashboard.card.tokenMixHourDesc',
     column: 'rail',
     hideable: true,
   },

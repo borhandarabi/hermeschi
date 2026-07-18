@@ -48,6 +48,7 @@ import type { ClaudeSession } from '@/server/claude-api'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
 import { getUnavailableReason } from '@/lib/feature-gates'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 import { applyTheme, useSettingsStore } from '@/hooks/use-settings'
 import { openHamburgerMenu } from '@/components/mobile-hamburger-menu'
 import { useFeatureAvailable } from '@/hooks/use-feature-available'
@@ -257,7 +258,7 @@ function ActivityChart({
     const now = Date.now() / 1000
     for (let i = 13; i >= 0; i--) {
       const d = new Date((now - i * 86400) * 1000)
-      const key = d.toLocaleDateString('en-US', {
+      const key = d.toLocaleDateString(getLocale(), {
         month: 'short',
         day: 'numeric',
       })
@@ -266,7 +267,7 @@ function ActivityChart({
     for (const s of sessions) {
       if (!s.started_at) continue
       const d = new Date(s.started_at * 1000)
-      const key = d.toLocaleDateString('en-US', {
+      const key = d.toLocaleDateString(getLocale(), {
         month: 'short',
         day: 'numeric',
       })
@@ -287,8 +288,8 @@ function ActivityChart({
 
   return (
     <GlassCard
-      title="Activity"
-      titleRight={<span className="text-[10px] text-muted">14 days</span>}
+      title={t('dashboard.noActivity')}
+      titleRight={<span className="text-[10px] text-muted">{t('dashboard.last30Days')}</span>}
       accentColor={palette.accent}
       className="h-full"
     >
@@ -405,7 +406,7 @@ function SkillsWidget({
   if (!skillsAvailable) {
     return (
       <UnavailableWidget
-        title="Skills"
+        title={t('nav.skills')}
         description={getUnavailableReason('skills')}
       />
     )
@@ -1144,7 +1145,7 @@ export function DashboardScreen() {
               <WidgetShell id="sessions_intelligence" layout={layout}>
                 {sessionsQuery.isError || sessionsUnavailable ? (
                   <UnavailableWidget
-                    title="Recent Sessions"
+                    title={t('dashboard.recentSessions')}
                     description={
                       sessionsQuery.isError
                         ? getUnavailableReason('sessions')

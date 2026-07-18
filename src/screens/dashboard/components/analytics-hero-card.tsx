@@ -16,6 +16,7 @@ import {
   CancelIcon,
 } from '@hugeicons/core-free-icons'
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
+import { t, getLocale } from '@/lib/i18n'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
 
 function formatTokens(n: number): string {
@@ -38,7 +39,7 @@ function shortDay(day: string): string {
   // Native API gives `YYYY-MM-DD`. Render as `Apr 18` etc. for axis ticks.
   const ts = Date.parse(day)
   if (!Number.isFinite(ts)) return day
-  return new Date(ts).toLocaleDateString('en-US', {
+  return new Date(ts).toLocaleDateString(getLocale(), {
     month: 'short',
     day: 'numeric',
   })
