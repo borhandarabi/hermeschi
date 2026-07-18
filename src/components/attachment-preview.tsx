@@ -11,6 +11,7 @@ import {
   PreviewCardTrigger,
 } from '@/components/ui/preview-card'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type AttachmentPreviewProps = {
   attachment: AttachmentFile
@@ -86,7 +87,7 @@ export function AttachmentPreview({
               size="icon-sm"
               onClick={() => onRemove(attachment.id)}
               className="size-5 shrink-0 rounded-full hover:bg-primary-200"
-              aria-label="Remove attachment"
+              aria-label={t('attachmentPreview.remove')}
               type="button"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} />
@@ -108,7 +109,7 @@ export function AttachmentPreview({
               <div className="flex items-center gap-2 text-xs text-primary-600">
                 <HugeiconsIcon icon={File01Icon} size={20} />
                 <span className="tabular-nums">
-                  {getFileExtension(attachment.file.name) || 'FILE'}
+                  {getFileExtension(attachment.file.name) || t('attachmentPreview.fileFallback')}
                 </span>
               </div>
             </div>

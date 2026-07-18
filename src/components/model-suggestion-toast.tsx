@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
+import { t } from '@/lib/i18n'
 
 type ModelSuggestionToastProps = {
   suggestedModel: string
@@ -40,7 +41,7 @@ export function ModelSuggestionToast({
             <span className="text-lg">💡</span>
             <div>
               <p className="text-sm font-medium text-primary-900">
-                Try {getModelDisplayName(suggestedModel)}?
+                {t('modelSuggestion.title', { model: getModelDisplayName(suggestedModel) })}
               </p>
               <p className="mt-0.5 text-xs text-primary-600">{reason}</p>
               {costImpact && (
@@ -54,7 +55,7 @@ export function ModelSuggestionToast({
             type="button"
             onClick={onDismiss}
             className="shrink-0 rounded-md p-1 text-primary-500 hover:bg-primary-200 hover:text-primary-900"
-            aria-label="Dismiss"
+            aria-label={t('modelSuggestion.dismiss')}
           >
             <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={1.5} />
           </button>
@@ -62,7 +63,7 @@ export function ModelSuggestionToast({
 
         <div className="flex gap-2">
           <Button size="sm" onClick={onSwitch} className="flex-1">
-            Switch
+            {t('modelSuggestion.switch')}
           </Button>
           <Button
             size="sm"
@@ -70,7 +71,7 @@ export function ModelSuggestionToast({
             onClick={onDismissForSession}
             className="flex-1"
           >
-            Not for this session
+            {t('modelSuggestion.notForSession')}
           </Button>
         </div>
       </div>

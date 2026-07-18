@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm'
 import { CodeBlock } from './code-block'
 import type { Components } from 'react-markdown'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 /**
  * Rewrite Workspace-local `MEDIA:<path>` tokens emitted by Hermes Agent to the
@@ -325,7 +326,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
     if (context) {
       const index = context.columnIndexRef.current
       context.columnIndexRef.current += 1
-      label = context.headersRef.current[index] ?? `Column ${index + 1}`
+      label = context.headersRef.current[index] ?? t('markdown.column', { index: index + 1 })
     }
     return (
       <td

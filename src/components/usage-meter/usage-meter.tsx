@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils'
 import { toast } from '@/components/ui/toast'
 import { SEARCH_MODAL_EVENTS } from '@/hooks/use-search-modal'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 const POLL_INTERVAL_MS = 10_000
 const PROVIDER_POLL_INTERVAL_MS = 30_000
@@ -28,11 +29,11 @@ const THRESHOLDS = [50, 75, 90]
 
 type StatsView = 'session' | 'provider' | 'cost' | 'agents'
 
-const STATS_VIEW_LABELS: Record<StatsView, string> = {
-  session: 'Session Stats',
-  provider: 'Provider Usage',
-  cost: 'Cost Breakdown',
-  agents: 'Agent Activity',
+const STATS_VIEW_LABELS: Record<StatsView, TranslationKey> = {
+  session: 'usageMeter.sessionStats',
+  provider: 'usageMeter.providerUsage',
+  cost: 'usageMeter.costBreakdown',
+  agents: 'usageMeter.agentActivity',
 }
 
 const PREFERRED_PROVIDER_KEY = 'clawsuite-preferred-provider'
@@ -498,7 +499,7 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
       const silent =
         /unauthorized/i.test(errorMessage) || /not found/i.test(errorMessage)
       if (!silent) {
-        toast('Failed to fetch usage data', { type: 'error' })
+        toast(t('usageMeter.fetchFailed'), { type: 'error' })
       }
     }
   }, [statusSessionKey])
@@ -727,25 +728,25 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
           <>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                In
+                {t('usageMeter.labelIn')}
               </span>
               <span>{formatTokens(usage.inputTokens)}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                Out
+                {t('usageMeter.labelOut')}
               </span>
               <span>{formatTokens(usage.outputTokens)}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                Ctx
+                {t('usageMeter.labelCtx')}
               </span>
               <span>{Math.round(usage.contextPercent)}%</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                Cost
+                {t('usageMeter.labelCost')}
               </span>
               <span>{formatCurrency(usage.dailyCost)}</span>
             </div>
@@ -806,7 +807,7 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
           )
         }
         return (
-          <span className="text-[10px] text-primary-500">No provider data</span>
+          <span className="text-[10px] text-primary-500">{t('usageMeter.noProviderData')}</span>
         )
       }
 
@@ -839,7 +840,7 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
         return (
           <div className="flex items-center gap-1">
             <span className="text-[10px] uppercase tracking-wide text-primary-600">
-              Total
+              {t('usageMeter.labelTotal')}
             </span>
             <span>{formatCurrency(usage.dailyCost)}</span>
           </div>
@@ -851,19 +852,19 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
           <>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                Active
+                {t('usageMeter.labelActive')}
               </span>
               <span>{agentActivity.activeAgents}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                Spawned
+                {t('usageMeter.labelSpawned')}
               </span>
               <span>{agentActivity.totalSpawned}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[10px] uppercase tracking-wide text-primary-600">
-                Cost
+                {t('usageMeter.labelCost')}
               </span>
               <span>{formatCurrency(agentActivity.totalAgentCost)}</span>
             </div>
@@ -889,7 +890,7 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
             data-tour="usage-meter"
           >
             <span className="text-[9px] uppercase tracking-widest text-primary-500 opacity-75">
-              {STATS_VIEW_LABELS[statsView].split(' ')[0]}
+              {t(STATS_VIEW_LABELS[statsView]).split(' ')[0]}
             </span>
             <span className="text-primary-300">|</span>
             {renderPillContent()}
@@ -903,12 +904,12 @@ export function UsageMeter({ visible = true }: { visible?: boolean }) {
                   statsView === view && 'bg-amber-100 text-amber-800',
                 )}
               >
-                <span className="flex-1">{STATS_VIEW_LABELS[view]}</span>
+                <span className="flex-1">{t(STATS_VIEW_LABELS[view])}</span>
                 {statsView === view && <span className="text-amber-600">✓</span>}
               </MenuItem>
             ))}
             <div className="my-1 h-px bg-primary-100" />
-            <MenuItem onClick={() => setOpen(true)}>View Details…</MenuItem>
+            <MenuItem onClick={() => setOpen(true)}>{t('usageMeter.viewDetails')}</MenuItem>
           </MenuContent>
         </MenuRoot>
       ) : null}

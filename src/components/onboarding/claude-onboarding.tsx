@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/utils'
 import { ProviderLogo } from '@/components/provider-logo'
+import { t, type TranslationKey } from '@/lib/i18n'
 
 const KNOWN_PROVIDER_PREFIXES = [
   'openrouter',
@@ -64,21 +65,21 @@ const PROVIDERS = [
     id: 'nous',
     name: 'Nous Portal',
     logo: '/providers/nous.png',
-    desc: 'Free via OAuth',
+    descKey: 'claudeOnboarding.provider.nous.desc' as TranslationKey,
     authType: 'oauth',
   },
   {
     id: 'openai-codex',
     name: 'OpenAI Codex',
     logo: '/providers/openai.png',
-    desc: 'Free via ChatGPT Pro',
+    descKey: 'claudeOnboarding.provider.openaiCodex.desc' as TranslationKey,
     authType: 'oauth',
   },
   {
     id: 'anthropic',
     name: 'Anthropic',
     logo: '/providers/anthropic.png',
-    desc: 'API key required',
+    descKey: 'claudeOnboarding.provider.anthropic.desc' as TranslationKey,
     authType: 'api_key',
     envKey: 'ANTHROPIC_API_KEY',
   },
@@ -86,7 +87,7 @@ const PROVIDERS = [
     id: 'openrouter',
     name: 'OpenRouter',
     logo: '/providers/openrouter.png',
-    desc: 'API key required',
+    descKey: 'claudeOnboarding.provider.openrouter.desc' as TranslationKey,
     authType: 'api_key',
     envKey: 'OPENROUTER_API_KEY',
   },
@@ -94,21 +95,21 @@ const PROVIDERS = [
     id: 'ollama',
     name: 'Ollama',
     logo: '/providers/ollama.png',
-    desc: 'Local models, no key needed',
+    descKey: 'claudeOnboarding.provider.ollama.desc' as TranslationKey,
     authType: 'none',
   },
   {
     id: 'atomic-chat',
     name: 'Atomic Chat',
     logo: '/providers/atomic-chat.png',
-    desc: 'Local LLMs via Atomic Chat desktop app',
+    descKey: 'claudeOnboarding.provider.atomicChat.desc' as TranslationKey,
     authType: 'none',
   },
   {
     id: 'custom',
     name: 'Custom (OpenAI-compat)',
     logo: '/providers/openai.png',
-    desc: 'Any OpenAI-compatible endpoint',
+    descKey: 'claudeOnboarding.provider.custom.desc' as TranslationKey,
     authType: 'custom',
   },
 ]
@@ -117,17 +118,17 @@ function getEnhancedFeatureNames(
   capabilities?: GatewayStatusResponse['capabilities'],
 ): Array<string> {
   if (!capabilities) return []
-  const features: Array<{ enabled?: boolean; label: string }> = [
-    { enabled: capabilities.sessions, label: 'Sessions' },
-    { enabled: capabilities.skills, label: 'Skills' },
-    { enabled: capabilities.memory, label: 'Memory' },
-    { enabled: capabilities.config, label: 'In-app config' },
-    { enabled: capabilities.jobs, label: 'Jobs' },
+  const features: Array<{ enabled?: boolean; labelKey: TranslationKey }> = [
+    { enabled: capabilities.sessions, labelKey: 'claudeOnboarding.feature.sessions' },
+    { enabled: capabilities.skills, labelKey: 'claudeOnboarding.feature.skills' },
+    { enabled: capabilities.memory, labelKey: 'claudeOnboarding.feature.memory' },
+    { enabled: capabilities.config, labelKey: 'claudeOnboarding.feature.inAppConfig' },
+    { enabled: capabilities.jobs, labelKey: 'claudeOnboarding.feature.jobs' },
   ]
 
   return features
     .filter((feature) => feature.enabled)
-    .map((feature) => feature.label)
+    .map((feature) => t(feature.labelKey))
 }
 
 export function ClaudeOnboarding() {
@@ -240,8 +241,8 @@ export function ClaudeOnboarding() {
         setBackendStatus('ready')
         setBackendMessage(
           data.capabilities.sessions
-            ? 'Backend connected. Core chat works, and Hermes Agent gateway enhancements are available.'
-            : 'Backend connected. Core chat is ready.',
+            ? t('claudeOnboarding.backendConnectedEnhanced')
+            : t('claudeOnboarding.backendConnectedCore'),
         )
         return
       }
@@ -249,18 +250,18 @@ export function ClaudeOnboarding() {
       if (data.capabilities?.health) {
         setBackendStatus('error')
         setBackendMessage(
-          'Backend is reachable, but /v1/chat/completions is not available yet.',
+          t('claudeOnboarding.backendReachableNoChat'),
         )
         return
       }
 
       setBackendStatus('error')
-      setBackendMessage('No compatible backend detected yet.')
+      setBackendMessage(t('claudeOnboarding.noBackendDetected'))
     } catch (err) {
       setBackendInfo(null)
       setBackendStatus('error')
       setBackendMessage(
-        err instanceof Error ? err.message : 'Connection check failed',
+        err instanceof Error ? err.message : t('claudeOnboarding.connectionCheckFailed'),
       )
     }
   }, [])
@@ -298,7 +299,7 @@ export function ClaudeOnboarding() {
       await loadModels()
       return true
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Failed to save')
+      setSaveError(err instanceof Error ? err.message : t('claudeOnboarding.saveFailed'))
       return false
     } finally {
       setSaving(false)
@@ -333,7 +334,7 @@ export function ClaudeOnboarding() {
       if (!res.ok) throw new Error(`Save failed: ${res.status}`)
       return true
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Failed to save model')
+      setSaveError(err instanceof Error ? err.message : t('claudeOnboarding.saveModelFailed'))
       return false
     }
   }, [canEditConfig, configuredModel, selectedModel, selectedProvider])
@@ -373,11 +374,11 @@ export function ClaudeOnboarding() {
         }
       }
 
-      setTestMessage(text.slice(0, 240) || 'Chat test succeeded.')
+      setTestMessage(text.slice(0, 240) || t('claudeOnboarding.chatTestSucceeded'))
       setTestStatus('success')
       void checkBackend()
     } catch (err) {
-      setTestMessage(err instanceof Error ? err.message : 'Connection failed')
+      setTestMessage(err instanceof Error ? err.message : t('claudeOnboarding.connectionFailed'))
       setTestStatus('error')
     }
   }, [checkBackend])
@@ -401,7 +402,7 @@ export function ClaudeOnboarding() {
       }
 
       if (!res.ok || data.error) {
-        setOauthError(data.error || 'Failed to start OAuth')
+        setOauthError(data.error || t('claudeOnboarding.startOauthFailed'))
         setOauthStep('error')
         return
       }
@@ -440,14 +441,14 @@ export function ClaudeOnboarding() {
 
           if (pollData.status === 'error') {
             if (oauthPollRef.current) clearInterval(oauthPollRef.current)
-            setOauthError(pollData.message || 'Authentication failed')
+            setOauthError(pollData.message || t('claudeOnboarding.authenticationFailed'))
             setOauthStep('error')
           }
         } catch {}
       }, intervalMs)
     } catch (err) {
       setOauthError(
-        err instanceof Error ? err.message : 'Failed to start OAuth',
+        err instanceof Error ? err.message : t('claudeOnboarding.startOauthFailed'),
       )
       setOauthStep('error')
     }
@@ -522,16 +523,15 @@ export function ClaudeOnboarding() {
             <div className="space-y-4 text-center">
               <img
                 src="/claude-avatar.webp"
-                alt="Hermes Agent"
+                alt={t('claudeOnboarding.hermesAgent')}
                 className="mx-auto size-20 rounded-2xl"
                 style={{
                   filter: 'drop-shadow(0 8px 24px rgba(99,102,241,0.3))',
                 }}
               />
-              <h2 className="text-xl font-bold">Welcome to Hermes Workspace</h2>
+              <h2 className="text-xl font-bold">{t('claudeOnboarding.welcomeTitle')}</h2>
               <p className="text-sm" style={mutedStyle}>
-                Works with any OpenAI-compatible backend. Hermes Agent gateway APIs
-                unlock sessions, memory, skills, and other extras automatically.
+                {t('claudeOnboarding.welcomeBody')}
               </p>
               <button
                 onClick={() => {
@@ -540,10 +540,10 @@ export function ClaudeOnboarding() {
                 }}
                 className="w-full rounded-xl bg-accent-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
               >
-                Connect Backend
+                {t('claudeOnboarding.connectBackend')}
               </button>
               <button onClick={complete} className="text-xs" style={mutedStyle}>
-                Skip setup
+                {t('claudeOnboarding.skipSetup')}
               </button>
             </div>
           )}
@@ -551,10 +551,9 @@ export function ClaudeOnboarding() {
           {step === 'connect' && (
             <div className="space-y-4 text-center">
               <div className="text-4xl">🔌</div>
-              <h2 className="text-lg font-bold">Connect Your Backend</h2>
+              <h2 className="text-lg font-bold">{t('claudeOnboarding.connectYourBackend')}</h2>
               <p className="text-sm" style={mutedStyle}>
-                Start by verifying that Hermes Workspace can reach your
-                OpenAI-compatible backend.
+                {t('claudeOnboarding.connectBody')}
               </p>
 
               {backendStatus === 'checking' && (
@@ -563,7 +562,7 @@ export function ClaudeOnboarding() {
                   style={mutedStyle}
                 >
                   <span className="size-2 animate-pulse rounded-full bg-accent-500" />
-                  Checking backend capabilities...
+                  {t('claudeOnboarding.checkingBackend')}
                 </div>
               )}
 
@@ -577,9 +576,9 @@ export function ClaudeOnboarding() {
                     className="rounded-xl p-3 text-left text-xs"
                     style={cardStyle}
                   >
-                    <p style={mutedStyle}>Backend URL</p>
+                    <p style={mutedStyle}>{t('claudeOnboarding.backendUrl')}</p>
                     <p className="mt-1 font-mono">
-                      {backendInfo?.claudeUrl || 'Configured automatically'}
+                      {backendInfo?.claudeUrl || t('claudeOnboarding.configuredAutomatically')}
                     </p>
                   </div>
                 </div>
@@ -596,13 +595,10 @@ export function ClaudeOnboarding() {
                     style={{ ...cardStyle, borderColor: 'var(--theme-border)' }}
                   >
                     <p className="font-medium text-white">
-                      Compatible backends
+                      {t('claudeOnboarding.compatibleBackends')}
                     </p>
                     <p className="mt-2" style={mutedStyle}>
-                      Use any backend that exposes{' '}
-                      <code>/v1/chat/completions</code>. If you point Hermes Agent
-                      Workspace at a Hermes Agent gateway, enhanced features unlock
-                      automatically.
+                      {t('claudeOnboarding.compatibleBackendsBody')}
                     </p>
                     <div
                       className="mt-3 rounded-lg px-3 py-2 font-mono text-[11px]"
@@ -626,7 +622,7 @@ export function ClaudeOnboarding() {
                   className="flex-1 rounded-xl border py-3 text-sm font-semibold transition-colors"
                   style={{ borderColor: 'var(--theme-border)' }}
                 >
-                  Retry
+                  {t('claudeOnboarding.retry')}
                 </button>
                 <button
                   onClick={() => {
@@ -636,7 +632,7 @@ export function ClaudeOnboarding() {
                   disabled={backendStatus !== 'ready'}
                   className="flex-1 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-600 disabled:opacity-50"
                 >
-                  Continue
+                  {t('claudeOnboarding.continue')}
                 </button>
               </div>
             </div>
@@ -645,24 +641,24 @@ export function ClaudeOnboarding() {
           {step === 'provider' && (
             <div className="space-y-4">
               <h2 className="text-center text-lg font-bold">
-                Choose Provider and Model
+                {t('claudeOnboarding.chooseProviderTitle')}
               </h2>
               <p className="text-center text-xs" style={mutedStyle}>
                 {canEditConfig
-                  ? 'Save provider settings here, then choose a model before testing chat.'
-                  : 'This backend manages provider settings outside Hermes Workspace. Confirm the model you expect to use, then test chat.'}
+                  ? t('claudeOnboarding.providerEditableBody')
+                  : t('claudeOnboarding.providerManagedBody')}
               </p>
 
               <div className="rounded-xl p-3 text-xs" style={cardStyle}>
-                <p style={mutedStyle}>Backend mode</p>
+                <p style={mutedStyle}>{t('claudeOnboarding.backendMode')}</p>
                 <p className="mt-1">
                   {backendInfo?.capabilities?.sessions
-                    ? 'Hermes Agent gateway detected'
-                    : 'Portable OpenAI-compatible backend'}
+                    ? t('claudeOnboarding.gatewayDetected')
+                    : t('claudeOnboarding.portableBackend')}
                 </p>
                 {configuredModel ? (
                   <p className="mt-2" style={mutedStyle}>
-                    Current model:{' '}
+                    {t('claudeOnboarding.currentModel')}{' '}
                     <span className="font-mono text-accent-400">
                       {configuredModel}
                     </span>
@@ -681,7 +677,9 @@ export function ClaudeOnboarding() {
                         id: p.id,
                         name: p.name || p.id,
                         logo: '/providers/openai.png',
-                        desc: p.configured ? 'Configured provider' : 'Custom provider',
+                        descKey: (p.configured
+                          ? 'claudeOnboarding.configuredProvider'
+                          : 'claudeOnboarding.customProvider') as TranslationKey,
                         authType: 'custom' as const,
                       })),
                   ]
@@ -708,7 +706,7 @@ export function ClaudeOnboarding() {
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-semibold">{p.name}</div>
                         <div className="text-xs" style={mutedStyle}>
-                          {p.desc}
+                          {t(p.descKey)}
                         </div>
                       </div>
                       {selectedProvider === p.id ? (
@@ -732,7 +730,7 @@ export function ClaudeOnboarding() {
                         onClick={startNousOAuth}
                         className="w-full rounded-lg bg-accent-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
                       >
-                        Connect with Nous Portal
+                        {t('claudeOnboarding.connectWithNous')}
                       </button>
                     )}
                     {oauthStep === 'loading' && (
@@ -741,7 +739,7 @@ export function ClaudeOnboarding() {
                         style={mutedStyle}
                       >
                         <span className="size-2 animate-pulse rounded-full bg-accent-500" />
-                        Starting OAuth flow...
+                        {t('claudeOnboarding.startingOauth')}
                       </div>
                     )}
                     {oauthStep === 'waiting' && (
@@ -751,12 +749,12 @@ export function ClaudeOnboarding() {
                           style={mutedStyle}
                         >
                           <span className="size-2 animate-pulse rounded-full bg-yellow-400" />
-                          Waiting for approval...
+                          {t('claudeOnboarding.waitingApproval')}
                         </div>
                         {oauthUserCode ? (
                           <div className="space-y-1 text-center">
                             <p className="text-xs" style={mutedStyle}>
-                              Your code
+                              {t('claudeOnboarding.yourCode')}
                             </p>
                             <p className="text-2xl font-mono font-bold tracking-widest">
                               {oauthUserCode}
@@ -771,7 +769,7 @@ export function ClaudeOnboarding() {
                             className="w-full rounded-lg border py-2 text-xs font-medium"
                             style={{ borderColor: 'var(--theme-border)' }}
                           >
-                            Open Nous Portal ↗
+                            {t('claudeOnboarding.openNousPortal')}
                           </button>
                         ) : null}
                       </div>
@@ -779,19 +777,19 @@ export function ClaudeOnboarding() {
                     {oauthStep === 'success' && (
                       <div className="flex items-center gap-2 text-sm text-green-500">
                         <span>✓</span>
-                        <span>Authenticated successfully.</span>
+                        <span>{t('claudeOnboarding.authenticated')}</span>
                       </div>
                     )}
                     {oauthStep === 'error' && (
                       <div className="space-y-2">
                         <p className="text-xs text-red-400">
-                          {oauthError || 'Authentication failed'}
+                          {oauthError || t('claudeOnboarding.authenticationFailed')}
                         </p>
                         <button
                           onClick={startNousOAuth}
                           className="w-full rounded-lg bg-accent-500 py-2 text-xs font-medium text-white"
                         >
-                          Retry
+                          {t('claudeOnboarding.retry')}
                         </button>
                       </div>
                     )}
@@ -806,7 +804,7 @@ export function ClaudeOnboarding() {
                     className="space-y-2 rounded-xl p-4 text-left"
                     style={{ ...cardStyle, borderColor: 'var(--theme-border)' }}
                   >
-                    <p className="text-sm font-medium">Run in your terminal</p>
+                    <p className="text-sm font-medium">{t('claudeOnboarding.runInTerminal')}</p>
                     <div
                       className="rounded-lg px-3 py-2 font-mono text-xs"
                       style={{ background: 'rgba(0,0,0,0.2)' }}
@@ -814,8 +812,7 @@ export function ClaudeOnboarding() {
                       claude auth login openai-codex
                     </div>
                     <p className="text-xs" style={mutedStyle}>
-                      After the login flow completes, click below to refresh
-                      provider settings.
+                      {t('claudeOnboarding.afterLoginRefresh')}
                     </p>
                     <button
                       onClick={async () => {
@@ -824,7 +821,7 @@ export function ClaudeOnboarding() {
                       }}
                       className="w-full rounded-lg bg-accent-500 py-2 text-xs font-medium text-white"
                     >
-                      I&apos;ve authenticated
+                      {t('claudeOnboarding.authenticatedButton')}
                     </button>
                   </div>
                 )}
@@ -838,10 +835,10 @@ export function ClaudeOnboarding() {
                         style={mutedStyle}
                       >
                         {selectedProvider === 'ollama'
-                          ? 'Ollama URL'
+                          ? t('claudeOnboarding.ollamaUrl')
                           : selectedProvider === 'atomic-chat'
-                            ? 'Atomic Chat URL'
-                            : 'Base URL'}
+                            ? t('claudeOnboarding.atomicChatUrl')
+                            : t('claudeOnboarding.baseUrl')}
                       </label>
                       <input
                         type="text"
@@ -865,7 +862,7 @@ export function ClaudeOnboarding() {
                         className="mb-1 block text-xs font-medium"
                         style={mutedStyle}
                       >
-                        API Key
+                        {t('claudeOnboarding.apiKey')}
                       </label>
                       <input
                         type="password"
@@ -885,7 +882,7 @@ export function ClaudeOnboarding() {
                   className="mb-1 block text-xs font-medium"
                   style={mutedStyle}
                 >
-                  Model
+                  {t('claudeOnboarding.model')}
                 </label>
                 {availableModels.length > 0 ? (
                   <select
@@ -914,16 +911,14 @@ export function ClaudeOnboarding() {
                 )}
                 <p className="mt-2 text-xs" style={mutedStyle}>
                   {canFetchModels
-                    ? 'Models were fetched from the backend when available.'
-                    : 'If your backend does not expose /v1/models, enter the model name manually.'}
+                    ? t('claudeOnboarding.modelsFetched')
+                    : t('claudeOnboarding.modelsManual')}
                 </p>
               </div>
 
               {!canEditConfig ? (
                 <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-xs text-yellow-200">
-                  In-app provider editing is unavailable on this backend. That
-                  is optional. If the backend is already configured, continue to
-                  the chat test.
+                  {t('claudeOnboarding.inAppEditingUnavailable')}
                 </div>
               ) : null}
 
@@ -942,7 +937,7 @@ export function ClaudeOnboarding() {
                     }
                     className="flex-1 rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
                   >
-                    {saving ? 'Saving...' : 'Save Settings'}
+                    {saving ? t('claudeOnboarding.saving') : t('claudeOnboarding.saveSettings')}
                   </button>
                 ) : null}
                 <button
@@ -967,7 +962,7 @@ export function ClaudeOnboarding() {
                   disabled={!backendSupportsChat}
                   className="flex-1 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-600 disabled:opacity-50"
                 >
-                  Continue →
+                  {t('claudeOnboarding.continueArrow')}
                 </button>
               </div>
             </div>
@@ -976,23 +971,22 @@ export function ClaudeOnboarding() {
           {step === 'test' && (
             <div className="space-y-4 text-center">
               <div className="text-4xl">🧪</div>
-              <h2 className="text-lg font-bold">Test Chat</h2>
+              <h2 className="text-lg font-bold">{t('claudeOnboarding.testChatTitle')}</h2>
               <p className="text-sm" style={mutedStyle}>
-                Verify that core chat works first. Enhanced Hermes Agent features are
-                optional and appear automatically when supported.
+                {t('claudeOnboarding.testChatBody')}
               </p>
 
               <div
                 className="rounded-xl p-3 text-left text-xs"
                 style={cardStyle}
               >
-                <p style={mutedStyle}>Backend</p>
+                <p style={mutedStyle}>{t('claudeOnboarding.backend')}</p>
                 <p className="mt-1 font-mono">
-                  {backendInfo?.claudeUrl || 'Configured automatically'}
+                  {backendInfo?.claudeUrl || t('claudeOnboarding.configuredAutomatically')}
                 </p>
                 {selectedModel || configuredModel ? (
                   <p className="mt-2" style={mutedStyle}>
-                    Model:{' '}
+                    {t('claudeOnboarding.modelLabel')}{' '}
                     <span className="font-mono text-accent-400">
                       {stripProviderPrefix(selectedModel || configuredModel)}
                     </span>
@@ -1005,7 +999,7 @@ export function ClaudeOnboarding() {
                   onClick={testConnection}
                   className="w-full rounded-xl bg-accent-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
                 >
-                  Send Test Message
+                  {t('claudeOnboarding.sendTestMessage')}
                 </button>
               ) : null}
 
@@ -1015,7 +1009,7 @@ export function ClaudeOnboarding() {
                   style={mutedStyle}
                 >
                   <span className="size-2 animate-pulse rounded-full bg-accent-500" />
-                  Waiting for the backend response...
+                  {t('claudeOnboarding.waitingForResponse')}
                 </div>
               ) : null}
 
@@ -1026,7 +1020,7 @@ export function ClaudeOnboarding() {
                     style={cardStyle}
                   >
                     <span className="font-medium text-green-500">
-                      Assistant:
+                      {t('claudeOnboarding.assistant')}
                     </span>{' '}
                     <span>{testMessage}</span>
                   </div>
@@ -1034,7 +1028,7 @@ export function ClaudeOnboarding() {
                     onClick={() => setStep('done')}
                     className="w-full rounded-xl bg-green-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-green-700"
                   >
-                    Continue
+                    {t('claudeOnboarding.continue')}
                   </button>
                 </div>
               ) : null}
@@ -1043,7 +1037,7 @@ export function ClaudeOnboarding() {
                 <div className="space-y-3">
                   <div className="rounded-xl border border-red-500/30 bg-red-900/20 p-3 text-left text-sm">
                     <p className="mb-1 font-medium text-red-400">
-                      Chat test failed
+                      {t('claudeOnboarding.chatTestFailed')}
                     </p>
                     <p className="text-xs" style={mutedStyle}>
                       {testMessage}
@@ -1051,16 +1045,15 @@ export function ClaudeOnboarding() {
                     {testMessage.includes('401') ||
                     testMessage.toLowerCase().includes('key') ? (
                       <p className="mt-2 text-xs text-yellow-400">
-                        Check your provider credentials and account access.
+                        {t('claudeOnboarding.checkCredentials')}
                       </p>
                     ) : testMessage.toLowerCase().includes('model') ? (
                       <p className="mt-2 text-xs text-yellow-400">
-                        Confirm the selected model exists on this backend.
+                        {t('claudeOnboarding.confirmModel')}
                       </p>
                     ) : (
                       <p className="mt-2 text-xs text-yellow-400">
-                        Confirm the backend is running and still reachable from
-                        Hermes Workspace.
+                        {t('claudeOnboarding.confirmBackend')}
                       </p>
                     )}
                   </div>
@@ -1069,14 +1062,14 @@ export function ClaudeOnboarding() {
                       onClick={testConnection}
                       className="flex-1 rounded-lg bg-accent-500 py-2 text-xs font-medium text-white"
                     >
-                      Retry
+                      {t('claudeOnboarding.retry')}
                     </button>
                     <button
                       onClick={() => setStep('provider')}
                       className="flex-1 rounded-lg border py-2 text-xs font-medium"
                       style={{ borderColor: 'var(--theme-border)' }}
                     >
-                      ← Back
+                      {t('claudeOnboarding.backArrow')}
                     </button>
                   </div>
                   <button
@@ -1084,7 +1077,7 @@ export function ClaudeOnboarding() {
                     className="mx-auto block text-xs"
                     style={mutedStyle}
                   >
-                    Skip for now
+                    {t('claudeOnboarding.skipForNow')}
                   </button>
                 </div>
               ) : null}
@@ -1094,12 +1087,12 @@ export function ClaudeOnboarding() {
           {step === 'done' && (
             <div className="space-y-4 text-center">
               <div className="text-5xl">🎉</div>
-              <h2 className="text-xl font-bold">Workspace Ready</h2>
+              <h2 className="text-xl font-bold">{t('claudeOnboarding.workspaceReady')}</h2>
               <p className="text-sm" style={mutedStyle}>
-                Core chat is set up.{' '}
+                {t('claudeOnboarding.coreChatSetUp')}{' '}
                 {enhancedFeatures.length > 0
-                  ? 'This backend also exposes Hermes Agent gateway enhancements.'
-                  : 'If you later connect a Hermes Agent gateway, enhanced features unlock automatically.'}
+                  ? t('claudeOnboarding.enhancementsAvailable')
+                  : t('claudeOnboarding.enhancementsLater')}
               </p>
               <div
                 className="grid grid-cols-3 gap-2 text-xs"
@@ -1107,12 +1100,12 @@ export function ClaudeOnboarding() {
               >
                 <div className="rounded-xl p-2" style={cardStyle}>
                   <div className="mb-1 text-lg">💬</div>
-                  <div>Chat Ready</div>
+                  <div>{t('claudeOnboarding.chatReady')}</div>
                 </div>
                 <div className="rounded-xl p-2" style={cardStyle}>
                   <div className="mb-1 text-lg">🔗</div>
                   <div>
-                    {enhancedFeatures.length > 0 ? 'Enhanced' : 'Portable'}
+                    {enhancedFeatures.length > 0 ? t('claudeOnboarding.enhanced') : t('claudeOnboarding.portable')}
                   </div>
                 </div>
                 <div className="rounded-xl p-2" style={cardStyle}>
@@ -1120,21 +1113,21 @@ export function ClaudeOnboarding() {
                   <div>
                     {enhancedFeatures.length > 0
                       ? enhancedFeatures.length
-                      : 'Optional'}{' '}
-                    Extras
+                      : t('claudeOnboarding.optional')}{' '}
+                    {t('claudeOnboarding.extras')}
                   </div>
                 </div>
               </div>
               {enhancedFeatures.length > 0 ? (
                 <p className="text-xs" style={mutedStyle}>
-                  Available now: {enhancedFeatures.join(', ')}.
+                  {t('claudeOnboarding.availableNow', { features: enhancedFeatures.join(', ') })}
                 </p>
               ) : null}
               <button
                 onClick={complete}
                 className="w-full rounded-xl bg-accent-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
               >
-                Open Workspace
+                {t('claudeOnboarding.openWorkspace')}
               </button>
             </div>
           )}
