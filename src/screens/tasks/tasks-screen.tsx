@@ -190,13 +190,13 @@ export function TasksScreen() {
           <h1 className="text-2xl font-medium text-ink">{t('tasks.title')}</h1>
           {assigneeFilter && (
             <div className="flex items-center gap-2 text-xs text-[var(--theme-muted)]">
-              <span>Filtered by: <span className="capitalize" style={{ color: '#f59e0b' }}>{assigneeFilter}</span></span>
+              <span>{t('common.search')}: <span className="capitalize" style={{ color: '#f59e0b' }}>{assigneeFilter}</span></span>
               <button
                 type="button"
                 onClick={() => setAssigneeFilter(null)}
                 className="text-[var(--theme-muted)] hover:text-[var(--theme-text)] transition-colors"
               >
-                ✕ Clear
+                ✕ {t('common.clear')}
               </button>
             </div>
           )}

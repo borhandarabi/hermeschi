@@ -21,6 +21,7 @@ import { EditJobDialog } from './edit-job-dialog'
 import type { ClaudeJob } from '@/lib/jobs-api'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 import {
   createJob,
   deleteJob,
@@ -43,19 +44,19 @@ function formatNextRun(nextRun?: string | null): string {
     const now = new Date()
     const diffMs = d.getTime() - now.getTime()
     if (diffMs < 0) return 'overdue'
-    if (diffMs < 60_000) return 'in < 1m'
-    if (diffMs < 3_600_000) return `in ${Math.round(diffMs / 60_000)}m`
-    if (diffMs < 86_400_000) return `in ${Math.round(diffMs / 3_600_000)}h`
-    return d.toLocaleDateString()
+    if (diffMs < 60_000) return t('time.inSeconds', { count: 1 })
+    if (diffMs < 3_600_000) return t('time.inMinutes', { count: Math.round(diffMs / 60_000) })
+    if (diffMs < 86_400_000) return t('time.inHours', { count: Math.round(diffMs / 3_600_000) })
+    return d.toLocaleDateString(getLocale())
   } catch {
     return nextRun
   }
 }
 
 function formatRunTimestamp(value?: string | null): string {
-  if (!value) return 'Never run'
+  if (!value) return t('jobs.lastRunAt', { time: '—' })
   try {
-    return new Date(value).toLocaleString()
+    return new Date(value).toLocaleString(getLocale())
   } catch {
     return value
   }
