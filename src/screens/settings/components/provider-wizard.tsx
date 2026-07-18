@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useConnectionRestart } from '@/components/connection-overlay'
+import { t, type TranslationKey } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 type WizardStep = 'provider' | 'auth' | 'instructions' | 'verify'
@@ -46,19 +47,19 @@ export type ProviderSummaryForEdit = {
 
 type StepItem = {
   id: WizardStep
-  label: string
+  label: TranslationKey
 }
 
 type AuthTypeMeta = {
-  title: string
-  description: string
+  title: TranslationKey
+  description: TranslationKey
 }
 
 const WIZARD_STEPS: Array<StepItem> = [
-  { id: 'provider', label: 'Choose Provider' },
-  { id: 'auth', label: 'Choose Auth' },
-  { id: 'instructions', label: 'Config Instructions' },
-  { id: 'verify', label: 'Verify' },
+  { id: 'provider', label: 'settings.wizard.step.provider' },
+  { id: 'auth', label: 'settings.wizard.step.auth' },
+  { id: 'instructions', label: 'settings.wizard.step.instructions' },
+  { id: 'verify', label: 'settings.wizard.step.verify' },
 ]
 
 const AUTH_TYPE_ORDER: Array<ProviderAuthType> = [
@@ -71,29 +72,28 @@ const AUTH_TYPE_ORDER: Array<ProviderAuthType> = [
 function getAuthTypeMeta(authType: ProviderAuthType): AuthTypeMeta {
   if (authType === 'api-key') {
     return {
-      title: 'API Key',
-      description: 'Paste your API key — saved directly to local config',
+      title: 'settings.wizard.auth.apiKey.title',
+      description: 'settings.wizard.auth.apiKey.desc',
     }
   }
 
   if (authType === 'cli-token') {
     return {
-      title: 'CLI Token',
-      description:
-        'Use your existing Hermes CLI auth token (from Claude Code / claude.ai)',
+      title: 'settings.wizard.auth.cliToken.title',
+      description: 'settings.wizard.auth.cliToken.desc',
     }
   }
 
   if (authType === 'oauth') {
     return {
-      title: 'OAuth',
-      description: 'Sign in via browser — launches OAuth flow automatically',
+      title: 'settings.wizard.auth.oauth.title',
+      description: 'settings.wizard.auth.oauth.desc',
     }
   }
 
   return {
-    title: 'Local',
-    description: 'No auth needed for local backends like Ollama or Atomic Chat',
+    title: 'settings.wizard.auth.local.title',
+    description: 'settings.wizard.auth.local.desc',
   }
 }
 
@@ -277,7 +277,7 @@ export function ProviderWizard({
       setSaveState('saved')
       setVerifyState('checking')
       setVerificationMessage(
-        `${providerName} API key saved. Hermes Agent is restarting…`,
+        t('settings.wizard.verify.apiKeySaved', { name: providerName }),
       )
       setStep('verify')
 
@@ -288,7 +288,7 @@ export function ProviderWizard({
       if (!pollingRef.current) {
         pollingRef.current = true
         setVerificationMessage(
-          `Checking if ${providerName} models are available…`,
+          t('settings.wizard.verify.checkingAvailable', { name: providerName }),
         )
 
         const found = await pollForProvider(providerId)
@@ -296,20 +296,19 @@ export function ProviderWizard({
         if (found) {
           setVerifyState('success')
           setVerificationMessage(
-            `${providerName} is connected and models are available.`,
+            t('settings.wizard.verify.connected', { name: providerName }),
           )
         } else {
           setVerifyState('warning')
           setVerificationMessage(
-            `Hermes Agent restarted, but ${providerName} models haven't appeared yet. ` +
-              `Check your API key or wait a moment and refresh.`,
+            t('settings.wizard.verify.modelsPending', { name: providerName }),
           )
         }
         pollingRef.current = false
       }
     } catch (err) {
       setSaveState('error')
-      setSaveError(err instanceof Error ? err.message : 'Network error')
+      setSaveError(err instanceof Error ? err.message : t('settings.wizard.verify.networkError'))
     }
   }
 
@@ -334,10 +333,10 @@ export function ProviderWizard({
 
   const verifyTitle =
     verifyState === 'success'
-      ? 'Connection Verified ✓'
+      ? t('settings.wizard.verifyTitle.success')
       : verifyState === 'warning'
-        ? 'Connected (models pending)'
-        : 'Checking connection…'
+        ? t('settings.wizard.verifyTitle.warning')
+        : t('settings.wizard.verifyTitle.checking')
 
   return (
     <DialogRoot open={open} onOpenChange={handleDialogOpenChange}>
@@ -348,12 +347,11 @@ export function ProviderWizard({
               <div className="space-y-1">
                 <DialogTitle className="text-balance">
                   {editProvider
-                    ? `Edit Provider: ${editProvider.name}`
-                    : 'Provider Setup Wizard'}
+                    ? t('settings.wizard.title.edit', { name: editProvider.name })
+                    : t('settings.wizard.title.new')}
                 </DialogTitle>
                 <DialogDescription className="text-pretty">
-                  Add provider credentials safely. API keys stay local in your
-                  Hermes config file and are never sent to Studio.
+                  {t('settings.wizard.desc')}
                 </DialogDescription>
               </div>
               <Button
@@ -362,7 +360,7 @@ export function ProviderWizard({
                 onClick={function onClose() {
                   handleDialogOpenChange(false)
                 }}
-                aria-label="Close provider setup wizard"
+                aria-label={t('settings.wizard.ariaClose')}
               >
                 <HugeiconsIcon
                   icon={Cancel01Icon}
@@ -405,7 +403,7 @@ export function ProviderWizard({
                         {index + 1}
                       </span>
                       <span className="truncate text-xs font-medium text-primary-800">
-                        {item.label}
+                        {t(item.label)}
                       </span>
                     </div>
                   </li>
@@ -416,10 +414,10 @@ export function ProviderWizard({
             {step === 'provider' ? (
               <section className="mt-5">
                 <h3 className="text-base font-medium text-primary-900 text-balance">
-                  Step 1: Choose Provider
+                  {t('settings.wizard.step1.title')}
                 </h3>
                 <p className="mt-1 text-sm text-primary-600 text-pretty">
-                  Select the provider you want to configure.
+                  {t('settings.wizard.step1.desc')}
                 </p>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -468,21 +466,22 @@ export function ProviderWizard({
             {step === 'auth' && selectedProvider ? (
               <section className="mt-5">
                 <h3 className="text-base font-medium text-primary-900 text-balance">
-                  Step 2: Choose Auth Type
+                  {t('settings.wizard.step2.title')}
                 </h3>
                 <p className="mt-1 text-sm text-primary-600 text-pretty">
-                  {selectedProvider.name} supports{' '}
-                  {selectedProvider.authTypes
-                    .map(function mapAuthType(authType) {
-                      return getAuthTypeLabel(authType)
-                    })
-                    .join(', ')}
-                  .
+                  {t('settings.wizard.step2.supports', {
+                    name: selectedProvider.name,
+                    authTypes: selectedProvider.authTypes
+                      .map(function mapAuthType(authType) {
+                        return getAuthTypeLabel(authType)
+                      })
+                      .join(', '),
+                  })}
                 </p>
 
                 <div className="mt-3 rounded-xl border border-primary-200 bg-primary-100/70 px-3 py-2">
                   <p className="text-xs text-primary-700 text-pretty">
-                    Config file path:{' '}
+                    {t('settings.wizard.step2.configPath')}{' '}
                     <code className="font-mono">{CLAUDE_CONFIG_PATH}</code>
                   </p>
                 </div>
@@ -509,14 +508,14 @@ export function ProviderWizard({
                         )}
                       >
                         <h4 className="text-sm font-medium text-primary-900 text-balance">
-                          {meta.title}
+                          {t(meta.title)}
                         </h4>
                         <p className="mt-1 text-xs text-primary-600 text-pretty">
-                          {meta.description}
+                          {t(meta.description)}
                         </p>
                         {!supported ? (
                           <p className="mt-2 text-xs text-primary-500 text-pretty">
-                            Not supported by {selectedProvider.name}.
+                            {t('settings.wizard.step2.notSupported', { name: selectedProvider.name })}
                           </p>
                         ) : null}
                       </button>
@@ -542,7 +541,7 @@ export function ProviderWizard({
                       size={20}
                       strokeWidth={1.5}
                     />
-                    Back
+                    {t('common.back')}
                   </Button>
                 </div>
               </section>
@@ -551,18 +550,13 @@ export function ProviderWizard({
             {step === 'instructions' && selectedProvider && selectedAuthType ? (
               <section className="mt-5">
                 <h3 className="text-base font-medium text-primary-900 text-balance">
-                  Step 3: Add API Key
+                  {t('settings.wizard.step3.title')}
                 </h3>
 
                 {selectedAuthType === 'oauth' ? (
                   <>
                     <p className="mt-1 text-sm text-primary-600 text-pretty">
-                      This will run{' '}
-                      <code className="font-mono text-primary-800">
-                        hermes setup
-                      </code>{' '}
-                      in the terminal to start the OAuth flow. A browser window
-                      will open for you to sign in with Google.
+                      {t('settings.wizard.step3.oauth.intro')}
                     </p>
 
                     <div className="mt-4 flex flex-col gap-3">
@@ -571,42 +565,39 @@ export function ProviderWizard({
                         onClick={function onLaunchOAuth() {
                           window.open('/terminal', '_blank')
                           setVerificationMessage(
-                            'Run "hermes setup" in the terminal and select Google OAuth when prompted. ' +
-                              'A browser window will open for sign-in. Once complete, Hermes Agent will restart automatically.',
+                            t('settings.wizard.step3.oauth.verifyMsg'),
                           )
                           setVerifyState('warning')
                           setStep('verify')
                         }}
                       >
-                        Open Terminal
+                        {t('settings.wizard.step3.openTerminal')}
                       </Button>
 
                       <div className="rounded-xl border border-primary-200 bg-primary-100/70 px-3 py-2">
                         <p className="text-xs text-primary-700 text-pretty">
-                          In the terminal, run:
+                          {t('settings.wizard.step3.inTerminalRun')}
                         </p>
                         <pre className="mt-1 rounded-lg bg-primary-200/60 px-2 py-1.5 text-xs font-mono text-primary-900">
                           hermes setup
                         </pre>
                         <p className="mt-1.5 text-xs text-primary-600 text-pretty">
-                          Select <strong>Google Antigravity</strong> →{' '}
-                          <strong>OAuth</strong>. A browser tab will open for
-                          Google sign-in.
+                          {t('settings.wizard.step3.oauth.selectPrompt')}
                         </p>
                       </div>
 
                       <div className="rounded-xl border border-primary-200 bg-primary-100/70 px-3 py-2">
                         <p className="text-xs text-primary-700 text-pretty">
-                          No terminal access?{' '}
+                          {t('settings.wizard.step3.noTerminal')}{' '}
                           <a
                             href="https://github.com/NousResearch/hermes-agent"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary-800 underline decoration-primary-400 hover:text-primary-900"
                           >
-                            See the Hermes Agent docs
+                            {t('settings.wizard.step3.seeDocs')}
                           </a>{' '}
-                          for setup instructions.
+                          {t('settings.wizard.step3.oauth.docsForSetup')}
                         </p>
                       </div>
                     </div>
@@ -614,9 +605,7 @@ export function ProviderWizard({
                 ) : selectedAuthType === 'cli-token' ? (
                   <>
                     <p className="mt-1 text-sm text-primary-600 text-pretty">
-                      If you have Claude Code or the Hermes CLI installed,
-                      Hermes Agent can use the same auth token. Run the configure
-                      command to detect and import it automatically.
+                      {t('settings.wizard.step3.cliToken.intro')}
                     </p>
 
                     <div className="mt-4 flex flex-col gap-3">
@@ -625,52 +614,46 @@ export function ProviderWizard({
                         onClick={function onLaunchCLI() {
                           window.open('/terminal', '_blank')
                           setVerificationMessage(
-                            'Run "hermes setup" in the terminal and select Anthropic → CLI Token. ' +
-                              'It will detect compatible local credentials and import them automatically.',
+                            t('settings.wizard.step3.cliToken.verifyMsg'),
                           )
                           setVerifyState('warning')
                           setStep('verify')
                         }}
                       >
-                        Open Terminal
+                        {t('settings.wizard.step3.openTerminal')}
                       </Button>
 
                       <div className="rounded-xl border border-primary-200 bg-primary-100/70 px-3 py-2">
                         <p className="text-xs text-primary-700 text-pretty">
-                          In the terminal, run:
+                          {t('settings.wizard.step3.inTerminalRun')}
                         </p>
                         <pre className="mt-1 rounded-lg bg-primary-200/60 px-2 py-1.5 text-xs font-mono text-primary-900">
                           hermes setup
                         </pre>
                         <p className="mt-1.5 text-xs text-primary-600 text-pretty">
-                          Select <strong>Anthropic</strong> →{' '}
-                          <strong>Setup Token (Hermes CLI)</strong>. It will
-                          detect your existing Claude credentials from{' '}
-                          <code className="font-mono">~/.hermes/</code>.
+                          {t('settings.wizard.step3.cliToken.selectPrompt')}
                         </p>
                       </div>
 
                       <div className="rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2">
                         <p className="text-xs text-amber-800 text-pretty">
-                          <strong>Requires:</strong> Claude Code or Hermes CLI
-                          must be installed and authenticated first. Run{' '}
-                          <code className="font-mono">hermes</code> in terminal
-                          to verify.
+                          <strong>{t('settings.wizard.step3.cliToken.requires')}</strong>{' '}
+                          {t('settings.wizard.step3.cliToken.requiresBody')}
                         </p>
                       </div>
 
                       <div className="rounded-xl border border-primary-200 bg-primary-100/70 px-3 py-2">
                         <p className="text-xs text-primary-700 text-pretty">
-                          No terminal access?{' '}
+                          {t('settings.wizard.step3.noTerminal')}{' '}
                           <a
                             href="https://github.com/NousResearch/hermes-agent"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary-800 underline decoration-primary-400 hover:text-primary-900"
                           >
-                            See the Hermes Agent docs
+                            {t('settings.wizard.step3.seeDocs')}
                           </a>{' '}
-                          for CLI token setup instructions.
+                          {t('settings.wizard.step3.cliToken.docsForSetup')}
                         </p>
                       </div>
                     </div>
@@ -678,8 +661,7 @@ export function ProviderWizard({
                 ) : selectedAuthType === 'api-key' ? (
                   <>
                     <p className="mt-1 text-sm text-primary-600 text-pretty">
-                      Paste your {selectedProvider.name} API key below. It will
-                      be saved directly to your local config file.
+                      {t('settings.wizard.step3.apiKey.intro', { name: selectedProvider.name })}
                     </p>
 
                     <div className="mt-4 flex flex-col gap-3">
@@ -690,7 +672,7 @@ export function ProviderWizard({
                           onChange={function onInputChange(e) {
                             setApiKeyInput(e.target.value)
                           }}
-                          placeholder={`sk-... or your ${selectedProvider.name} API key`}
+                          placeholder={t('settings.wizard.step3.apiKey.placeholder', { name: selectedProvider.name })}
                           className="flex-1 rounded-xl border border-primary-300 bg-white px-3 py-2 text-sm text-primary-900 placeholder:text-primary-400 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400/50"
                           autoFocus
                         />
@@ -704,10 +686,10 @@ export function ProviderWizard({
                           }}
                         >
                           {saveState === 'saving'
-                            ? 'Saving…'
+                            ? t('settings.wizard.step3.apiKey.saving')
                             : saveState === 'saved'
-                              ? 'Saved ✓'
-                              : 'Save & Connect'}
+                              ? t('settings.wizard.step3.apiKey.saved')
+                              : t('settings.wizard.step3.apiKey.saveConnect')}
                         </Button>
                       </div>
 
@@ -723,7 +705,7 @@ export function ProviderWizard({
                             strokeWidth={1.5}
                             className="inline mr-1"
                           />
-                          Key saved! Hermes Agent is restarting to apply changes.
+                          {t('settings.wizard.step3.apiKey.keySaved')}
                         </p>
                       ) : null}
                     </div>
@@ -739,14 +721,12 @@ export function ProviderWizard({
                         size={20}
                         strokeWidth={1.5}
                       />
-                      Get your {selectedProvider.name} API key
+                      {t('settings.wizard.step3.apiKey.getKey', { name: selectedProvider.name })}
                     </a>
 
                     <div className="mt-4 rounded-xl border border-primary-200 bg-primary-100/70 px-3 py-2">
                       <p className="text-xs text-primary-700 text-pretty">
-                        API keys are stored locally in{' '}
-                        <code className="font-mono">{CLAUDE_CONFIG_PATH}</code>,
-                        never sent to Studio.
+                        {t('settings.wizard.step3.apiKey.storedLocal', { path: CLAUDE_CONFIG_PATH })}
                       </p>
                     </div>
 
@@ -758,8 +738,7 @@ export function ProviderWizard({
                       }}
                       className="mt-3 text-xs text-primary-500 hover:text-primary-700 underline"
                     >
-                      {showManualSnippet ? 'Hide' : 'Show'} manual config
-                      snippet
+                      {showManualSnippet ? t('settings.wizard.step3.hideManual') : t('settings.wizard.step3.showManual')}
                     </button>
 
                     {showManualSnippet ? (
@@ -777,7 +756,7 @@ export function ProviderWizard({
                               size={20}
                               strokeWidth={1.5}
                             />
-                            Copy snippet
+                            {t('settings.wizard.step3.copySnippet')}
                           </Button>
                           {copyState === 'copied' ? (
                             <span className="inline-flex items-center gap-1 text-xs text-green-600">
@@ -786,7 +765,7 @@ export function ProviderWizard({
                                 size={20}
                                 strokeWidth={1.5}
                               />
-                              Copied
+                              {t('common.copied')}
                             </span>
                           ) : null}
                         </div>
@@ -801,8 +780,7 @@ export function ProviderWizard({
                 ) : (
                   <>
                     <p className="mt-1 text-sm text-primary-600 text-pretty">
-                      No additional configuration needed. Just ensure the
-                      service is running locally.
+                      {t('settings.wizard.step3.local.intro')}
                     </p>
                   </>
                 )}
@@ -820,7 +798,7 @@ export function ProviderWizard({
                       size={20}
                       strokeWidth={1.5}
                     />
-                    Back
+                    {t('common.back')}
                   </Button>
                   {selectedAuthType === 'local' ? (
                     <Button
@@ -829,7 +807,7 @@ export function ProviderWizard({
                         handleDone()
                       }}
                     >
-                      Done
+                      {t('common.done')}
                     </Button>
                   ) : null}
                 </div>
@@ -839,7 +817,7 @@ export function ProviderWizard({
             {step === 'verify' ? (
               <section className="mt-5">
                 <h3 className="text-base font-medium text-primary-900 text-balance">
-                  Step 4: Verify
+                  {t('settings.wizard.step4.title')}
                 </h3>
                 <div
                   className={cn(
@@ -856,7 +834,7 @@ export function ProviderWizard({
                     {verifyTitle}
                   </p>
                   <p className="mt-1 text-sm text-primary-600 text-pretty">
-                    {verificationMessage || 'Waiting for Hermes Agent to respond…'}
+                    {verificationMessage || t('settings.wizard.step4.waiting')}
                   </p>
                 </div>
 
@@ -873,7 +851,7 @@ export function ProviderWizard({
                       size={20}
                       strokeWidth={1.5}
                     />
-                    Back
+                    {t('common.back')}
                   </Button>
                   <Button
                     size="sm"
@@ -881,7 +859,7 @@ export function ProviderWizard({
                       handleDone()
                     }}
                   >
-                    Done
+                    {t('common.done')}
                   </Button>
                 </div>
               </section>

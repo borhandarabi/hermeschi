@@ -32,7 +32,7 @@ import { usePageTitle } from '@/hooks/use-page-title'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { useSettings } from '@/hooks/use-settings'
-import { LOCALE_LABELS, setLocale, t } from '@/lib/i18n'
+import { LOCALE_LABELS, setLocale, t, type TranslationKey } from '@/lib/i18n'
 import { useLocaleDirection } from '@/hooks/use-locale-direction'
 import { THEMES, getTheme, isDarkTheme, setTheme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
@@ -213,13 +213,13 @@ function WorkspaceThemePicker() {
 
   return (
     <div className="grid w-full grid-cols-2 gap-3 lg:grid-cols-4">
-      {THEMES.map((t) => {
-        const isActive = current === t.id
+      {THEMES.map((theme) => {
+        const isActive = current === theme.id
         return (
           <button
-            key={t.id}
+            key={theme.id}
             type="button"
-            onClick={() => applyWorkspaceTheme(t.id)}
+            onClick={() => applyWorkspaceTheme(theme.id)}
             className={cn(
               'flex min-h-[112px] flex-col gap-2.5 rounded-xl border p-3.5 text-left transition-all',
               isActive
@@ -227,18 +227,18 @@ function WorkspaceThemePicker() {
                 : 'border-[var(--theme-border)] bg-[var(--theme-card)] text-[var(--theme-text)] hover:-translate-y-0.5 hover:bg-[var(--theme-card2)]',
             )}
           >
-            <PageThemeSwatch colors={THEME_PREVIEWS[t.id]} />
+            <PageThemeSwatch colors={THEME_PREVIEWS[theme.id]} />
             <div className="flex items-center gap-1.5">
-              <span className="text-xs">{t.icon}</span>
-              <span className="text-xs font-semibold">{t.label}</span>
+              <span className="text-xs">{theme.icon}</span>
+              <span className="text-xs font-semibold">{theme.label}</span>
               {isActive && (
                 <span className="ml-auto text-[9px] font-bold uppercase tracking-wide text-[var(--theme-accent)]">
-                  Active
+                  {t('settings.appearance.themeActive')}
                 </span>
               )}
             </div>
             <p className="text-[10px] leading-tight text-[var(--theme-muted)]">
-              {t.description}
+              {theme.description}
             </p>
           </button>
         )
@@ -300,7 +300,7 @@ function SettingsRow({ label, description, children }: RowProps) {
 type SettingsSectionId = SettingsNavId
 
 function SettingsRoute() {
-  usePageTitle('Settings')
+  usePageTitle(t('settings.title'))
   const { settings, updateSettings } = useSettings()
   // Reactive locale subscription so the language <select> updates
   // immediately after setLocale() without a full page reload.
@@ -376,24 +376,23 @@ function SettingsRoute() {
             <>
               <SettingsSection
                 title={t('settings.appearance')}
-                description="Choose a workspace theme and accent color."
+                description={t('settings.appearance.desc')}
                 icon={PaintBoardIcon}
               >
                 <div className="space-y-2">
                   <div>
                     <p className="text-sm font-medium text-primary-900">
-                      Theme
+                      {t('settings.appearance.theme')}
                     </p>
                     <p className="text-xs text-primary-600 text-pretty">
-                      Choose the workspace palette. Light and dark variants are
-                      both available.
+                      {t('settings.appearance.themeDesc')}
                     </p>
                   </div>
                   <WorkspaceThemePicker />
                   <div className="grid gap-3 pt-3 md:grid-cols-2">
                     <label className="block text-sm">
                       <span className="mb-1 block font-medium text-primary-900">
-                        Interface font
+                        {t('settings.appearance.interfaceFont')}
                       </span>
                       <select
                         value={settings.interfaceFont}
@@ -404,15 +403,15 @@ function SettingsRoute() {
                         }
                         className="w-full rounded-xl border border-primary-200 bg-primary-50 px-3 py-2 text-sm text-primary-900 outline-none"
                       >
-                        <option value="system">System sans</option>
-                        <option value="inter">Inter-style sans</option>
-                        <option value="serif">Serif</option>
-                        <option value="mono">Monospace</option>
+                        <option value="system">{t('settings.appearance.fontSystem')}</option>
+                        <option value="inter">{t('settings.appearance.fontInter')}</option>
+                        <option value="serif">{t('settings.appearance.fontSerif')}</option>
+                        <option value="mono">{t('settings.appearance.fontMono')}</option>
                       </select>
                     </label>
                     <label className="block text-sm">
                       <span className="mb-1 block font-medium text-primary-900">
-                        Spacing density
+                        {t('settings.appearance.spacingDensity')}
                       </span>
                       <select
                         value={settings.interfaceDensity}
@@ -423,9 +422,9 @@ function SettingsRoute() {
                         }
                         className="w-full rounded-xl border border-primary-200 bg-primary-50 px-3 py-2 text-sm text-primary-900 outline-none"
                       >
-                        <option value="compact">Compact</option>
-                        <option value="comfortable">Comfortable</option>
-                        <option value="spacious">Spacious</option>
+                        <option value="compact">{t('settings.appearance.densityCompact')}</option>
+                        <option value="comfortable">{t('settings.appearance.densityComfortable')}</option>
+                        <option value="spacious">{t('settings.appearance.densitySpacious')}</option>
                       </select>
                     </label>
                   </div>
@@ -433,20 +432,20 @@ function SettingsRoute() {
               </SettingsSection>
 
               <SettingsSection
-                title="Labs (experimental)"
-                description="Early/unfinished features. May change or be removed. Off by default."
+                title={t('settings.labs.title')}
+                description={t('settings.labs.desc')}
                 icon={Settings02Icon}
               >
                 <SettingsRow
-                  label="Echo Studio"
-                  description="Show the Echo Studio dashboard builder (scaffold) in the nav. Experimental."
+                  label={t('settings.labs.echoStudio')}
+                  description={t('settings.labs.echoStudioDesc')}
                 >
                   <Switch
                     checked={settings.experimentalEchoStudio}
                     onCheckedChange={(checked) =>
                       updateSettings({ experimentalEchoStudio: checked })
                     }
-                    aria-label="Enable Echo Studio (experimental)"
+                    aria-label={t('settings.labs.echoStudioAria')}
                   />
                 </SettingsRow>
               </SettingsSection>
@@ -459,13 +458,13 @@ function SettingsRoute() {
           {/* ── Editor ──────────────────────────────────────────── */}
           {activeSection === ('editor' as SettingsSectionId) && (
             <SettingsSection
-              title="Editor"
-              description="Configure Monaco defaults for the files workspace."
+              title={t('settings.editor.title')}
+              description={t('settings.editor.desc')}
               icon={SourceCodeSquareIcon}
             >
               <SettingsRow
-                label="Font size"
-                description="Adjust editor font size between 12 and 20."
+                label={t('settings.editor.fontSize')}
+                description={t('settings.editor.fontSizeDesc')}
               >
                 <div className="flex w-full items-center gap-2 md:max-w-xs">
                   <input
@@ -477,7 +476,7 @@ function SettingsRoute() {
                       updateSettings({ editorFontSize: Number(e.target.value) })
                     }
                     className="w-full accent-primary-900 dark:accent-primary-400"
-                    aria-label={`Editor font size: ${settings.editorFontSize} pixels`}
+                    aria-label={t('settings.editor.fontSizeAria', { size: settings.editorFontSize })}
                     aria-valuemin={12}
                     aria-valuemax={20}
                     aria-valuenow={settings.editorFontSize}
@@ -488,27 +487,27 @@ function SettingsRoute() {
                 </div>
               </SettingsRow>
               <SettingsRow
-                label="Word wrap"
-                description="Wrap long lines in the editor by default."
+                label={t('settings.editor.wordWrap')}
+                description={t('settings.editor.wordWrapDesc')}
               >
                 <Switch
                   checked={settings.editorWordWrap}
                   onCheckedChange={(checked) =>
                     updateSettings({ editorWordWrap: checked })
                   }
-                  aria-label="Word wrap"
+                  aria-label={t('settings.editor.wordWrap')}
                 />
               </SettingsRow>
               <SettingsRow
-                label="Minimap"
-                description="Show minimap preview in Monaco editor."
+                label={t('settings.editor.minimap')}
+                description={t('settings.editor.minimapDesc')}
               >
                 <Switch
                   checked={settings.editorMinimap}
                   onCheckedChange={(checked) =>
                     updateSettings({ editorMinimap: checked })
                   }
-                  aria-label="Show minimap"
+                  aria-label={t('settings.editor.minimap')}
                 />
               </SettingsRow>
             </SettingsSection>
@@ -548,24 +547,24 @@ function SettingsRoute() {
             <>
               <SettingsSection
                 title={t('settings.notifications')}
-                description="Control alert delivery and usage warning threshold."
+                description={t('settings.notifications.desc')}
                 icon={Notification03Icon}
               >
                 <SettingsRow
-                  label="Enable alerts"
-                  description="Show usage and system alert notifications."
+                  label={t('settings.notifications.enableAlerts')}
+                  description={t('settings.notifications.enableAlertsDesc')}
                 >
                   <Switch
                     checked={settings.notificationsEnabled}
                     onCheckedChange={(checked) =>
                       updateSettings({ notificationsEnabled: checked })
                     }
-                    aria-label="Enable alerts"
+                    aria-label={t('settings.notifications.enableAlerts')}
                   />
                 </SettingsRow>
                 <SettingsRow
-                  label="Usage threshold"
-                  description="Set usage warning trigger between 50% and 100%."
+                  label={t('settings.notifications.usageThreshold')}
+                  description={t('settings.notifications.usageThresholdDesc')}
                 >
                   <div className="flex w-full items-center gap-2 md:max-w-xs">
                     <input
@@ -580,7 +579,7 @@ function SettingsRoute() {
                       }
                       className="w-full accent-primary-900 dark:accent-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={!settings.notificationsEnabled}
-                      aria-label={`Usage threshold: ${settings.usageThreshold} percent`}
+                      aria-label={t('settings.notifications.usageThresholdAria', { percent: settings.usageThreshold })}
                       aria-valuemin={50}
                       aria-valuemax={100}
                       aria-valuenow={settings.usageThreshold}
@@ -593,25 +592,25 @@ function SettingsRoute() {
               </SettingsSection>
 
               <SettingsSection
-                title="Smart Suggestions"
-                description="Get proactive model suggestions to optimize cost and quality."
+                title={t('settings.smartSuggestions.title')}
+                description={t('settings.smartSuggestions.desc')}
                 icon={Settings02Icon}
               >
                 <SettingsRow
-                  label="Enable smart suggestions"
-                  description="Suggest cheaper models for simple tasks or better models for complex work."
+                  label={t('settings.smartSuggestions.enable')}
+                  description={t('settings.smartSuggestions.enableDesc')}
                 >
                   <Switch
                     checked={settings.smartSuggestionsEnabled}
                     onCheckedChange={(checked) =>
                       updateSettings({ smartSuggestionsEnabled: checked })
                     }
-                    aria-label="Enable smart suggestions"
+                    aria-label={t('settings.smartSuggestions.enable')}
                   />
                 </SettingsRow>
                 <SettingsRow
-                  label="Preferred budget model"
-                  description="Default model for cheaper suggestions (leave empty for auto-detect)."
+                  label={t('settings.smartSuggestions.budgetModel')}
+                  description={t('settings.smartSuggestions.budgetModelDesc')}
                 >
                   <select
                     value={settings.preferredBudgetModel}
@@ -619,11 +618,11 @@ function SettingsRoute() {
                       updateSettings({ preferredBudgetModel: e.target.value })
                     }
                     className="h-9 w-full rounded-lg border border-primary-200 dark:border-gray-600 bg-primary-50 dark:bg-gray-800 px-3 text-sm text-primary-900 dark:text-gray-100 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-400 dark:focus-visible:ring-primary-500 md:max-w-xs"
-                    aria-label="Preferred budget model"
+                    aria-label={t('settings.smartSuggestions.budgetModel')}
                   >
-                    <option value="">Auto-detect</option>
+                    <option value="">{t('settings.smartSuggestions.autoDetect')}</option>
                     {modelsError && (
-                      <option disabled>Failed to load models</option>
+                      <option disabled>{t('settings.smartSuggestions.failedLoadModels')}</option>
                     )}
                     {availableModels.map((model) => (
                       <option key={model.id} value={model.id}>
@@ -633,8 +632,8 @@ function SettingsRoute() {
                   </select>
                 </SettingsRow>
                 <SettingsRow
-                  label="Preferred premium model"
-                  description="Default model for upgrade suggestions (leave empty for auto-detect)."
+                  label={t('settings.smartSuggestions.premiumModel')}
+                  description={t('settings.smartSuggestions.premiumModelDesc')}
                 >
                   <select
                     value={settings.preferredPremiumModel}
@@ -642,11 +641,11 @@ function SettingsRoute() {
                       updateSettings({ preferredPremiumModel: e.target.value })
                     }
                     className="h-9 w-full rounded-lg border border-primary-200 dark:border-gray-600 bg-primary-50 dark:bg-gray-800 px-3 text-sm text-primary-900 dark:text-gray-100 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-400 dark:focus-visible:ring-primary-500 md:max-w-xs"
-                    aria-label="Preferred premium model"
+                    aria-label={t('settings.smartSuggestions.premiumModel')}
                   >
-                    <option value="">Auto-detect</option>
+                    <option value="">{t('settings.smartSuggestions.autoDetect')}</option>
                     {modelsError && (
-                      <option disabled>Failed to load models</option>
+                      <option disabled>{t('settings.smartSuggestions.failedLoadModels')}</option>
                     )}
                     {availableModels.map((model) => (
                       <option key={model.id} value={model.id}>
@@ -656,15 +655,15 @@ function SettingsRoute() {
                   </select>
                 </SettingsRow>
                 <SettingsRow
-                  label="Only suggest cheaper models"
-                  description="Never suggest upgrades, only suggest cheaper alternatives."
+                  label={t('settings.smartSuggestions.onlyCheaper')}
+                  description={t('settings.smartSuggestions.onlyCheaperDesc')}
                 >
                   <Switch
                     checked={settings.onlySuggestCheaper}
                     onCheckedChange={(checked) =>
                       updateSettings({ onlySuggestCheaper: checked })
                     }
-                    aria-label="Only suggest cheaper models"
+                    aria-label={t('settings.smartSuggestions.onlyCheaper')}
                   />
                 </SettingsRow>
               </SettingsSection>
@@ -679,7 +678,7 @@ function SettingsRoute() {
                 strokeWidth={1.5}
               />
               <span className="text-pretty">
-                Changes are saved automatically to local storage.
+                {t('settings.changesSaved')}
               </span>
             </div>
           </footer>
@@ -704,7 +703,7 @@ function _ProfileSection() {
 
   function handleNameChange(value: string) {
     if (value.length > 50) {
-      setNameError('Display name too long (max 50 characters)')
+      setNameError(t('settings.profileSection.displayNameTooLong'))
       return
     }
     setNameError(null)
@@ -718,11 +717,11 @@ function _ProfileSection() {
     event.target.value = ''
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      setProfileError('Unsupported file type.')
+      setProfileError(t('settings.profileSection.unsupportedType'))
       return
     }
     if (file.size > PROFILE_IMAGE_MAX_FILE_SIZE) {
-      setProfileError('Image too large (max 10MB).')
+      setProfileError(t('settings.profileSection.tooLarge'))
       return
     }
     setProfileError(null)
@@ -749,7 +748,7 @@ function _ProfileSection() {
       const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
       updateChatSettings({ avatarDataUrl: canvas.toDataURL(outputType, 0.82) })
     } catch {
-      setProfileError('Failed to process image.')
+      setProfileError(t('settings.profileSection.processFailed'))
     } finally {
       setProfileProcessing(false)
     }
@@ -758,7 +757,7 @@ function _ProfileSection() {
   return (
     <SettingsSection
       title={t('settings.profile')}
-      description="Your display name and avatar for chat."
+      description={t('settings.profileSection.desc')}
       icon={UserIcon}
     >
       <div className="flex items-center gap-4">
@@ -770,19 +769,22 @@ function _ProfileSection() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-primary-900">{displayName}</p>
           <p className="text-xs text-primary-500">
-            Shown in the sidebar and chat messages.
+            {t('settings.profileSection.shownIn')}
           </p>
         </div>
       </div>
-      <SettingsRow label="Display name" description="Leave blank for default.">
+      <SettingsRow
+        label={t('settings.profileSection.displayName')}
+        description={t('settings.profileSection.displayNameDesc')}
+      >
         <div className="w-full md:max-w-xs">
           <Input
             value={chatSettings.displayName}
             onChange={(e) => handleNameChange(e.target.value)}
-            placeholder="User"
+            placeholder={t('settings.profileSection.displayNamePlaceholder')}
             className="h-9 w-full"
             maxLength={50}
-            aria-label="Display name"
+            aria-label={t('settings.profileSection.displayName')}
             aria-invalid={!!nameError}
             aria-describedby={nameError ? 'profile-name-error' : undefined}
           />
@@ -798,8 +800,8 @@ function _ProfileSection() {
         </div>
       </SettingsRow>
       <SettingsRow
-        label="Profile picture"
-        description="Resized to 128×128, stored locally."
+        label={t('settings.profileSection.picture')}
+        description={t('settings.profileSection.pictureDesc')}
       >
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -809,7 +811,7 @@ function _ProfileSection() {
                 accept="image/*"
                 onChange={handleAvatarUpload}
                 disabled={profileProcessing}
-                aria-label="Upload profile picture"
+                aria-label={t('settings.profileSection.picture')}
                 className="block w-full cursor-pointer text-xs text-primary-700 dark:text-gray-300 md:max-w-xs file:mr-2 file:cursor-pointer file:rounded-md file:border file:border-primary-200 dark:file:border-gray-600 file:bg-primary-100 dark:file:bg-gray-700 file:px-2.5 file:py-1.5 file:text-xs file:font-medium file:text-primary-900 dark:file:text-gray-100 file:transition-colors hover:file:bg-primary-200 dark:hover:file:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </label>
@@ -819,7 +821,7 @@ function _ProfileSection() {
               onClick={() => updateChatSettings({ avatarDataUrl: null })}
               disabled={!chatSettings.avatarDataUrl || profileProcessing}
             >
-              Remove
+              {t('settings.profileSection.remove')}
             </Button>
           </div>
           {profileError && (
@@ -843,52 +845,52 @@ function ChatDisplaySection() {
   return (
     <>
       <SettingsSection
-        title="Chat Display"
-        description="Control what's visible in chat messages."
+        title={t('settings.chatDisplay.title')}
+        description={t('settings.chatDisplay.desc')}
         icon={MessageMultiple01Icon}
       >
         <SettingsRow
-          label="Show tool messages"
-          description="Display tool call details when the agent uses tools."
+          label={t('settings.chatDisplay.toolMessages')}
+          description={t('settings.chatDisplay.toolMessagesDesc')}
         >
           <Switch
             checked={chatSettings.showToolMessages}
             onCheckedChange={(checked) =>
               updateChatSettings({ showToolMessages: checked })
             }
-            aria-label="Show tool messages"
+            aria-label={t('settings.chatDisplay.toolMessages')}
           />
         </SettingsRow>
         <SettingsRow
-          label="Show reasoning blocks"
-          description="Display model thinking and reasoning process."
+          label={t('settings.chatDisplay.reasoning')}
+          description={t('settings.chatDisplay.reasoningDesc')}
         >
           <Switch
             checked={chatSettings.showReasoningBlocks}
             onCheckedChange={(checked) =>
               updateChatSettings({ showReasoningBlocks: checked })
             }
-            aria-label="Show reasoning blocks"
+            aria-label={t('settings.chatDisplay.reasoning')}
           />
         </SettingsRow>
         <SettingsRow
-          label="Sound on response complete"
-          description="Play a short sound in the browser when the agent finishes replying."
+          label={t('settings.chatDisplay.soundComplete')}
+          description={t('settings.chatDisplay.soundCompleteDesc')}
         >
           <Switch
             checked={chatSettings.soundOnChatComplete}
             onCheckedChange={(checked) =>
               updateChatSettings({ soundOnChatComplete: checked })
             }
-            aria-label="Sound on response complete"
+            aria-label={t('settings.chatDisplay.soundComplete')}
           />
         </SettingsRow>
         <SettingsRow
-          label="Enter key behavior"
+          label={t('settings.chatDisplay.enterBehavior')}
           description={
             chatSettings.enterBehavior === 'newline'
-              ? 'Enter inserts a newline. Use ⌘/Ctrl+Enter to send.'
-              : 'Enter sends the message. Use Shift+Enter for a newline.'
+              ? t('settings.chatDisplay.enterBehaviorNewline')
+              : t('settings.chatDisplay.enterBehaviorSend')
           }
         >
           <Switch
@@ -898,12 +900,12 @@ function ChatDisplaySection() {
                 enterBehavior: checked ? 'newline' : 'send',
               })
             }
-            aria-label="Enter inserts newline instead of sending"
+            aria-label={t('settings.chatDisplay.enterBehaviorAria')}
           />
         </SettingsRow>
         <SettingsRow
-          label="Chat content width"
-          description="Controls the max-width of the message column on wide screens."
+          label={t('settings.chatDisplay.contentWidth')}
+          description={t('settings.chatDisplay.contentWidthDesc')}
         >
           <select
             value={chatSettings.chatWidth}
@@ -913,19 +915,19 @@ function ChatDisplaySection() {
               })
             }
             className="h-8 rounded-md border border-primary-200 bg-primary-50 px-2 text-sm text-primary-900 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-400"
-            aria-label="Chat content width"
+            aria-label={t('settings.chatDisplay.contentWidth')}
           >
-            <option value="comfortable">Comfortable (900px)</option>
-            <option value="wide">Wide (1200px)</option>
-            <option value="full">Full width</option>
+            <option value="comfortable">{t('settings.chatDisplay.widthComfortable')}</option>
+            <option value="wide">{t('settings.chatDisplay.widthWide')}</option>
+            <option value="full">{t('settings.chatDisplay.widthFull')}</option>
           </select>
         </SettingsRow>
         <SettingsRow
-          label="Expand sidebar on hover"
+          label={t('settings.chatDisplay.sidebarHover')}
           description={
             chatSettings.sidebarHoverExpand
-              ? 'Collapsed sidebar expands temporarily when you hover over it.'
-              : 'Collapsed sidebar stays at 48px. Click the toggle to open (default).'
+              ? t('settings.chatDisplay.sidebarHoverOn')
+              : t('settings.chatDisplay.sidebarHoverOff')
           }
         >
           <Switch
@@ -933,19 +935,19 @@ function ChatDisplaySection() {
             onCheckedChange={(checked) =>
               updateChatSettings({ sidebarHoverExpand: checked })
             }
-            aria-label="Expand sidebar on hover"
+            aria-label={t('settings.chatDisplay.sidebarHover')}
           />
         </SettingsRow>
         <SettingsRow
-          label="Show usage meter"
-          description="Show the floating usage/provider pill in chat. Off by default to keep the composer clean."
+          label={t('settings.chatDisplay.usageMeter')}
+          description={t('settings.chatDisplay.usageMeterDesc')}
         >
           <Switch
             checked={settings.showUsageMeter}
             onCheckedChange={(checked) =>
               updateSettings({ showUsageMeter: checked })
             }
-            aria-label="Show usage meter"
+            aria-label={t('settings.chatDisplay.usageMeter')}
           />
         </SettingsRow>
       </SettingsSection>
@@ -956,17 +958,17 @@ function ChatDisplaySection() {
 
 // ── Loader Style Section ────────────────────────────────────────────────
 
-type LoaderStyleOption = { value: LoaderStyle; label: string }
+type LoaderStyleOption = { value: LoaderStyle; label: TranslationKey }
 
 const LOADER_STYLES: Array<LoaderStyleOption> = [
-  { value: 'dots', label: 'Dots' },
-  { value: 'braille-claude', label: 'Claude' },
-  { value: 'braille-orbit', label: 'Orbit' },
-  { value: 'braille-breathe', label: 'Breathe' },
-  { value: 'braille-pulse', label: 'Pulse' },
-  { value: 'braille-wave', label: 'Wave' },
-  { value: 'lobster', label: 'Lobster' },
-  { value: 'logo', label: 'Logo' },
+  { value: 'dots', label: 'settings.loader.style.dots' },
+  { value: 'braille-claude', label: 'settings.loader.style.claude' },
+  { value: 'braille-orbit', label: 'settings.loader.style.orbit' },
+  { value: 'braille-breathe', label: 'settings.loader.style.breathe' },
+  { value: 'braille-pulse', label: 'settings.loader.style.pulse' },
+  { value: 'braille-wave', label: 'settings.loader.style.wave' },
+  { value: 'lobster', label: 'settings.loader.style.lobster' },
+  { value: 'logo', label: 'settings.loader.style.logo' },
 ]
 
 function getPreset(style: LoaderStyle): BrailleSpinnerPreset | null {
@@ -1004,8 +1006,8 @@ function _LoaderStyleSection() {
 
   return (
     <SettingsSection
-      title="Loading Animation"
-      description="Choose the animation while the assistant is streaming."
+      title={t('settings.loader.title')}
+      description={t('settings.loader.desc')}
       icon={Settings02Icon}
     >
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -1028,7 +1030,7 @@ function _LoaderStyleSection() {
                 <LoaderPreview style={option.value} />
               </span>
               <span className="text-[11px] font-medium text-center leading-4">
-                {option.label}
+                {t(option.label)}
               </span>
             </button>
           )
@@ -1341,14 +1343,14 @@ function ClaudeConfigSection({
         body: JSON.stringify(updates),
       })
       const result = (await res.json()) as { message?: string }
-      setSaveMessage(result.message || 'Saved')
+      setSaveMessage(result.message || t('settings.savedFallback'))
       const refreshData = await fetchConfig()
       if (refreshData.activeProvider) {
         void fetchModelsForProvider(refreshData.activeProvider)
       }
       setTimeout(() => setSaveMessage(null), 3000)
     } catch {
-      setSaveMessage('Failed to save')
+      setSaveMessage(t('settings.failedToSave'))
     }
     setSaving(false)
   }
@@ -1382,8 +1384,8 @@ function ClaudeConfigSection({
   if (loading) {
     return (
       <SettingsSection
-        title="Hermes Agent"
-        description="Loading configuration..."
+        title={t('settings.claude.loadingTitle')}
+        description={t('settings.claude.loadingDesc')}
         icon={Settings02Icon}
       >
         <div
@@ -1397,12 +1399,12 @@ function ClaudeConfigSection({
   if (!data) {
     return (
       <SettingsSection
-        title="Hermes Agent"
-        description="Could not load Hermes configuration."
+        title={t('settings.claude.loadingTitle')}
+        description={t('settings.claude.errorDesc')}
         icon={Settings02Icon}
       >
         <p className="text-sm" style={{ color: 'var(--theme-muted)' }}>
-          Make sure Hermes Agent is running on localhost:8642
+          {t('settings.claude.errorHint')}
         </p>
       </SettingsSection>
     )
@@ -1465,7 +1467,7 @@ function ClaudeConfigSection({
     const n = name.trim()
     const u = base_url.trim()
     if (!n || !u) {
-      setSaveMessage('Provider id and base URL are both required to save a row.')
+      setSaveMessage(t('settings.claude.customProviders.errorRowRequired'))
       setTimeout(() => setSaveMessage(null), 4000)
       return
     }
@@ -1504,12 +1506,12 @@ function ClaudeConfigSection({
     const title = addCpTitle.trim()
     const url = addCpBaseUrl.trim()
     if (!title) {
-      setSaveMessage('Add a title so you can recognize this endpoint (e.g. Qwen3.6.Eclipse).')
+      setSaveMessage(t('settings.claude.customProviders.errorTitleRequired'))
       setTimeout(() => setSaveMessage(null), 4000)
       return
     }
     if (!url) {
-      setSaveMessage('Base URL is required.')
+      setSaveMessage(t('settings.claude.customProviders.errorBaseUrlRequired'))
       setTimeout(() => setSaveMessage(null), 4000)
       return
     }
@@ -1526,7 +1528,7 @@ function ClaudeConfigSection({
 
   function saveCurrentToCustomProvidersList() {
     if (!providerInput.trim() || !baseUrlInput.trim()) {
-      setSaveMessage('Enter both provider and base URL in Model & Provider, then try again.')
+      setSaveMessage(t('settings.claude.customProviders.errorProviderAndUrl'))
       setTimeout(() => setSaveMessage(null), 4000)
       return
     }
@@ -1562,13 +1564,13 @@ function ClaudeConfigSection({
   const renderClaudeOverview = () => (
     <>
       <SettingsSection
-        title="Model & Provider"
-        description="Configure the default AI model for Hermes Agent."
+        title={t('settings.claude.modelProvider.title')}
+        description={t('settings.claude.modelProvider.desc')}
         icon={SourceCodeSquareIcon}
       >
         <SettingsRow
-          label="Provider"
-          description="Select the inference provider."
+          label={t('settings.claude.modelProvider.provider')}
+          description={t('settings.claude.modelProvider.providerDesc')}
         >
           <div className="flex w-full max-w-sm gap-2">
             {availableProviders.length > 0 ? (
@@ -1595,15 +1597,15 @@ function ClaudeConfigSection({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setProviderInput(e.target.value)
                 }
-                placeholder="e.g. ollama, anthropic, openai-codex"
+                placeholder={t('settings.claude.modelProvider.providerPlaceholder')}
                 className="flex-1"
               />
             )}
           </div>
         </SettingsRow>
         <SettingsRow
-          label="Model"
-          description="The model Claude uses for conversations."
+          label={t('settings.claude.modelProvider.model')}
+          description={t('settings.claude.modelProvider.modelDesc')}
         >
           <div className="flex w-full max-w-sm gap-2">
             {availableModels.length > 0 ? (
@@ -1614,7 +1616,7 @@ function ClaudeConfigSection({
               >
                 {!availableModels.some((m) => m.id === modelInput) &&
                   modelInput && (
-                    <option value={modelInput}>{modelInput} (current)</option>
+                    <option value={modelInput}>{t('settings.claude.modelProvider.modelCurrent', { model: modelInput })}</option>
                   )}
                 {availableModels.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -1630,7 +1632,7 @@ function ClaudeConfigSection({
                   setModelInput(e.target.value)
                 }
                 placeholder={
-                  loadingModels ? 'Loading models...' : 'e.g. qwen3.5:35b'
+                  loadingModels ? t('settings.claude.modelProvider.modelLoading') : t('settings.claude.modelProvider.modelPlaceholder')
                 }
                 className="flex-1 font-mono"
               />
@@ -1638,8 +1640,8 @@ function ClaudeConfigSection({
           </div>
         </SettingsRow>
         <SettingsRow
-          label="Base URL"
-          description="For local providers (Ollama, LM Studio, MLX). Leave blank for cloud."
+          label={t('settings.claude.modelProvider.baseUrl')}
+          description={t('settings.claude.modelProvider.baseUrlDesc')}
         >
           <div className="flex w-full max-w-sm gap-2">
             <Input
@@ -1647,7 +1649,7 @@ function ClaudeConfigSection({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setBaseUrlInput(e.target.value)
               }
-              placeholder="e.g. http://localhost:11434/v1"
+              placeholder={t('settings.claude.modelProvider.baseUrlPlaceholder')}
               className="flex-1 font-mono text-sm"
             />
           </div>
@@ -1657,11 +1659,10 @@ function ClaudeConfigSection({
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div className="space-y-0.5">
               <p className="text-sm font-medium text-primary-900">
-                Fallback model (optional)
+                {t('settings.claude.modelProvider.fallback')}
               </p>
               <p className="text-xs text-primary-600">
-                Used only if the primary model fails. Keep empty to disable — avoids mixing this
-                up with your main provider (for example OpenRouter only here, local primary above).
+                {t('settings.claude.modelProvider.fallbackDesc')}
               </p>
             </div>
             <Button
@@ -1671,43 +1672,43 @@ function ClaudeConfigSection({
               className="shrink-0"
               onClick={() => setShowFallbackRow((v) => !v)}
             >
-              {showFallbackRow ? 'Hide fallback fields' : 'Show fallback fields'}
+              {showFallbackRow ? t('settings.claude.modelProvider.hideFallback') : t('settings.claude.modelProvider.showFallback')}
             </Button>
           </div>
           {showFallbackRow ? (
             <div className="mt-3 space-y-3 border-t border-primary-200 pt-3">
               <div className="grid gap-3 md:grid-cols-2">
                 <label className="space-y-1">
-                  <span className="text-xs font-medium text-primary-600">Fallback provider</span>
+                  <span className="text-xs font-medium text-primary-600">{t('settings.claude.modelProvider.fallbackProvider')}</span>
                   <Input
                     value={fallbackProviderInput}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setFallbackProviderInput(e.target.value)
                     }
-                    placeholder="e.g. openrouter"
+                    placeholder={t('settings.claude.modelProvider.fallbackProviderPlaceholder')}
                     className="font-mono text-sm"
                   />
                 </label>
                 <label className="space-y-1">
-                  <span className="text-xs font-medium text-primary-600">Fallback model id</span>
+                  <span className="text-xs font-medium text-primary-600">{t('settings.claude.modelProvider.fallbackModelId')}</span>
                   <Input
                     value={fallbackModelInput}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setFallbackModelInput(e.target.value)
                     }
-                    placeholder="provider/model or model id"
+                    placeholder={t('settings.claude.modelProvider.fallbackModelIdPlaceholder')}
                     className="font-mono text-sm"
                   />
                 </label>
               </div>
               <label className="block space-y-1">
-                <span className="text-xs font-medium text-primary-600">Fallback base URL</span>
+                <span className="text-xs font-medium text-primary-600">{t('settings.claude.modelProvider.fallbackBaseUrl')}</span>
                 <Input
                   value={fallbackBaseUrlInput}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFallbackBaseUrlInput(e.target.value)
                   }
-                  placeholder="Leave blank for hosted APIs"
+                  placeholder={t('settings.claude.modelProvider.fallbackBaseUrlPlaceholder')}
                   className="font-mono text-sm"
                 />
               </label>
@@ -1741,14 +1742,14 @@ function ClaudeConfigSection({
               void saveConfig({ config: configUpdate })
             }}
           >
-            {saving ? 'Saving...' : 'Save Model'}
+            {saving ? t('settings.claude.modelProvider.saving') : t('settings.claude.modelProvider.save')}
           </Button>
         </div>
       </SettingsSection>
 
       <SettingsSection
-        title="API Keys"
-        description="Manage provider API keys stored in ~/.hermes/.env"
+        title={t('settings.claude.apiKeys.title')}
+        description={t('settings.claude.apiKeys.desc')}
         icon={CloudIcon}
       >
         {data.providers
@@ -1758,7 +1759,7 @@ function ClaudeConfigSection({
               key={provider.id}
               label={provider.name}
               description={
-                provider.configured ? '✅ Configured' : '❌ Not configured'
+                provider.configured ? t('settings.claude.apiKeys.configured') : t('settings.claude.apiKeys.notConfigured')
               }
             >
               <div className="flex w-full max-w-sm items-center gap-2">
@@ -1772,7 +1773,7 @@ function ClaudeConfigSection({
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setKeyInput(e.target.value)
                           }
-                          placeholder={`Enter ${envKey}`}
+                          placeholder={t('settings.claude.apiKeys.enterKey', { key: envKey })}
                           className="flex-1"
                         />
                         <Button
@@ -1783,7 +1784,7 @@ function ClaudeConfigSection({
                             setKeyInput('')
                           }}
                         >
-                          Save
+                          {t('common.save')}
                         </Button>
                         <Button
                           size="sm"
@@ -1802,7 +1803,7 @@ function ClaudeConfigSection({
                           className="text-xs font-mono"
                           style={{ color: 'var(--theme-muted)' }}
                         >
-                          {provider.maskedKeys[envKey] || 'Not set'}
+                          {provider.maskedKeys[envKey] || t('settings.claude.apiKeys.notSet')}
                         </span>
                         <Button
                           size="sm"
@@ -1812,7 +1813,7 @@ function ClaudeConfigSection({
                             setKeyInput('')
                           }}
                         >
-                          {provider.configured ? 'Change' : 'Add'}
+                          {provider.configured ? t('settings.claude.apiKeys.change') : t('common.add')}
                         </Button>
                       </div>
                     )}
@@ -1825,12 +1826,12 @@ function ClaudeConfigSection({
 
       <SettingsSection
         title={t('nav.memory')}
-        description="Configure Hermes Agent memory and user profiles."
+        description={t('settings.claude.memory.desc')}
         icon={UserIcon}
       >
         <SettingsRow
-          label="Memory enabled"
-          description="Store and recall memories across sessions."
+          label={t('settings.claude.memory.enabled')}
+          description={t('settings.claude.memory.enabledDesc')}
         >
           <Switch
             checked={memoryConfig.memory_enabled !== false}
@@ -1842,8 +1843,8 @@ function ClaudeConfigSection({
           />
         </SettingsRow>
         <SettingsRow
-          label="User profile"
-          description="Remember user preferences and context."
+          label={t('settings.claude.memory.userProfile')}
+          description={t('settings.claude.memory.userProfileDesc')}
         >
           <Switch
             checked={memoryConfig.user_profile_enabled !== false}
@@ -1857,11 +1858,11 @@ function ClaudeConfigSection({
       </SettingsSection>
 
       <SettingsSection
-        title="Terminal"
-        description="Shell execution settings."
+        title={t('settings.claude.terminal.title')}
+        description={t('settings.claude.terminal.desc')}
         icon={SourceCodeSquareIcon}
       >
-        <SettingsRow label="Backend" description="Terminal execution backend.">
+        <SettingsRow label={t('settings.claude.terminal.backend')} description={t('settings.claude.terminal.backendDesc')}>
           <span
             className="text-sm font-mono"
             style={{ color: 'var(--theme-muted)' }}
@@ -1870,8 +1871,8 @@ function ClaudeConfigSection({
           </span>
         </SettingsRow>
         <SettingsRow
-          label="Timeout"
-          description="Max seconds for terminal commands."
+          label={t('settings.claude.terminal.timeout')}
+          description={t('settings.claude.terminal.timeoutDesc')}
         >
           <Input
             type="number"
@@ -1886,31 +1887,29 @@ function ClaudeConfigSection({
       </SettingsSection>
 
       <SettingsSection
-        title="Custom Providers"
-        description="Configure a custom OpenAI-compatible endpoint. Add named rows (with a title like Qwen3.6.Eclipse) to custom_providers; optional manifest env key and URL below only apply if you use that path."
+        title={t('settings.claude.customProviders.title')}
+        description={t('settings.claude.customProviders.desc')}
         icon={CloudIcon}
       >
         <div className="space-y-4 rounded-xl border border-primary-200 bg-primary-50/80 p-4">
           <div>
-            <p className="text-sm font-medium text-primary-900">Add custom provider</p>
+            <p className="text-sm font-medium text-primary-900">{t('settings.claude.customProviders.add')}</p>
             <p className="mt-1 text-xs text-primary-600">
-              <span className="font-medium">Title</span> is for your list only (e.g.{' '}
-              <span className="font-mono">Qwen3.6.Eclipse</span> = model + host).{' '}
-              <span className="font-medium">Provider id</span> is the config name Hermes uses — leave
-              blank to derive a safe id from the title. Optional row API key is stored on this
-              provider entry, not in .env.
+              <span className="font-medium">{t('settings.claude.customProviders.titleField')}</span> {t('settings.claude.customProviders.addDescA')}{' '}
+              <span className="font-mono">{t('settings.claude.customProviders.addDescAExample')}</span> {t('settings.claude.customProviders.addDescAMeaning')}{' '}
+              <span className="font-medium">{t('settings.claude.customProviders.providerIdField')}</span> {t('settings.claude.customProviders.addDescB')}
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             <label className="space-y-1 md:col-span-2">
-              <span className="text-xs font-medium text-primary-600">Title</span>
+              <span className="text-xs font-medium text-primary-600">{t('settings.claude.customProviders.titleField')}</span>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <Input
                   value={addCpTitle}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setAddCpTitle(e.target.value)
                   }
-                  placeholder="e.g. Qwen3.6.Eclipse"
+                  placeholder={t('settings.claude.customProviders.titlePlaceholder')}
                   className="font-mono text-sm sm:flex-1"
                 />
                 <Button
@@ -1927,29 +1926,29 @@ function ClaudeConfigSection({
                     )
                   }
                 >
-                  Suggest from model + URL
+                  {t('settings.claude.customProviders.suggestFromModel')}
                 </Button>
               </div>
             </label>
             <label className="space-y-1">
-              <span className="text-xs font-medium text-primary-600">Provider id (optional)</span>
+              <span className="text-xs font-medium text-primary-600">{t('settings.claude.customProviders.providerIdOptional')}</span>
               <Input
                 value={addCpProviderId}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setAddCpProviderId(e.target.value)
                 }
-                placeholder="e.g. ECLIPSE"
+                placeholder={t('settings.claude.customProviders.providerIdPlaceholder')}
                 className="font-mono text-sm"
               />
             </label>
             <label className="space-y-1">
-              <span className="text-xs font-medium text-primary-600">Base URL</span>
+              <span className="text-xs font-medium text-primary-600">{t('settings.claude.customProviders.baseUrlLabel')}</span>
               <Input
                 value={addCpBaseUrl}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setAddCpBaseUrl(e.target.value)
                 }
-                placeholder="http://host:11434/v1"
+                placeholder={t('settings.claude.customProviders.baseUrlPlaceholder')}
                 className="font-mono text-sm"
               />
             </label>
@@ -1961,19 +1960,19 @@ function ClaudeConfigSection({
                 className="h-auto px-0 py-0 text-xs text-primary-700 underline"
                 onClick={() => {
                   setAddCpBaseUrl(baseUrlInput.trim())
-                  setAddCpTitle((t) =>
-                    t.trim()
-                      ? t
+                  setAddCpTitle((currentTitle) =>
+                    currentTitle.trim()
+                      ? currentTitle
                       : suggestCustomProviderTitle(modelInput, baseUrlInput.trim()),
                   )
                 }}
               >
-                Prefill from Model &amp; Provider above
+                {t('settings.claude.customProviders.prefillFromAbove')}
               </Button>
             </div>
             <label className="space-y-1 md:col-span-2">
               <span className="text-xs font-medium text-primary-600">
-                Optional API key (this row only)
+                {t('settings.claude.customProviders.optionalApiKey')}
               </span>
               <Input
                 type="password"
@@ -1981,7 +1980,7 @@ function ClaudeConfigSection({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setAddCpYamlKey(e.target.value)
                 }
-                placeholder="Leave blank if the server needs no key"
+                placeholder={t('settings.claude.customProviders.apiKeyPlaceholder')}
                 className="font-mono text-sm"
               />
             </label>
@@ -1992,14 +1991,14 @@ function ClaudeConfigSection({
             disabled={saving}
             onClick={() => submitAddCustomProviderForm()}
           >
-            Add to custom providers list
+            {t('settings.claude.customProviders.addToList')}
           </Button>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-primary-200 bg-white/90">
           <div className="flex flex-col gap-2 border-b border-primary-200 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-primary-700">
-              <span className="font-medium text-primary-900">Saved &amp; detected endpoints</span>
+              <span className="font-medium text-primary-900">{t('settings.claude.customProviders.savedDetected')}</span>
               <span className="text-primary-600">
                 {' '}
                 (
@@ -2016,17 +2015,17 @@ function ClaudeConfigSection({
               disabled={saving}
               onClick={() => saveCurrentToCustomProvidersList()}
             >
-              Save current model setup to list
+              {t('settings.claude.customProviders.saveCurrentToList')}
             </Button>
           </div>
           <table className="w-full min-w-[720px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-primary-200 bg-primary-100/70 text-left text-[11px] font-semibold uppercase tracking-wide text-primary-600">
-                <th className="px-3 py-2">Source</th>
-                <th className="px-3 py-2">Title</th>
-                <th className="px-3 py-2">Provider id</th>
-                <th className="px-3 py-2">Base URL</th>
-                <th className="px-3 py-2 text-right">Actions</th>
+                <th className="px-3 py-2">{t('settings.claude.customProviders.col.source')}</th>
+                <th className="px-3 py-2">{t('settings.claude.customProviders.col.title')}</th>
+                <th className="px-3 py-2">{t('settings.claude.customProviders.col.providerId')}</th>
+                <th className="px-3 py-2">{t('settings.claude.customProviders.col.baseUrl')}</th>
+                <th className="px-3 py-2 text-right">{t('settings.claude.customProviders.col.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -2038,10 +2037,10 @@ function ClaudeConfigSection({
                     colSpan={5}
                     className="px-3 py-4 text-xs leading-relaxed text-primary-600"
                   >
-                    No rows in <span className="font-mono">custom_providers</span> yet, and no
-                    primary base URL or manifest URL was detected. Use{' '}
-                    <span className="font-medium">Add custom provider</span>, or set Model &amp;
-                    Provider and click &quot;Save current model setup to list&quot;.
+                    {t('settings.claude.customProviders.empty')}{' '}
+                    <span className="font-medium">{t('settings.claude.customProviders.add')}</span>{', '}
+                    {t('settings.claude.customProviders.emptyOr')}{' '}
+                    <span className="font-medium">{t('settings.claude.customProviders.saveCurrentToList')}</span>.
                   </td>
                 </tr>
               ) : null}
@@ -2053,7 +2052,7 @@ function ClaudeConfigSection({
                     key={`saved-${key}-${index}`}
                     className="border-b border-primary-100 odd:bg-primary-50/40"
                   >
-                    <td className="px-3 py-2 align-top text-xs text-primary-600">Saved</td>
+                    <td className="px-3 py-2 align-top text-xs text-primary-600">{t('settings.claude.customProviders.rowSaved')}</td>
                     <td className="max-w-[160px] px-3 py-2 align-top text-xs font-medium text-primary-900 break-words">
                       {entry.title || '—'}
                     </td>
@@ -2072,7 +2071,7 @@ function ClaudeConfigSection({
                           disabled={saving || !entry.name}
                           onClick={() => applyCustomProviderFromList(raw)}
                         >
-                          Apply
+                          {t('settings.claude.customProviders.apply')}
                         </Button>
                         <Button
                           type="button"
@@ -2081,7 +2080,7 @@ function ClaudeConfigSection({
                           className="text-red-700 hover:text-red-800"
                           disabled={saving}
                           onClick={() => removeCustomProviderAt(index)}
-                          aria-label={`Remove ${entry.name || 'custom provider'}`}
+                          aria-label={t('settings.claude.customProviders.removeAria', { name: entry.name || t('settings.claude.customProviders.add') })}
                         >
                           <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.5} />
                         </Button>
@@ -2092,7 +2091,7 @@ function ClaudeConfigSection({
               })}
               {extraPrimaryNotInList ? (
                 <tr className="border-b border-primary-100 bg-amber-50/50">
-                  <td className="px-3 py-2 align-top text-xs text-amber-900">Active (not in list)</td>
+                  <td className="px-3 py-2 align-top text-xs text-amber-900">{t('settings.claude.customProviders.rowActive')}</td>
                   <td className="max-w-[160px] px-3 py-2 align-top text-xs text-primary-800 break-words">
                     {suggestCustomProviderTitle(modelInput, extraPrimaryNotInList.base_url)}
                   </td>
@@ -2115,7 +2114,7 @@ function ClaudeConfigSection({
                           void fetchModelsForProvider(extraPrimaryNotInList.name)
                         }}
                       >
-                        Apply
+                        {t('settings.claude.customProviders.apply')}
                       </Button>
                       <Button
                         type="button"
@@ -2135,7 +2134,7 @@ function ClaudeConfigSection({
                           )
                         }
                       >
-                        Add to list
+                        {t('settings.claude.customProviders.addToListShort')}
                       </Button>
                     </div>
                   </td>
@@ -2143,7 +2142,7 @@ function ClaudeConfigSection({
               ) : null}
               {extraManifestNotInList ? (
                 <tr className="border-b border-primary-100 bg-sky-50/50">
-                  <td className="px-3 py-2 align-top text-xs text-sky-900">Manifest block</td>
+                  <td className="px-3 py-2 align-top text-xs text-sky-900">{t('settings.claude.customProviders.rowManifest')}</td>
                   <td className="max-w-[160px] px-3 py-2 align-top text-xs text-primary-800 break-words">
                     {(() => {
                       try {
@@ -2156,7 +2155,7 @@ function ClaudeConfigSection({
                     })()}
                   </td>
                   <td className="px-3 py-2 align-top font-mono text-xs text-primary-600">
-                    (env key path)
+                    {t('settings.claude.customProviders.envKeyPath')}
                   </td>
                   <td className="max-w-[240px] px-3 py-2 align-top font-mono text-xs text-primary-700 break-all">
                     {extraManifestNotInList.base_url}
@@ -2182,7 +2181,7 @@ function ClaudeConfigSection({
                         })
                       }}
                     >
-                      Add to list
+                      {t('settings.claude.customProviders.addToListShort')}
                     </Button>
                   </td>
                 </tr>
@@ -2192,18 +2191,18 @@ function ClaudeConfigSection({
         </div>
 
         <SettingsRow
-          label="Manifest: CUSTOM_API_KEY"
+          label={t('settings.claude.customProviders.manifestKey')}
           description={
             customApiKeyConfigured
-              ? '✅ Saved in ~/.hermes/.env for the manifest OpenAI provider.'
+              ? t('settings.claude.customProviders.manifestKeyConfigured')
               : customEndpointConfigured
-                ? '○ Not set — optional when your endpoint is local or needs no env key.'
-                : '○ Optional. Leave blank if you do not use providers.manifest + CUSTOM_API_KEY.'
+                ? t('settings.claude.customProviders.manifestKeyNotSet')
+                : t('settings.claude.customProviders.manifestKeyOptional')
           }
         >
           <div className="flex w-full max-w-sm flex-col gap-1">
             <p className="text-[11px] text-primary-500">
-              Leave blank if unused. Add only when your manifest integration requires this key.
+              {t('settings.claude.customProviders.manifestKeyHint')}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
@@ -2215,7 +2214,7 @@ function ClaudeConfigSection({
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setCustomApiKey(e.target.value)
                       }
-                      placeholder="Leave blank to clear saved key"
+                      placeholder={t('settings.claude.customProviders.manifestKeyPlaceholder')}
                       className="min-w-[12rem] flex-1"
                     />
                     <Button
@@ -2229,7 +2228,7 @@ function ClaudeConfigSection({
                         setEditingCustomKey(false)
                       }}
                     >
-                      Save
+                      {t('common.save')}
                     </Button>
                     <Button
                       size="sm"
@@ -2246,8 +2245,8 @@ function ClaudeConfigSection({
                       style={{ color: 'var(--theme-muted)' }}
                     >
                       {customApiKeyConfigured
-                        ? customProviderCatalogEntry.maskedKeys['CUSTOM_API_KEY'] || 'Set'
-                        : 'Not set'}
+                        ? customProviderCatalogEntry!.maskedKeys['CUSTOM_API_KEY'] || t('settings.claude.customProviders.manifestKeySet')
+                        : t('settings.claude.apiKeys.notSet')}
                     </span>
                     <Button
                       size="sm"
@@ -2257,7 +2256,7 @@ function ClaudeConfigSection({
                         setCustomApiKey('')
                       }}
                     >
-                      {customApiKeyConfigured ? 'Change' : 'Add'}
+                      {customApiKeyConfigured ? t('settings.claude.apiKeys.change') : t('common.add')}
                     </Button>
                   </div>
                 )}
@@ -2266,17 +2265,16 @@ function ClaudeConfigSection({
           </div>
         </SettingsRow>
         <SettingsRow
-          label="Manifest: base URL"
+          label={t('settings.claude.customProviders.manifestBaseUrl')}
           description={
             manifestBaseUrlOnly
-              ? `✅ ${manifestBaseUrlOnly}`
-              : '○ Optional — only if you use providers.manifest (separate from primary base URL).'
+              ? t('settings.claude.customProviders.manifestBaseUrlSet', { url: manifestBaseUrlOnly })
+              : t('settings.claude.customProviders.manifestBaseUrlOptional')
           }
         >
           <div className="flex w-full max-w-sm flex-col gap-1">
             <p className="text-[11px] text-primary-500">
-              This updates <span className="font-mono">providers.manifest</span> only. Primary model
-              base URL stays under Model &amp; Provider.
+              {t('settings.claude.customProviders.manifestBaseUrlHint')}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
@@ -2287,7 +2285,7 @@ function ClaudeConfigSection({
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setCustomBaseUrl(e.target.value)
                       }
-                      placeholder="http://127.0.0.1:8080/v1"
+                      placeholder={t('settings.claude.customProviders.manifestBaseUrlPlaceholder')}
                       className="min-w-[12rem] flex-1 font-mono text-sm"
                     />
                     <Button
@@ -2295,7 +2293,7 @@ function ClaudeConfigSection({
                       onClick={() => {
                         const u = customBaseUrl.trim()
                         if (!u) {
-                          setSaveMessage('Enter a manifest base URL, or cancel.')
+                          setSaveMessage(t('settings.claude.customProviders.manifestBaseUrlRequired'))
                           setTimeout(() => setSaveMessage(null), 3000)
                           return
                         }
@@ -2314,7 +2312,7 @@ function ClaudeConfigSection({
                         setEditingCustomBaseUrl(false)
                       }}
                     >
-                      Save
+                      {t('common.save')}
                     </Button>
                     <Button
                       size="sm"
@@ -2333,7 +2331,7 @@ function ClaudeConfigSection({
                       className="text-xs font-mono"
                       style={{ color: 'var(--theme-muted)' }}
                     >
-                      {manifestBaseUrlOnly || 'Not set'}
+                      {manifestBaseUrlOnly || t('settings.claude.apiKeys.notSet')}
                     </span>
                     <Button
                       size="sm"
@@ -2343,7 +2341,7 @@ function ClaudeConfigSection({
                         setEditingCustomBaseUrl(true)
                       }}
                     >
-                      {manifestBaseUrlOnly ? 'Edit' : 'Add'}
+                      {manifestBaseUrlOnly ? t('settings.claude.customProviders.manifestBaseUrlEdit') : t('common.add')}
                     </Button>
                   </div>
                 )}
@@ -2355,12 +2353,12 @@ function ClaudeConfigSection({
 
       <SettingsSection
         title={t('settings.about')}
-        description="Hermes Agent runtime information."
+        description={t('settings.claude.about.desc')}
         icon={Notification03Icon}
       >
         <SettingsRow
-          label="Config location"
-          description="Where Claude stores its configuration."
+          label={t('settings.claude.about.configLocation')}
+          description={t('settings.claude.about.configLocationDesc')}
         >
           <span
             className="text-xs font-mono"
@@ -2370,8 +2368,8 @@ function ClaudeConfigSection({
           </span>
         </SettingsRow>
         <SettingsRow
-          label="Active provider"
-          description="Current inference provider."
+          label={t('settings.claude.about.activeProvider')}
+          description={t('settings.claude.about.activeProviderDesc')}
         >
           <span
             className="text-sm font-medium"
@@ -2387,13 +2385,13 @@ function ClaudeConfigSection({
 
   const renderAgentBehavior = () => (
     <SettingsSection
-      title="Agent Behavior"
-      description="Control agent execution limits and tool access."
+      title={t('settings.agent.title')}
+      description={t('settings.agent.desc')}
       icon={Settings02Icon}
     >
       <SettingsRow
-        label="Max turns"
-        description="Maximum agent turns per request (1-100)."
+        label={t('settings.agent.maxTurns')}
+        description={t('settings.agent.maxTurnsDesc')}
       >
         <Input
           type="number"
@@ -2407,8 +2405,8 @@ function ClaudeConfigSection({
         />
       </SettingsRow>
       <SettingsRow
-        label="Gateway timeout"
-        description="Seconds before gateway times out a request."
+        label={t('settings.agent.gatewayTimeout')}
+        description={t('settings.agent.gatewayTimeoutDesc')}
       >
         <Input
           type="number"
@@ -2422,8 +2420,8 @@ function ClaudeConfigSection({
         />
       </SettingsRow>
       <SettingsRow
-        label="Tool use enforcement"
-        description="Whether the agent must use tools when available."
+        label={t('settings.agent.toolUseEnforcement')}
+        description={t('settings.agent.toolUseEnforcementDesc')}
       >
         <select
           value={(agentConfig.tool_use_enforcement as string) || 'auto'}
@@ -2434,9 +2432,9 @@ function ClaudeConfigSection({
           }
           className={selectClassName}
         >
-          <option value="auto">auto</option>
-          <option value="required">required</option>
-          <option value="none">none</option>
+          <option value="auto">{t('settings.agent.toolUseEnforcementAuto')}</option>
+          <option value="required">{t('settings.agent.toolUseEnforcementRequired')}</option>
+          <option value="none">{t('settings.agent.toolUseEnforcementNone')}</option>
         </select>
       </SettingsRow>
     </SettingsSection>
@@ -2444,13 +2442,13 @@ function ClaudeConfigSection({
 
   const renderSmartRouting = () => (
     <SettingsSection
-      title="Smart Model Routing"
-      description="Automatically route simple queries to cheaper models."
+      title={t('settings.routing.title')}
+      description={t('settings.routing.desc')}
       icon={SparklesIcon}
     >
       <SettingsRow
-        label="Enable smart routing"
-        description="Route simple queries to a cheaper model automatically."
+        label={t('settings.routing.enable')}
+        description={t('settings.routing.enableDesc')}
       >
         <Switch
           checked={readBoolean(smartRouting.enabled, false)}
@@ -2462,8 +2460,8 @@ function ClaudeConfigSection({
         />
       </SettingsRow>
       <SettingsRow
-        label="Cheap model"
-        description="Model to use for simple queries."
+        label={t('settings.routing.cheapModel')}
+        description={t('settings.routing.cheapModelDesc')}
       >
         <select
           value={(smartRouting.cheap_model as string) || ''}
@@ -2474,7 +2472,7 @@ function ClaudeConfigSection({
           }
           className={selectClassName}
         >
-          <option value="">Select model</option>
+          <option value="">{t('settings.routing.selectModel')}</option>
           {availableModels.map((model) => (
             <option key={model.id} value={model.id}>
               {model.id}
@@ -2483,8 +2481,8 @@ function ClaudeConfigSection({
         </select>
       </SettingsRow>
       <SettingsRow
-        label="Max simple chars"
-        description="Messages shorter than this use the cheap model."
+        label={t('settings.routing.maxSimpleChars')}
+        description={t('settings.routing.maxSimpleCharsDesc')}
       >
         <Input
           type="number"
@@ -2502,8 +2500,8 @@ function ClaudeConfigSection({
         />
       </SettingsRow>
       <SettingsRow
-        label="Max simple words"
-        description="Messages with fewer words use the cheap model."
+        label={t('settings.routing.maxSimpleWords')}
+        description={t('settings.routing.maxSimpleWordsDesc')}
       >
         <Input
           type="number"
@@ -2526,13 +2524,13 @@ function ClaudeConfigSection({
   const renderVoice = () => (
     <div className="space-y-4">
       <SettingsSection
-        title="Text-to-Speech"
-        description="Configure voice output for agent responses."
+        title={t('settings.voice.tts.title')}
+        description={t('settings.voice.tts.desc')}
         icon={VolumeHighIcon}
       >
         <SettingsRow
-          label="TTS provider"
-          description="Which TTS engine to use."
+          label={t('settings.voice.tts.provider')}
+          description={t('settings.voice.tts.providerDesc')}
         >
           <select
             value={ttsProvider}
@@ -2541,15 +2539,15 @@ function ClaudeConfigSection({
             }
             className={selectClassName}
           >
-            <option value="edge">Edge TTS (free)</option>
-            <option value="elevenlabs">ElevenLabs</option>
-            <option value="openai">OpenAI TTS</option>
-            <option value="neutts">NeuTTS</option>
+            <option value="edge">{t('settings.voice.tts.edge')}</option>
+            <option value="elevenlabs">{t('settings.voice.tts.elevenlabs')}</option>
+            <option value="openai">{t('settings.voice.tts.openai')}</option>
+            <option value="neutts">{t('settings.voice.tts.neutts')}</option>
           </select>
         </SettingsRow>
 
         {ttsProvider === 'edge' && (
-          <SettingsRow label="Voice" description="Edge voice name.">
+          <SettingsRow label={t('settings.voice.tts.voice')} description={t('settings.voice.tts.edgeVoiceDesc')}>
             <Input
               value={(ttsEdge.voice as string) || ''}
               onChange={(e) =>
@@ -2565,7 +2563,7 @@ function ClaudeConfigSection({
 
         {ttsProvider === 'elevenlabs' && (
           <>
-            <SettingsRow label="Voice ID" description="ElevenLabs voice_id.">
+            <SettingsRow label={t('settings.voice.tts.voiceId')} description={t('settings.voice.tts.elevenVoiceIdDesc')}>
               <Input
                 value={(ttsElevenLabs.voice_id as string) || ''}
                 onChange={(e) =>
@@ -2578,7 +2576,7 @@ function ClaudeConfigSection({
                 className="md:w-64"
               />
             </SettingsRow>
-            <SettingsRow label="Model" description="ElevenLabs model name.">
+            <SettingsRow label={t('settings.voice.tts.model')} description={t('settings.voice.tts.elevenModelDesc')}>
               <Input
                 value={(ttsElevenLabs.model as string) || ''}
                 onChange={(e) =>
@@ -2595,8 +2593,8 @@ function ClaudeConfigSection({
         {ttsProvider === 'openai' && (
           <>
             <SettingsRow
-              label="Voice"
-              description="alloy, echo, fable, onyx, nova, shimmer"
+              label={t('settings.voice.tts.voice')}
+              description={t('settings.voice.tts.openaiVoicesDesc')}
             >
               <select
                 value={(ttsOpenAi.voice as string) || 'alloy'}
@@ -2616,7 +2614,7 @@ function ClaudeConfigSection({
                 )}
               </select>
             </SettingsRow>
-            <SettingsRow label="Model" description="OpenAI TTS model.">
+            <SettingsRow label={t('settings.voice.tts.model')} description={t('settings.voice.tts.openaiModelDesc')}>
               <Input
                 value={(ttsOpenAi.model as string) || ''}
                 onChange={(e) =>
@@ -2633,11 +2631,11 @@ function ClaudeConfigSection({
       </SettingsSection>
 
       <SettingsSection
-        title="Speech-to-Text"
-        description="Configure voice input recognition."
+        title={t('settings.voice.stt.title')}
+        description={t('settings.voice.stt.desc')}
         icon={Mic01Icon}
       >
-        <SettingsRow label="Enable STT" description="Turn on voice input.">
+        <SettingsRow label={t('settings.voice.stt.enable')} description={t('settings.voice.stt.enableDesc')}>
           <Switch
             checked={readBoolean(sttConfig.enabled, false)}
             onCheckedChange={(checked) =>
@@ -2646,8 +2644,8 @@ function ClaudeConfigSection({
           />
         </SettingsRow>
         <SettingsRow
-          label="STT provider"
-          description="Which speech engine to use."
+          label={t('settings.voice.stt.provider')}
+          description={t('settings.voice.stt.providerDesc')}
         >
           <select
             value={sttProvider}
@@ -2665,8 +2663,8 @@ function ClaudeConfigSection({
         </SettingsRow>
         {sttProvider === 'local' && (
           <SettingsRow
-            label="Model size"
-            description="tiny, base, small, medium, large"
+            label={t('settings.voice.stt.modelSize')}
+            description={t('settings.voice.stt.modelSizeDesc')}
           >
             <select
               value={(sttLocal.model_size as string) || 'base'}
@@ -2677,19 +2675,28 @@ function ClaudeConfigSection({
               }
               className={selectClassName}
             >
-              {['tiny', 'base', 'small', 'medium', 'large'].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
+              {(['tiny', 'base', 'small', 'medium', 'large'] as const).map((size) => {
+                const sizeKeyMap: Record<typeof size, TranslationKey> = {
+                  tiny: 'settings.voice.stt.modelSizeTiny',
+                  base: 'settings.voice.stt.modelSizeBase',
+                  small: 'settings.voice.stt.modelSizeSmall',
+                  medium: 'settings.voice.stt.modelSizeMedium',
+                  large: 'settings.voice.stt.modelSizeLarge',
+                }
+                return (
+                  <option key={size} value={size}>
+                    {t(sizeKeyMap[size])}
+                  </option>
+                )
+              })}
             </select>
           </SettingsRow>
         )}
         {sttProvider === 'groq' && (
           <>
             <SettingsRow
-              label="Groq model"
-              description="Choose the Whisper model Groq should run."
+              label={t('settings.voice.stt.groqModel')}
+              description={t('settings.voice.stt.groqModelDesc')}
             >
               <select
                 value={(sttGroq.model as string) || GROQ_STT_MODELS[0]}
@@ -2708,8 +2715,8 @@ function ClaudeConfigSection({
               </select>
             </SettingsRow>
             <SettingsRow
-              label="Language"
-              description="Optional BCP-47 code, e.g. en or en-US. Leave blank for auto-detect."
+              label={t('settings.voice.stt.language')}
+              description={t('settings.voice.stt.languageDesc')}
             >
               <Input
                 value={(sttConfig.language as string) || ''}
@@ -2730,11 +2737,11 @@ function ClaudeConfigSection({
 
   const renderDisplay = () => (
     <SettingsSection
-      title="Display"
-      description="CLI display preferences reflected in the agent UI."
+      title={t('settings.display.title')}
+      description={t('settings.display.desc')}
       icon={PaintBoardIcon}
     >
-      <SettingsRow label="Personality" description="Agent response style.">
+      <SettingsRow label={t('settings.display.personality')} description={t('settings.display.personalityDesc')}>
         <select
           value={(displayConfig.personality as string) || 'default'}
           onChange={(e) =>
@@ -2744,16 +2751,24 @@ function ClaudeConfigSection({
           }
           className={selectClassName}
         >
-          {['default', 'concise', 'verbose', 'creative'].map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
+          {(['default', 'concise', 'verbose', 'creative'] as const).map((value) => {
+            const personalityKeyMap: Record<typeof value, TranslationKey> = {
+              default: 'settings.display.personalityDefault',
+              concise: 'settings.display.personalityConcise',
+              verbose: 'settings.display.personalityVerbose',
+              creative: 'settings.display.personalityCreative',
+            }
+            return (
+              <option key={value} value={value}>
+                {t(personalityKeyMap[value])}
+              </option>
+            )
+          })}
         </select>
       </SettingsRow>
       <SettingsRow
-        label="Streaming"
-        description="Stream tokens as they arrive."
+        label={t('settings.display.streaming')}
+        description={t('settings.display.streamingDesc')}
       >
         <Switch
           checked={readBoolean(displayConfig.streaming, true)}
@@ -2763,8 +2778,8 @@ function ClaudeConfigSection({
         />
       </SettingsRow>
       <SettingsRow
-        label="Show reasoning"
-        description="Expose model reasoning blocks in the UI."
+        label={t('settings.display.showReasoning')}
+        description={t('settings.display.showReasoningDesc')}
       >
         <Switch
           checked={readBoolean(displayConfig.show_reasoning, false)}
@@ -2775,7 +2790,7 @@ function ClaudeConfigSection({
           }
         />
       </SettingsRow>
-      <SettingsRow label="Show cost" description="Display usage cost metadata.">
+      <SettingsRow label={t('settings.display.showCost')} description={t('settings.display.showCostDesc')}>
         <Switch
           checked={readBoolean(displayConfig.show_cost, false)}
           onCheckedChange={(checked) =>
@@ -2783,7 +2798,7 @@ function ClaudeConfigSection({
           }
         />
       </SettingsRow>
-      <SettingsRow label="Compact" description="Use a denser display layout.">
+      <SettingsRow label={t('settings.display.compact')} description={t('settings.display.compactDesc')}>
         <Switch
           checked={readBoolean(displayConfig.compact, false)}
           onCheckedChange={(checked) =>
@@ -2791,7 +2806,7 @@ function ClaudeConfigSection({
           }
         />
       </SettingsRow>
-      <SettingsRow label="Skin" description="CLI theme skin.">
+      <SettingsRow label={t('settings.display.skin')} description={t('settings.display.skinDesc')}>
         <span
           className="text-sm font-mono"
           style={{ color: 'var(--theme-muted)' }}
@@ -2879,10 +2894,10 @@ function ConnectionSection() {
       const data = (await res.json()) as ConnectionSettings & { error?: string }
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
       setCurrent(data)
-      setMessage('Saved. Connection updated — no restart needed.')
+      setMessage(t('settings.connection.savedNoRestart'))
     } catch (err) {
       setIsError(true)
-      setMessage(err instanceof Error ? err.message : 'Failed to save')
+      setMessage(err instanceof Error ? err.message : t('settings.failedToSave'))
     } finally {
       setSaving(false)
       setTimeout(() => setMessage(null), 6000)
@@ -2903,10 +2918,10 @@ function ConnectionSection() {
       setCurrent(data)
       setGatewayInput(data.gateway)
       setDashboardInput(data.dashboard)
-      setMessage('Reset to env / default URLs.')
+      setMessage(t('settings.connection.resetToEnv'))
     } catch {
       setIsError(true)
-      setMessage('Reset failed')
+      setMessage(t('settings.connection.resetFailed'))
     } finally {
       setSaving(false)
       setTimeout(() => setMessage(null), 6000)
@@ -2917,30 +2932,30 @@ function ConnectionSection() {
     'h-9 w-full rounded-lg border border-primary-200 bg-primary-50 px-3 text-sm text-primary-900 font-mono outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-400'
 
   const sourceLabel: Record<ConnectionSettings['source'], string> = {
-    override: 'Runtime override (saved in workspace-overrides.json)',
-    env: 'From HERMES_API_URL / HERMES_DASHBOARD_URL env vars',
-    default: 'Defaults — no override set',
+    override: t('settings.connection.sourceOverride'),
+    env: t('settings.connection.sourceEnv'),
+    default: t('settings.connection.sourceDefault'),
   }
 
   return (
     <SettingsSection
-      title="Connection"
-      description="Point the workspace at your Hermes Agent services. Useful for Tailscale, LAN, or remote-server setups (#101)."
+      title={t('settings.connection.title')}
+      description={t('settings.connection.desc')}
       icon={Link01Icon}
     >
       <div className="text-xs text-primary-600">
-        {current ? sourceLabel[current.source] : 'Loading…'}
+        {current ? sourceLabel[current.source] : t('settings.connection.loading')}
       </div>
 
       <SettingsRow
-        label="Gateway URL"
-        description="Core chat + completions + health. Default http://127.0.0.1:8645."
+        label={t('settings.connection.gatewayUrl')}
+        description={t('settings.connection.gatewayUrlDesc')}
       >
         <input
           className={inputClass}
           value={gatewayInput}
           onChange={(e) => setGatewayInput(e.target.value)}
-          placeholder="http://100.x.y.z:8642"
+          placeholder={t('settings.connection.gatewayUrlPlaceholder')}
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
@@ -2948,14 +2963,14 @@ function ConnectionSection() {
       </SettingsRow>
 
       <SettingsRow
-        label="Dashboard URL"
-        description="Extended APIs — sessions, skills, config, jobs. Default http://127.0.0.1:9119."
+        label={t('settings.connection.dashboardUrl')}
+        description={t('settings.connection.dashboardUrlDesc')}
       >
         <input
           className={inputClass}
           value={dashboardInput}
           onChange={(e) => setDashboardInput(e.target.value)}
-          placeholder="http://100.x.y.z:9119"
+          placeholder={t('settings.connection.dashboardUrlPlaceholder')}
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
@@ -2964,7 +2979,7 @@ function ConnectionSection() {
 
       <div className="flex items-center gap-2 pt-2">
         <Button size="sm" onClick={save} disabled={saving}>
-          {saving ? 'Saving…' : 'Save & reprobe'}
+          {saving ? t('settings.connection.saving') : t('settings.connection.saveReprobe')}
         </Button>
         <Button
           size="sm"
@@ -2972,7 +2987,7 @@ function ConnectionSection() {
           onClick={reset}
           disabled={saving || current?.source === 'default'}
         >
-          Reset to defaults
+          {t('settings.reset')}
         </Button>
         {message ? (
           <span
@@ -2987,11 +3002,14 @@ function ConnectionSection() {
       </div>
 
       <div className="mt-3 rounded-lg border border-primary-200 bg-primary-100/50 p-3 text-xs text-primary-600">
-        <strong className="font-semibold">Tailscale / remote tip:</strong> Set
-        the gateway to its Tailscale IP (e.g. <code>http://100.x.y.z:8642</code>
-        ) and ensure the gateway listens on <code>0.0.0.0</code> (set{' '}
-        <code>API_SERVER_HOST=0.0.0.0</code> in the agent-side <code>.env</code>
-        ). No workspace restart needed — capabilities reprobe on save.
+        <strong className="font-semibold">{t('settings.connection.tailscaleTipLabel')}</strong>{' '}
+        {t('settings.connection.tailscaleTipBody')}{' '}
+        <code>http://100.x.y.z:8642</code>
+        {t('settings.connection.tailscaleTipBody2')}{' '}
+        <code>0.0.0.0</code>{' '}
+        {t('settings.connection.tailscaleTipBody3')}{' '}
+        <code>API_SERVER_HOST=0.0.0.0</code>{' '}
+        {t('settings.connection.tailscaleTipBody4')}
       </div>
     </SettingsSection>
   )
