@@ -118,6 +118,7 @@ const EN = {
   'common.name': 'Name',
   'common.status': 'Status',
   'common.unavailable': 'Unavailable',
+  'common.featureNotEnabled': 'This feature is not enabled in this build.',
   'common.schedule': 'Schedule',
   // ── Chat — composer ──────────────────────────────────────────────────
   'chat.composer.placeholder': 'Type a message...',
@@ -5124,6 +5125,12 @@ const EN = {
   'settingsSidebar.chat': 'Chat',
   'settingsSidebar.notifications': 'Notifications',
   'settingsSidebar.language': 'Language',
+  'settingsSidebar.game': 'Game',
+  // ── Game settings ───────────────────────────────────────────────────
+  'settings.game.title': 'HermesWorld Game',
+  'settings.game.desc': 'Enable the game module (playground, agora, etc.)',
+  'settings.game.enable': 'Enable game',
+  'settings.game.enableDesc': 'When enabled, game routes (/playground, /agora) become accessible. Off by default.',
   // ── Usage meter ─────────────────────────────────────────────────────
   'usageMeter.sessionStats': 'Session Stats',
   'usageMeter.providerUsage': 'Provider Usage',
@@ -5743,6 +5750,7 @@ const FA: LocaleTranslations = {
   'common.name': 'نام',
   'common.status': 'وضعیت',
   'common.unavailable': 'غیرقابل‌دسترس',
+  'common.featureNotEnabled': 'این قابلیت در این نسخه فعال نیست.',
   'common.schedule': 'زمان‌بندی',
   // ── Chat — composer ──────────────────────────────────────────────────
   'chat.composer.placeholder': 'پیام بنویسید…',
@@ -10749,6 +10757,12 @@ const FA: LocaleTranslations = {
   'settingsSidebar.chat': 'گفتگو',
   'settingsSidebar.notifications': 'اعلان‌ها',
   'settingsSidebar.language': 'زبان',
+  'settingsSidebar.game': 'بازی',
+  // ── Game settings ───────────────────────────────────────────────────
+  'settings.game.title': 'بازی HermesWorld',
+  'settings.game.desc': 'فعال‌سازی ماژول بازی (زمین بازی، آگورا و غیره)',
+  'settings.game.enable': 'فعال‌سازی بازی',
+  'settings.game.enableDesc': 'هنگام فعال‌سازی، مسیرهای بازی (/playground، /agora) قابل دسترس می‌شوند. پیش‌فرض خاموش.',
   // ── Usage meter ─────────────────────────────────────────────────────
   'usageMeter.sessionStats': 'آمار نشست',
   'usageMeter.providerUsage': 'مصرف ارائه‌دهنده',

@@ -5,7 +5,7 @@ import {
   createSupabaseReservationStore,
   ReservationValidationError,
   sendReservationConfirmationEmail,
-} from '@/server/name-reservations'
+} from '@/modules/hermesworld/server/name-reservations'
 import {
   getClientIp,
   rateLimit,
