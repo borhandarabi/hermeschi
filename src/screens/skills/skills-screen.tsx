@@ -20,6 +20,7 @@ import { Markdown } from '@/components/prompt-kit/markdown'
 import { cn } from '@/lib/utils'
 import { writeTextToClipboard } from '@/lib/clipboard'
 import { toast } from '@/components/ui/toast'
+import { t } from '@/lib/i18n'
 
 type SkillsTab = 'installed' | 'marketplace' | 'featured'
 type SkillsSort = 'name' | 'category'
@@ -475,12 +476,12 @@ export function SkillsScreen() {
   async function copyCommandAndToast(command: string, message: string) {
     try {
       await writeTextToClipboard(command)
-      toast(`${message} Copied: ${command}`, {
+      toast(t('skills.copiedToast', { message, command }), {
         type: 'warning',
         icon: '📋',
       })
     } catch {
-      toast(`${message} ${command}`, {
+      toast(t('skills.copyFallbackToast', { message, command }), {
         type: 'warning',
         icon: '📋',
         duration: 7000,
@@ -504,7 +505,7 @@ export function SkillsScreen() {
     // can edit). The dashboard's per-profile endpoint only supports toggle.
     if (action !== 'toggle' && !isOnActiveProfile) {
       setActionError(
-        `Install/uninstall is only available on the active profile. Switch the profile dropdown to "${activeProfileName || 'default'}" to manage installs.`,
+        t('skills.installOnActiveOnly', { name: activeProfileName || 'default' }),
       )
       setActionSkillId(null)
       return
@@ -559,7 +560,7 @@ export function SkillsScreen() {
         if (data.command) {
           await copyCommandAndToast(
             data.command,
-            data.error || 'Gateway action unavailable.',
+            data.error || t('skills.gatewayUnavailable'),
           )
           return
         }
@@ -643,14 +644,13 @@ export function SkillsScreen() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1.5">
               <p className="text-xs font-medium uppercase text-primary-500 tabular-nums">
-                Hermes Workspace Marketplace
+                {t('skills.hermesMarketplace')}
               </p>
               <h1 className="text-2xl font-medium text-ink text-balance sm:text-3xl">
-                Skills Browser
+                {t('skills.skillsBrowser')}
               </h1>
               <p className="text-sm text-primary-500 text-pretty sm:text-base">
-                Discover, install, and manage skills across your local workspace
-                and Skills Hub.
+                {t('skills.browserDesc')}
               </p>
             </div>
           </div>
@@ -662,7 +662,7 @@ export function SkillsScreen() {
               {profiles.length > 1 ? (
                 <label className="flex h-9 items-center gap-2 rounded-lg border border-primary-200 bg-primary-100/60 px-3 text-xs text-primary-500">
                   <span className="font-medium uppercase tracking-wider text-[10px]">
-                    Profile
+                    {t('skills.profile')}
                   </span>
                   <select
                     value={effectiveProfile}
@@ -671,12 +671,12 @@ export function SkillsScreen() {
                       setPage(1)
                     }}
                     className="h-7 rounded-md border border-primary-200 bg-primary-50/70 px-2 text-xs text-ink outline-none"
-                    aria-label="Profile"
+                    aria-label={t('skills.profile')}
                   >
                     {profiles.map((profile) => (
                       <option key={profile.name} value={profile.name}>
                         {profile.name === activeProfileName
-                          ? `${profile.name} (active)`
+                          ? t('skills.profileActive', { name: profile.name })
                           : profile.name}
                       </option>
                     ))}
@@ -689,8 +689,8 @@ export function SkillsScreen() {
                 onChange={(event) => handleSearchChange(event.target.value)}
                 placeholder={
                   tab === 'marketplace'
-                    ? 'Search Skills Hub, GitHub, and local fallback'
-                    : 'Search by name, tags, or description'
+                    ? t('skills.searchHub')
+                    : t('skills.search')
                 }
                 className="h-9 w-full min-w-0 flex-1 rounded-lg border border-primary-200 bg-primary-100/60 px-3 text-sm text-ink outline-none transition-colors focus:border-primary sm:min-w-[220px]"
               />
@@ -717,10 +717,10 @@ export function SkillsScreen() {
                   onChange={(event) => handleOriginChange(event.target.value)}
                   className="h-9 rounded-lg border border-primary-200 bg-primary-100/60 px-3 text-sm text-ink outline-none"
                 >
-                  <option value="All">All Origins</option>
-                  <option value="builtin">Built-in</option>
-                  <option value="agent-created">Agent-created</option>
-                  <option value="marketplace">Marketplace</option>
+                  <option value="All">{t('skills.allOrigins')}</option>
+                  <option value="builtin">{t('skills.originBuiltin')}</option>
+                  <option value="agent-created">{t('skills.originAgentCreated')}</option>
+                  <option value="marketplace">{t('skills.originMarketplace')}</option>
                 </select>
               ) : null}
 
@@ -734,8 +734,8 @@ export function SkillsScreen() {
                   }
                   className="h-9 rounded-lg border border-primary-200 bg-primary-100/60 px-3 text-sm text-ink outline-none"
                 >
-                  <option value="name">Name A-Z</option>
-                  <option value="category">Category</option>
+                  <option value="name">{t('skills.nameAZ')}</option>
+                  <option value="category">{t('skills.category')}</option>
                 </select>
               ) : null}
 
@@ -744,11 +744,11 @@ export function SkillsScreen() {
                 variant="default"
               >
                 <TabsTab value="installed" className="min-w-[110px]">
-                  Installed
+                  {t('skills.installed')}
                 </TabsTab>
                 {isOnActiveProfile ? (
                   <TabsTab value="marketplace" className="min-w-[120px]">
-                    Marketplace
+                    {t('skills.marketplace')}
                   </TabsTab>
                 ) : null}
               </TabsList>
@@ -781,7 +781,7 @@ export function SkillsScreen() {
               <div className="flex items-center justify-between gap-2">
                 {hubQuery.data?.source ? (
                   <div className="text-xs text-primary-500">
-                    Source: {hubQuery.data.source}
+                    {t('skills.sourceLabel', { source: hubQuery.data.source })}
                   </div>
                 ) : (
                   <div />
@@ -792,14 +792,13 @@ export function SkillsScreen() {
                 <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {hubQuery.error instanceof Error
                     ? hubQuery.error.message
-                    : 'Failed to load marketplace skills.'}
+                    : t('skills.marketplaceUnavailable')}
                 </div>
               ) : hubQuery.data &&
                 (hubQuery.data.source === 'installed-fallback' ||
                   hubQuery.data.source === 'error') ? (
                 <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-                  Skills Hub search unavailable — showing installed skills
-                  instead. Ensure the Hermes Agent gateway is running.
+                  {t('skills.hubUnavailable')}
                 </div>
               ) : null}
 
@@ -810,11 +809,11 @@ export function SkillsScreen() {
                 tab="marketplace"
                 emptyState={{
                   title: searchInput.trim()
-                    ? 'No hub skills found'
-                    : 'Search the Skills Hub',
+                    ? t('skills.noHubSkills')
+                    : t('skills.searchHubEmpty'),
                   description: searchInput.trim()
-                    ? 'Try a different search term. If Skills Hub is unavailable, local installed skills are used as fallback.'
-                    : 'Start typing to search Skills Hub and other skill sources.',
+                    ? t('skills.noHubDesc')
+                    : t('skills.searchHubStart'),
                 }}
                 onOpenDetails={setSelectedSkill}
                 onInstall={(skillId) => {
@@ -840,7 +839,7 @@ export function SkillsScreen() {
         {tab !== 'marketplace' ? (
           <footer className="flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50/80 px-3 py-2.5 text-sm text-primary-500 tabular-nums">
             <span>
-              {(skillsQuery.data?.total || 0).toLocaleString()} total skills
+              {t('skills.totalSkills', { count: (skillsQuery.data?.total || 0).toLocaleString() })}
             </span>
             <div className="flex items-center gap-2">
               <Button
@@ -849,7 +848,7 @@ export function SkillsScreen() {
                 disabled={page <= 1 || skillsQuery.isPending}
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
               >
-                Previous
+                {t('common.previous')}
               </Button>
               <span className="min-w-[82px] text-center">
                 {page} / {totalPages}
@@ -862,7 +861,7 @@ export function SkillsScreen() {
                   setPage((current) => Math.min(totalPages, current + 1))
                 }
               >
-                Next
+                {t('common.next')}
               </Button>
             </div>
           </footer>
@@ -885,8 +884,8 @@ export function SkillsScreen() {
                   {selectedSkill.icon} {selectedSkill.name}
                 </DialogTitle>
                 <DialogDescription className="mt-1 text-pretty">
-                  by {selectedSkill.author} • {selectedSkill.category} •{' '}
-                  {selectedSkill.fileCount.toLocaleString()} files
+                  {t('skills.byAuthor', { author: selectedSkill.author })} • {selectedSkill.category} •{' '}
+                  {t('skills.fileCount', { count: selectedSkill.fileCount.toLocaleString() })}
                 </DialogDescription>
                 {selectedSkill.security && (
                   <div className="mt-3 rounded-xl border border-primary-200 bg-primary-50/80 overflow-hidden">
@@ -903,7 +902,7 @@ export function SkillsScreen() {
                   <div className="space-y-3">
                     {selectedSkill.homepage ? (
                       <p className="text-sm text-primary-500 text-pretty">
-                        Homepage:{' '}
+                        {t('skills.homepage')}{' '}
                         <a
                           href={selectedSkill.homepage}
                           target="_blank"
@@ -927,7 +926,7 @@ export function SkillsScreen() {
                         ))
                       ) : (
                         <span className="rounded-md border border-primary-200 bg-primary-100/50 px-2 py-0.5 text-xs text-primary-500">
-                          No triggers listed
+                          {t('skills.noTriggers')}
                         </span>
                       )}
                     </div>
@@ -960,14 +959,14 @@ export function SkillsScreen() {
                       )}
                     >
                       {selectedSkill.origin === 'builtin'
-                        ? 'Built-in'
+                        ? t('skills.originBuiltin')
                         : selectedSkill.origin === 'agent-created'
-                          ? 'Agent-created'
-                          : 'Marketplace'}
+                          ? t('skills.originAgentCreated')
+                          : t('skills.originMarketplace')}
                     </span>
                   ) : null}
                   <p className="text-sm text-primary-500 text-pretty">
-                    Source:{' '}
+                    {t('skills.sourceColon')}{' '}
                     <code className="inline-code">
                       {selectedSkill.sourcePath}
                     </code>
@@ -985,7 +984,7 @@ export function SkillsScreen() {
                         })
                       }}
                     >
-                      Uninstall
+                      {t('skills.uninstall')}
                     </Button>
                   ) : (
                     <Button
@@ -995,7 +994,7 @@ export function SkillsScreen() {
                         runSkillAction('install', { skillId: selectedSkill.id })
                       }
                     >
-                      Install
+                      {t('skills.install')}
                     </Button>
                   )}
                   <Button
@@ -1003,7 +1002,7 @@ export function SkillsScreen() {
                     size="sm"
                     onClick={() => setSelectedSkill(null)}
                   >
-                    Close
+                    {t('common.close')}
                   </Button>
                 </div>
               </div>
@@ -1111,21 +1110,36 @@ function SecurityScanCard({ security }: { security: SecurityRisk }) {
 
   const summaryText =
     security.flags.length === 0
-      ? 'No risky patterns detected. This skill appears safe to install.'
+      ? t('skills.securitySafe')
       : security.level === 'high'
-        ? `Found ${security.flags.length} potential security concern${security.flags.length !== 1 ? 's' : ''}. Review before installing.`
-        : `The skill's code was scanned for common risk patterns. ${security.flags.length} item${security.flags.length !== 1 ? 's' : ''} noted.`
+        ? t('skills.securityHighRisk', { count: security.flags.length, s: security.flags.length !== 1 ? 's' : '' })
+        : t('skills.securityConcerns', { count: security.flags.length, s: security.flags.length !== 1 ? 's' : '' })
+
+  const labelKey =
+    config.label === 'Benign'
+      ? 'skills.securityBenign'
+      : config.label === 'Caution'
+        ? 'skills.securityCaution'
+        : 'skills.securityWarning'
+  const confidenceKey =
+    config.confidence === 'HIGH CONFIDENCE'
+      ? 'skills.securityHighConfidence'
+      : config.confidence === 'MODERATE'
+        ? 'skills.securityModerate'
+        : config.confidence === 'REVIEW RECOMMENDED'
+          ? 'skills.securityReviewRecommended'
+          : 'skills.securityManualReview'
 
   return (
     <div className="text-xs">
       <div className="px-3 pt-3 pb-2">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-primary-400 mb-2">
-          Security Scan
+          {t('skills.securityScan')}
         </p>
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="text-primary-500 font-medium w-16 shrink-0">
-              Hermes Workspace
+              {t('skills.securityHermesWorkspace')}
             </span>
             <span
               className={cn(
@@ -1133,10 +1147,10 @@ function SecurityScanCard({ security }: { security: SecurityRisk }) {
                 config.badgeClass,
               )}
             >
-              {config.label}
+              {t(labelKey)}
             </span>
             <span className="text-[10px] text-primary-400 uppercase tracking-wide font-medium">
-              {config.confidence}
+              {t(confidenceKey)}
             </span>
           </div>
         </div>
@@ -1156,7 +1170,7 @@ function SecurityScanCard({ security }: { security: SecurityRisk }) {
             }}
             className="flex w-full items-center justify-between px-3 py-2 text-accent-500 hover:text-accent-600 transition-colors"
           >
-            <span className="text-[11px] font-medium">Details</span>
+            <span className="text-[11px] font-medium">{t('skills.securityDetails')}</span>
             <span className="text-[10px]">{showDetails ? '▲' : '▼'}</span>
           </button>
           {showDetails && (
@@ -1176,8 +1190,7 @@ function SecurityScanCard({ security }: { security: SecurityRisk }) {
       )}
       <div className="border-t border-primary-100 px-3 py-2">
         <p className="text-[10px] text-primary-400 italic">
-          Like a lobster shell, security has layers — review code before you run
-          it.
+          {t('skills.securityLayersNote')}
         </p>
       </div>
     </div>
@@ -1203,11 +1216,10 @@ function SkillsGrid({
     return (
       <div className="rounded-xl border border-dashed border-primary-200 bg-primary-100/40 px-4 py-8 text-center">
         <p className="text-sm font-medium text-primary-700">
-          {emptyState?.title || 'No skills found'}
+          {emptyState?.title || t('skills.noResults')}
         </p>
         <p className="mt-1 text-xs text-primary-500 text-pretty max-w-sm mx-auto">
-          {emptyState?.description ||
-            'Try adjusting your filters or search term'}
+          {emptyState?.description || t('skills.tryAdjust')}
         </p>
       </div>
     )
@@ -1237,7 +1249,7 @@ function SkillsGrid({
                   </div>
                   {skill.author ? (
                     <p className="line-clamp-1 text-xs text-primary-500">
-                      by {skill.author}
+                      {t('skills.byAuthor', { author: skill.author })}
                     </p>
                   ) : null}
                 </div>
@@ -1255,10 +1267,10 @@ function SkillsGrid({
                       )}
                     >
                       {skill.origin === 'builtin'
-                        ? 'Built-in'
+                        ? t('skills.originBuiltin')
                         : skill.origin === 'agent-created'
-                          ? 'Agent-created'
-                          : 'Marketplace'}
+                          ? t('skills.originAgentCreated')
+                          : t('skills.originMarketplace')}
                     </span>
                   ) : null}
                   <span
@@ -1269,7 +1281,7 @@ function SkillsGrid({
                         : 'border-primary-200 bg-primary-100/60 text-primary-500',
                     )}
                   >
-                    {skill.installed ? 'Installed' : 'Available'}
+                    {skill.installed ? t('skills.installedLabel') : t('skills.availableLabel')}
                   </span>
                 </div>
               </div>
@@ -1299,7 +1311,7 @@ function SkillsGrid({
                   size="sm"
                   onClick={() => onOpenDetails(skill)}
                 >
-                  Details
+                  {t('skills.details')}
                 </Button>
 
                 {tab === 'installed' ? (
@@ -1311,9 +1323,9 @@ function SkillsGrid({
                         onCheckedChange={(checked) =>
                           onToggle(skill.id, checked)
                         }
-                        aria-label={`Toggle ${skill.name}`}
+                        aria-label={t('skills.toggleSkill', { name: skill.name })}
                       />
-                      {skill.enabled ? 'Enabled' : 'Disabled'}
+                      {skill.enabled ? t('common.enabled') : t('common.disabled')}
                     </div>
                     <Button
                       variant="outline"
@@ -1321,7 +1333,7 @@ function SkillsGrid({
                       disabled={isActing}
                       onClick={() => onUninstall(skill.id)}
                     >
-                      Uninstall
+                      {t('skills.uninstall')}
                     </Button>
                   </div>
                 ) : skill.installed ? (
@@ -1331,7 +1343,7 @@ function SkillsGrid({
                     disabled={isActing}
                     onClick={() => onUninstall(skill.id)}
                   >
-                    Uninstall
+                    {t('skills.uninstall')}
                   </Button>
                 ) : (
                   <Button
@@ -1339,7 +1351,7 @@ function SkillsGrid({
                     disabled={isActing}
                     onClick={() => onInstall(skill.id)}
                   >
-                    Install
+                    {t('skills.install')}
                   </Button>
                 )}
               </div>
@@ -1375,7 +1387,7 @@ function FeaturedGrid({
   if (skills.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-primary-200 bg-primary-100/40 px-4 py-10 text-center text-sm text-primary-500 text-pretty">
-        Featured picks are currently unavailable.
+        {t('skills.featuredUnavailable')}
       </div>
     )
   }
@@ -1392,12 +1404,12 @@ function FeaturedGrid({
             <div className="mb-3 flex items-start justify-between gap-2">
               <div className="space-y-1">
                 <p className="text-xs font-medium uppercase text-primary-500 tabular-nums">
-                  {skill.featuredGroup || 'Staff Pick'}
+                  {skill.featuredGroup || t('skills.staffPick')}
                 </p>
                 <h3 className="text-lg font-medium text-ink text-balance">
                   {skill.icon} {skill.name}
                 </h3>
-                <p className="text-sm text-primary-500">by {skill.author}</p>
+                <p className="text-sm text-primary-500">{t('skills.byAuthor', { author: skill.author })}</p>
               </div>
 
               <span
@@ -1408,7 +1420,7 @@ function FeaturedGrid({
                     : 'border-primary-200 bg-primary-100/60 text-primary-500',
                 )}
               >
-                {skill.installed ? 'Installed' : 'Staff Pick'}
+                {skill.installed ? t('skills.installedLabel') : t('skills.staffPick')}
               </span>
             </div>
 
@@ -1422,7 +1434,7 @@ function FeaturedGrid({
                 size="sm"
                 onClick={() => onOpenDetails(skill)}
               >
-                Details
+                {t('skills.details')}
               </Button>
               {skill.installed ? (
                 <Button
@@ -1431,7 +1443,7 @@ function FeaturedGrid({
                   disabled={isActing}
                   onClick={() => onUninstall(skill.id)}
                 >
-                  Uninstall
+                  {t('skills.uninstall')}
                 </Button>
               ) : (
                 <Button
@@ -1439,7 +1451,7 @@ function FeaturedGrid({
                   disabled={isActing}
                   onClick={() => onInstall(skill.id)}
                 >
-                  Install
+                  {t('skills.install')}
                 </Button>
               )}
             </div>

@@ -18,6 +18,7 @@ import {
 } from '../hooks/use-mcp-mutations'
 import { useMcpCapabilityMode } from '../hooks/use-mcp-capability-mode'
 import type { McpClientInput, McpServer } from '@/types/mcp'
+import { t } from '@/lib/i18n'
 
 interface Props {
   open: boolean
@@ -104,7 +105,7 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
 
   const fallbackMode = capabilityMode === 'fallback'
   const discoverDisabledReason = fallbackMode
-    ? 'Discover requires hermes-agent /api/mcp runtime endpoint (not available in local fallback mode).'
+    ? t('mcp.discoverDisabledReason')
     : ''
 
   return (
@@ -118,23 +119,23 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
         <div className="flex max-h-[85vh] flex-col">
           <div className="border-b border-primary-200 px-5 py-4">
             <DialogTitle className="text-balance">
-              🔌 {draft.name || (initial ? 'Edit MCP Server' : 'Add MCP Server')}
+              🔌 {draft.name || (initial ? t('mcp.editServerTitle') : t('mcp.addServerTitle'))}
             </DialogTitle>
             <DialogDescription className="mt-1 text-pretty">
-              {initial ? 'Edit MCP Server' : 'Add MCP Server'} •{' '}
-              {draft.transportType.toUpperCase()} transport •{' '}
-              {draft.authType || 'none'} auth
+              {initial ? t('mcp.editServerTitle') : t('mcp.addServerTitle')} •{' '}
+              {t('mcp.transportInfo', { type: draft.transportType.toUpperCase() })} •{' '}
+              {t('mcp.authInfo', { auth: draft.authType || t('mcp.authNone') })}
             </DialogDescription>
             <div className="mt-3 flex flex-wrap gap-1.5">
               <span className="rounded-md border border-primary-200 bg-primary-100/50 px-2 py-0.5 text-xs text-primary-500">
                 {draft.transportType}
               </span>
               <span className="rounded-md border border-primary-200 bg-primary-100/50 px-2 py-0.5 text-xs text-primary-500">
-                auth: {draft.authType || 'none'}
+                {t('mcp.authInfo', { auth: draft.authType || t('mcp.authNone') })}
               </span>
               {fallbackMode ? (
                 <span className="rounded-md border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-                  config-only mode
+                  {t('mcp.configOnly')}
                 </span>
               ) : null}
             </div>
@@ -144,16 +145,16 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
             <ScrollAreaViewport className="px-5 py-4">
               <div className="space-y-3">
                 <label className={LABEL}>
-                  <span>Name</span>
+                  <span>{t('mcp.name')}</span>
                   <input
                     className={FIELD}
                     value={draft.name}
                     onChange={(e) => update({ name: e.target.value })}
-                    placeholder="my-mcp-server"
+                    placeholder={t('mcp.namePlaceholder')}
                   />
                 </label>
                 <label className={LABEL}>
-                  <span>Transport</span>
+                  <span>{t('mcp.transport')}</span>
                   <select
                     className={FIELD}
                     value={draft.transportType}
@@ -163,33 +164,33 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
                       })
                     }
                   >
-                    <option value="http">HTTP</option>
-                    <option value="stdio">stdio</option>
+                    <option value="http">{t('mcp.http')}</option>
+                    <option value="stdio">{t('mcp.stdio')}</option>
                   </select>
                 </label>
                 {draft.transportType === 'http' ? (
                   <label className={LABEL}>
-                    <span>URL</span>
+                    <span>{t('mcp.url')}</span>
                     <input
                       className={FIELD}
                       value={draft.url || ''}
                       onChange={(e) => update({ url: e.target.value })}
-                      placeholder="https://example.com/mcp"
+                      placeholder={t('mcp.urlPlaceholder')}
                     />
                   </label>
                 ) : (
                   <>
                     <label className={LABEL}>
-                      <span>Command</span>
+                      <span>{t('mcp.command')}</span>
                       <input
                         className={FIELD}
                         value={draft.command || ''}
                         onChange={(e) => update({ command: e.target.value })}
-                        placeholder="/usr/local/bin/my-mcp"
+                        placeholder={t('mcp.commandPlaceholder')}
                       />
                     </label>
                     <label className={LABEL}>
-                      <span>Args (one per line)</span>
+                      <span>{t('mcp.argsOnePerLine')}</span>
                       <textarea
                         className={`${FIELD} h-auto py-2 font-mono text-xs`}
                         rows={3}
@@ -207,7 +208,7 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
                   </>
                 )}
                 <label className={LABEL}>
-                  <span>Auth</span>
+                  <span>{t('mcp.auth')}</span>
                   <select
                     className={FIELD}
                     value={draft.authType || 'none'}
@@ -217,14 +218,14 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
                       })
                     }
                   >
-                    <option value="none">none</option>
-                    <option value="bearer">bearer</option>
-                    <option value="oauth">oauth</option>
+                    <option value="none">{t('mcp.authNone')}</option>
+                    <option value="bearer">{t('mcp.authBearer')}</option>
+                    <option value="oauth">{t('mcp.authOauth')}</option>
                   </select>
                 </label>
                 {draft.authType === 'bearer' ? (
                   <label className={LABEL}>
-                    <span>Bearer token</span>
+                    <span>{t('mcp.bearerToken')}</span>
                     <input
                       type="password"
                       className={FIELD}
@@ -233,18 +234,17 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
                       autoComplete="off"
                       placeholder={
                         initialHasBearer
-                          ? '••••••• (currently set — leave blank to keep, type to replace)'
-                          : 'Enter bearer token'
+                          ? t('mcp.bearerKeep')
+                          : t('mcp.bearerEnter')
                       }
                     />
                     {authEnvRef ? (
                       <span className="text-[11px] text-amber-700 dark:text-amber-300">
-                        Token resolved from env var <code className="font-mono">{authEnvRef}</code> — leave blank to keep current, or type to override.
+                        {t('mcp.tokenEnvResolved', { ref: authEnvRef })}
                       </span>
                     ) : initialHasBearer ? (
                       <span className="text-[11px] text-emerald-700 dark:text-emerald-300">
-                        Token currently set on server. Leave blank to keep
-                        existing; type a new value to replace.
+                        {t('mcp.tokenCurrentlySet')}
                       </span>
                     ) : null}
                   </label>
@@ -252,14 +252,12 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
 
                 {fallbackMode ? (
                   <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-                    ⚠ Local fallback mode — config-only CRUD. Live tool
-                    Discover and connectivity Test require the hermes-agent
-                    /api/mcp runtime endpoint.
+                    {t('mcp.configOnlyWarning')}
                   </p>
                 ) : null}
                 {discover.data ? (
                   <p className="text-xs text-primary-500">
-                    Discovered {discover.data.tools.length} tools.
+                    {t('mcp.discovered', { count: discover.data.tools.length })}
                   </p>
                 ) : null}
                 {discover.error ? (
@@ -281,7 +279,7 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
 
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-primary-200 px-5 py-3">
             <p className="min-w-0 flex-1 truncate text-sm text-primary-500 text-pretty">
-              Target:{' '}
+              {t('mcp.target')}{' '}
               <code className="inline-code">
                 {draft.transportType === 'http'
                   ? draft.url || '—'
@@ -295,7 +293,7 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
               onClick={onClose}
               disabled={upsert.isPending}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="outline"
@@ -304,7 +302,7 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
               title={discoverDisabledReason}
               onClick={() => discover.mutate(draft)}
             >
-              {discover.isPending ? 'Discovering…' : 'Discover'}
+              {discover.isPending ? t('mcp.discovering') : t('mcp.discover')}
             </Button>
             <Button
               size="sm"
@@ -323,7 +321,7 @@ export function McpServerDialog({ open, initial, onClose }: Props) {
                 }
               }}
             >
-              {upsert.isPending ? 'Saving…' : 'Save'}
+              {upsert.isPending ? t('common.saving') : t('common.save')}
             </Button>
             </div>
           </div>

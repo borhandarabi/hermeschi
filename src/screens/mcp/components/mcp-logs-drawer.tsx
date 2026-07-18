@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { McpServer } from '@/types/mcp'
+import { t } from '@/lib/i18n'
 
 interface Props {
   server: McpServer | null
@@ -14,6 +15,14 @@ interface LogLine {
 }
 
 const MAX_LINES = 500
+
+function streamStatusLabel(status: 'idle' | 'connecting' | 'open' | 'error' | 'closed'): string {
+  if (status === 'open') return t('mcp.statusStreaming')
+  if (status === 'connecting') return t('mcp.statusConnecting')
+  if (status === 'error') return t('mcp.statusError')
+  if (status === 'closed') return t('mcp.statusClosed')
+  return t('mcp.statusIdle')
+}
 
 export function McpLogsDrawer({ server, open, onClose }: Props) {
   const [lines, setLines] = useState<Array<LogLine>>([])
@@ -101,11 +110,11 @@ export function McpLogsDrawer({ server, open, onClose }: Props) {
     <div
       className="fixed inset-0 z-40 flex justify-end"
       role="dialog"
-      aria-label={`Logs for ${server.name}`}
+      aria-label={t('mcp.logsFor', { name: server.name })}
     >
       <button
         type="button"
-        aria-label="Close logs"
+        aria-label={t('mcp.closeLogs')}
         className="absolute inset-0 bg-black/30"
         onClick={onClose}
       />
@@ -113,10 +122,10 @@ export function McpLogsDrawer({ server, open, onClose }: Props) {
         <header className="flex items-center justify-between border-b border-primary-200 px-4 py-3">
           <div className="min-w-0">
             <h3 className="truncate text-sm font-semibold text-primary-900">
-              {server.name} logs
+              {t('mcp.serverLogs', { name: server.name })}
             </h3>
             <p className="text-xs text-primary-500">
-              {status === 'open' ? 'streaming' : status} · {lines.length}/{MAX_LINES}
+              {t('mcp.streamStatus', { status: streamStatusLabel(status), count: lines.length, max: MAX_LINES })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -126,14 +135,14 @@ export function McpLogsDrawer({ server, open, onClose }: Props) {
                 checked={autoScroll}
                 onChange={(e) => setAutoScroll(e.target.checked)}
               />
-              auto-scroll
+              {t('mcp.autoScroll')}
             </label>
             <button
               type="button"
               className="rounded border border-primary-300 px-2 py-1 text-xs text-primary-700 hover:bg-primary-50"
               onClick={onClose}
             >
-              Close
+              {t('common.close')}
             </button>
           </div>
         </header>
@@ -142,7 +151,7 @@ export function McpLogsDrawer({ server, open, onClose }: Props) {
           className="flex-1 overflow-y-auto bg-primary-950/95 px-3 py-2 font-mono text-xs text-primary-100"
         >
           {lines.length === 0 ? (
-            <p className="text-primary-300">Waiting for logs…</p>
+            <p className="text-primary-300">{t('mcp.waitingForLogs')}</p>
           ) : (
             <ul className="space-y-0.5">
               {lines.map((line) => (
