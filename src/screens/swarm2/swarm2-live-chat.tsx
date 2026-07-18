@@ -10,6 +10,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import { ChatComposer } from '@/screens/chat/components/chat-composer'
 import { cn } from '@/lib/utils'
+import { getLocale } from '@/lib/i18n'
 import { useSwarmChat, type SwarmChatMessage } from '@/hooks/use-swarm-chat'
 
 type Swarm2LiveChatProps = {
@@ -26,12 +27,12 @@ function formatMessageTime(ts: number | null | undefined): string {
   const date = new Date(millis)
   const now = new Date()
   const sameDay = date.toDateString() === now.toDateString()
-  const time = new Intl.DateTimeFormat(undefined, {
+  const time = new Intl.DateTimeFormat(getLocale(), {
     hour: 'numeric',
     minute: '2-digit',
   }).format(date)
   if (sameDay) return time
-  const shortDate = new Intl.DateTimeFormat(undefined, {
+  const shortDate = new Intl.DateTimeFormat(getLocale(), {
     month: 'short',
     day: 'numeric',
   }).format(date)

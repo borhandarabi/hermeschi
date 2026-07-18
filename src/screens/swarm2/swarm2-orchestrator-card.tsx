@@ -17,6 +17,7 @@ import { OfficeView } from '@/screens/gateway/components/office-view'
 import type { AgentWorkingRow } from '@/screens/gateway/components/agents-working-panel'
 import type { CrewMember } from '@/hooks/use-crew-status'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 const ORCHESTRATOR_NAME_KEY = 'swarm2:orchestrator:name'
 const DEFAULT_NAME = 'Main Agent'
@@ -204,7 +205,7 @@ export function Swarm2OrchestratorCard({
               type="button"
               onClick={openSettings}
               className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
-              aria-label="Orchestrator settings"
+              aria-label={t('swarm.role.orchestrator')}
               title="Orchestrator settings"
             >
               <HugeiconsIcon
@@ -434,7 +435,7 @@ export function Swarm2OrchestratorCard({
                 type="button"
                 onClick={() => setSettingsOpen(false)}
                 className="inline-flex size-10 items-center justify-center rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card2)] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-accent)] hover:text-[var(--theme-accent-strong)]"
-                aria-label="Close orchestrator settings"
+                aria-label={t('common.close')}
               >
                 <HugeiconsIcon
                   icon={Cancel01Icon}
