@@ -10,6 +10,7 @@
 import { useState } from 'react'
 import { useAgoraProfile } from './hooks/use-agora-profile'
 import { useAgoraRoom } from './hooks/use-agora-room'
+import { t } from '@/lib/i18n'
 import { AgoraWorld } from './components/agora-world'
 import { AgoraChatPanel } from './components/agora-chat-panel'
 import { AgoraOnlinePanel } from './components/agora-online-panel'
@@ -73,7 +74,7 @@ export function AgoraScreen() {
               background: 'var(--theme-card)',
               border: '1px solid var(--theme-border)',
             }}
-            title="Your profile"
+            title={t('agora.yourProfile')}
           >
             <img
               src={`/avatars/${self.profile.avatarId}.png`}

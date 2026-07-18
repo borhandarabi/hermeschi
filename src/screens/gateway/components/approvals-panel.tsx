@@ -8,6 +8,7 @@ import {
   resolveGatewayApproval,
   type GatewayApprovalEntry,
 } from '@/lib/gateway-api'
+import { t } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import type { ApprovalRequest } from '../lib/approvals-store'
 
@@ -227,7 +228,7 @@ export function ApprovalsPanel({
                 <span className="text-2xl">✅</span>
               </div>
               <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                No pending approvals
+                {t('gateway.approvals.empty')}
               </p>
               <p className="mt-1 text-xs text-neutral-400">
                 Agents are running autonomously
