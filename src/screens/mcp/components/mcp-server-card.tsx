@@ -11,6 +11,7 @@ import { useMcpCapabilityMode } from '../hooks/use-mcp-capability-mode'
 import { useMcpOauth } from '../hooks/use-mcp-oauth'
 import { isArgPlaceholder, isUrlPlaceholder } from '../lib/placeholder-detect'
 import type { McpServer, McpTestResult } from '@/types/mcp'
+import { t } from '@/lib/i18n'
 
 interface Props {
   server: McpServer
@@ -24,6 +25,12 @@ const STATUS_COLORS: Record<McpServer['status'], string> = {
     'border border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-200',
   unknown:
     'border border-primary-200 bg-primary-100/60 text-primary-500',
+}
+
+function statusLabel(status: McpServer['status']): string {
+  if (status === 'connected') return t('mcp.statusConnected')
+  if (status === 'failed') return t('mcp.statusFailed')
+  return t('mcp.statusUnknown')
 }
 
 function Badge({
@@ -53,7 +60,7 @@ export function McpServerCard({ server, onEdit }: Props) {
   // (workspace shells out to `hermes mcp test <name>`). Logs and Reauth
   // still require the live runtime /api/mcp endpoints.
   const liveOnlyTitle = fallbackMode
-    ? 'Requires hermes-agent /api/mcp runtime endpoint (not available in local fallback mode).'
+    ? t('mcp.requiresRuntime')
     : ''
   const qc = useQueryClient()
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -67,7 +74,7 @@ export function McpServerCard({ server, onEdit }: Props) {
             <h3 className="truncate text-sm font-medium text-ink">
               {server.name}
             </h3>
-            <Badge className={STATUS_COLORS[server.status]}>{server.status}</Badge>
+            <Badge className={STATUS_COLORS[server.status]}>{statusLabel(server.status)}</Badge>
             <Badge className="border border-primary-200 bg-primary-100/60 text-primary-500">
               {server.transportType}
             </Badge>
@@ -82,19 +89,19 @@ export function McpServerCard({ server, onEdit }: Props) {
           onCheckedChange={(checked) =>
             configure.mutate({ name: server.name, enabled: checked })
           }
-          aria-label={server.enabled ? 'Disable server' : 'Enable server'}
+          aria-label={server.enabled ? t('mcp.disableServer') : t('mcp.enableServer')}
         />
       </header>
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-primary-500">
         <div className="flex items-center gap-1.5">
-          <dt>Tools:</dt>
+          <dt>{t('mcp.toolsLabel')}</dt>
           <dd className="font-medium text-ink tabular-nums">
             {server.discoveredToolsCount}
           </dd>
         </div>
         <div className="flex items-center gap-1.5">
-          <dt>Auth:</dt>
+          <dt>{t('mcp.authLabel')}</dt>
           <dd className="font-medium text-ink">{server.authType}</dd>
         </div>
       </dl>
@@ -116,7 +123,7 @@ export function McpServerCard({ server, onEdit }: Props) {
             qc.invalidateQueries({ queryKey: ['mcp', 'servers'] })
           }}
         >
-          {test.isPending ? 'Testing…' : 'Test'}
+          {test.isPending ? t('mcp.testing') : t('mcp.test')}
         </Button>
         {server.authType === 'oauth' ? (
           <Button
@@ -128,7 +135,7 @@ export function McpServerCard({ server, onEdit }: Props) {
               void oauth.start(server)
             }}
           >
-            {oauth.isPending ? 'Reauth…' : 'Reauth'}
+            {oauth.isPending ? t('mcp.reauthing') : t('mcp.reauth')}
           </Button>
         ) : null}
         {/* Logs button hidden until hermes-agent dashboard exposes the
@@ -136,7 +143,7 @@ export function McpServerCard({ server, onEdit }: Props) {
             endpoint is available; the McpLogsDrawer component is still
             available at ./mcp-logs-drawer. */}
         <Button variant="outline" size="sm" onClick={() => onEdit(server)}>
-          Edit
+          {t('common.edit')}
         </Button>
         {confirmDelete ? (
           <>
@@ -146,14 +153,14 @@ export function McpServerCard({ server, onEdit }: Props) {
               disabled={remove.isPending}
               onClick={() => remove.mutate({ name: server.name })}
             >
-              Confirm Delete
+              {t('mcp.confirmDelete')}
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setConfirmDelete(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </>
         ) : (
@@ -163,7 +170,7 @@ export function McpServerCard({ server, onEdit }: Props) {
             className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-950/40"
             onClick={() => setConfirmDelete(true)}
           >
-            Delete
+            {t('common.delete')}
           </Button>
         )}
       </div>
@@ -171,8 +178,8 @@ export function McpServerCard({ server, onEdit }: Props) {
       {testResult ? (
         <p className="text-xs text-primary-500">
           {testResult.ok
-            ? `Connected (${testResult.latencyMs ?? '?'}ms, ${testResult.discoveredTools.length} tools)`
-            : `Failed: ${testResult.error || 'unknown error'}`}
+            ? t('mcp.connectedResult', { latency: testResult.latencyMs ?? '?', count: testResult.discoveredTools.length })
+            : t('mcp.failedResult', { error: testResult.error || t('mcp.unknownError') })}
         </p>
       ) : null}
       {testResult && !testResult.ok && testResult.error ? (
@@ -191,19 +198,19 @@ export function McpServerCard({ server, onEdit }: Props) {
           if (!showHint) return null
           return (
             <p className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-[11px] text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-              Edit server args/url — looks like a placeholder. Click Edit to fix.
+              {t('mcp.placeholderHint')}
             </p>
           )
         })()
       ) : null}
       {oauth.isError && oauth.error ? (
         <p className="text-xs text-red-700 dark:text-red-300">
-          Reauth failed: {oauth.error.message}
+          {t('mcp.reauthFailed', { error: oauth.error.message })}
         </p>
       ) : null}
       {oauth.data?.status === 'connected' ? (
         <p className="text-xs text-emerald-700 dark:text-emerald-300">
-          Reauth succeeded.
+          {t('mcp.reauthSucceeded')}
         </p>
       ) : null}
     </article>

@@ -23,6 +23,19 @@ import {
   type AddSourceInput,
   type MutationError,
 } from '../hooks/use-mcp-hub-sources'
+import { t } from '@/lib/i18n'
+
+const TRUST_PILL_LOCAL: Record<string, string> = {
+  official: 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300',
+  community: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300',
+  unverified: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300',
+}
+
+function trustLabel(value: string): string {
+  if (value === 'official') return t('mcp.official')
+  if (value === 'community') return t('mcp.community')
+  return t('mcp.unverified')
+}
 
 interface Props {
   open: boolean
@@ -65,17 +78,17 @@ function SourceForm({ initial, isEdit, onSave, onCancel, saving, serverErrors }:
   function validate(): boolean {
     const errs: Record<string, string> = {}
     if (!form.id.match(/^[a-z][a-z0-9_-]{0,63}$/)) {
-      errs.id = 'id must match /^[a-z][a-z0-9_-]{0,63}$/'
+      errs.id = t('mcp.sources.errorIdPattern')
     }
-    if (form.name.trim().length < 1) errs.name = 'name is required'
+    if (form.name.trim().length < 1) errs.name = t('mcp.sources.errorNameRequired')
     if (!form.url) {
-      errs.url = 'url is required'
+      errs.url = t('mcp.sources.errorUrlRequired')
     } else {
       try {
         const u = new URL(form.url)
-        if (u.protocol !== 'https:') errs.url = 'url must use https://'
+        if (u.protocol !== 'https:') errs.url = t('mcp.sources.errorUrlHttps')
       } catch {
-        errs.url = 'url is not valid'
+        errs.url = t('mcp.sources.errorUrlInvalid')
       }
     }
     setLocalErrors(errs)
@@ -102,71 +115,71 @@ function SourceForm({ initial, isEdit, onSave, onCancel, saving, serverErrors }:
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className={LABEL}>
-        <span>Source ID <span className="text-red-500">*</span></span>
+        <span>{t('mcp.sourceId')} <span className="text-red-500">*</span></span>
         <input
           className={FIELD}
           value={form.id}
           onChange={(e) => set('id', e.target.value)}
           disabled={isEdit || saving}
-          placeholder="internal"
+          placeholder={t('mcp.idPlaceholder')}
           autoFocus
         />
         {idErr ? <p className={ERROR_TEXT}>{idErr}</p> : null}
-        <p className="text-[11px] text-primary-400">Lowercase, alphanumeric + _ -. Cannot be changed after creation.</p>
+        <p className="text-[11px] text-primary-400">{t('mcp.sourceIdHelp')}</p>
       </div>
 
       <div className={LABEL}>
-        <span>Name <span className="text-red-500">*</span></span>
+        <span>{t('mcp.nameField')} <span className="text-red-500">*</span></span>
         <input
           className={FIELD}
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
           disabled={saving}
-          placeholder="Internal Catalog"
+          placeholder={t('mcp.sourceNamePlaceholder')}
         />
         {nameErr ? <p className={ERROR_TEXT}>{nameErr}</p> : null}
       </div>
 
       <div className={LABEL}>
-        <span>URL <span className="text-red-500">*</span></span>
+        <span>{t('mcp.urlField')} <span className="text-red-500">*</span></span>
         <input
           className={FIELD}
           value={form.url}
           onChange={(e) => set('url', e.target.value)}
           disabled={saving}
-          placeholder="https://corp.local/mcp.json"
+          placeholder={t('mcp.sourceUrlPlaceholder')}
           type="url"
         />
         {urlErr ? <p className={ERROR_TEXT}>{urlErr}</p> : null}
-        <p className="text-[11px] text-primary-400">HTTPS only. Must return JSON.</p>
+        <p className="text-[11px] text-primary-400">{t('mcp.urlHelp')}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className={LABEL}>
-          <span>Trust</span>
+          <span>{t('mcp.trust')}</span>
           <select
             className={FIELD}
             value={form.trust}
             onChange={(e) => set('trust', e.target.value as AddSourceInput['trust'])}
             disabled={saving}
           >
-            {TRUST_OPTIONS.map((t) => (
-              <option key={t} value={t}>{t}</option>
+            {TRUST_OPTIONS.map((trust) => (
+              <option key={trust} value={trust}>{trustLabel(trust)}</option>
             ))}
           </select>
           {trustErr ? <p className={ERROR_TEXT}>{trustErr}</p> : null}
         </div>
 
         <div className={LABEL}>
-          <span>Format</span>
+          <span>{t('mcp.format')}</span>
           <select
             className={FIELD}
             value={form.format}
             onChange={(e) => set('format', e.target.value as AddSourceInput['format'])}
             disabled={saving}
           >
-            {FORMAT_OPTIONS.map((f) => (
-              <option key={f} value={f}>{f}</option>
+            {FORMAT_OPTIONS.map((format) => (
+              <option key={format} value={format}>{format}</option>
             ))}
           </select>
           {formatErr ? <p className={ERROR_TEXT}>{formatErr}</p> : null}
@@ -183,7 +196,7 @@ function SourceForm({ initial, isEdit, onSave, onCancel, saving, serverErrors }:
           className="h-4 w-4 rounded border-primary-200 text-primary accent-primary"
         />
         <label htmlFor="enabled-toggle" className="text-sm text-ink cursor-pointer">
-          Enabled
+          {t('common.enabled')}
         </label>
       </div>
 
@@ -193,10 +206,10 @@ function SourceForm({ initial, isEdit, onSave, onCancel, saving, serverErrors }:
 
       <div className="flex items-center justify-end gap-2 pt-1">
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={saving}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button type="submit" size="sm" disabled={saving}>
-          {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Source'}
+          {saving ? t('mcp.savingBtn') : isEdit ? t('mcp.saveChanges') : t('mcp.addSource')}
         </Button>
       </div>
     </form>
@@ -210,11 +223,7 @@ interface SourceRowProps {
   deleting: boolean
 }
 
-const TRUST_PILL: Record<string, string> = {
-  official: 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300',
-  community: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300',
-  unverified: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300',
-}
+const TRUST_PILL: Record<string, string> = TRUST_PILL_LOCAL
 
 function SourceRow({ source, onEdit, onDelete, deleting }: SourceRowProps) {
   return (
@@ -223,16 +232,16 @@ function SourceRow({ source, onEdit, onDelete, deleting }: SourceRowProps) {
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-sm font-medium text-ink truncate">{source.name}</span>
           <span className={`rounded border px-1.5 py-0.5 text-[10px] font-medium ${TRUST_PILL[source.trust] ?? TRUST_PILL.unverified}`}>
-            {source.trust}
+            {trustLabel(source.trust)}
           </span>
           {source.builtin ? (
             <span className="rounded border border-primary-200 bg-primary-100/50 px-1.5 py-0.5 text-[10px] text-primary-500">
-              built-in
+              {t('mcp.builtIn')}
             </span>
           ) : null}
           {!source.enabled ? (
             <span className="rounded border border-primary-200 bg-primary-100/50 px-1.5 py-0.5 text-[10px] text-primary-400">
-              disabled
+              {t('mcp.disabled')}
             </span>
           ) : null}
         </div>
@@ -248,7 +257,7 @@ function SourceRow({ source, onEdit, onDelete, deleting }: SourceRowProps) {
             disabled={deleting}
             className="h-7 px-2 text-xs"
           >
-            Edit
+            {t('common.edit')}
           </Button>
           <Button
             variant="ghost"
@@ -257,7 +266,7 @@ function SourceRow({ source, onEdit, onDelete, deleting }: SourceRowProps) {
             disabled={deleting}
             className="h-7 px-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30"
           >
-            {deleting ? '…' : 'Remove'}
+            {deleting ? '…' : t('mcp.removeBtn')}
           </Button>
         </div>
       ) : null}
@@ -298,13 +307,13 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         setDeletingId(null)
-        toast('Source removed', { type: 'success' })
+        toast(t('mcp.sourceRemoved'), { type: 'success' })
       },
       onError: (err) => {
         setDeletingId(null)
         const errors = (err as { errors?: MutationError[] }).errors ?? []
         setServerErrors(errors)
-        toast('Failed to remove source', { type: 'error' })
+        toast(t('mcp.failedToRemove'), { type: 'error' })
       },
     })
   }
@@ -314,7 +323,7 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
     addMutation.mutate(data, {
       onSuccess: () => {
         setMode('list')
-        toast('Source added', { type: 'success' })
+        toast(t('mcp.sourceAdded'), { type: 'success' })
       },
       onError: (err) => {
         const errors = (err as { errors?: MutationError[] }).errors ?? []
@@ -332,7 +341,7 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
         onSuccess: () => {
           setMode('list')
           setEditingSource(null)
-          toast('Source updated', { type: 'success' })
+          toast(t('mcp.sourceUpdated'), { type: 'success' })
         },
         onError: (err) => {
           const errors = (err as { errors?: MutationError[] }).errors ?? []
@@ -342,7 +351,7 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
     )
   }
 
-  const title = mode === 'add' ? 'Add Source' : mode === 'edit' ? 'Edit Source' : 'Marketplace Sources'
+  const title = mode === 'add' ? t('mcp.addSource') : mode === 'edit' ? t('mcp.editSource') : t('mcp.marketplaceSources')
   const saving = addMutation.isPending || updateMutation.isPending
 
   return (
@@ -355,7 +364,7 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
                 onClick={() => { setMode('list'); setEditingSource(null); setServerErrors([]) }}
                 className="text-sm text-primary-500 hover:text-ink transition-colors"
               >
-                ← Back
+                {t('mcp.backArrow')}
               </button>
             ) : null}
             <DialogTitle className="text-base font-semibold text-ink flex-1">
@@ -364,10 +373,10 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
           </div>
           <DialogDescription className="mt-0.5 text-xs text-primary-400">
             {mode === 'list'
-              ? 'Built-in sources are read-only. User-defined sources can be added, edited, or removed.'
+              ? t('mcp.builtInReadonly')
               : mode === 'add'
-                ? 'Add a new HTTPS catalog source that returns JSON.'
-                : `Editing "${editingSource?.name ?? ''}"`}
+                ? t('mcp.addSourceDesc')
+                : t('mcp.editingSource', { name: editingSource?.name ?? '' })}
           </DialogDescription>
         </div>
 
@@ -375,9 +384,9 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
           {mode === 'list' ? (
             <div className="flex flex-col gap-3">
               {query.isLoading ? (
-                <p className="text-sm text-primary-400">Loading sources…</p>
+                <p className="text-sm text-primary-400">{t('mcp.loadingSources')}</p>
               ) : query.error ? (
-                <p className="text-sm text-red-600">Failed to load sources.</p>
+                <p className="text-sm text-red-600">{t('mcp.loadSourcesFailed')}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {sources.map((source) => (
@@ -390,7 +399,7 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
                     />
                   ))}
                   {sources.length === 0 ? (
-                    <p className="text-sm text-primary-400">No sources found.</p>
+                    <p className="text-sm text-primary-400">{t('mcp.noSources')}</p>
                   ) : null}
                 </div>
               )}
@@ -406,10 +415,10 @@ export function SourcesManagerDialog({ open, onClose }: Props) {
                   size="sm"
                   onClick={() => { setServerErrors([]); setMode('add') }}
                 >
-                  Add Source
+                  {t('mcp.addSource')}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleClose}>
-                  Done
+                  {t('mcp.done')}
                 </Button>
               </div>
             </div>

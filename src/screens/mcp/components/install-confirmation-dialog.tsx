@@ -32,14 +32,9 @@ import {
   isStillPlaceholder,
 } from '../lib/placeholder-detect'
 import type { PlaceholderField } from '../lib/placeholder-detect'
+import { t } from '@/lib/i18n'
 
-interface Props {
-  entry: HubMcpEntry | null
-  onClose: () => void
-  onInstalled?: () => void
-}
-
-const TRUST_PILL: Record<
+const TRUST_PILL_LOCAL: Record<
   string,
   { label: string; className: string }
 > = {
@@ -56,6 +51,23 @@ const TRUST_PILL: Record<
     className: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300',
   },
 }
+
+function trustPillLabel(label: string): string {
+  if (label === 'Official') return t('mcp.official')
+  if (label === 'Community') return t('mcp.community')
+  return t('mcp.unverified')
+}
+
+interface Props {
+  entry: HubMcpEntry | null
+  onClose: () => void
+  onInstalled?: () => void
+}
+
+const TRUST_PILL: Record<
+  string,
+  { label: string; className: string }
+> = TRUST_PILL_LOCAL
 
 const FIELD =
   'h-9 w-full rounded-lg border border-primary-200 bg-primary-100/60 px-3 text-sm text-ink outline-none transition-colors focus:border-primary'
@@ -154,13 +166,13 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
       if (!res.ok || body.ok === false) {
         throw new Error(body.error || `Install failed (${res.status})`)
       }
-      toast(`Installed ${entry.name}`, { type: 'success', icon: '✓' })
+      toast(t('mcp.installedToast', { name: entry.name }), { type: 'success', icon: '✓' })
       onInstalled?.()
       onClose()
     } catch (err) {
       // Ignore abort errors — the dialog was closed intentionally
       if (err instanceof Error && err.name === 'AbortError') return
-      setError(err instanceof Error ? err.message : 'Install failed')
+      setError(err instanceof Error ? err.message : t('mcp.installFailed'))
     } finally {
       setInstalling(false)
       abortControllerRef.current = null
@@ -204,24 +216,23 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
                 <span
                   className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${trustConfig.className}`}
                 >
-                  {trustConfig.label}
+                  {trustPillLabel(trustConfig.label)}
                 </span>
                 <span className="rounded-md border border-primary-200 bg-primary-100/60 px-2 py-0.5 text-[11px] font-medium text-primary-500">
                   {template.transportType}
                 </span>
               </div>
               <DialogDescription className="text-sm text-primary-500 text-pretty">
-                {entry.description || 'No description provided.'}
+                {entry.description || t('mcp.noDescriptionProvided')}
               </DialogDescription>
             </div>
 
             {/* Template preview */}
             <div className="rounded-xl border border-primary-200 bg-primary-100/40 p-4 space-y-3 text-sm">
-              {/* Command */}
               {template.command ? (
                 <div>
                   <p className="mb-1 text-xs font-medium uppercase text-primary-400 tracking-wide">
-                    Command
+                    {t('mcp.commandLabel')}
                   </p>
                   <p className="font-mono text-ink break-all">{template.command}</p>
                 </div>
@@ -231,7 +242,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
               {template.args && template.args.length > 0 ? (
                 <div>
                   <p className="mb-1 text-xs font-medium uppercase text-primary-400 tracking-wide">
-                    Args
+                    {t('mcp.args')}
                   </p>
                   <ul className="space-y-0.5">
                     {template.args.map((arg, i) => (
@@ -247,7 +258,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
               {template.url ? (
                 <div>
                   <p className="mb-1 text-xs font-medium uppercase text-primary-400 tracking-wide">
-                    URL
+                    {t('mcp.urlLabel')}
                   </p>
                   <p className="font-mono text-ink break-all">{template.url}</p>
                 </div>
@@ -257,7 +268,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
               {envKeys.length > 0 ? (
                 <div>
                   <p className="mb-1 text-xs font-medium uppercase text-primary-400 tracking-wide">
-                    Environment Variables
+                    {t('mcp.envVars')}
                   </p>
                   <ul className="space-y-0.5">
                     {envKeys.map((key) => (
@@ -279,14 +290,14 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
                 data-testid="placeholder-fill-form"
               >
                 <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
-                  This template contains placeholder values. Fill in the fields below before installing.
+                  {t('mcp.placeholderWarning')}
                 </p>
                 {placeholders.map((ph) => (
                   <label key={ph.path} className="flex flex-col gap-1 text-sm text-primary-500">
                     <span className="font-mono text-xs text-primary-600">
                       {ph.path}
                       {ph.currentValue ? (
-                        <span className="ml-1 text-primary-400">(was: {ph.currentValue})</span>
+                        <span className="ml-1 text-primary-400">{t('mcp.wasValue', { value: ph.currentValue })}</span>
                       ) : null}
                     </span>
                     <input
@@ -295,7 +306,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
                       onChange={(e) =>
                         setOverrides((prev) => ({ ...prev, [ph.path]: e.target.value }))
                       }
-                      placeholder={`Replace ${ph.currentValue || ph.path}`}
+                      placeholder={t('mcp.replacePlaceholder', { value: ph.currentValue || ph.path })}
                       data-testid={`placeholder-input-${ph.path}`}
                     />
                   </label>
@@ -307,7 +318,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
             <div className="space-y-1 text-xs text-primary-500">
               {entry.homepage ? (
                 <p>
-                  Homepage:{' '}
+                  {t('mcp.homepageLabel')}{' '}
                   <a
                     href={entry.homepage}
                     target="_blank"
@@ -319,7 +330,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
                 </p>
               ) : null}
               <p>
-                Source:{' '}
+                {t('mcp.sourceColon')}{' '}
                 <span className="font-medium text-ink">{entry.source}</span>
               </p>
             </div>
@@ -334,7 +345,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
             {/* Footer actions */}
             <div className="flex items-center justify-end gap-2 border-t border-primary-200 pt-3">
               <Button variant="ghost" size="sm" onClick={onClose} disabled={installing}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 size="sm"
@@ -342,7 +353,7 @@ export function InstallConfirmationDialog({ entry, onClose, onInstalled }: Props
                 onClick={handleInstall}
                 data-testid="install-confirm-btn"
               >
-                {installing ? 'Installing…' : 'Install'}
+                {installing ? t('mcp.installing') : t('skills.install')}
               </Button>
             </div>
           </div>

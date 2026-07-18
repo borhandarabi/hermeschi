@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 import { Markdown } from '@/components/prompt-kit/markdown'
+import { t } from '@/lib/i18n'
 
 function SkillMarkdown({ content }: { content: string }) {
   return <Markdown>{content}</Markdown>
@@ -59,6 +60,11 @@ const STATUS_BADGE_CLASS: Record<SkillItem['status'], string> = {
   active: 'border-green-200 bg-green-50 text-green-700',
 }
 
+function skillStatusLabel(status: SkillItem['status']): string {
+  if (status === 'active') return t('skills.workspace.statusActive')
+  return status
+}
+
 async function readPayload(response: Response): Promise<unknown> {
   const text = await response.text()
   if (!text) return null
@@ -91,9 +97,9 @@ async function apiRequest(input: string, init?: RequestInit): Promise<unknown> {
 }
 
 function sectionLabel(section: MemorySection): string {
-  if (section === 'workspace') return 'Workspace Memory'
-  if (section === 'project') return 'Daily Logs'
-  return 'Agent Memory'
+  if (section === 'workspace') return t('skills.workspace.workspaceMemory')
+  if (section === 'project') return t('skills.workspace.dailyLogs')
+  return t('skills.workspace.agentMemory')
 }
 
 function matchesFilter(section: MemorySection, filter: MemoryFilter): boolean {
@@ -103,10 +109,17 @@ function matchesFilter(section: MemorySection, filter: MemoryFilter): boolean {
   return section === 'agent'
 }
 
+function filterLabel(filter: MemoryFilter): string {
+  if (filter === 'All') return t('skills.workspace.filterAll')
+  if (filter === 'Workspace') return t('skills.workspace.filterWorkspace')
+  if (filter === 'Project') return t('skills.workspace.filterProject')
+  return t('skills.workspace.filterAgent')
+}
+
 function EmptyMemorySection({ label }: { label: string }) {
   return (
     <div className="rounded-xl border border-dashed border-primary-200 bg-primary-50/70 px-3 py-4 text-xs text-primary-500">
-      No files found in {label.toLowerCase()}.
+      {t('skills.workspace.noFilesIn', { label: label.toLowerCase() })}
     </div>
   )
 }
@@ -145,7 +158,7 @@ export function WorkspaceSkillsScreen() {
         throw new Error(
           'error' in payload && typeof payload.error === 'string'
             ? payload.error
-            : 'Failed to load memory files',
+            : t('skills.workspace.loadMemoryFailed'),
         )
       }
 
@@ -215,18 +228,18 @@ export function WorkspaceSkillsScreen() {
   }, [memoryQuery.data?.files, selectedMemoryPath])
 
   function handleComingSoon() {
-    toast('Coming soon', { type: 'info' })
+    toast(t('skills.workspace.comingSoon'), { type: 'info' })
   }
 
   function handleClearAll() {
-    toast('Are you sure?', { type: 'warning' })
+    toast(t('skills.workspace.areYouSure'), { type: 'warning' })
     const confirmed =
       typeof window === 'undefined'
         ? true
-        : window.confirm('Are you sure you want to clear all memory?')
+        : window.confirm(t('skills.workspace.clearAllConfirm'))
 
     if (!confirmed) return
-    toast('Cleared', { type: 'success' })
+    toast(t('skills.workspace.cleared'), { type: 'success' })
   }
 
   return (
@@ -239,10 +252,10 @@ export function WorkspaceSkillsScreen() {
             </div>
             <div>
               <h1 className="text-base font-semibold text-primary-900">
-                Skills
+                {t('nav.skills')}
               </h1>
               <p className="mt-1 text-sm text-primary-500">
-                Installed skills and workspace memory sources
+                {t('skills.workspace.subtitle')}
               </p>
             </div>
           </div>
@@ -254,7 +267,7 @@ export function WorkspaceSkillsScreen() {
               <div className="flex flex-col gap-3 border-b border-primary-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-[15px] font-semibold text-primary-900">
-                    Skills
+                    {t('nav.skills')}
                   </h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -263,14 +276,14 @@ export function WorkspaceSkillsScreen() {
                     size="sm"
                     onClick={handleComingSoon}
                   >
-                    + Install Skill
+                    {t('skills.workspace.installSkill')}
                   </Button>
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={handleComingSoon}
                   >
-                    Browse Skills Hub
+                    {t('skills.workspace.browseHub')}
                   </Button>
                 </div>
               </div>
@@ -278,17 +291,17 @@ export function WorkspaceSkillsScreen() {
               <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
                 {skillsQuery.isPending ? (
                   <div className="rounded-xl border border-primary-200 bg-primary-50/70 px-4 py-5 text-sm text-primary-600">
-                    Loading skills...
+                    {t('skills.workspace.loadingSkills')}
                   </div>
                 ) : skillsQuery.isError ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-5 text-sm text-red-600">
                     {skillsQuery.error instanceof Error
                       ? skillsQuery.error.message
-                      : 'Failed to load skills'}
+                      : t('skills.workspace.loadFailed')}
                   </div>
                 ) : visibleSkills.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-primary-200 bg-primary-50/70 px-4 py-5 text-sm text-primary-500">
-                    No skills found in `~/.hermes/skills` for Hermes Agent.
+                    {t('skills.workspace.noSkillsFound')}
                   </div>
                 ) : (
                   visibleSkills.map((skill) => {
@@ -330,7 +343,7 @@ export function WorkspaceSkillsScreen() {
                                   STATUS_BADGE_CLASS[skill.status],
                                 )}
                               >
-                                {skill.status}
+                                {skillStatusLabel(skill.status)}
                               </span>
                             </span>
                             <span className="mt-1 block text-sm text-primary-600">
@@ -364,8 +377,7 @@ export function WorkspaceSkillsScreen() {
                                   />
                                   <div className="space-y-1">
                                     <p>
-                                      Installed and ready to use in the
-                                      workspace.
+                                      {t('skills.workspace.installedReady')}
                                     </p>
                                     <p className="break-all text-xs text-primary-500">
                                       {skill.path}
@@ -376,12 +388,12 @@ export function WorkspaceSkillsScreen() {
                                   size="sm"
                                   variant="secondary"
                                   onClick={() =>
-                                    toast(`${skill.name} is installed`, {
+                                    toast(t('skills.workspace.skillInstalledToast', { name: skill.name }), {
                                       type: 'info',
                                     })
                                   }
                                 >
-                                  Enabled
+                                  {t('common.enabled')}
                                 </Button>
                               </div>
                             </motion.div>
@@ -396,7 +408,7 @@ export function WorkspaceSkillsScreen() {
               {selectedSkill ? (
                 <div className="mt-4 space-y-3">
                   <div className="rounded-xl border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm text-primary-600">
-                    Selected skill:{' '}
+                    {t('skills.workspace.selectedSkill')}{' '}
                     <span className="font-medium text-primary-900">
                       {selectedSkill.name}
                     </span>
@@ -415,14 +427,14 @@ export function WorkspaceSkillsScreen() {
                       <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
                         {skillContentQuery.error instanceof Error
                           ? skillContentQuery.error.message
-                          : 'Failed to load skill content'}
+                          : t('skills.workspace.loadContentFailed')}
                       </div>
                     ) : (
                       <div className="max-h-96 overflow-y-auto rounded-lg border border-primary-200 bg-white p-4 text-sm text-primary-800 prose prose-sm prose-primary max-w-none">
                         <SkillMarkdown
                           content={
                             skillContentQuery.data?.trim() ||
-                            'No content available.'
+                            t('skills.workspace.noContent')
                           }
                         />
                       </div>
@@ -437,7 +449,7 @@ export function WorkspaceSkillsScreen() {
             <div className="flex h-full min-h-0 flex-col p-4 sm:p-5">
               <div className="flex flex-col gap-3 border-b border-primary-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-[15px] font-semibold text-primary-900">
-                  Memory
+                  {t('skills.workspace.memory')}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -445,14 +457,14 @@ export function WorkspaceSkillsScreen() {
                     size="sm"
                     onClick={handleComingSoon}
                   >
-                    Export
+                    {t('common.export')}
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={handleClearAll}
                   >
-                    Clear All
+                    {t('skills.workspace.clearAll')}
                   </Button>
                 </div>
               </div>
@@ -468,7 +480,7 @@ export function WorkspaceSkillsScreen() {
                   <input
                     value={memorySearch}
                     onChange={(event) => setMemorySearch(event.target.value)}
-                    placeholder="Search memory..."
+                    placeholder={t('skills.workspace.searchMemory')}
                     className="w-full rounded-xl border border-primary-200 bg-white px-10 py-2.5 text-sm text-primary-900 outline-none transition-colors placeholder:text-primary-500 focus:border-accent-500/50"
                   />
                 </div>
@@ -488,7 +500,7 @@ export function WorkspaceSkillsScreen() {
                             : 'border-primary-200 bg-white text-primary-600 hover:border-primary-300 hover:text-primary-900',
                         )}
                       >
-                        {filter}
+                        {filterLabel(filter)}
                       </button>
                     )
                   })}
@@ -498,13 +510,13 @@ export function WorkspaceSkillsScreen() {
               <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pr-1">
                 {memoryQuery.isPending ? (
                   <div className="rounded-xl border border-primary-200 bg-primary-50/70 px-4 py-5 text-sm text-primary-600">
-                    Loading memory files...
+                    {t('skills.workspace.loadingMemory')}
                   </div>
                 ) : memoryQuery.isError ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-5 text-sm text-red-600">
                     {memoryQuery.error instanceof Error
                       ? memoryQuery.error.message
-                      : 'Failed to load memory files'}
+                      : t('skills.workspace.loadMemoryFailed')}
                   </div>
                 ) : (
                   <>
@@ -533,31 +545,31 @@ export function WorkspaceSkillsScreen() {
                 !memoryQuery.isError &&
                 filteredMemoryFiles.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-primary-200 bg-primary-50/70 px-4 py-5 text-sm text-primary-500">
-                    No memory files match the current filter.
+                    {t('skills.workspace.noMemoryMatch')}
                   </div>
                 ) : null}
 
                 <div className="rounded-xl border border-primary-200 bg-primary-50/70 p-4">
                   <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-400">
-                    Retention
+                    {t('skills.workspace.retention')}
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 px-3 py-2">
-                      <span className="text-primary-600">Workspace memory</span>
+                      <span className="text-primary-600">{t('skills.workspace.workspaceMemoryRetention')}</span>
                       <span className="font-medium text-primary-900">
-                        Permanent
+                        {t('skills.workspace.permanent')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 px-3 py-2">
-                      <span className="text-primary-600">Project memory</span>
+                      <span className="text-primary-600">{t('skills.workspace.projectMemory')}</span>
                       <span className="font-medium text-primary-900">
-                        Per-project
+                        {t('skills.workspace.perProject')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 px-3 py-2">
-                      <span className="text-primary-600">Agent memory</span>
+                      <span className="text-primary-600">{t('skills.workspace.agentMemoryRetention')}</span>
                       <span className="font-medium text-primary-900">
-                        30 day rolling
+                        {t('skills.workspace.rolling30')}
                       </span>
                     </div>
                   </div>
