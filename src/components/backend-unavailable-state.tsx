@@ -1,5 +1,6 @@
 import { Alert02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { t } from '@/lib/i18n'
 
 type Props = {
   feature: string
@@ -16,8 +17,7 @@ export function BackendUnavailableState({ feature, description }: Props) {
         <div className="mt-4 space-y-2">
           <h2 className="text-lg font-semibold text-primary-900">{feature}</h2>
           <p className="text-sm leading-6 text-primary-600">
-            Not available on this backend. Connect to a Hermes Agent gateway to unlock{' '}
-            {feature}.
+            {t('backendUnavailable.message', { feature })}
           </p>
           {description ? (
             <p className="text-xs leading-5 text-primary-500">{description}</p>

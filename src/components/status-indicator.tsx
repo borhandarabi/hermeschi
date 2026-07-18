@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { t } from '@/lib/i18n'
 
 type ConnectionStatus = {
   status: 'connected' | 'enhanced' | 'partial' | 'disconnected'
@@ -22,8 +23,8 @@ async function fetchConnectionStatus(): Promise<ConnectionStatus> {
   if (!response.ok) {
     return {
       status: 'disconnected',
-      label: 'Disconnected',
-      detail: 'No compatible backend detected.',
+      label: t('statusIndicator.disconnected') as ConnectionStatus['label'],
+      detail: t('statusIndicator.disconnectedDetail'),
       health: false,
       chatReady: false,
       modelConfigured: false,
@@ -44,30 +45,30 @@ function statusToColors(
     return {
       dot: 'bg-yellow-400',
       pulse: 'bg-yellow-400/40',
-      label: 'Checking...',
+      label: t('statusIndicator.checking'),
     }
   }
   switch (status) {
     case 'enhanced':
-      return { dot: 'bg-cyan-400', pulse: 'bg-cyan-400/40', label: 'Enhanced' }
+      return { dot: 'bg-cyan-400', pulse: 'bg-cyan-400/40', label: t('statusIndicator.enhanced') }
     case 'connected':
       return {
         dot: 'bg-emerald-400',
         pulse: 'bg-emerald-400/40',
-        label: 'Connected',
+        label: t('statusIndicator.connected'),
       }
     case 'partial':
       return {
         dot: 'bg-yellow-400',
         pulse: 'bg-yellow-400/40',
-        label: 'Partial',
+        label: t('statusIndicator.partial'),
       }
     case 'disconnected':
     default:
       return {
         dot: 'bg-red-400',
         pulse: 'bg-red-400/40',
-        label: 'Disconnected',
+        label: t('statusIndicator.disconnected'),
       }
   }
 }
@@ -76,17 +77,18 @@ function buildTooltip(
   data: ConnectionStatus | undefined,
   label: string,
 ): string {
-  if (!data) return `Backend: ${label}`
-  const parts: Array<string> = [`Backend: ${label}`]
-  if (data.detail) parts.push(data.detail)
-  if (data.status === 'partial') {
-    if (!data.chatReady) parts.push('Missing /v1/chat/completions')
-    if (!data.modelConfigured) parts.push('No model selected')
+  const parts: Array<string> = [t('statusIndicator.backendLabel', { label })]
+  if (data) {
+    if (data.detail) parts.push(data.detail)
+    if (data.status === 'partial') {
+      if (!data.chatReady) parts.push(t('statusIndicator.missingChat'))
+      if (!data.modelConfigured) parts.push(t('statusIndicator.noModel'))
+    }
+    if (data.status === 'enhanced') {
+      parts.push(t('statusIndicator.enhancedDetected'))
+    }
+    if (data.activeModel) parts.push(t('statusIndicator.modelLabel', { model: data.activeModel }))
   }
-  if (data.status === 'enhanced') {
-    parts.push('Hermes Agent gateway enhancements detected')
-  }
-  if (data.activeModel) parts.push(`Model: ${data.activeModel}`)
   return parts.join(' · ')
 }
 
