@@ -4,7 +4,7 @@ import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 import { t } from '@/lib/i18n'
 
 const AgoraScreen = GAME_BUILD_ENABLED
-  ? lazy(() => import('@/modules/hermesworld/screens/agora/agora-screen').then((m) => ({ default: m.AgoraScreen })))
+  ? lazy(() => import('@/modules/hermeschiworld/screens/agora/agora-screen').then((m) => ({ default: m.AgoraScreen })))
   : null
 
 export const Route = createFileRoute('/agora')({
@@ -24,7 +24,7 @@ function AgoraRoute() {
   }
   return (
     <Suspense fallback={null}>
-      <AgoraScreen! />
+      <AgoraScreen />
     </Suspense>
   )
 }

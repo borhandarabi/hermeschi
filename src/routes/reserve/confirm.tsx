@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react'
 import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 
 const ReserveConfirmComponent = GAME_BUILD_ENABLED
-  ? lazy(() => import('@/modules/hermesworld/routes/reserve/confirm').then((m) => ({ default: m.default })))
+  ? lazy(() => import('@/modules/hermeschiworld/routes/reserve/confirm').then((m) => ({ default: m.default })))
   : null
 
 export const Route = createFileRoute('/reserve/confirm')({
@@ -17,7 +17,7 @@ function ReserveConfirmRoute() {
   }
   return (
     <Suspense fallback={null}>
-      <ReserveConfirmComponent! />
+      <ReserveConfirmComponent />
     </Suspense>
   )
 }

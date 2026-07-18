@@ -1,11 +1,11 @@
 /**
- * Feature flag for HermesWorld game module.
+ * Feature flag for HermesChiWorld game module.
  *
  * Build-time flag:
- *   VITE_ENABLE_HERMESWORLD=1  → game code is bundled (but still gated
+ *   VITE_ENABLE_HERMESCHIWORLD=1  → game code is bundled (but still gated
  *                                 by a runtime settings toggle that
  *                                 defaults to OFF)
- *   VITE_ENABLE_HERMESWORLD=0  → game code is completely excluded
+ *   VITE_ENABLE_HERMESCHIWORLD=0  → game code is completely excluded
  *                                 from the bundle (tree-shaken)
  *
  * Runtime flag (only meaningful when build-time flag is '1'):
@@ -15,8 +15,8 @@
  * The settings dialog exposes a toggle that writes the runtime flag.
  */
 export const GAME_BUILD_ENABLED: boolean =
-  (import.meta as any).env?.VITE_ENABLE_HERMESWORLD === '1' ||
-  (import.meta as any).env?.VITE_ENABLE_HERMESWORLD === true
+  (import.meta as any).env?.VITE_ENABLE_HERMESCHIWORLD === '1' ||
+  (import.meta as any).env?.VITE_ENABLE_HERMESCHIWORLD === true
 
 const RUNTIME_KEY = 'hermeschi-game-enabled'
 

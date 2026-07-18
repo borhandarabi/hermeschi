@@ -106,7 +106,7 @@ in
       '';
     };
 
-    hermesWorldEnabled = mkOption {
+    hermesChiWorldEnabled = mkOption {
       type = types.bool;
       default = true;
       description = "Show the HermesWorld multiplayer link in the sidebar.";
@@ -178,7 +178,7 @@ in
           HOST = cfg.host;
           HERMES_API_URL = cfg.hermesApiUrl;
           HERMESCHI_DASHBOARD_URL = cfg.hermesDashboardUrl;
-          VITE_HERMESWORLD_ENABLED = if cfg.hermesWorldEnabled then "1" else "0";
+          VITE_HERMESCHIWORLD_ENABLED = if cfg.hermesChiWorldEnabled then "1" else "0";
           TRUST_PROXY = if cfg.trustProxy then "1" else "0";
           HERMES_ALLOW_INSECURE_REMOTE = if cfg.allowInsecureRemote then "1" else "0";
           # Point HOME to the data dir so session files land there

@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react'
 import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 
 const EarlyAccessComponent = GAME_BUILD_ENABLED
-  ? lazy(() => import('@/modules/hermesworld/routes/early-access').then((m) => ({ default: m.default })))
+  ? lazy(() => import('@/modules/hermeschiworld/routes/early-access').then((m) => ({ default: m.default })))
   : null
 
 export const Route = createFileRoute('/early-access')({
@@ -17,7 +17,7 @@ function EarlyAccessRoute() {
   }
   return (
     <Suspense fallback={null}>
-      <EarlyAccessComponent! />
+      <EarlyAccessComponent />
     </Suspense>
   )
 }

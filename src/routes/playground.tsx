@@ -4,7 +4,7 @@ import { GAME_BUILD_ENABLED, isGameRuntimeEnabled } from '@/lib/game-flag'
 import { t } from '@/lib/i18n'
 
 const PlaygroundScreen = GAME_BUILD_ENABLED
-  ? lazy(() => import('@/modules/hermesworld/screens/playground/hermes-world-embed').then((m) => ({ default: m.HermesWorldEmbed })))
+  ? lazy(() => import('@/modules/hermeschiworld/screens/playground/hermeschi-world-embed').then((m) => ({ default: m.HermesChiWorldEmbed })))
   : null
 
 export const Route = createFileRoute('/playground')({
@@ -18,7 +18,7 @@ function PlaygroundRoute() {
   }
   return (
     <Suspense fallback={null}>
-      <PlaygroundScreen! />
+      <PlaygroundScreen />
     </Suspense>
   )
 }
