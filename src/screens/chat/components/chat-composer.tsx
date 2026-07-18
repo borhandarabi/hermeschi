@@ -839,16 +839,16 @@ async function fetchWorkspaceContext(): Promise<WorkspaceDetectionResponse> {
 }
 
 function shortPathLabel(pathValue: string): string {
-  if (!pathValue) return 'Workspace'
+  if (!pathValue) return t('chat.sidebar.hermesWorkspace')
   const parts = pathValue.replace(/\\/g, '/').split('/').filter(Boolean)
   return parts.at(-1) || pathValue
 }
 
 function thinkingLabel(level: ThinkingLevel): string {
-  if (level === 'off') return 'None'
-  if (level === 'low') return 'Low'
-  if (level === 'medium') return 'Medium'
-  return 'High'
+  if (level === 'off') return t('chat.composer.thinkingNone')
+  if (level === 'low') return t('chat.composer.thinkingLow')
+  if (level === 'medium') return t('chat.composer.thinkingMedium')
+  return t('chat.composer.thinkingHigh')
 }
 
 function profileMeta(profile: ProfileSummary): string {
@@ -1068,11 +1068,11 @@ function ChatComposerComponent({
         }),
       ])
       setIsProfileMenuOpen(false)
-      toast(`Activated profile ${profileName}`)
+      toast(t('chat.composer.activatedProfile', { name: profileName }))
     },
     onError: (error) => {
       toast(
-        error instanceof Error ? error.message : 'Failed to activate profile',
+        error instanceof Error ? error.message : t('chat.composer.failedActivateProfile'),
       )
     },
   })
@@ -1096,7 +1096,7 @@ function ChatComposerComponent({
     },
     onError: (error) => {
       toast(
-        error instanceof Error ? error.message : 'Failed to switch workspace',
+        error instanceof Error ? error.message : t('chat.composer.failedSwitchWorkspace'),
       )
     },
   })
@@ -1188,7 +1188,7 @@ function ChatComposerComponent({
     activeWorkspace?.name ||
     workspaceContextQuery.data?.folderName ||
     shortPathLabel(detectedWorkspacePath) ||
-    'Workspace'
+    t('chat.sidebar.hermesWorkspace')
 
   const currentModel = currentModelQuery.data ?? ''
 
@@ -1227,7 +1227,7 @@ function ChatComposerComponent({
   // Derive the label directly from the store so navigation between sessions
   // updates without a render-window flash from a stale React-state mirror.
   const modelButtonLabel =
-    persistedSessionModel || currentModel || configuredModel || '⚕ Hermes Agent'
+    persistedSessionModel || currentModel || configuredModel || t('chat.composer.hermesAgentDefault')
 
   // Measure composer height and set CSS variable for scroll padding
   useLayoutEffect(() => {
@@ -1465,7 +1465,7 @@ function ChatComposerComponent({
 
             if (file.size > MAX_ATTACHMENT_FILE_SIZE) {
               toast(
-                `“${file.name || 'file'}” is ${formatFileSize(file.size)}. Max upload input size is ${formatFileSize(MAX_ATTACHMENT_FILE_SIZE)}.`,
+                t('chat.composer.attachmentTooLarge', { name: file.name || 'file', size: formatFileSize(file.size), max: formatFileSize(MAX_ATTACHMENT_FILE_SIZE) }),
                 { type: 'warning' },
               )
               return null
@@ -1508,7 +1508,7 @@ function ChatComposerComponent({
             const transportBytes = estimateDataUrlBytes(dataUrl)
             if (transportBytes > MAX_TRANSPORT_IMAGE_SIZE) {
               toast(
-                `Image compressed to ${(transportBytes / (1024 * 1024)).toFixed(2)}mb — still over the 1mb limit. Try a smaller screenshot.`,
+                t('chat.composer.imageCompressedTooLarge', { size: (transportBytes / (1024 * 1024)).toFixed(2) }),
                 { type: 'warning' },
               )
               return null
@@ -1547,8 +1547,8 @@ function ChatComposerComponent({
       if (skippedCount > 0) {
         toast(
           skippedCount === 1
-            ? '1 file could not be attached.'
-            : `${skippedCount} files could not be attached.`,
+            ? t('chat.composer.fileNotAttached')
+            : t('chat.composer.filesNotAttached', { count: skippedCount }),
           { type: 'warning' },
         )
       }
@@ -1708,8 +1708,8 @@ function ChatComposerComponent({
 
   const hasDraft = value.trim().length > 0 || attachments.length > 0
   const promptPlaceholder = isMobileViewport
-    ? 'Message...'
-    : 'Ask anything... (↵ to send · ⇧↵ new line · ⌘⇧M switch model)'
+    ? t('chat.composer.placeholderMobile')
+    : t('chat.composer.placeholderDesktop')
   const [serverCommands, setServerCommands] = useState<Array<SlashCommandDefinition>>([])
 
   useEffect(() => {
@@ -1734,7 +1734,7 @@ function ChatComposerComponent({
           .filter((skill) => skill.installed && skill.enabled)
           .map((skill) => ({
             command: `/${skill.id}`,
-            description: skill.description || `Run ${skill.name}`,
+            description: skill.description || t('chat.composer.runSkill', { name: skill.name }),
           })),
       ),
     [serverCommands, installedSkillsQuery.data],
@@ -1772,7 +1772,7 @@ function ChatComposerComponent({
   const transcribeVoiceBlob = useCallback(
     async (blob: Blob) => {
       if (!useRemoteStt) {
-        throw new Error('Remote STT is not enabled for this profile.')
+        throw new Error(t('chat.composer.errorRemoteSttDisabled'))
       }
 
       const form = new FormData()
@@ -1789,7 +1789,7 @@ function ChatComposerComponent({
         error?: string
       }
       if (!response.ok || payload.ok === false) {
-        throw new Error(payload.error || `Transcription failed (${response.status})`)
+        throw new Error(payload.error || t('chat.composer.errorTranscriptionFailed', { status: response.status }))
       }
       return typeof payload.text === 'string' ? payload.text : ''
     },
@@ -1807,7 +1807,7 @@ function ChatComposerComponent({
     ),
     onError: useCallback(
       (error: string) => {
-        toast(error || 'Voice transcription failed', { type: 'error' })
+        toast(error || t('chat.composer.voiceTranscriptionFailed'), { type: 'error' })
       },
       [],
     ),
@@ -1835,19 +1835,19 @@ function ChatComposerComponent({
               previewUrl: '',
             },
           ])
-          appendTextToDraft(`🎤 Voice note (${secs}s)`, '\n')
+          appendTextToDraft(t('chat.composer.voiceNoteLabel', { secs }), '\n')
           if (useRemoteStt) {
             void transcribeVoiceBlob(blob)
               .then((text) => {
                 if (text.trim()) {
-                  appendTextToDraft(`Transcript: ${text.trim()}`, '\n')
+                  appendTextToDraft(t('chat.composer.transcriptLabel', { text: text.trim() }), '\n')
                 }
               })
               .catch((error) => {
                 toast(
                   error instanceof Error
                     ? error.message
-                    : 'Voice note transcription failed',
+                    : t('chat.composer.voiceNoteTranscriptionFailed'),
                   { type: 'error' },
                 )
               })
@@ -2193,7 +2193,7 @@ function ChatComposerComponent({
 
         {isDraggingOver ? (
           <div className="pointer-events-none absolute inset-1 z-20 flex items-center justify-center rounded-[18px] border-2 border-dashed border-primary-400 bg-primary-50/90 text-sm font-medium text-primary-700">
-            Drop files to attach
+            {t('chat.composer.dropFilesToAttach')}
           </div>
         ) : null}
 
@@ -2220,14 +2220,14 @@ function ChatComposerComponent({
                         onClick={() =>
                           setPreviewImage({
                             url: attachment.previewUrl || '',
-                            name: attachment.name || 'Attached image',
+                            name: attachment.name || t('chat.composer.attachedImage'),
                           })
                         }
-                        aria-label={`Preview ${attachment.name || 'image'}`}
+                        aria-label={t('chat.composer.previewAttachment', { name: attachment.name || t('chat.composer.previewImage').toLowerCase() })}
                       >
                         <img
                           src={attachment.previewUrl}
-                          alt={attachment.name || 'Attached image'}
+                          alt={attachment.name || t('chat.composer.attachedImage')}
                           className="h-full w-full object-cover"
                         />
                       </button>
@@ -2352,10 +2352,10 @@ function ChatComposerComponent({
                     onPointerLeave={handleMicPointerUp}
                     aria-label={
                       voiceRecorder.isRecording
-                        ? 'Recording voice note'
+                        ? t('chat.composer.recordingVoiceNote')
                         : voiceInput.isListening
-                          ? 'Stop listening'
-                          : 'Voice input'
+                          ? t('chat.composer.stopListening')
+                          : t('chat.composer.voiceInput')
                     }
                     disabled={disabled}
                     className={cn(
@@ -2417,7 +2417,7 @@ function ChatComposerComponent({
                     >
                       <div className="mx-auto mt-3 mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-600" />
                       <div className="px-4 pb-2 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
-                        Actions
+                        {t('chat.composer.actionsHeader')}
                       </div>
                       <div className="grid grid-cols-2 gap-2 px-4 pb-4">
                         {/* Attach File — keep sheet open so iOS picker can layer on top */}
@@ -2438,7 +2438,7 @@ function ChatComposerComponent({
                             />
                           </span>
                           <span className="text-sm font-medium text-neutral-800 dark:text-neutral-100">
-                            Attach File
+                            {t('chat.composer.attachFile')}
                           </span>
                         </button>
 
@@ -2484,7 +2484,7 @@ function ChatComposerComponent({
                               />
                             </span>
                             <span className="text-sm font-medium text-neutral-800 dark:text-neutral-100">
-                              Clear Draft
+                              {t('chat.composer.clearDraft')}
                             </span>
                           </button>
                         ) : null}
@@ -2506,7 +2506,7 @@ function ChatComposerComponent({
                               />
                             </span>
                             <span className="text-sm font-medium text-neutral-800 dark:text-neutral-100">
-                              New Session
+                              {t('chat.composer.newSession')}
                             </span>
                           </button>
                         ) : null}
@@ -2535,7 +2535,7 @@ function ChatComposerComponent({
                     >
                       <div className="mx-auto mt-3 mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-600" />
                       <div className="px-4 pb-2 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
-                        Model
+                        {t('chat.composer.modelHeader')}
                       </div>
                       <div className="pb-4 max-h-[60dvh] overflow-y-auto overflow-x-hidden">
                         {(() => {
@@ -2546,10 +2546,10 @@ function ChatComposerComponent({
                             return (
                               <div className="p-4 text-center text-sm text-neutral-500">
                                 <p className="font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-                                  No models available
+                                  {t('chat.composer.noModelsAvailable')}
                                 </p>
                                 <p className="text-xs">
-                                  Check your Hermes provider configuration.
+                                  {t('chat.composer.checkProviderConfig')}
                                 </p>
                               </div>
                             )
@@ -2635,7 +2635,7 @@ function ChatComposerComponent({
                                   </span>
                                   {entry.isLocal && (
                                     <span className="text-[10px] text-neutral-400 px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                                      local
+                                      {t('chat.composer.localTag')}
                                     </span>
                                   )}
                                   {isActive && (
@@ -2655,8 +2655,8 @@ function ChatComposerComponent({
                                   }`}
                                   aria-label={
                                     isPinned(entry.id)
-                                      ? `Unpin ${entry.name}`
-                                      : `Pin ${entry.name}`
+                                      ? t('chat.composer.unpinModel', { name: entry.name })
+                                      : t('chat.composer.pinModel', { name: entry.name })
                                   }
                                 >
                                   <svg
@@ -2693,7 +2693,7 @@ function ChatComposerComponent({
                                     >
                                       <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
                                     </svg>
-                                    <span>Pinned</span>
+                                    <span>{t('chat.composer.pinned')}</span>
                                   </div>
                                   {pinnedEntries.map(renderEntry)}
                                 </div>
@@ -2745,7 +2745,7 @@ function ChatComposerComponent({
             />
             <PromptInputActions className="justify-between px-1.5 md:px-3 gap-0.5 md:gap-2">
               <div className="flex min-w-0 flex-1 items-center gap-0 md:gap-1">
-                <PromptInputAction tooltip="Add attachment">
+                <PromptInputAction tooltip={t('chat.composer.tooltipAddAttachment')}>
                   <Button
                     size="icon-sm"
                     variant="ghost"
@@ -2762,7 +2762,7 @@ function ChatComposerComponent({
                   </Button>
                 </PromptInputAction>
                 {hasDraft && !isLoading && (
-                  <PromptInputAction tooltip="Clear draft">
+                  <PromptInputAction tooltip={t('chat.composer.tooltipClearDraft')}>
                     <Button
                       size="icon-sm"
                       variant="ghost"
@@ -2781,7 +2781,7 @@ function ChatComposerComponent({
                 {/* Token counter — bottom bar, mirrors Hermes style, triggers at ~25 tokens */}
                 {value.length >= 100 && (
                   <span className="ml-1 text-[10px] text-primary-400 tabular-nums select-none">
-                    ~{Math.ceil(value.length / 4)} tokens
+                    {t('chat.composer.tokenEstimate', { count: Math.ceil(value.length / 4) })}
                   </span>
                 )}
 
@@ -2799,8 +2799,8 @@ function ChatComposerComponent({
                         setIsModelMenuOpen(false)
                       }}
                       className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primary-100/70 px-2 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-200/80 dark:hover:bg-primary-800/60"
-                      title={`Chat controls · ${modelButtonLabel}`}
-                      aria-label={`Chat controls, current model: ${modelButtonLabel}`}
+                      title={t('chat.composer.titleChatControlsModel', { model: modelButtonLabel })}
+                      aria-label={t('chat.composer.ariaChatControlsModel', { model: modelButtonLabel })}
                     >
                       <svg
                         width="13"
@@ -2826,7 +2826,7 @@ function ChatComposerComponent({
                     {isControlsMenuOpen ? (
                       <div className="absolute bottom-full start-0 z-[190] mb-2 w-[min(32rem,calc(100vw-2rem))] min-w-[18rem] overflow-visible rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
                         <div className="mb-2 px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
-                          Chat controls
+                          {t('chat.composer.chatControlsHeader')}
                         </div>
                         <div className="flex flex-wrap items-start gap-2">
                           <div
@@ -2858,7 +2858,7 @@ function ChatComposerComponent({
                             {isProfileMenuOpen && (
                               <div className="absolute bottom-full start-0 z-[200] mb-2 min-w-[14rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
                                 <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
-                                  Agent profile
+                                  {t('chat.composer.agentProfileHeader')}
                                 </div>
                                 {(profilesQuery.data?.profiles ?? []).map((profile) => {
                                   const selected = profile.name === activeProfileName
@@ -2882,13 +2882,13 @@ function ChatComposerComponent({
                                     >
                                       <span className="flex items-center gap-2">
                                         <span className="truncate font-medium">{profile.name}</span>
-                                        {selected ? <span className="text-[10px] text-accent-500">active</span> : null}
+                                        {selected ? <span className="text-[10px] text-accent-500">{t('chat.composer.activeProfileTag')}</span> : null}
                                       </span>
                                       {profileMeta(profile) ? <span className="mt-0.5 max-w-[12rem] truncate text-[11px] text-neutral-500">{profileMeta(profile)}</span> : null}
                                     </button>
                                   )
                                 })}
-                                {profilesQuery.isError ? <div className="px-3 py-2 text-xs text-red-500">Failed to load profiles</div> : null}
+                                {profilesQuery.isError ? <div className="px-3 py-2 text-xs text-red-500">{t('chat.composer.failedLoadProfiles')}</div> : null}
                               </div>
                             )}
                           </div>
@@ -2908,7 +2908,7 @@ function ChatComposerComponent({
                                 'inline-flex h-8 items-center gap-1.5 rounded-full bg-primary-100/70 px-2.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-200/80 dark:hover:bg-primary-800/60',
                                 thinkingLevel === 'off' && 'opacity-70',
                               )}
-                              title={`Reasoning effort: ${thinkingLabel(thinkingLevel)}`}
+                              title={t('chat.composer.titleReasoningEffort', { level: thinkingLabel(thinkingLevel) })}
                             >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                 <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
@@ -2920,10 +2920,10 @@ function ChatComposerComponent({
                             {isThinkingMenuOpen && (
                               <div className="absolute bottom-full start-0 z-[200] mb-2 min-w-[10rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 dark:border-neutral-700 dark:bg-neutral-900">
                                 {([
-                                  ['off', 'None'],
-                                  ['low', 'Low'],
-                                  ['medium', 'Medium'],
-                                  ['high', 'High'],
+                                  ['off', t('chat.composer.thinkingNone')],
+                                  ['low', t('chat.composer.thinkingLow')],
+                                  ['medium', t('chat.composer.thinkingMedium')],
+                                  ['high', t('chat.composer.thinkingHigh')],
                                 ] as Array<[ThinkingLevel, string]>).map(([level, label]) => (
                                   <button
                                     key={level}
@@ -2970,7 +2970,7 @@ function ChatComposerComponent({
                                       const allModels = modelsQuery.data?.models ?? []
                                       const defaultProvider = modelsQuery.data?.currentProvider ?? ''
                                       if (allModels.length === 0) {
-                                        return <div className="p-4 text-center text-sm text-neutral-500">No models available</div>
+                                        return <div className="p-4 text-center text-sm text-neutral-500">{t('chat.composer.noModelsAvailable')}</div>
                                       }
                                       const parsed = allModels.map((m) => {
                                         const mId = String(typeof m === 'string' ? m : m.id || m.model || m.name || 'unknown')
@@ -3008,7 +3008,7 @@ function ChatComposerComponent({
                                               }`}
                                             >
                                               <span className="flex-1 truncate">{entry.name}</span>
-                                              {entry.isLocal ? <span className="text-[10px] text-neutral-400 px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700">local</span> : null}
+                                              {entry.isLocal ? <span className="text-[10px] text-neutral-400 px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700">{t('chat.composer.localTag')}</span> : null}
                                               {isActive ? <span className="h-1.5 w-1.5 rounded-full bg-accent-500" /> : null}
                                             </button>
                                             <button
@@ -3022,7 +3022,7 @@ function ChatComposerComponent({
                                                   ? 'text-accent-500 opacity-80 hover:opacity-100'
                                                   : 'text-neutral-400 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-accent-500'
                                               }`}
-                                              aria-label={isPinned(entry.id) ? `Unpin ${entry.name}` : `Pin ${entry.name}`}
+                                              aria-label={isPinned(entry.id) ? t('chat.composer.unpinModel', { name: entry.name }) : t('chat.composer.pinModel', { name: entry.name })}
                                             >
                                               <svg width="12" height="12" viewBox="0 0 24 24" fill={isPinned(entry.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
                                                 <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
@@ -3039,7 +3039,7 @@ function ChatComposerComponent({
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" className="text-accent-500">
                                                   <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
                                                 </svg>
-                                                <span>Pinned</span>
+                                                <span>{t('chat.composer.pinned')}</span>
                                               </div>
                                               {pinnedEntries.map(renderEntry)}
                                             </div>
@@ -3070,10 +3070,10 @@ function ChatComposerComponent({
                   <PromptInputAction
                     tooltip={
                       voiceRecorder.isRecording
-                        ? `Recording… ${Math.round(voiceRecorder.durationMs / 1000)}s`
+                        ? t('chat.composer.tooltipRecording', { secs: Math.round(voiceRecorder.durationMs / 1000) })
                         : voiceInput.isListening
-                          ? 'Listening — tap to stop'
-                          : 'Tap: dictate · Hold: voice note'
+                          ? t('chat.composer.tooltipListening')
+                          : t('chat.composer.tooltipVoiceInput')
                     }
                   >
                     <Button
@@ -3101,10 +3101,10 @@ function ChatComposerComponent({
                       )}
                       aria-label={
                         voiceRecorder.isRecording
-                          ? 'Recording voice note'
+                          ? t('chat.composer.recordingVoiceNote')
                           : voiceInput.isListening
-                            ? 'Stop listening'
-                            : 'Voice input'
+                            ? t('chat.composer.stopListening')
+                            : t('chat.composer.voiceInput')
                       }
                       disabled={disabled}
                     >
@@ -3123,7 +3123,7 @@ function ChatComposerComponent({
                   </PromptInputAction>
                 ) : null}
                 {isLoading ? (
-                  <PromptInputAction tooltip="Stop generation">
+                  <PromptInputAction tooltip={t('chat.composer.tooltipStopGeneration')}>
                     <Button
                       onClick={handleAbort}
                       size="icon-sm"
@@ -3140,7 +3140,7 @@ function ChatComposerComponent({
                   </PromptInputAction>
                 ) : (
                   <>
-                    <PromptInputAction tooltip="Send message">
+                    <PromptInputAction tooltip={t('chat.composer.tooltipSendMessage')}>
                       <Button
                         type="button"
                         onClick={handleSubmit}

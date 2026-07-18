@@ -12,6 +12,7 @@ import { memo, useMemo } from 'react'
 import { getMessageTimestamp } from '../../utils'
 import type { SessionMeta } from '../../types'
 import { cn } from '@/lib/utils'
+import { getLocale, t } from '@/lib/i18n'
 import {
   MenuContent,
   MenuItem,
@@ -29,15 +30,19 @@ type SessionItemProps = {
   onDelete: (session: SessionMeta) => void
 }
 
-const dayFormatter = new Intl.DateTimeFormat(undefined, {
-  month: 'short',
-  day: 'numeric',
-})
+function makeDayFormatter() {
+  return new Intl.DateTimeFormat(getLocale(), {
+    month: 'short',
+    day: 'numeric',
+  })
+}
 
-const timeFormatter = new Intl.DateTimeFormat(undefined, {
-  hour: 'numeric',
-  minute: '2-digit',
-})
+function makeTimeFormatter() {
+  return new Intl.DateTimeFormat(getLocale(), {
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -47,7 +52,7 @@ function formatSessionTimestamp(timestamp?: number | null): string {
   const date = new Date(timestamp)
   const now = new Date()
   const sameDay = date.toDateString() === now.toDateString()
-  return (sameDay ? timeFormatter : dayFormatter).format(date)
+  return (sameDay ? makeTimeFormatter() : makeDayFormatter()).format(date)
 }
 
 function isUuidLike(value: string): boolean {
@@ -86,14 +91,14 @@ function getSessionDisplayTitle(
   const title = normalizeTitleValue(session.title)
   if (title) return title
 
-  if (isGenerating) return 'Naming…'
+  if (isGenerating) return t('chat.sessionItem.naming')
   const shortId = getSessionShortId(session)
-  return shortId ? `Session ${shortId}` : 'Session'
+  return shortId ? t('chat.sessionItem.sessionShortId', { shortId }) : t('chat.sessionItem.sessionFallback')
 }
 
 function getFriendlyIdLabel(friendlyId: string): string {
   if (!isUuidLike(friendlyId)) return friendlyId
-  return `ID ${friendlyId.slice(0, 8)}`
+  return t('chat.sessionItem.idLabel', { id: friendlyId.slice(0, 8) })
 }
 
 function SessionItemComponent({
@@ -117,7 +122,7 @@ function SessionItemComponent({
 
   const subtitle = useMemo(() => {
     if (isError) {
-      return session.titleError || 'Could not generate a title'
+      return session.titleError || t('chat.sessionItem.couldNotGenerateTitle')
     }
     const parts: Array<string> = []
     const formatted = formatSessionTimestamp(updatedAt)
@@ -177,7 +182,7 @@ function SessionItemComponent({
             'opacity-0 transition-opacity group-hover:opacity-100 hover:bg-primary-200 dark:hover:bg-primary-800',
             'aria-expanded:opacity-100 aria-expanded:bg-primary-200',
           )}
-          aria-label="Session options"
+          aria-label={t('chat.sessionItem.options')}
         >
           <HugeiconsIcon
             icon={MoreHorizontalIcon}
@@ -195,7 +200,7 @@ function SessionItemComponent({
             className="gap-2"
           >
             <HugeiconsIcon icon={PinIcon} size={20} strokeWidth={1.5} />{' '}
-            {isPinned ? 'Unpin session' : 'Pin session'}
+            {isPinned ? t('chat.sessionItem.unpinSession') : t('chat.sessionItem.pinSession')}
           </MenuItem>
           <MenuItem
             onClick={(event) => {
@@ -206,7 +211,7 @@ function SessionItemComponent({
             className="gap-2"
           >
             <HugeiconsIcon icon={Pen01Icon} size={20} strokeWidth={1.5} />{' '}
-            Rename
+            {t('common.rename')}
           </MenuItem>
           <MenuItem
             onClick={(event) => {
@@ -217,7 +222,7 @@ function SessionItemComponent({
             className="text-red-700 gap-2 hover:bg-red-50 dark:hover:bg-red-900/30/80 data-highlighted:bg-red-50/80"
           >
             <HugeiconsIcon icon={Delete01Icon} size={20} strokeWidth={1.5} />{' '}
-            Delete
+            {t('common.delete')}
           </MenuItem>
         </MenuContent>
       </MenuRoot>
