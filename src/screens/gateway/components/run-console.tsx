@@ -7,6 +7,7 @@ import { RunLearnings, type RunLearningsProps } from './run-learnings'
 import { MissionEventLog } from './mission-event-log'
 import type { MissionEvent } from '@/screens/gateway/lib/mission-events'
 import { onFeedEvent, type FeedEvent } from './feed-event-bus'
+import { t, getLocale } from '@/lib/i18n'
 
 type RunArtifact = {
   id: string
@@ -66,13 +67,13 @@ type LiveStreamEvent = {
   toolName?: string
 }
 
-const TAB_OPTIONS: Array<{ id: ConsoleTab; label: string }> = [
-  { id: 'stream', label: 'Stream' },
-  { id: 'timeline', label: 'Timeline' },
-  { id: 'artifacts', label: 'Artifacts' },
-  { id: 'report', label: 'Report' },
-  { id: 'events', label: 'Events' },
-  { id: 'learnings', label: 'Learnings' },
+const TAB_OPTIONS: Array<{ id: ConsoleTab; labelKey: 'stream' | 'timeline' | 'artifacts' | 'report' | 'events' | 'learnings' }> = [
+  { id: 'stream', labelKey: 'stream' },
+  { id: 'timeline', labelKey: 'timeline' },
+  { id: 'artifacts', labelKey: 'artifacts' },
+  { id: 'report', labelKey: 'report' },
+  { id: 'events', labelKey: 'events' },
+  { id: 'learnings', labelKey: 'learnings' },
 ]
 
 const STATUS_STYLES: Record<RunConsoleProps['runStatus'], string> = {
@@ -92,14 +93,14 @@ const EVENT_STYLES: Record<LiveStreamEvent['eventType'], string> = {
 function formatRunStatus(status: RunConsoleProps['runStatus']): string {
   switch (status) {
     case 'needs_input':
-      return 'Needs Input'
+      return t('gateway.runConsole.status.needsInput')
     case 'complete':
-      return 'Complete'
+      return t('gateway.runConsole.status.complete')
     case 'failed':
-      return 'Failed'
+      return t('gateway.runConsole.status.failed')
     case 'running':
     default:
-      return 'Running'
+      return t('gateway.runConsole.status.running')
   }
 }
 
@@ -110,9 +111,9 @@ function formatDuration(startedAt?: number): string | null {
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`
-  if (minutes > 0) return `${minutes}m ${seconds}s`
-  return `${seconds}s`
+  if (hours > 0) return t('gateway.runConsole.formatDuration.hms', { hours, minutes, seconds })
+  if (minutes > 0) return t('gateway.runConsole.formatDuration.ms', { minutes, seconds })
+  return t('gateway.runConsole.formatDuration.s', { seconds })
 }
 
 function formatCost(costEstimate?: number): string {
@@ -140,12 +141,12 @@ function extractContent(msg: { content?: string | Array<{ type?: string; text?: 
 }
 
 function sanitizeArgsPreview(args?: string): string {
-  if (!args) return 'No arguments'
+  if (!args) return t('gateway.runConsole.noArguments')
   const cleaned = args
     .replace(/[\u0000-\u001F\u007F]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-  if (!cleaned) return 'No arguments'
+  if (!cleaned) return t('gateway.runConsole.noArguments')
   if (cleaned.length <= 200) return cleaned
   return `${cleaned.slice(0, 200)}...`
 }
@@ -163,9 +164,9 @@ function getElapsedLabel(firstSeconds: number, currentSeconds: number): string {
   const hours = Math.floor(elapsed / 3600)
   const minutes = Math.floor((elapsed % 3600) / 60)
   const seconds = elapsed % 60
-  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`
-  if (minutes > 0) return `${minutes}m ${seconds}s`
-  return `${seconds}s`
+  if (hours > 0) return t('gateway.runConsole.formatDuration.hms', { hours, minutes, seconds })
+  if (minutes > 0) return t('gateway.runConsole.formatDuration.ms', { minutes, seconds })
+  return t('gateway.runConsole.formatDuration.s', { seconds })
 }
 
 function getEventDotClass(eventType: LiveStreamEvent['eventType']): string {
@@ -176,7 +177,7 @@ function getEventDotClass(eventType: LiveStreamEvent['eventType']): string {
 }
 
 function getEventPillLabel(event: LiveStreamEvent): string {
-  if (event.eventType === 'tool' && event.toolName) return `TOOL: ${event.toolName}`
+  if (event.eventType === 'tool' && event.toolName) return t('gateway.runConsole.toolPill', { name: event.toolName })
   return event.eventType.toUpperCase()
 }
 
@@ -242,7 +243,7 @@ export function RunConsole({
       try {
         const res = await fetchSessionHistory(key)
         const msgs = res?.messages ?? []
-        const agentName = agentNameMap?.[key] ?? 'Agent'
+        const agentName = agentNameMap?.[key] ?? t('gateway.runConsole.agentFallback')
         for (const msg of msgs) {
           const content = extractContent(msg)
           const toolName = msg.toolName
@@ -253,7 +254,9 @@ export function RunConsole({
             timestamp: formatTs(ts),
             agentName,
             eventType: roleToEventType(msg.role),
-            message: content || `[${toolName ?? 'tool call'}]`,
+            message: content || (toolName
+              ? t('gateway.runConsole.toolCall', { name: toolName })
+              : t('gateway.runConsole.toolCallFallback')),
             toolName,
           })
         }
@@ -281,7 +284,7 @@ export function RunConsole({
           {
             id: event.id,
             timestamp: formatTs(event.timestamp),
-            agentName: event.agentName || 'System',
+            agentName: event.agentName || t('gateway.runConsole.systemFallback'),
             eventType: mapFeedEventType(event),
             message: event.message,
           },
@@ -310,8 +313,8 @@ export function RunConsole({
     setIsAutoScroll(atBottom)
   }, [])
 
-  const resolvedDuration = duration || formatDuration(startedAt) || '0s'
-  const resolvedTokens = typeof tokenCount === 'number' ? tokenCount.toLocaleString() : '0'
+  const resolvedDuration = duration || formatDuration(startedAt) || t('gateway.runConsole.durationFallback')
+  const resolvedTokens = typeof tokenCount === 'number' ? tokenCount.toLocaleString(getLocale()) : t('gateway.runConsole.tokensFallback')
   const statusLabel = formatRunStatus(runStatus)
 
   const displayEvents: Array<{ id: string; timestamp: string; agentName: string; eventType: 'status' | 'output' | 'tool' | 'error'; message: string }> = useMemo(() => {
@@ -394,10 +397,10 @@ export function RunConsole({
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-primary-300">
-              <span>Duration: {resolvedDuration}</span>
-              <span>Tokens: {resolvedTokens}</span>
-              <span>Cost: {formatCost(costEstimate)}</span>
-              <span>Agents: {agents.length}</span>
+              <span>{t('gateway.runConsole.duration', { duration: resolvedDuration })}</span>
+              <span>{t('gateway.runConsole.tokens', { count: resolvedTokens })}</span>
+              <span>{t('gateway.runConsole.cost', { cost: formatCost(costEstimate) })}</span>
+              <span>{t('gateway.runConsole.agents', { count: agents.length })}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -408,7 +411,7 @@ export function RunConsole({
                 disabled={isStopping}
                 className="inline-flex h-8 items-center gap-1 rounded-md border border-red-500/40 bg-red-500/15 px-3 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isStopping ? 'Stopping...' : '■ Stop'}
+                {isStopping ? t('gateway.runConsole.stopping') : t('gateway.runConsole.stop')}
               </button>
             ) : null}
             {onClose ? (
@@ -417,7 +420,7 @@ export function RunConsole({
                 onClick={onClose}
                 className="inline-flex h-8 items-center rounded-md border border-primary-700 bg-primary-900/70 px-3 text-xs font-medium text-primary-200 transition-colors hover:border-primary-600 hover:bg-primary-800"
               >
-                Close
+                {t('common.close')}
               </button>
             ) : null}
           </div>
@@ -446,7 +449,7 @@ export function RunConsole({
                     : 'bg-primary-900/60 text-primary-300 hover:bg-primary-800/80 hover:text-primary-100',
               )}
             >
-              {tab.label}
+              {t(`gateway.runConsole.tab.${tab.labelKey}`)}
               {tab.id === 'stream' && displayEvents.length > 0 && (
                 <span className={cn(
                   'ml-1 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none',
@@ -487,7 +490,7 @@ export function RunConsole({
                     onClick={() => setSteerTarget(steerTarget === agent.id ? null : agent.id)}
                     className="rounded px-1.5 py-0.5 text-[10px] text-primary-400 transition-colors hover:bg-primary-800 hover:text-primary-200"
                   >
-                    Steer
+                    {t('gateway.runConsole.steer')}
                   </button>
                 ) : null}
                 {onKillAgent ? (
@@ -496,7 +499,7 @@ export function RunConsole({
                     onClick={() => onKillAgent(agent.id)}
                     className="rounded px-1.5 py-0.5 text-[10px] text-red-400 transition-colors hover:bg-red-500/15 hover:text-red-300"
                   >
-                    Kill
+                    {t('gateway.runConsole.kill')}
                   </button>
                 ) : null}
               </div>
@@ -504,7 +507,7 @@ export function RunConsole({
           </div>
           {steerTarget && onSteerAgent ? (
             <div className="mt-2 flex items-center gap-2">
-              <span className="text-[11px] text-primary-400">→ {agents.find(a => a.id === steerTarget)?.name}:</span>
+              <span className="text-[11px] text-primary-400">{t('gateway.runConsole.steerLabel', { name: agents.find(a => a.id === steerTarget)?.name ?? '' })}</span>
               <input
                 type="text"
                 value={steerInput}
@@ -516,7 +519,7 @@ export function RunConsole({
                     setSteerTarget(null)
                   }
                 }}
-                placeholder="Send directive..."
+                placeholder={t('gateway.runConsole.steerPlaceholder')}
                 className="flex-1 rounded-md border border-primary-700 bg-primary-950 px-2 py-1 text-xs text-primary-100 placeholder:text-primary-500 focus:border-accent-500 focus:outline-none"
               />
               <button
@@ -530,7 +533,7 @@ export function RunConsole({
                 }}
                 className="rounded-md bg-accent-500/20 px-2 py-1 text-[11px] font-medium text-accent-300 transition-colors hover:bg-accent-500/30"
               >
-                Send
+                {t('gateway.runConsole.send')}
               </button>
               <button
                 type="button"
@@ -553,7 +556,7 @@ export function RunConsole({
           <div className="space-y-3 font-mono text-xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className={cn('text-sm font-medium', minimalChrome ? 'text-[var(--theme-muted)]' : 'text-primary-200')}>
-                {displayEvents.length > 0 ? `${displayEvents.length} events` : 'Waiting for live agent output'}
+                {displayEvents.length > 0 ? t('gateway.runConsole.eventsCount', { count: displayEvents.length }) : t('gateway.runConsole.waitingForLive')}
               </p>
               <div className={cn(
                 'inline-flex items-center rounded-md p-0.5 text-xs',
@@ -575,7 +578,7 @@ export function RunConsole({
                         : 'bg-primary-900/60 text-primary-300 hover:text-primary-100',
                   )}
                 >
-                  Combined
+                  {t('gateway.runConsole.combined')}
                 </button>
                 <button
                   type="button"
@@ -591,14 +594,14 @@ export function RunConsole({
                         : 'bg-primary-900/60 text-primary-300 hover:text-primary-100',
                   )}
                 >
-                  Lanes
+                  {t('gateway.runConsole.lanes')}
                 </button>
               </div>
             </div>
 
             {pendingApprovals && pendingApprovals.length > 0 ? (
               <section className="sticky top-0 z-10 rounded-lg border border-amber-500/40 bg-amber-500/15 p-3 shadow-lg backdrop-blur">
-                <h3 className="text-sm font-semibold text-amber-200">⚠️ Approval Required</h3>
+                <h3 className="text-sm font-semibold text-amber-200">{t('gateway.runConsole.approvalRequired')}</h3>
                 <ol className="mt-2 space-y-2">
                   {pendingApprovals.map((approval) => (
                     <li
@@ -608,13 +611,13 @@ export function RunConsole({
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="space-y-1">
                           <p className="text-xs text-amber-100">
-                            Tool: <span className="font-semibold">{approval.tool}</span>
+                            {t('gateway.runConsole.tool', { name: approval.tool })}
                           </p>
                           <p className="text-xs text-primary-200">
-                            Agent: <span className="font-medium">{approval.agentName || 'Unknown agent'}</span>
+                            {t('gateway.runConsole.agent', { name: approval.agentName || t('gateway.runConsole.unknownAgent') })}
                           </p>
                           <p className="text-xs text-primary-300 break-all">
-                            Args: {sanitizeArgsPreview(approval.args)}
+                            {t('gateway.runConsole.args', { args: sanitizeArgsPreview(approval.args) })}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -624,7 +627,7 @@ export function RunConsole({
                             disabled={!onApprove}
                             className="rounded-md border border-amber-500/50 bg-amber-500/20 px-2.5 py-1 text-xs font-medium text-amber-100 transition-colors hover:bg-amber-500/30"
                           >
-                            Approve
+                            {t('gateway.runConsole.approve')}
                           </button>
                           <button
                             type="button"
@@ -632,7 +635,7 @@ export function RunConsole({
                             disabled={!onDeny}
                             className="rounded-md border border-primary-700 bg-primary-900/80 px-2.5 py-1 text-xs font-medium text-primary-200 transition-colors hover:bg-primary-800"
                           >
-                            Deny
+                            {t('gateway.runConsole.deny')}
                           </button>
                         </div>
                       </div>
@@ -644,7 +647,7 @@ export function RunConsole({
 
             {runStatus === 'needs_input' && (!pendingApprovals || pendingApprovals.length === 0) ? (
               <div className="rounded-lg border border-primary-700/80 bg-primary-900/60 px-3 py-2 text-xs text-primary-300">
-                Mission is waiting for input — check the approval queue
+                {t('gateway.runConsole.waitingForInput')}
               </div>
             ) : null}
 
@@ -664,13 +667,13 @@ export function RunConsole({
                   <HugeiconsIcon icon={Rocket01Icon} size={22} strokeWidth={1.8} />
                 </div>
                 <p className={cn('text-base font-semibold', minimalChrome ? 'text-[var(--theme-text)]' : 'text-primary-100')}>
-                  Stream is ready
+                  {t('gateway.runConsole.streamReady')}
                 </p>
                 <p className={cn(
                   'mt-2 max-w-md text-sm leading-6',
                   minimalChrome ? 'text-[var(--theme-muted)]' : 'text-primary-300',
                 )}>
-                  Agent output, approvals, and system events will appear here as work begins. Use timeline or artifacts to inspect the run once activity starts.
+                  {t('gateway.runConsole.streamReadyDesc')}
                 </p>
               </div>
             ) : null}
@@ -822,7 +825,7 @@ export function RunConsole({
                 }}
                 className="sticky bottom-2 mx-auto flex items-center gap-1 rounded-full border border-primary-700 bg-primary-900/90 px-3 py-1.5 text-[11px] font-medium text-primary-200 shadow-lg backdrop-blur transition-colors hover:bg-primary-800"
               >
-                ↓ Jump to latest
+                {t('gateway.runConsole.jumpToLatest')}
               </button>
             )}
           </div>
@@ -831,7 +834,7 @@ export function RunConsole({
         {activeTab === 'timeline' ? (
           <div className="rounded-xl border border-primary-800/80 bg-primary-950/50 p-4 sm:p-5">
             {timelineBuckets.length === 0 ? (
-              <p className="text-sm text-primary-300">No timeline events yet</p>
+              <p className="text-sm text-primary-300">{t('gateway.runConsole.noTimelineEvents')}</p>
             ) : (
               <ol className="space-y-4">
                 {timelineBuckets.map((bucket) => (
@@ -877,7 +880,7 @@ export function RunConsole({
         {activeTab === 'artifacts' ? (
           <div className="rounded-xl border border-primary-800/80 bg-primary-950/50 p-4 sm:p-5">
             {!artifacts || artifacts.length === 0 ? (
-              <p className="text-sm text-primary-300">No artifacts collected yet</p>
+              <p className="text-sm text-primary-300">{t('gateway.runConsole.noArtifacts')}</p>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {artifacts
@@ -886,7 +889,7 @@ export function RunConsole({
                   .map((artifact) => {
                     const isExpanded = expandedArtifactId === artifact.id
                     const commitHash = artifact.name.split(' ')[0] || artifact.name
-                    const commitMessage = artifact.content || artifact.name.slice(commitHash.length).trim() || 'No commit message'
+                    const commitMessage = artifact.content || artifact.name.slice(commitHash.length).trim() || t('gateway.runConsole.noCommitMessage')
                     return (
                       <article key={artifact.id} className="rounded-lg border border-primary-800/80 bg-primary-900/60 p-3">
                         <div className="mb-2 flex items-start justify-between gap-2">
@@ -900,24 +903,24 @@ export function RunConsole({
                             className="inline-flex items-center gap-1 rounded-md border border-primary-700 bg-primary-900/80 px-2 py-1 text-[11px] text-primary-200 transition-colors hover:bg-primary-800"
                           >
                             <HugeiconsIcon icon={Copy01Icon} size={12} strokeWidth={1.8} />
-                            {copiedArtifactId === artifact.id ? 'Copied' : 'Copy'}
+                            {copiedArtifactId === artifact.id ? t('common.copied') : t('common.copy')}
                           </button>
                         </div>
 
                         {artifact.type === 'file' ? (
                           <div className="space-y-2 text-xs text-primary-300">
-                            <p className="truncate text-primary-200">Path: {artifact.path || 'Unknown path'}</p>
+                            <p className="truncate text-primary-200">{t('gateway.runConsole.path', { path: artifact.path || t('gateway.runConsole.unknownPath') })}</p>
                             <button
                               type="button"
                               onClick={() => setExpandedArtifactId(isExpanded ? null : artifact.id)}
                               className="inline-flex items-center gap-1 rounded-md border border-primary-700 bg-primary-900/80 px-2 py-1 text-[11px] font-medium text-primary-200 transition-colors hover:bg-primary-800"
                             >
                               <HugeiconsIcon icon={ViewIcon} size={12} strokeWidth={1.8} />
-                              View
+                              {t('gateway.runConsole.view')}
                             </button>
                             {isExpanded ? (
                               <pre className="max-h-32 overflow-auto rounded-md border border-primary-800 bg-primary-950/80 p-2 text-[11px] text-primary-200">
-                                {artifact.content || artifact.path || 'No file preview available'}
+                                {artifact.content || artifact.path || t('gateway.runConsole.noFilePreview')}
                               </pre>
                             ) : null}
                           </div>
@@ -925,14 +928,14 @@ export function RunConsole({
 
                         {artifact.type === 'output' ? (
                           <pre className="max-h-32 overflow-auto rounded-md border border-primary-800 bg-primary-950/80 p-2 text-[11px] text-primary-200">
-                            {(artifact.content || 'No output content').slice(0, 200)}
+                            {(artifact.content || t('gateway.runConsole.noOutputContent')).slice(0, 200)}
                             {(artifact.content || '').length > 200 ? '...' : ''}
                           </pre>
                         ) : null}
 
                         {artifact.type === 'commit' ? (
                           <div className="space-y-1.5 text-xs text-primary-300">
-                            <p className="font-mono text-primary-200">Hash: {commitHash}</p>
+                            <p className="font-mono text-primary-200">{t('gateway.runConsole.hash', { hash: commitHash })}</p>
                             <p className="line-clamp-3 break-words">{commitMessage}</p>
                           </div>
                         ) : null}
@@ -947,7 +950,7 @@ export function RunConsole({
         {activeTab === 'events' ? (
           <div className="min-h-[200px]">
             {!missionEvents || missionEvents.length === 0 ? (
-              <p className="text-sm text-primary-300">No mission events recorded for this run yet.</p>
+              <p className="text-sm text-primary-300">{t('gateway.runConsole.noMissionEvents')}</p>
             ) : (
               <MissionEventLog
                 events={missionEvents}
@@ -977,16 +980,16 @@ export function RunConsole({
         {activeTab === 'report' ? (
           <div className="rounded-xl border border-primary-800/80 bg-primary-950/50 p-4 sm:p-5">
             {!report ? (
-              <p className="text-sm text-primary-300">Report will be generated when the mission completes</p>
+              <p className="text-sm text-primary-300">{t('gateway.runConsole.reportPending')}</p>
             ) : (
               <div className="space-y-4">
                 <section className="rounded-lg border border-primary-800/80 bg-primary-900/50 p-3">
-                  <h3 className="text-sm font-semibold text-primary-100">Summary</h3>
+                  <h3 className="text-sm font-semibold text-primary-100">{t('gateway.runConsole.summary')}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-primary-300">{report.summary}</p>
                 </section>
 
                 <section className="rounded-lg border border-primary-800/80 bg-primary-900/50 p-3">
-                  <h3 className="text-sm font-semibold text-primary-100">Key Findings</h3>
+                  <h3 className="text-sm font-semibold text-primary-100">{t('gateway.runConsole.keyFindings')}</h3>
                   {report.keyFindings.length > 0 ? (
                     <ul className="mt-2 space-y-2">
                       {report.keyFindings.map((finding, index) => (
@@ -997,33 +1000,33 @@ export function RunConsole({
                       ))}
                     </ul>
                   ) : (
-                    <p className="mt-2 text-sm text-primary-400">No key findings available</p>
+                    <p className="mt-2 text-sm text-primary-400">{t('gateway.runConsole.noKeyFindings')}</p>
                   )}
                 </section>
 
                 <section className="grid gap-2 rounded-lg border border-primary-800/80 bg-primary-900/50 p-3 text-xs sm:grid-cols-3">
                   <div className="rounded-md border border-primary-800 bg-primary-950/70 px-2 py-1.5">
-                    <p className="text-primary-400">Duration</p>
+                    <p className="text-primary-400">{t('gateway.runConsole.durationLabel')}</p>
                     <p className="mt-0.5 text-sm font-semibold text-primary-100">{report.duration}</p>
                   </div>
                   <div className="rounded-md border border-primary-800 bg-primary-950/70 px-2 py-1.5">
-                    <p className="text-primary-400">Total Tokens</p>
-                    <p className="mt-0.5 text-sm font-semibold text-primary-100">{report.totalTokens.toLocaleString()}</p>
+                    <p className="text-primary-400">{t('gateway.runConsole.totalTokens')}</p>
+                    <p className="mt-0.5 text-sm font-semibold text-primary-100">{report.totalTokens.toLocaleString(getLocale())}</p>
                   </div>
                   <div className="rounded-md border border-primary-800 bg-primary-950/70 px-2 py-1.5">
-                    <p className="text-primary-400">Total Cost</p>
+                    <p className="text-primary-400">{t('gateway.runConsole.totalCost')}</p>
                     <p className="mt-0.5 text-sm font-semibold text-primary-100">${report.totalCost.toFixed(2)}</p>
                   </div>
                 </section>
 
                 <section className="overflow-hidden rounded-lg border border-primary-800/80 bg-primary-900/50">
-                  <h3 className="border-b border-primary-800/80 px-3 py-2 text-sm font-semibold text-primary-100">Agent Breakdown</h3>
+                  <h3 className="border-b border-primary-800/80 px-3 py-2 text-sm font-semibold text-primary-100">{t('gateway.runConsole.agentBreakdown')}</h3>
                   <table className="w-full text-left text-xs">
                     <thead className="bg-primary-950/70 text-primary-300">
                       <tr>
-                        <th className="px-3 py-2 font-medium">Agent</th>
-                        <th className="px-3 py-2 font-medium">Tasks Completed</th>
-                        <th className="px-3 py-2 font-medium">Tokens Used</th>
+                        <th className="px-3 py-2 font-medium">{t('gateway.runConsole.col.agent')}</th>
+                        <th className="px-3 py-2 font-medium">{t('gateway.runConsole.col.tasksCompleted')}</th>
+                        <th className="px-3 py-2 font-medium">{t('gateway.runConsole.col.tokensUsed')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1031,7 +1034,7 @@ export function RunConsole({
                         <tr key={`${agent.name}-${index}`} className="border-t border-primary-800/70 text-primary-200">
                           <td className="px-3 py-2">{agent.name}</td>
                           <td className="px-3 py-2">{agent.tasks}</td>
-                          <td className="px-3 py-2">{agent.tokens.toLocaleString()}</td>
+                          <td className="px-3 py-2">{agent.tokens.toLocaleString(getLocale())}</td>
                         </tr>
                       ))}
                     </tbody>

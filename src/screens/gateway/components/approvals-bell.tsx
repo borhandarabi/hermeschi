@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import type { ApprovalRequest } from '../lib/approvals-store'
+import { t } from '@/lib/i18n'
 
 type ApprovalsBellProps = {
   approvals: ApprovalRequest[]
@@ -13,10 +14,10 @@ type ApprovalsBellProps = {
 function timeAgo(ms: number): string {
   const delta = Math.max(0, Date.now() - ms)
   const s = Math.floor(delta / 1000)
-  if (s < 60) return `${s}s ago`
+  if (s < 60) return t('gateway.approvalsBell.timeAgo.seconds', { count: s })
   const m = Math.floor(s / 60)
-  if (m < 60) return `${m}m ago`
-  return `${Math.floor(m / 60)}h ago`
+  if (m < 60) return t('gateway.approvalsBell.timeAgo.minutes', { count: m })
+  return t('gateway.approvalsBell.timeAgo.hours', { count: Math.floor(m / 60) })
 }
 
 export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellProps) {
@@ -102,7 +103,11 @@ export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellPro
             : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200',
           pulse && 'ring-2 ring-amber-400/50',
         )}
-        aria-label={`Approvals${count > 0 ? ` — ${count} pending` : ''}`}
+        aria-label={
+          count > 0
+            ? t('gateway.approvalsBell.aria.pendingCount', { count })
+            : t('gateway.approvalsBell.aria.label')
+        }
       >
         {pulse ? (
           <span className="pointer-events-none absolute inset-0 animate-ping rounded-lg border-2 border-amber-400 opacity-30" />
@@ -124,20 +129,20 @@ export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellPro
             'shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]',
           )}
           role="dialog"
-          aria-label="Pending approvals"
+          aria-label={t('gateway.approvalsBell.aria.dialog')}
         >
           <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-700">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-[var(--theme-text)]">Approvals</span>
+              <span className="text-sm font-semibold text-[var(--theme-text)]">{t('gateway.approvalsBell.title')}</span>
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                {count} pending
+                {t('gateway.approvals.pendingCount', { count })}
               </span>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="rounded-md p-0.5 text-neutral-400 transition-colors hover:text-neutral-600 dark:hover:text-neutral-200"
-              aria-label="Close"
+              aria-label={t('gateway.approvalsBell.aria.close')}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
                 <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -149,8 +154,8 @@ export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellPro
             {latestThree.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <span className="mb-2 text-2xl">🛡️</span>
-                <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">All clear</p>
-                <p className="mt-0.5 text-xs text-neutral-400 dark:text-neutral-500">No pending approvals</p>
+                <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">{t('gateway.approvalsBell.allClear')}</p>
+                <p className="mt-0.5 text-xs text-neutral-400 dark:text-neutral-500">{t('gateway.approvalsBell.noPending')}</p>
               </div>
             ) : (
               latestThree.map((approval) => {
@@ -177,7 +182,7 @@ export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellPro
                         disabled={Boolean(busy)}
                         className="flex-1 rounded-lg bg-emerald-500 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {busy === 'approve' ? 'Approving...' : 'Approve'}
+                        {busy === 'approve' ? t('gateway.approvalsBell.approving') : t('gateway.approvalsBell.approve')}
                       </button>
                       <button
                         type="button"
@@ -185,7 +190,7 @@ export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellPro
                         disabled={Boolean(busy)}
                         className="flex-1 rounded-lg border border-red-200 bg-white py-1.5 text-[11px] font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-800/50 dark:bg-neutral-800 dark:text-red-400 dark:hover:bg-red-900/20"
                       >
-                        {busy === 'deny' ? 'Denying...' : 'Deny'}
+                        {busy === 'deny' ? t('gateway.approvalsBell.denying') : t('gateway.approvalsBell.deny')}
                       </button>
                     </div>
                   </article>
@@ -196,7 +201,7 @@ export function ApprovalsBell({ approvals, onApprove, onDeny }: ApprovalsBellPro
 
           {count > latestThree.length ? (
             <div className="border-t border-neutral-200 px-4 py-2 text-[10px] text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
-              +{count - latestThree.length} more pending in Approvals tab
+              {t('gateway.approvalsBell.moreInTab', { count: count - latestThree.length })}
             </div>
           ) : null}
         </div>

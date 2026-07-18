@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import type { ApprovalRequest } from '../lib/approvals-store'
+import { t, getLocale } from '@/lib/i18n'
 
 type InlineApprovalCardProps = {
   approval: ApprovalRequest
@@ -16,10 +17,10 @@ export function InlineApprovalCard({ approval, onApprove, onDeny }: InlineApprov
   const isPending = !resolved && approval.status === 'pending'
   const age = Date.now() - approval.requestedAt
   const ageLabel = age < 60_000
-    ? `${Math.floor(age / 1000)}s ago`
+    ? t('gateway.inlineApproval.age.seconds', { count: Math.floor(age / 1000) })
     : age < 3_600_000
-      ? `${Math.floor(age / 60_000)}m ago`
-      : `${Math.floor(age / 3_600_000)}h ago`
+      ? t('gateway.inlineApproval.age.minutes', { count: Math.floor(age / 60_000) })
+      : t('gateway.inlineApproval.age.hours', { count: Math.floor(age / 3_600_000) })
 
   return (
     <div
@@ -39,7 +40,7 @@ export function InlineApprovalCard({ approval, onApprove, onDeny }: InlineApprov
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">
-              Approval Required
+              {t('gateway.inlineApproval.title')}
             </span>
             <span className="text-[10px] text-neutral-500">{ageLabel}</span>
           </div>
@@ -58,20 +59,24 @@ export function InlineApprovalCard({ approval, onApprove, onDeny }: InlineApprov
                 onClick={() => { setResolved('approved'); onApprove(approval.id) }}
                 className="rounded-md bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-emerald-700"
               >
-                ✓ Approve
+                {t('gateway.inlineApproval.approve')}
               </button>
               <button
                 type="button"
                 onClick={() => { setResolved('denied'); onDeny(approval.id) }}
                 className="rounded-md border border-red-300 bg-white px-3 py-1 text-[11px] font-semibold text-red-600 transition-colors hover:bg-red-50 dark:border-red-700 dark:bg-neutral-800 dark:text-red-400 dark:hover:bg-red-950"
               >
-                ✕ Deny
+                {t('gateway.inlineApproval.deny')}
               </button>
             </div>
           ) : (
             <p className="mt-1.5 text-[11px] font-medium text-neutral-500">
-              {resolved === 'approved' ? 'Approved' : 'Denied'}
-              {approval.resolvedAt ? ` at ${new Date(approval.resolvedAt).toLocaleTimeString()}` : ''}
+              {resolved === 'approved' ? t('gateway.inlineApproval.approved') : t('gateway.inlineApproval.denied')}
+              {approval.resolvedAt
+                ? t('gateway.inlineApproval.resolvedAt', {
+                    time: new Date(approval.resolvedAt).toLocaleTimeString(getLocale()),
+                  })
+                : ''}
             </p>
           )}
         </div>

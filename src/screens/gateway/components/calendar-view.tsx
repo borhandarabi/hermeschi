@@ -4,6 +4,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 
 export type CalendarViewProps = {
   cronJobs: Array<{ id: string; name: string; schedule: string; nextRunAt: number; enabled: boolean }>
@@ -30,7 +31,7 @@ type CalendarEvent = {
   status?: 'running' | 'complete' | 'failed'
 }
 
-const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
 const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
 
 function startOfDay(date: Date): Date {
@@ -304,15 +305,15 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
 
   const title = useMemo(() => {
     if (mode === 'month') {
-      return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(cursorDate)
+      return new Intl.DateTimeFormat(getLocale(), { month: 'long', year: 'numeric' }).format(cursorDate)
     }
 
     if (mode === 'week') {
-      const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
+      const formatter = new Intl.DateTimeFormat(getLocale(), { month: 'short', day: 'numeric' })
       return `${formatter.format(weekRange.start)} - ${formatter.format(weekRange.end)}`
     }
 
-    return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(cursorDate)
+    return new Intl.DateTimeFormat(getLocale(), { month: 'long', day: 'numeric', year: 'numeric' }).format(cursorDate)
   }, [cursorDate, mode, weekRange.end, weekRange.start])
 
   return (
@@ -323,7 +324,7 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
             type="button"
             onClick={() => stepCursor(-1)}
             className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-primary-800 text-primary-200 transition-colors hover:bg-primary-900"
-            aria-label="Previous"
+            aria-label={t('gateway.calendarView.aria.previous')}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={1.7} />
           </button>
@@ -332,7 +333,7 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
             type="button"
             onClick={() => stepCursor(1)}
             className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-primary-800 text-primary-200 transition-colors hover:bg-primary-900"
-            aria-label="Next"
+            aria-label={t('gateway.calendarView.aria.next')}
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={1.7} />
           </button>
@@ -349,7 +350,7 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
                 mode === view ? 'bg-accent-500 text-primary-950' : 'text-primary-300 hover:bg-primary-800 hover:text-primary-100',
               )}
             >
-              {view}
+              {t(`gateway.calendarView.view.${view}`)}
             </button>
           ))}
         </div>
@@ -366,9 +367,9 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
             className="space-y-2"
           >
             <div className="grid grid-cols-7 gap-2">
-              {WEEKDAY_LABELS.map((day) => (
-                <div key={day} className="px-1 py-1 text-center text-[11px] font-semibold uppercase tracking-wide text-primary-400">
-                  {day}
+              {WEEKDAY_KEYS.map((dayKey) => (
+                <div key={dayKey} className="px-1 py-1 text-center text-[11px] font-semibold uppercase tracking-wide text-primary-400">
+                  {t(`gateway.calendarView.weekday.${dayKey}`)}
                 </div>
               ))}
             </div>
@@ -409,7 +410,7 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
                         </button>
                       ))}
                       {dayEvents.length > 3 ? (
-                        <div className="px-1.5 text-[11px] font-medium text-primary-400">+{dayEvents.length - 3} more</div>
+                        <div className="px-1.5 text-[11px] font-medium text-primary-400">{t('gateway.calendarView.more', { count: dayEvents.length - 3 })}</div>
                       ) : null}
                     </div>
                   </div>
@@ -430,10 +431,10 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
           >
             <div className="min-w-[760px] rounded-lg border border-primary-800">
               <div className="grid grid-cols-[64px_repeat(7,minmax(0,1fr))] border-b border-primary-800 bg-primary-900/50">
-                <div className="border-r border-primary-800 p-2 text-[11px] font-semibold uppercase tracking-wide text-primary-400">Time</div>
+                <div className="border-r border-primary-800 p-2 text-[11px] font-semibold uppercase tracking-wide text-primary-400">{t('gateway.calendarView.time')}</div>
                 {weekRange.days.map((day) => (
                   <div key={getDayKey(day)} className={cn('border-r border-primary-800 p-2 text-center text-xs font-semibold last:border-r-0', isSameDay(day, today) ? 'text-accent-300' : 'text-primary-200')}>
-                    {WEEKDAY_LABELS[day.getDay()]} {day.getDate()}
+                    {t(`gateway.calendarView.weekday.${WEEKDAY_KEYS[day.getDay()]}`)} {day.getDate()}
                   </div>
                 ))}
               </div>
@@ -464,7 +465,7 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
                                 {event.title}
                               </button>
                             ))}
-                            {dayEvents.length > 2 ? <div className="text-[10px] text-primary-400">+{dayEvents.length - 2} more</div> : null}
+                            {dayEvents.length > 2 ? <div className="text-[10px] text-primary-400">{t('gateway.calendarView.more', { count: dayEvents.length - 2 })}</div> : null}
                           </div>
                         </div>
                       )
@@ -512,7 +513,7 @@ export function CalendarView({ cronJobs, missionRuns, onSelectEvent }: CalendarV
                               <span className="truncate">{event.title}</span>
                             </div>
                             <div className="mt-1 text-[11px] text-primary-300">
-                              {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(event.date)}
+                              {new Intl.DateTimeFormat(getLocale(), { hour: 'numeric', minute: '2-digit' }).format(event.date)}
                             </div>
                           </button>
                         ))}

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import type { TeamMember } from './team-panel'
 import type { HubTask } from './task-board'
 import { AgentOutputPanel } from './agent-output-panel'
+import { t, getLocale } from '@/lib/i18n'
 
 type MissionTimelineProps = {
   tasks: HubTask[]
@@ -16,14 +17,14 @@ type MissionTimelineProps = {
 }
 
 function formatElapsed(ms?: number): string {
-  if (!ms || ms <= 0) return '0s'
+  if (!ms || ms <= 0) return t('gateway.missionTimeline.duration.zero')
   const totalSeconds = Math.floor(ms / 1000)
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-  if (hours > 0) return `${hours}h ${minutes}m`
-  if (minutes > 0) return `${minutes}m ${seconds}s`
-  return `${seconds}s`
+  if (hours > 0) return t('gateway.missionTimeline.duration.hoursMinutes', { hours, minutes })
+  if (minutes > 0) return t('gateway.missionTimeline.duration.minutesSeconds', { minutes, seconds })
+  return t('gateway.missionTimeline.duration.seconds', { seconds })
 }
 
 export function MissionTimeline({
@@ -60,8 +61,8 @@ export function MissionTimeline({
         <li className="flex items-start gap-3">
           <span className="mt-1 h-[14px] w-[14px] rounded-full bg-orange-400" />
           <div>
-            <p className="text-[16px] font-bold text-neutral-900">Mission started</p>
-            <p className="text-xs text-neutral-500">{new Date(startedAt).toLocaleString()}</p>
+            <p className="text-[16px] font-bold text-neutral-900">{t('gateway.missionTimeline.missionStarted')}</p>
+            <p className="text-xs text-neutral-500">{new Date(startedAt).toLocaleString(getLocale())}</p>
           </div>
         </li>
 
@@ -75,10 +76,10 @@ export function MissionTimeline({
                 <span className="mt-1 h-3 w-3 rounded-full bg-blue-500" />
                 <div className="min-w-0">
                   <p className="break-words text-base font-bold text-neutral-900">
-                    Agent dispatched: {member?.name ?? task.agentId}
+                    {t('gateway.missionTimeline.agentDispatched', { name: member?.name ?? task.agentId ?? '' })}
                   </p>
                   <p className="break-words text-sm text-neutral-500">
-                    {task.title} · {member?.modelId || 'Unknown model'}
+                    {task.title} · {member?.modelId || t('gateway.missionTimeline.unknownModel')}
                   </p>
                 </div>
               </li>
@@ -99,18 +100,23 @@ export function MissionTimeline({
                 <div className="flex items-center justify-between gap-2">
                   <p className="truncate text-base font-bold text-neutral-900">{member.name}</p>
                   {isActive ? (
-                    <span className="rounded-full bg-emerald-700 px-2.5 py-1 text-xs text-white">Active</span>
+                    <span className="rounded-full bg-emerald-700 px-2.5 py-1 text-xs text-white">{t('gateway.missionTimeline.active')}</span>
                   ) : (
-                    <span className="text-sm text-neutral-400">Stopped</span>
+                    <span className="text-sm text-neutral-400">{t('gateway.missionTimeline.stopped')}</span>
                   )}
                 </div>
-                <p className="mt-1 text-sm text-neutral-500">Assigned tasks: {assignedTaskCount}</p>
+                <p className="mt-1 text-sm text-neutral-500">{t('gateway.missionTimeline.assignedTasks', { count: assignedTaskCount })}</p>
 
                 {isActive ? (
                   <div className="mt-2 rounded-r-lg border-l-4 border-emerald-500 bg-emerald-50 px-3 py-2">
-                    <p className="text-sm font-semibold text-emerald-800">Agent working</p>
+                    <p className="text-sm font-semibold text-emerald-800">{t('gateway.missionTimeline.agentWorking')}</p>
                     <p className="mt-0.5 text-xs text-emerald-600">
-                      Live stream is active{status?.lastSeen ? ` · last seen ${new Date(status.lastSeen).toLocaleTimeString()}` : ''}
+                      {t('gateway.missionTimeline.liveStreamActive')}
+                      {status?.lastSeen
+                        ? t('gateway.missionTimeline.lastSeen', {
+                            time: new Date(status.lastSeen).toLocaleTimeString(getLocale()),
+                          })
+                        : ''}
                     </p>
                   </div>
                 ) : null}
@@ -120,7 +126,7 @@ export function MissionTimeline({
                   onClick={() => setExpandedOutputs((prev) => ({ ...prev, [member.id]: !prev[member.id] }))}
                   className="mt-3 text-sm text-neutral-600"
                 >
-                  {isExpanded ? '▼ Live output' : '▶ Live output'}
+                  {isExpanded ? `▼ ${t('gateway.missionTimeline.liveOutput')}` : `▶ ${t('gateway.missionTimeline.liveOutput')}`}
                 </button>
 
                 {isExpanded ? (
@@ -130,13 +136,13 @@ export function MissionTimeline({
                         compact
                         agentName={member.name}
                         sessionKey={agentSessionMap[member.id]}
-                        tasks={tasks.filter((t) => t.agentId === member.id)}
+                        tasks={tasks.filter((task) => task.agentId === member.id)}
                         onClose={() => {}}
                       />
                     </div>
                   ) : (
                     <div className="mt-2 rounded-lg border border-neutral-200 bg-white p-2">
-                      <p className="text-[11px] text-neutral-400">Waiting for agent session...</p>
+                      <p className="text-[11px] text-neutral-400">{t('gateway.missionTimeline.waitingForSession')}</p>
                     </div>
                   )
                 ) : null}
@@ -149,9 +155,13 @@ export function MissionTimeline({
           <li className="flex items-start gap-3">
             <span className="mt-1 h-3 w-3 rounded-full bg-neutral-300" />
             <div>
-              <p className="text-base font-bold text-neutral-900">Mission stopped</p>
+              <p className="text-base font-bold text-neutral-900">{t('gateway.missionTimeline.missionStopped')}</p>
               <p className="text-xs text-neutral-500">
-                {completedTasks}/{totalTasks} tasks complete · total time {formatElapsed(elapsedTime)}
+                {t('gateway.missionTimeline.tasksComplete', {
+                  completed: completedTasks,
+                  total: totalTasks,
+                  duration: formatElapsed(elapsedTime),
+                })}
               </p>
             </div>
           </li>

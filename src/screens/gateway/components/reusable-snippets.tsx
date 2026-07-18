@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type SnippetProps = {
   snippets: Array<{
@@ -34,14 +35,14 @@ export function ReusableSnippets({ snippets, onUseSnippet }: SnippetProps) {
     <section className="flex h-full min-h-[320px] flex-col rounded-2xl border border-primary-800 bg-primary-950 p-4">
       <div className="mb-3">
         <label className="sr-only" htmlFor="snippet-search">
-          Search snippets
+          {t('gateway.reusableSnippets.searchLabel')}
         </label>
         <input
           id="snippet-search"
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search snippets by title, content, or tag..."
+          placeholder={t('gateway.reusableSnippets.searchPlaceholder')}
           className="h-10 w-full rounded-lg border border-primary-700 bg-primary-900 px-3 text-sm text-primary-100 placeholder:text-primary-400 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
         />
       </div>
@@ -49,7 +50,7 @@ export function ReusableSnippets({ snippets, onUseSnippet }: SnippetProps) {
       <div className="min-h-0 flex-1 overflow-y-auto">
         {filteredSnippets.length === 0 ? (
           <div className="rounded-xl border border-dashed border-primary-800 bg-primary-900/60 px-4 py-8 text-center text-sm text-primary-300">
-            No snippets match your search.
+            {t('gateway.reusableSnippets.noMatches')}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -67,7 +68,7 @@ export function ReusableSnippets({ snippets, onUseSnippet }: SnippetProps) {
                       'shrink-0 rounded-full border border-primary-700 bg-primary-900 px-2 py-0.5 text-[10px] font-medium text-primary-300',
                     )}
                   >
-                    {snippet.usageCount} uses
+                    {t('gateway.reusableSnippets.uses', { count: snippet.usageCount })}
                   </span>
                 </div>
 
@@ -91,7 +92,7 @@ export function ReusableSnippets({ snippets, onUseSnippet }: SnippetProps) {
                   onClick={() => onUseSnippet(snippet.id)}
                   className="mt-auto h-9 rounded-lg bg-accent-500 px-3 text-xs font-semibold text-primary-950 transition-colors hover:bg-accent-400"
                 >
-                  Use
+                  {t('gateway.reusableSnippets.use')}
                 </button>
               </article>
             ))}

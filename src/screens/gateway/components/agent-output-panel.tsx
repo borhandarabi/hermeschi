@@ -6,6 +6,7 @@ import type { HubTask } from './task-board'
 import { InlineApprovalCard } from './inline-approval-card'
 import type { ApprovalRequest } from '../lib/approvals-store'
 import { StreamingText } from './streaming-text'
+import { t, getLocale } from '@/lib/i18n'
 
 type OutputMessage = {
   role: 'assistant' | 'user' | 'tool'
@@ -96,7 +97,7 @@ function stripThinkBlocks(content: string): string {
 /** Format a timestamp to HH:MM:SS for terminal-style display */
 function formatTimestamp(ms: number): string {
   const d = new Date(ms)
-  return d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return d.toLocaleTimeString(getLocale(), { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
 function truncateArgs(args: unknown, maxLength = 80): string {
@@ -317,14 +318,16 @@ export function AgentOutputPanel({
     }
   }, [messages])
 
-  const streamStatus = sessionEnded
-    ? 'Completed'
+  const streamStatusKey = sessionEnded
+    ? 'completed' as const
     : streamDisconnected
-      ? 'Disconnected'
+      ? 'disconnected' as const
       : sessionKey
-        ? 'Streaming'
-        : 'Idle'
-  const headerStatus = statusLabel || streamStatus
+        ? 'streaming' as const
+        : 'idle' as const
+  const streamStatusLabel = t(`gateway.agentOutput.status.${streamStatusKey}`)
+  // statusLabel is provided already-translated by the parent; otherwise fall back to the localized internal label
+  const headerStatus = statusLabel || streamStatusLabel
   const handleReconnect = useCallback(() => {
     setStreamDisconnected(false)
     setStreamReconnectNonce((n) => n + 1)
@@ -378,7 +381,7 @@ export function AgentOutputPanel({
 
     // 'done' — session/run completed: add status marker
     source.addEventListener('done', (event) => {
-      let doneLabel = 'Session ended'
+      let doneLabel = t('gateway.agentOutput.sessionEnded')
       if (event instanceof MessageEvent) {
         const payload = parseSsePayload(event.data as string)
         if (!payload) return
@@ -386,9 +389,11 @@ export function AgentOutputPanel({
         const state = readString(payload?.state).toLowerCase()
         const error = readString(payload?.errorMessage)
         if (state === 'error') {
-          doneLabel = error ? `Session ended with error: ${error}` : 'Session ended with error'
+          doneLabel = error
+            ? t('gateway.agentOutput.sessionEndedWithError', { error })
+            : t('gateway.agentOutput.sessionEndedWithErrorShort')
         } else if (state === 'aborted') {
-          doneLabel = 'Session aborted'
+          doneLabel = t('gateway.agentOutput.sessionAborted')
         }
       }
       setSessionEnded(true)
@@ -466,10 +471,10 @@ export function AgentOutputPanel({
               </div>
               <p className={cn('mt-1 text-[10px]', compact ? 'text-[var(--theme-muted)]' : 'text-[var(--theme-muted)]')}>
                 {task.status === 'in_progress'
-                  ? 'Working...'
+                  ? t('gateway.agentOutput.task.working')
                   : task.status === 'done'
-                    ? '✓ Completed'
-                    : 'Queued'}
+                    ? t('gateway.agentOutput.task.completed')
+                    : t('gateway.agentOutput.task.queued')}
               </p>
             </div>
           ))}
@@ -479,13 +484,13 @@ export function AgentOutputPanel({
       {/* Terminal output */}
       {sessionKey && streamDisconnected && !sessionEnded ? (
         <div className="mb-2 flex items-center justify-between gap-2 rounded-md border border-amber-300 bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-700 dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-400">
-          <span>Stream disconnected</span>
+          <span>{t('gateway.agentOutput.streamDisconnected')}</span>
           <button
             type="button"
             onClick={handleReconnect}
             className="rounded border border-amber-400 px-2 py-0.5 text-[10px] font-semibold text-amber-600 transition-colors hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/40"
           >
-            Reconnect
+            {t('gateway.agentOutput.reconnect')}
           </button>
         </div>
       ) : null}
@@ -525,7 +530,7 @@ export function AgentOutputPanel({
               <span className="animate-pulse text-emerald-600 dark:text-emerald-400">▊</span>
             </>
           ) : messages.length === 0 && !sessionEnded ? (
-            <p className="animate-pulse text-[var(--theme-muted)]">Waiting for response…</p>
+            <p className="animate-pulse text-[var(--theme-muted)]">{t('gateway.agentOutput.waitingForResponse')}</p>
           ) : (
             <>
               {sortedMessages.map((msg, index) =>
@@ -544,7 +549,7 @@ export function AgentOutputPanel({
                     className="my-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm leading-6 text-blue-900 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-200"
                   >
                     <div className="mb-1 flex items-center gap-2">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">You</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">{t('gateway.agentOutput.you')}</span>
                       <span className="text-[10px] text-[var(--theme-muted)] tabular-nums">{formatTimestamp(msg.timestamp)}</span>
                     </div>
                     <Markdown className="text-sm leading-6 text-blue-800 dark:text-blue-100 [&_p]:my-1 [&_ul]:my-2 [&_ol]:my-2">
@@ -591,10 +596,10 @@ export function AgentOutputPanel({
         // Fallback placeholder when no sessionKey
         <div className={cn('min-h-0 flex-1 overflow-y-auto rounded-lg bg-[var(--theme-card2)] p-3 font-mono text-sm leading-6 text-[var(--theme-text)]', compact ? 'min-h-0 flex-1 overflow-y-auto' : 'mt-1 min-h-[300px]')}>
           {tasks.length === 0 ? (
-            <p className="text-[var(--theme-muted)]">No dispatched tasks yet.</p>
+            <p className="text-[var(--theme-muted)]">{t('gateway.agentOutput.noDispatchedTasks')}</p>
           ) : (
             <>
-              <p className="text-[var(--theme-muted)]">$ Dispatching to {agentName}…</p>
+              <p className="text-[var(--theme-muted)]">{t('gateway.agentOutput.dispatchingTo', { name: agentName })}</p>
               <p className="animate-pulse text-emerald-600 dark:text-emerald-400">▊</p>
             </>
           )}
@@ -650,7 +655,7 @@ export function AgentOutputPanel({
             type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
-            placeholder={`Message ${agentName}...`}
+            placeholder={t('gateway.agentOutput.messagePlaceholder', { name: agentName })}
             disabled={sendingMessage}
             className="flex-1 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-1.5 text-sm text-[var(--theme-text)] placeholder:text-[var(--theme-muted)] focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50"
           />
@@ -659,7 +664,7 @@ export function AgentOutputPanel({
             disabled={!messageInput.trim() || sendingMessage}
             className="shrink-0 rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-sky-700 disabled:opacity-40"
           >
-            Send
+            {t('gateway.agentOutput.send')}
           </button>
         </form>
       )}
@@ -702,7 +707,7 @@ export function AgentOutputPanel({
           </span>
           {tokenCount > 0 ? (
             <span className="shrink-0 font-mono text-[10px] text-[var(--theme-muted)] tabular-nums">
-              ~{tokenCount.toLocaleString()} tok
+              {t('gateway.agentOutput.tokens', { count: tokenCount.toLocaleString(getLocale()) })}
             </span>
           ) : null}
         </div>
@@ -710,7 +715,7 @@ export function AgentOutputPanel({
           type="button"
           onClick={onClose}
           className="flex size-8 shrink-0 items-center justify-center rounded-md border border-[var(--theme-border)] text-sm text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
-          aria-label="Close agent output"
+          aria-label={t('gateway.agentOutput.aria.close')}
         >
           ✕
         </button>
