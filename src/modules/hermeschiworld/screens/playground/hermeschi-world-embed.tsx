@@ -7,7 +7,7 @@ export function HermesChiWorldEmbed() {
   const showPanelShowcase = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('panels') === 'wave-chat'
   const playUrl = useMemo(() => {
     const url = new URL('/play/', HERMESCHI_WORLD_ORIGIN)
-    url.searchParams.set('source', 'hermes-workspace')
+    url.searchParams.set('source', 'hermeschi')
     return url.toString()
   }, [])
 

@@ -79,7 +79,7 @@ Hermes Playground turns agent onboarding into a social RPG loop. Instead of read
 
 ### Tweet draft
 
-Hermes Playground turns AI-agent onboarding into a multiplayer RPG: move, gear up, chat, learn docs + memory, then unlock the Forge and build live with friends nearby. Built for the @NousResearch × @Kimi_Moonshot hackathon. #HermesWorkspace #AIAgents
+Hermes Playground turns AI-agent onboarding into a multiplayer RPG: move, gear up, chat, learn docs + memory, then unlock the Forge and build live with friends nearby. Built for the @NousResearch × @Kimi_Moonshot hackathon. #HermesChi #AIAgents
 
 ### What to capture
 

@@ -100,8 +100,8 @@ describe('profiles-browser', () => {
       warnSpy.mockRestore()
     })
 
-    it('skips sticky active_profile writes when HERMES_WORKSPACE_STICKY_PROFILE=0', async () => {
-      process.env.HERMES_WORKSPACE_STICKY_PROFILE = '0'
+    it('skips sticky active_profile writes when HERMESCHI_STICKY_PROFILE=0', async () => {
+      process.env.HERMESCHI_STICKY_PROFILE = '0'
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       existsSync.mockImplementation((p: string) => {
@@ -123,7 +123,7 @@ describe('profiles-browser', () => {
       expect(warnSpy).toHaveBeenCalledTimes(1)
 
       warnSpy.mockRestore()
-      delete process.env.HERMES_WORKSPACE_STICKY_PROFILE
+      delete process.env.HERMESCHI_STICKY_PROFILE
     })
 
     it('clears active profile file when setting default', async () => {
@@ -139,8 +139,8 @@ describe('profiles-browser', () => {
   })
 
   describe('renameProfile', () => {
-    it('skips sticky active_profile rewrites on rename when HERMES_WORKSPACE_STICKY_PROFILE=0', async () => {
-      process.env.HERMES_WORKSPACE_STICKY_PROFILE = '0'
+    it('skips sticky active_profile rewrites on rename when HERMESCHI_STICKY_PROFILE=0', async () => {
+      process.env.HERMESCHI_STICKY_PROFILE = '0'
       const profilesRoot = path.join('/home/testuser', '.hermes', 'profiles')
       const oldPath = path.join(profilesRoot, 'jarvis')
       const newPath = path.join(profilesRoot, 'friday')
@@ -173,7 +173,7 @@ describe('profiles-browser', () => {
       )
       expect(renamed.name).toBe('friday')
 
-      delete process.env.HERMES_WORKSPACE_STICKY_PROFILE
+      delete process.env.HERMESCHI_STICKY_PROFILE
     })
   })
 

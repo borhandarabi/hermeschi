@@ -15,7 +15,7 @@ const PLATFORM_NAMES: Record<string, string> = {
   signal: 'Signal',
   imessage: 'iMessage',
   webchat: 'Claude',
-  'hermes-workspace': 'HermesChi',
+  'hermeschi': 'HermesChi',
   'hermeschi': 'HermesChi',
   slack: 'Slack',
   irc: 'IRC',

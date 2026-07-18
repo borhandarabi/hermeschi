@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path'
  * Resolve the Hermes workspace state directory.
  *
  * Priority:
- * 1. `HERMES_WORKSPACE_STATE_DIR` env var (explicit override)
+ * 1. `HERMESCHI_STATE_DIR` env var (explicit override)
  * 2. `join(HERMES_HOME, 'workspace')` where HERMES_HOME respects
  *    `HERMES_HOME` → `CLAUDE_HOME` → `~/.hermes` (standard chain)
  *
@@ -13,7 +13,7 @@ import { join, resolve } from 'node:path'
  * directory at startup if it doesn't exist.
  */
 export function getStateDir(): string {
-  const explicit = process.env.HERMES_WORKSPACE_STATE_DIR?.trim()
+  const explicit = process.env.HERMESCHI_STATE_DIR?.trim()
   if (explicit) return resolve(explicit)
 
   const hermesHome =

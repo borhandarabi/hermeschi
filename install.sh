@@ -7,7 +7,7 @@
 # What it does:
 #   1. Verifies Node 22+, git, pnpm
 #   2. Installs hermes-agent via Nous's official upstream installer
-#   3. Clones hermes-workspace
+#   3. Clones hermeschi
 #   4. Sets up .env, enables the Hermes API server, installs deps,
 #      and links bundled skills
 #
@@ -16,7 +16,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/borhandarabi/hermeschi.git}"
-INSTALL_DIR="${INSTALL_DIR:-$HOME/hermes-workspace}"
+INSTALL_DIR="${INSTALL_DIR:-$HOME/hermeschi}"
 GATEWAY_PORT="${GATEWAY_PORT:-8642}"
 NOUS_INSTALLER_URL="${NOUS_INSTALLER_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
 

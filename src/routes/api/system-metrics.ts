@@ -123,7 +123,7 @@ function readMemory() {
 }
 
 function readDisk() {
-  const diskPath = process.env.HERMES_WORKSPACE_METRICS_DISK_PATH || os.homedir()
+  const diskPath = process.env.HERMESCHI_METRICS_DISK_PATH || os.homedir()
 
   try {
     const stats = fs.statfsSync(diskPath)

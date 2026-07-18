@@ -275,7 +275,7 @@ function workspaceInstallKind(): InstallKind {
     process.env.ELECTRON_RUN_AS_NODE
   )
     return 'desktop'
-  if (process.env.HERMES_WORKSPACE_DOCKER === '1' || existsSync('/.dockerenv'))
+  if (process.env.HERMESCHI_DOCKER === '1' || existsSync('/.dockerenv'))
     return 'docker'
   return realGitRepoPath(process.cwd()) ? 'git' : 'unknown'
 }

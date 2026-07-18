@@ -69,7 +69,7 @@ function getActiveProfilePath(): string {
 }
 
 function stickyActiveProfileEnabled(): boolean {
-  return process.env.HERMES_WORKSPACE_STICKY_PROFILE !== '0'
+  return process.env.HERMESCHI_STICKY_PROFILE !== '0'
 }
 
 /**

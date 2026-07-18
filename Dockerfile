@@ -1,13 +1,18 @@
 # syntax=docker/dockerfile:1.6
 # HermesChi — production Docker image
-# Publishes to ghcr.io/outsourc-e/hermeschi
+# Publishes to ghcr.io/borhandarabi/hermeschi
 #
 # Build locally:
 #   docker build -t hermeschi .
 # Run:
 #   docker run -p 3000:3000 -e HERMES_API_URL=http://host.docker.internal:8642 hermeschi
 # Or pull pre-built:
-#   docker pull ghcr.io/outsourc-e/hermeschi:latest
+#   docker pull ghcr.io/borhandarabi/hermeschi:latest
+#
+# Build with game module:
+#   docker build --build-arg VITE_ENABLE_HERMESCHIWORLD=1 -t hermeschi:full .
+# Build without game (default, lighter):
+#   docker build -t hermeschi .
 #
 FROM tianon/gosu:1.17-bookworm AS gosu_source
 # ─── build stage ─────────────────────────────────────────────────────────
@@ -23,6 +28,10 @@ RUN pnpm install --frozen-lockfile
 
 # Copy sources and build
 COPY . .
+
+# Build argument for game module (0 = no game, 1 = with game)
+ARG VITE_ENABLE_HERMESCHIWORLD=0
+ENV VITE_ENABLE_HERMESCHIWORLD=$VITE_ENABLE_HERMESCHIWORLD
 RUN pnpm build
 
 # ─── runtime stage ────────────────────────────────────────────────────────

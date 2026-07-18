@@ -1,0 +1,22 @@
+# HermesChi — Full Build Overlay (with game module)
+#
+# This overlay switches the workspace image to the full build (with game
+# module). The game is still disabled by default at runtime — users must
+# enable it in Settings → Game.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.full.yml up
+#
+# This pulls the full image:
+#   ghcr.io/borhandarabi/hermeschi:full
+#
+# To build from source instead, also use the dev overlay:
+#   docker compose -f docker-compose.yml -f docker-compose.full.yml -f docker-compose.dev.yml up --build
+
+services:
+  hermeschi:
+    image: ghcr.io/borhandarabi/hermeschi:full
+    environment:
+      # Game module is bundled but disabled by default.
+      # Users can enable it in Settings → Game.
+      VITE_ENABLE_HERMESCHIWORLD: '1'
