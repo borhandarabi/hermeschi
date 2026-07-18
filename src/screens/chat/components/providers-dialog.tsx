@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ProvidersScreen } from '@/screens/settings/providers-screen'
+import { t } from '@/lib/i18n'
 
 type ProvidersDialogProps = {
   open: boolean
@@ -21,9 +22,9 @@ export function ProvidersDialog({ open, onOpenChange }: ProvidersDialogProps) {
       <DialogContent className="flex h-[min(85dvh,680px)] w-[min(640px,92vw)] max-h-[calc(100dvh-3rem)] flex-col overflow-hidden p-0">
         <div className="flex items-start justify-between border-b border-primary-200 p-4 pb-3">
           <div>
-            <DialogTitle className="mb-1 text-balance">Providers</DialogTitle>
+            <DialogTitle className="mb-1 text-balance">{t('chat.providers.dialogTitle')}</DialogTitle>
             <DialogDescription className="text-pretty">
-              Configure provider access without leaving your current page.
+              {t('chat.providers.dialogDesc')}
             </DialogDescription>
           </div>
           <DialogClose
@@ -32,7 +33,7 @@ export function ProvidersDialog({ open, onOpenChange }: ProvidersDialogProps) {
                 size="icon-sm"
                 variant="ghost"
                 className="text-primary-500 hover:bg-primary-100 dark:hover:bg-primary-800 hover:text-primary-700"
-                aria-label="Close providers dialog"
+                aria-label={t('chat.providers.closeDialog')}
               >
                 <HugeiconsIcon
                   icon={Cancel01Icon}

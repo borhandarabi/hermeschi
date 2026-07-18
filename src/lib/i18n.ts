@@ -328,6 +328,9 @@ const EN = {
   'chat.providers.use': 'Use',
   'chat.providers.using': 'In use',
   'chat.providers.close': 'Close',
+  'chat.providers.dialogTitle': 'Providers',
+  'chat.providers.dialogDesc': 'Configure provider access without leaving your current page.',
+  'chat.providers.closeDialog': 'Close providers dialog',
   // ── Chat — context bar ──────────────────────────────────────────────
   'chat.contextBar.title': 'Active context',
   'chat.contextBar.files': '{count} files',
@@ -340,6 +343,7 @@ const EN = {
   'chat.session.renameSave': 'Save',
   'chat.session.deleteTitle': 'Delete conversation',
   'chat.session.deleteDesc': 'This action cannot be undone. All messages in this conversation will be permanently removed.',
+  'chat.session.deleteConfirmDesc': 'Are you sure you want to delete "{title}"? This action cannot be undone.',
   'chat.session.deleteCta': 'Delete',
 } as const
 
@@ -671,6 +675,9 @@ const FA: LocaleTranslations = {
   'chat.providers.use': 'استفاده',
   'chat.providers.using': 'در حال استفاده',
   'chat.providers.close': 'بستن',
+  'chat.providers.dialogTitle': 'ارائه‌دهنده‌ها',
+  'chat.providers.dialogDesc': 'دسترسی به ارائه‌دهنده را بدون ترک صفحه فعلی پیکربندی کنید.',
+  'chat.providers.closeDialog': 'بستن گفتگو ارائه‌دهنده‌ها',
   // ── Chat — context bar ──────────────────────────────────────────────
   'chat.contextBar.title': 'زمینه فعال',
   'chat.contextBar.files': '{count} فایل',
@@ -683,6 +690,7 @@ const FA: LocaleTranslations = {
   'chat.session.renameSave': 'ذخیره',
   'chat.session.deleteTitle': 'حذف گفتگو',
   'chat.session.deleteDesc': 'این عمل قابل بازگشت نیست. همه پیام‌های این گفتگو برای همیشه حذف خواهند شد.',
+  'chat.session.deleteConfirmDesc': 'مطمئنید می‌خواهید «{title}» را حذف کنید؟ این عمل قابل بازگشت نیست.',
   'chat.session.deleteCta': 'حذف',
 }
 

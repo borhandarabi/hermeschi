@@ -8,6 +8,7 @@ import {
   AlertDialogRoot,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { t } from '@/lib/i18n'
 
 type SessionDeleteDialogProps = {
   open: boolean
@@ -28,14 +29,13 @@ export function SessionDeleteDialog({
     <AlertDialogRoot open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <div className="p-4">
-          <AlertDialogTitle className="mb-1">Delete Session</AlertDialogTitle>
+          <AlertDialogTitle className="mb-1">{t('chat.session.deleteTitle')}</AlertDialogTitle>
           <AlertDialogDescription className="mb-4">
-            Are you sure you want to delete "{sessionTitle}"? This action cannot
-            be undone.
+            {t('chat.session.deleteConfirmDesc', { title: sessionTitle })}
           </AlertDialogDescription>
           <div className="flex justify-end gap-2">
-            <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm}>Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={onCancel}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm}>{t('chat.session.deleteCta')}</AlertDialogAction>
           </div>
         </div>
       </AlertDialogContent>
