@@ -15,6 +15,7 @@ import {
   saveAvatarConfig,
   type AvatarConfig,
 } from '../lib/avatar-config'
+import { t } from '@/lib/i18n'
 
 type Props = {
   open: boolean
@@ -61,8 +62,8 @@ export function PlaygroundCustomizer({ open, onClose, value, onChange }: Props) 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-cyan-500/15 via-transparent to-violet-500/15 px-5 py-3">
           <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">Customize your agent</div>
-            <div className="text-base font-extrabold">Builder Workshop</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">{t('playground.customizer.headerLabel')}</div>
+            <div className="text-base font-extrabold">{t('playground.customizer.title')}</div>
           </div>
           <button onClick={onClose} className="text-white/55 hover:text-white">✕</button>
         </div>
@@ -73,7 +74,7 @@ export function PlaygroundCustomizer({ open, onClose, value, onChange }: Props) 
             <div className="relative h-[260px] w-[220px] overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-b from-cyan-500/10 to-black/40">
               <PreviewSvg cfg={cfg} />
             </div>
-            <div className="text-[10px] uppercase tracking-[0.16em] text-white/55">Quick presets</div>
+            <div className="text-[10px] uppercase tracking-[0.16em] text-white/55">{t('playground.customizer.quickPresets')}</div>
             <div className="flex flex-wrap justify-center gap-1.5">
               {Object.keys(AVATAR_PRESETS).map((id) => (
                 <button
@@ -89,41 +90,41 @@ export function PlaygroundCustomizer({ open, onClose, value, onChange }: Props) 
 
           {/* Tweaks */}
           <div className="relative z-0 space-y-4">
-            <Section label="Skin">
+            <Section label={t('playground.customizer.sectionSkin')}>
               <Swatches values={SKIN_TONES} active={cfg.skin} onPick={(v) => update('skin', v)} />
             </Section>
-            <Section label="Hair color">
+            <Section label={t('playground.customizer.sectionHairColor')}>
               <Swatches values={HAIR_COLORS} active={cfg.hair} onPick={(v) => update('hair', v)} />
             </Section>
-            <Section label="Hair style">
+            <Section label={t('playground.customizer.sectionHairStyle')}>
               <Toggles values={HAIR_STYLES} active={cfg.hairStyle} onPick={(v) => update('hairStyle', v)} />
             </Section>
-            <Section label="Eyes">
+            <Section label={t('playground.customizer.sectionEyes')}>
               <Swatches values={EYE_COLORS} active={cfg.eyes} onPick={(v) => update('eyes', v)} />
             </Section>
-            <Section label="Outfit">
+            <Section label={t('playground.customizer.sectionOutfit')}>
               <Swatches values={OUTFIT_COLORS} active={cfg.outfit} onPick={(v) => update('outfit', v)} />
             </Section>
-            <Section label="Outfit accent">
+            <Section label={t('playground.customizer.sectionOutfitAccent')}>
               <Swatches values={ACCENT_COLORS} active={cfg.outfitAccent} onPick={(v) => update('outfitAccent', v)} />
             </Section>
-            <Section label="Cape">
+            <Section label={t('playground.customizer.sectionCape')}>
               <Swatches values={['#0891b2', '#7c3aed', '#b45309', '#166534', '#7c2d12', '#1f2937', '#fb7185', 'transparent']} active={cfg.cape} onPick={(v) => update('cape', v)} />
             </Section>
-            <Section label="Helmet">
+            <Section label={t('playground.customizer.sectionHelmet')}>
               <Toggles values={HELMETS} active={cfg.helmet} onPick={(v) => update('helmet', v)} />
             </Section>
-            <Section label="Weapon">
+            <Section label={t('playground.customizer.sectionWeapon')}>
               <Toggles values={WEAPONS} active={cfg.weapon} onPick={(v) => update('weapon', v)} />
             </Section>
-            <Section label="Avatar portrait">
+            <Section label={t('playground.customizer.sectionPortrait')}>
               <Toggles values={PORTRAITS} active={cfg.portrait} onPick={(v) => update('portrait', v)} />
             </Section>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-2 border-t border-white/10 bg-black/40 px-5 py-3">
-          <div className="text-[10px] uppercase tracking-[0.16em] text-white/45">Saved automatically</div>
+          <div className="text-[10px] uppercase tracking-[0.16em] text-white/45">{t('playground.customizer.savedAuto')}</div>
           <div className="flex gap-2">
             <button
               onClick={() => {
@@ -133,13 +134,13 @@ export function PlaygroundCustomizer({ open, onClose, value, onChange }: Props) 
               }}
               className="rounded-lg border border-white/15 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-white/75 hover:bg-white/5"
             >
-              Reset
+              {t('playground.customizer.reset')}
             </button>
             <button
               onClick={onClose}
               className="rounded-lg border border-cyan-400/50 bg-cyan-400/15 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-100 hover:bg-cyan-400/25"
             >
-              Done
+              {t('playground.customizer.done')}
             </button>
           </div>
         </div>

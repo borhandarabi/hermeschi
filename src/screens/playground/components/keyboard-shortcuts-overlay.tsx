@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react'
 import { t } from '@/lib/i18n'
 
 export const SHORTCUTS = [
-  ['WASD/arrows', 'move'],
-  ['Shift', 'run'],
-  ['Space', 'jump'],
-  ['Ctrl', 'crouch'],
-  ['E', 'interact / talk'],
-  ['Tab', 'party'],
-  ['I', 'inventory'],
-  ['M', 'map'],
-  ['K', 'skills'],
-  ['N', 'noticeboard / quests'],
-  ['C', 'character'],
-  ['Esc', 'settings'],
-  ['Enter', 'chat'],
-  ['/', 'commands'],
-  ['?', 'help'],
+  ['WASD/arrows', 'playground.shortcuts.actionMove'],
+  ['Shift', 'playground.shortcuts.actionRun'],
+  ['Space', 'playground.shortcuts.actionJump'],
+  ['Ctrl', 'playground.shortcuts.actionCrouch'],
+  ['E', 'playground.shortcuts.actionInteract'],
+  ['Tab', 'playground.shortcuts.actionParty'],
+  ['I', 'playground.shortcuts.actionInventory'],
+  ['M', 'playground.shortcuts.actionMap'],
+  ['K', 'playground.shortcuts.actionSkills'],
+  ['N', 'playground.shortcuts.actionNoticeboard'],
+  ['C', 'playground.shortcuts.actionCharacter'],
+  ['Esc', 'playground.shortcuts.actionSettings'],
+  ['Enter', 'playground.shortcuts.actionChat'],
+  ['/', 'playground.shortcuts.actionCommands'],
+  ['?', 'playground.shortcuts.actionHelp'],
 ] as const
 
 export function isTypingTarget(target: EventTarget | null) {
@@ -62,21 +62,21 @@ export function KeyboardShortcutsOverlay() {
       >
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-200/70">HermesWorld</div>
-            <h2 className="text-xl font-black text-[#F1C56D]">Keyboard Shortcuts</h2>
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-200/70">{t('playground.shortcuts.headerLabel')}</div>
+            <h2 className="text-xl font-black text-[#F1C56D]">{t('playground.shortcuts.headerTitle')}</h2>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
             className="rounded-xl border border-amber-200/25 bg-white/5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white/70 hover:bg-white/10"
           >
-            Esc
+            {t('playground.shortcuts.escButton')}
           </button>
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
-          {SHORTCUTS.map(([key, action]) => (
+          {SHORTCUTS.map(([key, actionKey]) => (
             <div key={key} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
-              <span className="text-sm text-white/78">{action}</span>
+              <span className="text-sm text-white/78">{t(actionKey)}</span>
               <kbd className="rounded-md border border-amber-200/30 bg-black/45 px-2 py-1 text-[11px] font-black text-amber-100">{key}</kbd>
             </div>
           ))}

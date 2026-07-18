@@ -32,18 +32,34 @@ function LazyPanelBoundary({ children }: { children: ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>
 }
 
+function worldNameKey(id: PlaygroundWorldId): string {
+  switch (id) {
+    case 'training':
+      return t('playground.world.training.name')
+    case 'agora':
+      return t('playground.world.agora.name')
+    case 'forge':
+      return t('playground.world.forge.name')
+    case 'grove':
+      return t('playground.world.grove.name')
+    case 'oracle':
+      return t('playground.world.oracle.name')
+    case 'arena':
+      return t('playground.world.arena.name')
+  }
+}
+
 const WORLD_META: Record<PlaygroundWorldId, { name: string; accent: string }> = {
-  training: { name: 'Training Grounds', accent: '#5eead4' },
-  agora: { name: 'Agora Commons', accent: '#d9b35f' },
-  forge: { name: 'The Forge', accent: '#22d3ee' },
-  grove: { name: 'The Grove', accent: '#34d399' },
-  oracle: { name: 'Oracle Temple', accent: '#a78bfa' },
-  arena: { name: 'Benchmark Arena', accent: '#fb7185' },
+  training: { name: '', accent: '#5eead4' },
+  agora: { name: '', accent: '#d9b35f' },
+  forge: { name: '', accent: '#22d3ee' },
+  grove: { name: '', accent: '#34d399' },
+  oracle: { name: '', accent: '#a78bfa' },
+  arena: { name: '', accent: '#fb7185' },
 }
 
 const FORGE_INTRO_STORAGE_KEY = 'hermes-playground-forge-intro-seen'
-const FORGE_FALLBACK_FLAVOR =
-  'The Forge wakes with a lattice of cyan sparks as half-finished tools hum themselves into being around you.'
+const FORGE_FALLBACK_FLAVOR = t('playground.world.forgeFallbackFlavor')
 
 type ForgeIntroState =
   | { open: false; flavor: string; loading: false }
@@ -367,7 +383,7 @@ export function PlaygroundScreen() {
     addChatMessage({
       id: `${ts}-${Math.random()}`,
       authorId: 'self',
-      authorName: rpg.state.playerProfile.displayName || 'You',
+      authorName: rpg.state.playerProfile.displayName || t('playground.player.you'),
       body,
       ts,
       color: '#a7f3d0',
@@ -390,7 +406,7 @@ export function PlaygroundScreen() {
   function handleIncomingChat(msg: { id: string; name: string; color: string; text: string; ts: number }) {
     // Defensive: never accept a chat that we sent ourselves — the server tries
     // to filter, but old chat ring entries from previous selfIds can leak.
-    if (msg.name === (rpg.state.playerProfile.displayName || 'You')) return
+    if (msg.name === (rpg.state.playerProfile.displayName || t('playground.player.you'))) return
     addChatMessage({
       id: `${msg.ts}-${msg.id}`,
       authorId: msg.id,
@@ -569,14 +585,14 @@ export function PlaygroundScreen() {
           onQuestZone={handleQuestZone}
           onNpcNearChange={setNearbyNpc}
           botBubbles={botBubbles}
-          playerName={rpg.state.playerProfile.displayName || 'Builder'}
+          playerName={rpg.state.playerProfile.displayName || t('playground.player.defaultName')}
           playerAvatar={rpg.state.playerProfile.avatarConfig}
           playerAccent={equippedVisuals.accent}
           playerCape={equippedVisuals.cape}
           playerArtifact={equippedVisuals.artifact}
           playerWeapon={equippedVisuals.weapon}
           playerHelmet={equippedVisuals.helmet}
-          portalLabel={world === 'training' ? 'Forge Gate' : 'World Portal'}
+          portalLabel={world === 'training' ? t('playground.portal.forgeGate') : t('playground.portal.worldPortal')}
           portalLocked={world === 'training' && !forgeUnlocked}
           multiplayerName={rpg.state.playerProfile.displayName || undefined}
           monsterHp={monsterHp}
@@ -666,8 +682,8 @@ export function PlaygroundScreen() {
         <FpsCounter enabled={settings.performance.fpsCounter} />
         <PlaygroundHud
           state={rpg.state}
-          activeQuestTitle={activeQuest?.title ?? 'Training Complete'}
-          objectiveLabel={currentObjective?.label ?? 'Forge Gate unlocked. Keep exploring the Playground.'}
+          activeQuestTitle={activeQuest?.title ?? t('playground.hud.activeQuestFallback')}
+          objectiveLabel={currentObjective?.label ?? t('playground.hud.objectiveFallback')}
           objectiveHint={currentObjective?.hint}
           objectiveTarget={currentObjective?.target ?? null}
           levelProgress={rpg.levelProgress}
@@ -711,8 +727,8 @@ export function PlaygroundScreen() {
         <button
           type="button"
           onClick={() => setFocusMode((v) => !v)}
-          aria-label={focusMode ? 'Exit focus mode (F or Esc)' : 'Focus mode — hide side rail (F)'}
-          title={focusMode ? 'Exit focus mode (F or Esc)' : 'Focus mode — hide side rail (F)'}
+          aria-label={focusMode ? t('playground.focus.exitTitle') : t('playground.focus.enterTitle')}
+          title={focusMode ? t('playground.focus.exitTitle') : t('playground.focus.enterTitle')}
           className="pointer-events-auto fixed right-3 top-[230px] z-[71] hidden h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-[16px] text-white shadow-xl backdrop-blur-xl md:flex"
           style={{
             boxShadow: focusMode ? `0 0 14px ${WORLD_META[world].accent}88` : '0 8px 22px rgba(0,0,0,.55)',
@@ -727,7 +743,7 @@ export function PlaygroundScreen() {
           type="button"
           onClick={() => setSettingsOpen(true)}
           aria-label={t('playground.settings.graphics')}
-          title="Settings (Esc)"
+          title={t('playground.settings.openTitle')}
           className="pointer-events-auto fixed right-3 top-[314px] z-[71] hidden h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-[15px] text-white shadow-xl backdrop-blur-xl md:flex"
           style={{ boxShadow: '0 8px 22px rgba(0,0,0,.55)', borderColor: 'rgba(241,197,109,0.42)' }}
         >
@@ -736,8 +752,8 @@ export function PlaygroundScreen() {
         <button
           type="button"
           onClick={toggleAdminMode}
-          aria-label={adminMode ? 'Hide admin panel' : 'Show admin panel'}
-          title={adminMode ? 'Hide admin panel' : 'Show admin panel'}
+          aria-label={adminMode ? t('playground.admin.hide') : t('playground.admin.show')}
+          title={adminMode ? t('playground.admin.hide') : t('playground.admin.show')}
           className="pointer-events-auto fixed right-3 top-[314px] z-[71] hidden h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-[15px] text-white shadow-xl backdrop-blur-xl md:flex"
           style={{
             boxShadow: adminMode ? '0 0 14px rgba(251,191,36,0.55)' : '0 8px 22px rgba(0,0,0,.55)',
@@ -754,7 +770,7 @@ export function PlaygroundScreen() {
           onClick={() => setMobileMenuOpen(true)}
           className="pointer-events-auto fixed right-3 top-12 z-[72] rounded-full border border-white/15 bg-black/70 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-xl backdrop-blur-xl md:hidden"
           >
-          Menu
+          {t('playground.menu.open')}
         </button>
         <KeyboardShortcutsOverlay />
         <MobileAbilityControls />
@@ -838,12 +854,12 @@ function PlaygroundRightRail({
 }: PlaygroundRightRailProps) {
   const hudAccent = accent === '#d9b35f' ? '#F1C56D' : accent
   const railItems: Array<{ label: string; glyph: string; onClick: () => void; active?: boolean }> = [
-    { label: focusMode ? 'Exit focus' : 'Sigil focus', glyph: '☤', onClick: onToggleFocus, active: focusMode },
-    { label: 'Inventory', glyph: '▣', onClick: onOpenInventory },
-    { label: 'Quest scroll', glyph: '?', onClick: onOpenJournal },
-    { label: 'Map', glyph: '◇', onClick: onOpenMap },
-    { label: 'Settings', glyph: '⚙', onClick: onOpenSettings },
-    { label: adminMode ? 'Hide admin' : 'Admin shield', glyph: '⌂', onClick: onToggleAdmin, active: adminMode },
+    { label: focusMode ? t('playground.rail.exitFocus') : t('playground.rail.sigilFocus'), glyph: '☤', onClick: onToggleFocus, active: focusMode },
+    { label: t('playground.rail.inventory'), glyph: '▣', onClick: onOpenInventory },
+    { label: t('playground.rail.questScroll'), glyph: '?', onClick: onOpenJournal },
+    { label: t('playground.rail.map'), glyph: '◇', onClick: onOpenMap },
+    { label: t('playground.rail.settings'), glyph: '⚙', onClick: onOpenSettings },
+    { label: adminMode ? t('playground.rail.hideAdmin') : t('playground.rail.adminShield'), glyph: '⌂', onClick: onToggleAdmin, active: adminMode },
   ]
   return (
     <div
@@ -892,7 +908,7 @@ function MobileAbilityControls() {
         onClick={jump}
         className="pointer-events-auto fixed bottom-[138px] right-4 z-[74] h-14 w-14 rounded-full border-2 border-amber-200/40 bg-black/72 text-[11px] font-black uppercase tracking-[0.12em] text-amber-100 shadow-2xl backdrop-blur-xl md:hidden"
       >
-        Jump
+        {t('playground.mobile.jump')}
       </button>
       <button
         type="button"
@@ -900,7 +916,7 @@ function MobileAbilityControls() {
         className="pointer-events-auto fixed bottom-[104px] left-4 z-[74] rounded-full border border-white/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-xl backdrop-blur-xl md:hidden"
         style={{ background: crouching ? 'rgba(241,197,109,.24)' : 'rgba(0,0,0,.68)', borderColor: crouching ? 'rgba(241,197,109,.55)' : 'rgba(255,255,255,.15)' }}
       >
-        {crouching ? 'Crouch on' : 'Crouch'}
+        {crouching ? t('playground.mobile.crouchOn') : t('playground.mobile.crouch')}
       </button>
     </>
   )
@@ -910,13 +926,13 @@ function OnboardingHintCard({ open }: { open: boolean }) {
   if (!open) return null
   return (
     <div className="pointer-events-none fixed left-1/2 top-[108px] z-[92] w-[min(92vw,420px)] -translate-x-1/2 rounded-2xl border border-amber-200/35 bg-black/76 p-3 text-white shadow-2xl backdrop-blur-xl">
-      <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-200/70">Training hint</div>
-      <div className="mt-1 text-sm font-black text-[#F1C56D]">Move • Talk • Jump • Crouch</div>
+      <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-200/70">{t('playground.onboarding.label')}</div>
+      <div className="mt-1 text-sm font-black text-[#F1C56D]">{t('playground.onboarding.title')}</div>
       <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-white/72">
-        <span><kbd className="text-amber-100">WASD</kbd> Move</span>
-        <span><kbd className="text-amber-100">E</kbd> Talk</span>
-        <span><kbd className="text-amber-100">Space</kbd> Jump</span>
-        <span><kbd className="text-amber-100">Ctrl</kbd> Crouch</span>
+        <span><kbd className="text-amber-100">WASD</kbd> {t('playground.onboarding.move')}</span>
+        <span><kbd className="text-amber-100">E</kbd> {t('playground.onboarding.talk')}</span>
+        <span><kbd className="text-amber-100">Space</kbd> {t('playground.onboarding.jump')}</span>
+        <span><kbd className="text-amber-100">Ctrl</kbd> {t('playground.onboarding.crouch')}</span>
       </div>
     </div>
   )
@@ -977,8 +993,8 @@ function TitleScreen({
               }}
             >
               <span style={{ color: '#facc15' }}>✦</span>
-              Hermes Agent Realm
-              <span className="opacity-60">· Nous Research × Kimi</span>
+              {t('playground.title.realm')}
+              <span className="opacity-60">· {t('playground.title.subtitle')}</span>
             </div>
             <img
               src="/assets/hermesworld/art/hermesworld-logo-horizontal.svg"
@@ -1012,14 +1028,14 @@ function TitleScreen({
               className="mt-2 text-[10px] font-bold uppercase tracking-[0.45em]"
               style={{ color: 'rgba(245, 217, 122, 0.7)' }}
             >
-              — the agent MMO —
+              {t('playground.title.tagline')}
             </div>
             <p className="mt-5 max-w-[560px] text-[15px] leading-relaxed text-white/72">
               {displayName.trim().length === 0
-                ? 'Step into a shared world of Hermes agents. Train, build, and quest with builders worldwide.'
+                ? t('playground.title.descEmpty')
                 : tutorialComplete
-                  ? `Welcome back, ${displayName}. Six worlds await.`
-                  : `${displayName}, your training awaits. Six worlds. One builder. Forge your path.`}
+                  ? t('playground.title.descReturning', { name: displayName })
+                  : t('playground.title.descNew', { name: displayName })}
             </p>
           </div>
         </div>
@@ -1039,7 +1055,7 @@ function TitleScreen({
                 className="text-[10px] font-bold uppercase tracking-[0.22em]"
                 style={{ color: '#fde68a' }}
               >
-                ❖ Identify Yourself
+                ❖ {t('playground.title.identify')}
               </div>
               <input
                 value={displayName}
@@ -1060,7 +1076,7 @@ function TitleScreen({
                     background: 'rgba(255,255,255,0.03)',
                   }}
                 >
-                  🎭 Customize Avatar
+                  {t('playground.title.customizeAvatar')}
                 </button>
                 <button
                   type="button"
@@ -1076,14 +1092,14 @@ function TitleScreen({
                       : 'none',
                   }}
                 >
-                  Enter the Realm
+                  {t('playground.title.enterRealm')}
                 </button>
               </div>
             </div>
             <div className="grid gap-2 text-[12px] sm:grid-cols-3">
-              <PremiumFeatureCard icon="❁" title="Six Worlds" desc="Training Grounds → Forge → Arena" />
-              <PremiumFeatureCard icon="⛔" title="Live Multiplayer" desc="Walk with builders worldwide" />
-              <PremiumFeatureCard icon="🔮" title="Hermes Skills" desc="Promptcraft · Memory · Diplomacy" />
+              <PremiumFeatureCard icon="❁" title={t('playground.title.featureSixWorlds')} desc={t('playground.title.featureSixWorldsDesc')} />
+              <PremiumFeatureCard icon="⛔" title={t('playground.title.featureMultiplayer')} desc={t('playground.title.featureMultiplayerDesc')} />
+              <PremiumFeatureCard icon="🔮" title={t('playground.title.featureSkills')} desc={t('playground.title.featureSkillsDesc')} />
             </div>
           </div>
 
@@ -1095,15 +1111,15 @@ function TitleScreen({
             }}
           >
             <div className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: 'rgba(34,211,238,0.85)' }}>
-              ◈ Your Path
+              ◈ {t('playground.title.yourPath')}
             </div>
             <ol className="mt-4 space-y-3 text-[13px]">
               {[
-                'Meet Athena. Claim the Hermes Sigil.',
-                'Equip your kit at the Quartermaster.',
-                'Send your first chat message.',
-                'Visit the Archive Podium.',
-                'Pass through the Forge Gate.',
+                t('playground.title.path1'),
+                t('playground.title.path2'),
+                t('playground.title.path3'),
+                t('playground.title.path4'),
+                t('playground.title.path5'),
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span
@@ -1181,17 +1197,17 @@ function ArchiveBriefingModal({
   return (
     <div className="pointer-events-auto fixed inset-0 z-[120] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-[560px] rounded-3xl border border-violet-300/30 bg-[#070b14] p-5 text-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200/80">Archive Podium</div>
-        <div className="mt-1 text-xl font-extrabold">Docs and Memory Loop</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200/80">{t('playground.archive.label')}</div>
+        <div className="mt-1 text-xl font-extrabold">{t('playground.archive.title')}</div>
         <div className="mt-4 space-y-3 text-sm text-white/80">
-          <p><strong>Docs:</strong> `docs/playground/README.md` explains the worlds, systems, and multiplayer wiring.</p>
-          <p><strong>Memory:</strong> Hermes saves project intent in `memory/goals/...` so the next iteration starts with context, recall, and less drift.</p>
-          <p><strong>Builder habit:</strong> read the spec, inspect the state shape, ship the smallest slice, then verify with a clean build.</p>
+          <p>{t('playground.archive.docsLine')}</p>
+          <p>{t('playground.archive.memoryLine')}</p>
+          <p>{t('playground.archive.habitLine')}</p>
         </div>
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white/70 hover:bg-white/5">Close</button>
+          <button onClick={onClose} className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white/70 hover:bg-white/5">{t('playground.archive.close')}</button>
           <button onClick={onAcknowledge} className="rounded-xl border border-violet-300/40 bg-violet-400/15 px-4 py-2 text-sm font-bold text-violet-100 hover:bg-violet-400/25">
-            Mark Briefing Read
+            {t('playground.archive.acknowledge')}
           </button>
         </div>
       </div>
@@ -1212,24 +1228,24 @@ function TutorialCompleteModal({
   return (
     <div className="pointer-events-auto fixed inset-0 z-[120] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-[520px] rounded-3xl border border-cyan-300/35 bg-[#070b14] p-5 text-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">Training Complete</div>
-        <div className="mt-1 text-xl font-extrabold">Initiate Builder</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">{t('playground.tutorialComplete.label')}</div>
+        <div className="mt-1 text-xl font-extrabold">{t('playground.tutorialComplete.title')}</div>
         <div className="mt-3 space-y-2 text-sm text-white/80">
-          <p>You learned the full builder loop:</p>
+          <p>{t('playground.tutorialComplete.intro')}</p>
           <ul className="space-y-1 text-white/72">
-            <li>Movement through the grounds</li>
-            <li>Starter gear and loadout basics</li>
-            <li>Local chat and nearby builders</li>
-            <li>Docs, memory, and briefing recall</li>
-            <li>How Hermes turns prompts into builds</li>
+            <li>{t('playground.tutorialComplete.step1')}</li>
+            <li>{t('playground.tutorialComplete.step2')}</li>
+            <li>{t('playground.tutorialComplete.step3')}</li>
+            <li>{t('playground.tutorialComplete.step4')}</li>
+            <li>{t('playground.tutorialComplete.step5')}</li>
           </ul>
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white/70 hover:bg-white/5">
-            Later
+            {t('playground.tutorialComplete.later')}
           </button>
           <button onClick={onStepThroughForgeGate} className="rounded-xl border border-cyan-300/40 bg-cyan-400/15 px-4 py-2 text-sm font-bold text-cyan-100 hover:bg-cyan-400/25">
-            Step through the Forge Gate
+            {t('playground.tutorialComplete.stepThrough')}
           </button>
         </div>
       </div>
@@ -1250,10 +1266,10 @@ function ForgeArrivalOverlay({
   return (
     <div className="pointer-events-none fixed inset-0 z-[118] flex items-center justify-center bg-[#030712]/78 p-4 backdrop-blur-md">
       <div className="w-full max-w-[560px] rounded-3xl border border-cyan-300/30 bg-[#07131a]/92 p-6 text-center text-white shadow-2xl">
-        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">Forge Gate</div>
-        <div className="mt-2 text-2xl font-extrabold text-cyan-100">Generating world...</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">{t('playground.forgeArrival.label')}</div>
+        <div className="mt-2 text-2xl font-extrabold text-cyan-100">{t('playground.forgeArrival.title')}</div>
         <div className="mt-4 text-sm text-white/76">
-          {loading ? 'Pan is hardening the first blueprint into a playable space.' : flavor}
+          {loading ? t('playground.forgeArrival.loading') : flavor}
         </div>
       </div>
     </div>
@@ -1272,7 +1288,7 @@ function NearbyBuildersChip({ players }: { players: Array<RemotePlayer> }) {
       className="pointer-events-auto fixed top-[210px] z-[70] hidden w-[220px] rounded-2xl border border-white/15 bg-black/65 p-2 text-white shadow-2xl backdrop-blur-xl md:block"
       style={{ left: chromeLeft }}
     >
-      <div className="mb-1 px-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">Builders Nearby</div>
+      <div className="mb-1 px-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">{t('playground.buildersNearby.label')}</div>
       <div className="space-y-1">
         {players.map((player) => (
           <button
@@ -1290,7 +1306,7 @@ function NearbyBuildersChip({ players }: { players: Array<RemotePlayer> }) {
               <span className="text-[11px] font-semibold">{player.name}</span>
             </span>
             <span className="text-[9px] uppercase tracking-[0.12em] text-white/40">
-              {pingedId === player.id ? 'pinged' : 'ping'}
+              {pingedId === player.id ? t('playground.buildersNearby.pinged') : t('playground.buildersNearby.ping')}
             </span>
           </button>
         ))}
@@ -1337,7 +1353,7 @@ function CameraPresetToast() {
   if (!name) return null
   return (
     <div className="pointer-events-none fixed left-1/2 top-[88px] z-[85] w-[min(86vw,360px)] -translate-x-1/2">
-      <Toast title="Camera preset" rarity="common" icon="🎬">
+      <Toast title={t('playground.cameraPreset.title')} rarity="common" icon="🎬">
         {name}
       </Toast>
     </div>
@@ -1345,16 +1361,16 @@ function CameraPresetToast() {
 }
 
 const HERMES_LORE_LINES = [
-  'Hermes carried prompts between the gods of Olympus and the builders of Earth.',
-  'A Hermes Agent is just a fast, faithful messenger — with memory.',
-  'Promptcraft is the first skill. Diplomacy is the last.',
-  'Build small. Ship now. Iterate at the speed of intent.',
-  'Memory turns moments into a story. Story turns a tool into a teammate.',
-  'The Forge is where prompts harden into tools. The Arena is where they earn their keep.',
-  'Six worlds. One builder. Forge your path.',
-  'Every NPC here teaches a real Hermes Agent skill. Listen.',
-  'Routing is the art of choosing the right tool, the right model, the right moment.',
-  'You are not alone. The Agora is full of builders walking the same road.',
+  t('playground.lore.1'),
+  t('playground.lore.2'),
+  t('playground.lore.3'),
+  t('playground.lore.4'),
+  t('playground.lore.5'),
+  t('playground.lore.6'),
+  t('playground.lore.7'),
+  t('playground.lore.8'),
+  t('playground.lore.9'),
+  t('playground.lore.10'),
 ]
 
 /** Loading screen shown during world transitions — rotating Hermes lore + spinner. */
@@ -1378,7 +1394,7 @@ function TransitionLoadingScreen({ active, worldName }: { active: boolean; world
           className="text-[12px] font-bold uppercase tracking-[0.45em]"
           style={{ color: 'rgba(245, 217, 122, 0.7)' }}
         >
-          — entering —
+          {t('playground.transition.entering')}
         </div>
         <div
           className="text-[44px] leading-none font-black"
@@ -1428,13 +1444,13 @@ function PlaygroundHelpHud({ worldName }: { worldName: string }) {
       <button
         onClick={() => setOpen((value) => !value)}
         className="flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-black/55 text-[12px] font-bold text-white/80 hover:bg-white/10"
-        title="Show controls"
+        title={t('playground.helpHud.showControls')}
       >
         ?
       </button>
       {open && (
         <div className="rounded-xl border border-white/10 bg-black/85 px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-white/80 backdrop-blur-xl">
-          Click ground = walk · Click NPC = talk · WASD · Shift sprint · 1 Strike · 2 Dash · 3 Bolt · 4 Summon · E talk · J journal · M map · T chat · F focus · Drag mouse to rotate camera
+          {t('playground.helpHud.controlsLine')}
         </div>
       )}
     </div>
@@ -1494,49 +1510,49 @@ function PlaygroundUtilityDock({
       <button
         onClick={captureScreenshot}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title="Screenshot the world (PNG)"
+        title={t('playground.utility.screenshot')}
       >
         📸
       </button>
       <button
         onClick={toggleFullscreen}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+        title={isFullscreen ? t('playground.utility.exitFullscreen') : t('playground.utility.enterFullscreen')}
       >
         {isFullscreen ? '⤢' : '⛶'}
       </button>
       <button
         onClick={copyShareLink}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title="Copy share link"
+        title={t('playground.utility.copyShare')}
       >
         🔗
       </button>
       <button
         onClick={onReplayNarration}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title="Replay world narration"
+        title={t('playground.utility.replayNarration')}
       >
         📢
       </button>
       <button
         onClick={onToggleNarration}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title={narrationMuted ? 'Unmute narration' : 'Mute narration'}
+        title={narrationMuted ? t('playground.utility.unmuteNarration') : t('playground.utility.muteNarration')}
       >
         {narrationMuted ? '🔇' : '🗣️'}
       </button>
       <button
         onClick={onToggleAudio}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title={audioMuted ? 'Unmute audio' : 'Mute audio'}
+        title={audioMuted ? t('playground.utility.unmuteAudio') : t('playground.utility.muteAudio')}
       >
         {audioMuted ? '🔇' : '🔊'}
       </button>
       <button
         onClick={onCustomize}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/65 text-base text-cyan-100 backdrop-blur-xl hover:bg-cyan-400/20"
-        title="Customize avatar (C)"
+        title={t('playground.utility.customizeAvatar')}
       >
         👤
       </button>
@@ -1548,10 +1564,10 @@ function RouteFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#050b12] p-6 text-white">
       <div className="max-w-[520px] rounded-3xl border border-amber-300/25 bg-[#070b14] p-5 shadow-2xl">
-        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-200/80">HermesWorld</div>
-        <div className="mt-1 text-xl font-extrabold">Route fallback active</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-200/80">{t('playground.fallback.label')}</div>
+        <div className="mt-1 text-xl font-extrabold">{t('playground.fallback.title')}</div>
         <p className="mt-3 text-sm text-white/75">
-          The 3D route failed to render in this browser context. Reload the page or open `/agora` for the lightweight fallback.
+          {t('playground.fallback.desc')}
         </p>
       </div>
     </div>

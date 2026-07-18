@@ -75,15 +75,15 @@ function PlaygroundChatInner({ worldId, messages, onSend, collapsed = false, onT
   const visibleMessages = useMemo(() => (filter === 'humans' ? humanMessages : filter === 'npcs' ? npcMessages : messages), [filter, humanMessages, messages, npcMessages])
   const onlineCount = serverOnline != null && liveConnected ? serverOnline : 1 + npcCount
   const onlineLabel = serverOnline != null && liveConnected
-    ? `${onlineCount} player${onlineCount === 1 ? '' : 's'}`
-    : `${onlineCount} online`
+    ? (onlineCount === 1 ? t('playground.chat.playersSingular', { count: onlineCount }) : t('playground.chat.playersPlural', { count: onlineCount }))
+    : t('playground.chat.onlineSuffix', { count: onlineCount })
   const transportLabel = transport === 'ws' || transport === 'both'
-    ? 'live'
+    ? t('playground.chat.transportLive')
     : transport === 'broadcast'
-      ? 'local-only'
+      ? t('playground.chat.transportLocal')
       : transport === 'offline'
-        ? 'offline'
-        : 'connecting'
+        ? t('playground.chat.transportOffline')
+        : t('playground.chat.transportConnecting')
   const visiblyCollapsed = collapsed && !softExpanded
   return (
     <div
@@ -101,8 +101,8 @@ function PlaygroundChatInner({ worldId, messages, onSend, collapsed = false, onT
             style={{ background: liveConnected ? '#34d399' : '#facc15' }}
             title={transportLabel}
           />
-          Chat · {onlineLabel}
-          {npcCount > 0 && <span className="text-white/35"> · {npcCount} ambient NPC</span>}
+          {t('playground.chat.headerLabel')} · {onlineLabel}
+          {npcCount > 0 && <span className="text-white/35"> · {npcCount} {t('playground.chat.ambientNpc')}</span>}
           <span className="ml-1 rounded border border-white/15 bg-white/5 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.14em] text-white/45">
             {transportLabel}
           </span>
@@ -117,15 +117,15 @@ function PlaygroundChatInner({ worldId, messages, onSend, collapsed = false, onT
       {!visiblyCollapsed && (
         <>
           <div className="flex items-center gap-1 border-b border-white/8 px-2 py-1.5">
-            <FilterButton active={filter === 'all'} onClick={() => setFilter('all')} label="All" count={messages.length} />
-            <FilterButton active={filter === 'humans'} onClick={() => setFilter('humans')} label="Humans" count={humanMessages.length} />
-            <FilterButton active={filter === 'npcs'} onClick={() => setFilter('npcs')} label="NPC" count={npcMessages.length} />
-            <span className="ml-auto text-[9px] text-white/32">NPC flavor is local, not analytics</span>
+            <FilterButton active={filter === 'all'} onClick={() => setFilter('all')} label={t('playground.chat.filterAll')} count={messages.length} />
+            <FilterButton active={filter === 'humans'} onClick={() => setFilter('humans')} label={t('playground.chat.filterHumans')} count={humanMessages.length} />
+            <FilterButton active={filter === 'npcs'} onClick={() => setFilter('npcs')} label={t('playground.chat.filterNpc')} count={npcMessages.length} />
+            <span className="ml-auto text-[9px] text-white/32">{t('playground.chat.flavorHint')}</span>
           </div>
           <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-3 py-2 text-[12px] leading-snug">
             {visibleMessages.length === 0 ? (
               <div className="text-center text-white/40">
-                {filter === 'humans' ? 'No human chat yet — say hi 👋' : filter === 'npcs' ? 'No ambient NPC lines yet.' : 'No messages yet — say hi 👋'}
+                {filter === 'humans' ? t('playground.chat.emptyHumans') : filter === 'npcs' ? t('playground.chat.emptyNpcs') : t('playground.chat.emptyAll')}
               </div>
             ) : (
               visibleMessages.map((m) => {
@@ -134,7 +134,7 @@ function PlaygroundChatInner({ worldId, messages, onSend, collapsed = false, onT
                   <div key={m.id} className={`mb-1.5 rounded-lg px-1.5 py-1 ${isBot ? 'bg-purple-300/[0.035] text-white/72' : 'bg-cyan-300/[0.045]'}`}>
                     {isBot && (
                       <span className="mr-1 rounded bg-purple-400/15 px-1 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-purple-200">
-                        Ambient NPC
+                        {t('playground.chat.botBadge')}
                       </span>
                     )}
                     <span className="font-semibold" style={{ color: m.color ?? 'white' }}>
@@ -167,7 +167,7 @@ function PlaygroundChatInner({ worldId, messages, onSend, collapsed = false, onT
               disabled={!draft.trim()}
               className="rounded-lg bg-cyan-300 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-black disabled:opacity-40"
             >
-              Send
+              {t('playground.chat.sendButton')}
             </button>
           </form>
         </>
