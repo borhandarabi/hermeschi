@@ -1,11 +1,10 @@
-# Agent Pairing Guide — Workspace ↔ Hermes Agent
+# راهنمای جفت‌سازی عامل — Workspace ↔ Hermes Agent
 
-> **Audience:** AI agents helping users set up HermesChi.
-> Run these steps in order. Each step has a verification command. Do not skip
-> ahead, and do not start a second gateway until the current one fails the
-> checks below.
+> **مخاطب:** عامل‌های هوش مصنوعی که به کاربران در راه‌اندازی HermesChi کمک می‌کنند.
+> این مراحل را به‌ترتیب اجرا کنید. هر مرحله یک دستور راستی‌آزمایی دارد. جلو نپرید،
+> و تا زمانی که دروازهٔ فعلی بررسی‌های زیر را شکست ندهد، دروازهٔ دومی شروع نکنید.
 
-## Architecture (30-second version)
+## معماری (نسخهٔ ۳۰ ثانیه‌ای)
 
 ```
 ┌─────────────────┐       HTTP :8642        ┌──────────────────┐
@@ -16,35 +15,35 @@
 └─────────────────┘                        └──────────────────┘
 ```
 
-Workspace talks to Hermes Agent over HTTP. No WebSocket. No magic.
+Workspace از طریق HTTP با Hermes Agent صحبت می‌کند. بدون WebSocket. بدون جادو.
 
-A fully paired local setup has two services:
+یک راه‌اندازی محلی کاملاً جفت‌شده دو سرویس دارد:
 
-- `hermes gateway run` on **:8642** for chat, models, and streaming
-- `hermes dashboard` on **:9119** for sessions, skills, config, and jobs
+- `hermes gateway run` روی **:8642** برای گفتگو، مدل‌ها و استریم
+- `hermes dashboard` روی **:9119** برای سشن‌ها، skills، پیکربندی و jobs
 
-If `curl http://127.0.0.1:8642/health` and `curl http://127.0.0.1:9119/` both
-return successfully, they can pair.
+اگر `curl http://127.0.0.1:8642/health` و `curl http://127.0.0.1:9119/` هر دو
+با موفقیت بازگردند، می‌توانند جفت شوند.
 
 ---
 
-## Step 1 — Is hermes-agent installed?
+## مرحلهٔ ۱ — آیا hermes-agent نصب شده است؟
 
 ```bash
 hermes --version
 ```
 
-**Pass:** prints `Hermes Agent vX.Y.Z`.
-**Fail:** `command not found`.
+**گذر:** `Hermes Agent vX.Y.Z` را چاپ می‌کند.
+**شکست:** `command not found`.
 
-### Fix (if hermes-agent not installed)
+### رفع (اگر hermes-agent نصب نیست)
 
 ```bash
-# Official Nous installer — works on macOS, Linux, WSL
+# نصب‌کنندهٔ رسمی Nous — روی macOS، Linux، WSL کار می‌کند
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 ```
 
-After install, restart your shell or run:
+پس از نصب، shell خود را restart کنید یا اجرا کنید:
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 hermes --version
@@ -52,85 +51,84 @@ hermes --version
 
 ---
 
-## Step 2 — Is the API server enabled?
+## مرحلهٔ ۲ — آیا سرور API فعال است؟
 
-The gateway exposes an HTTP API on port 8642, but only if `API_SERVER_ENABLED=true`
-is set in the Hermes env file.
+دروازه یک HTTP API روی پورت 8642 ارائه می‌دهد، اما فقط در صورتی که `API_SERVER_ENABLED=true`
+در فایل env هرمس تنظیم شده باشد.
 
 ```bash
-# Find the env file
+# یافتن فایل env
 HERMES_ENV="$(hermes config env-path 2>/dev/null || echo "$HOME/.hermes/.env")"
 echo "Hermes env file: $HERMES_ENV"
 
-# Check for the key
+# بررسی کلید
 grep -i "API_SERVER" "$HERMES_ENV" 2>/dev/null || echo "NO API_SERVER KEYS FOUND"
 ```
 
-**Pass:** output includes `API_SERVER_ENABLED=true` (with underscores).
+**گذر:** خروجی شامل `API_SERVER_ENABLED=true` (با underscore) است.
 
-**Common failure — wrong env var names:**
+**شکست رایج — نام متغیرهای محیطی اشتباه:**
 ```
-# ❌ WRONG (missing underscores — gateway silently ignores these)
+# ❌ اشتباه (بدون underscore — دروازه این‌ها را به‌صورت خاموش نادیده می‌گیرد)
 APISERVERENABLED=true
 APISERVERHOST=0.0.0.0
 
-# ✅ CORRECT
+# ✅ درست
 API_SERVER_ENABLED=true
 API_SERVER_HOST=127.0.0.1
 ```
 
-> **Critical:** env var names MUST have underscores. `APISERVERENABLED` ≠
-> `API_SERVER_ENABLED`. The gateway reads exact names via `os.getenv()`.
-> Typos are silently ignored — no warning, no error, just no API server.
+> **بحرانی:** نام متغیرهای محیطی باید underscore داشته باشند. `APISERVERENABLED` ≠
+> `API_SERVER_ENABLED`. دروازه نام‌های دقیق را از طریق `os.getenv()` می‌خواند.
+> اشتباهات تایپی به‌صورت خاموش نادیده گرفته می‌شوند — بدون هشدار، بدون خطا، فقط بدون سرور API.
 
-### Fix
+### رفع
 
 ```bash
 HERMES_ENV="$(hermes config env-path 2>/dev/null || echo "$HOME/.hermes/.env")"
 mkdir -p "$(dirname "$HERMES_ENV")"
 
-# Remove any typo'd versions first
+# ابتدا نسخه‌های دارای اشتباه تایپی را حذف کنید
 sed -i.bak '/^APISERVERENABLED/d; /^APISERVERHOST/d; /^APISERVERKEY/d; /^APISERVERPORT/d' "$HERMES_ENV" 2>/dev/null || true
 
-# Write correct keys (idempotent — updates existing or appends)
+# نوشتن کلیدهای صحیح (idempotent — موجود را به‌روز می‌کند یا اضافه می‌کند)
 grep -q '^API_SERVER_ENABLED=' "$HERMES_ENV" 2>/dev/null && \
   sed -i.bak 's/^API_SERVER_ENABLED=.*/API_SERVER_ENABLED=true/' "$HERMES_ENV" || \
   echo 'API_SERVER_ENABLED=true' >> "$HERMES_ENV"
 ```
 
-**Do NOT set `API_SERVER_HOST=0.0.0.0`** unless the user explicitly wants
-network access AND sets `API_SERVER_KEY=<some-secret>`. The gateway refuses
-to bind non-loopback without a key (silent failure). Default `127.0.0.1` is
-correct for local Workspace.
+**`API_SERVER_HOST=0.0.0.0` را تنظیم نکنید** مگر آنکه کاربر صریحاً دسترسی شبکه‌ای بخواهد
+و `API_SERVER_KEY=<some-secret>` را تنظیم کند. دروازه بدون کلید از bind غیر loopback
+امتناع می‌کند (شکست خاموش). پیش‌فرض `127.0.0.1` برای Workspace محلی درست است.
 
 ---
 
-## Step 3 — Is the gateway process running?
+## مرحلهٔ ۳ — آیا فرآیند دروازه در حال اجراست؟
 
 ```bash
 pgrep -af "hermes.*gateway" || echo "NOT RUNNING"
 ```
 
-**Pass:** shows a `hermes gateway run` (or similar) process.
-**Fail:** nothing.
+**گذر:** یک فرآیند `hermes gateway run` (یا مشابه) را نشان می‌دهد.
+**شکست:** هیچ‌چیز.
 
-### Fix
+### رفع
 
 ```bash
-# Start in foreground (recommended for debugging — you see all output)
+# شروع در foreground (برای debug توصیه می‌شود — همهٔ خروجی را می‌بینید)
 hermes gateway run
 
-# OR if using systemd
-hermes gateway install   # creates the service
+# یا اگر از systemd استفاده می‌کنید
+hermes gateway install   # سرویس را ایجاد می‌کند
 systemctl --user start claude-gateway
 ```
 
-**First run:** Hermes may prompt for initial setup (provider, model). Complete
-the interactive setup before continuing.
+**اجرای نخست:** هرمس ممکن است برای راه‌اندازی اولیه (provider، model) درخواست کند. راه‌اندازی
+تعاملی را پیش از ادامه تکمیل کنید.
 
 ---
 
-## Step 4 — Is port 8642 bound?
+## مرحلهٔ ۴ — آیا پورت 8642 bind شده است؟
 
 ```bash
 # Linux / WSL
@@ -139,32 +137,32 @@ ss -tlnp | grep 8642 || echo "PORT NOT BOUND"
 # macOS
 lsof -iTCP:8642 -sTCP:LISTEN || echo "PORT NOT BOUND"
 
-# Universal fallback
+# fallback عمومی
 curl -sf http://127.0.0.1:8642/health && echo "OK" || echo "NOT REACHABLE"
 ```
 
-**Pass:** port is bound AND `curl /health` returns `{"status": "ok", "platform": "hermes-agent"}`.
+**گذر:** پورت bind شده است و `curl /health` برمی‌گرداند `{"status": "ok", "platform": "hermes-agent"}`.
 
-**Fail — gateway running but port not bound:** API server didn't start.
-Go back to Step 2 and verify the env vars have underscores.
+**شکست — دروازه در حال اجرا اما پورت bind نشده:** سرور API شروع نشده است.
+به مرحلهٔ ۲ برگردید و راستی‌آزمایی کنید متغیرهای محیطی underscore دارند.
 
-**Fail — port bound by something else:**
+**شکست — پورت توسط چیز دیگری bind شده:**
 ```bash
-# Find what's on the port
+# یافتن آنچه روی پورت است
 lsof -i :8642   # macOS
 ss -tlnp | grep 8642   # Linux
-# Kill the stale process, then restart gateway
+# فرآیند stale را ببندید، سپس دروازه را restart کنید
 ```
 
-## Step 4b — Is the dashboard running on 9119?
+## مرحلهٔ ۴b — آیا داشبورد روی 9119 اجرا می‌شود؟
 
 ```bash
 curl -sf http://127.0.0.1:9119/ && echo "DASHBOARD OK" || echo "DASHBOARD NOT REACHABLE"
 ```
 
-**Pass:** returns HTTP 200 (HTML or JSON is fine).
+**گذر:** HTTP 200 برمی‌گرداند (HTML یا JSON قابل‌قبول است).
 
-### Fix
+### رفع
 
 ```bash
 hermes dashboard
@@ -172,106 +170,106 @@ hermes dashboard
 
 ---
 
-## Step 5 — Is Workspace pointed at the gateway?
+## مرحلهٔ ۵ — آیا Workspace به دروازه اشاره می‌کند؟
 
 ```bash
-# In the hermeschi directory
+# در دایرکتوری hermeschi
 cat .env | grep HERMES_API_URL
 ```
 
-**Pass:** `HERMES_API_URL=http://127.0.0.1:8642`
+**گذر:** `HERMES_API_URL=http://127.0.0.1:8642`
 
-Also set the dashboard URL:
+همچنین URL داشبورد را تنظیم کنید:
 
 ```bash
 grep HERMESCHI_DASHBOARD_URL .env
 ```
 
-**Pass:** `HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119`
+**گذر:** `HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119`
 
-**Fail or missing:**
+**شکست یا غایب:**
 ```bash
-# In the hermeschi directory
+# در دایرکتوری hermeschi
 echo 'HERMES_API_URL=http://127.0.0.1:8642' >> .env
 echo 'HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119' >> .env
 ```
 
-If `.env` doesn't exist:
+اگر `.env` وجود ندارد:
 ```bash
 cp .env.example .env
-# Then set HERMES_API_URL as above
+# سپس HERMES_API_URL را به‌صورت بالا تنظیم کنید
 ```
 
 ---
 
-## Step 6 — Start Workspace and verify pairing
+## مرحلهٔ ۶ — شروع Workspace و راستی‌آزمایی جفت‌سازی
 
 ```bash
-cd ~/hermeschi   # or wherever it's installed
+cd ~/hermeschi   # یا هر کجا نصب شده است
 pnpm dev
 ```
 
-**Look for this in the startup output:**
+**در خروجی راه‌اندازی به دنبال این باشید:**
 ```
 [claude-api] Configured API: http://127.0.0.1:8642
 [gateway] gateway=http://127.0.0.1:8642 ... mode=enhanced-fork core=[health, chatCompletions, models, streaming]
 ```
 
-**`mode=enhanced-fork`** = paired successfully. Sessions, memory, skills all
-available.
+**`mode=enhanced-fork`** = جفت‌سازی موفق. سشن‌ها، memory، skills همگی
+در دسترس هستند.
 
-### Critical verification before starting another gateway
+### راستی‌آزمایی بحرانی پیش از شروع یک دروازهٔ دیگر
 
 ```bash
 curl -sf http://127.0.0.1:8642/health
 curl -sf http://127.0.0.1:3000/api/sessions | jq '.sessions | length' 2>/dev/null || curl -sf http://127.0.0.1:3000/api/sessions
 ```
 
-If `/api/sessions` returns sessions (or an empty array) the pairing is alive.
-**Do not start another gateway just because the UI still says Offline** —
-refresh or reprobe the workspace UI first.
+اگر `/api/sessions` سشن‌ها (یا یک آرایهٔ خالی) را برمی‌گرداند، جفت‌سازی زنده است.
+**صرفاً به‌خاطر اینکه رابط کاربری همچنان Offline می‌گوید، دروازهٔ دیگری شروع نکنید** —
+ابتدا رابط کاربری workspace را refresh یا reprobe کنید.
 
-**`mode=disconnected`** = pairing failed. Go back to Step 4.
-
----
-
-## Step 7 — Verify in browser
-
-Open `http://localhost:3000` (or whatever port Vite reports).
-
-- **Full UI with chat** = success.
-- **"Connect Backend" / "Skip setup" onboarding screen** = gateway not reachable
-  from the Vite SSR server. Re-check Steps 4–5.
-- **500 error / blank page** = Vite build issue, not a pairing problem.
-  Check terminal for build errors.
+**`mode=disconnected`** = جفت‌سازی شکست خورد. به مرحلهٔ ۴ برگردید.
 
 ---
 
-## Quick-fix cheat sheet (copy-paste block)
+## مرحلهٔ ۷ — راستی‌آزمایی در مرورگر
 
-For users who just want it to work — run this entire block:
+`http://localhost:3000` را باز کنید (یا هر پورتی که Vite گزارش می‌کند).
+
+- **رابط کاربری کامل با گفتگو** = موفقیت.
+- **صفحهٔ onboarding «Connect Backend» / «Skip setup»** = دروازه از سرور SSR Vite
+  قابل‌دسترس نیست. مراحل ۴–۵ را دوباره بررسی کنید.
+- **خطای ۵۰۰ / صفحهٔ خالی** = مسئلهٔ build Vite، نه مسئلهٔ جفت‌سازی.
+  ترمینال را برای خطاهای build بررسی کنید.
+
+---
+
+## برگه تقلب رفع سریع (بلاک copy-paste)
+
+برای کاربرانی که فقط می‌خواهند کار کند — این بلاک کامل را اجرا کنید:
 
 ```bash
-# 1. Find Hermes env
+# 1. یافتن env هرمس
 HERMES_ENV="$(hermes config env-path 2>/dev/null || echo "$HOME/.hermes/.env")"
 mkdir -p "$(dirname "$HERMES_ENV")"
 
-# 2. Enable API server (idempotent)
+# 2. فعال‌سازی سرور API (idempotent)
 grep -q '^API_SERVER_ENABLED=' "$HERMES_ENV" 2>/dev/null && \
   sed -i.bak 's/^API_SERVER_ENABLED=.*/API_SERVER_ENABLED=true/' "$HERMES_ENV" || \
   echo 'API_SERVER_ENABLED=true' >> "$HERMES_ENV"
 
-# 3. Clean up common typos
+# 3. پاک‌سازی اشتباهات تایپی رایج
 sed -i.bak '/^APISERVERENABLED/d; /^APISERVERHOST/d' "$CLAUDE_ENV" 2>/dev/null || true
 
-# 4. Restart gateway
+# 4. restart دروازه
 hermes gateway stop 2>/dev/null; sleep 2; hermes gateway run &
 sleep 8
 
-# 5. Verify
+# 5. راستی‌آزمایی
 curl -sf http://127.0.0.1:8642/health && echo "✅ Gateway API is up" || echo "❌ Gateway API not reachable"
 
-# 6. Set workspace env
+# 6. تنظیم env workspace
 cd ~/hermeschi 2>/dev/null || cd "$(find ~ -maxdepth 2 -name hermeschi -type d | head -1)"
 grep -q '^HERMES_API_URL=' .env 2>/dev/null && \
   sed -i.bak 's|^HERMES_API_URL=.*|HERMES_API_URL=http://127.0.0.1:8642|' .env || \
@@ -282,37 +280,37 @@ echo "✅ Done. Run: pnpm dev"
 
 ---
 
-## Platform-specific notes
+## یادداشت‌های خاص پلتفرم
 
 ### WSL (Windows Subsystem for Linux)
 
-- Python cold-start is slower on WSL due to filesystem I/O overhead.
-  The gateway may take 10–15 seconds to bind port 8642.
-- If Workspace's health check times out before the gateway is ready,
-  start the gateway separately first (`hermes gateway run`), wait for
-  the port to bind, then start Workspace in a second terminal.
-- Use `127.0.0.1`, not `localhost` — WSL2 sometimes resolves `localhost`
-  to the Windows host instead of the WSL VM.
+- cold-start Python روی WSL به‌دلیل overhead I/O فایل‌سیستم کندتر است.
+  ممکن است دروازه ۱۰–۱۵ ثانیه طول بکشد تا پورت 8642 را bind کند.
+- اگر بررسی سلامت Workspace پیش از آماده‌شدن دروازه timeout شود،
+  ابتدا دروازه را جداگانه شروع کنید (`hermes gateway run`)، منتظر بمانید تا
+  پورت bind شود، سپس Workspace را در یک ترمینال دوم شروع کنید.
+- از `127.0.0.1` استفاده کنید، نه `localhost` — WSL2 گاهی `localhost` را
+  به‌جای VM کنونی WSL، به host ویندوز تفکیک می‌کند.
 
 ### macOS
 
-- No special considerations. Default setup works.
-- If using Homebrew Python, ensure `claude` is on PATH:
+- ملاحظات خاصی ندارد. راه‌اندازی پیش‌فرض کار می‌کند.
+- اگر از Python هوم‌برو استفاده می‌کنید، مطمئن شوید `claude` روی PATH است:
   `export PATH="$HOME/.local/bin:$PATH"`
 
-### Linux (native)
+### Linux (بومی)
 
-- systemd users: `hermes gateway install` creates a user service.
-  Check status with `systemctl --user status claude-gateway`.
-- If using a different `$HOME` for the systemd service (e.g. running as
-  a different user), the `.env` file location changes. Use
-  `claude config env-path` to find it.
+- کاربران systemd: `hermes gateway install` یک سرویس کاربر ایجاد می‌کند.
+  وضعیت را با `systemctl --user status claude-gateway` بررسی کنید.
+- اگر از `$HOME` متفاوتی برای سرویس systemd استفاده می‌کنید (مثلاً اجرا به‌عنوان
+  کاربر متفاوت)، مکان فایل `.env` تغییر می‌کند. از
+  `claude config env-path` برای یافتن آن استفاده کنید.
 
 ---
 
-## Still broken?
+## هنوز خراب است؟
 
-Collect this diagnostic bundle and share it:
+این بستهٔ تشخیصی را جمع‌آوری و به اشتراک بگذارید:
 
 ```bash
 echo "=== claude version ===" && claude --version 2>&1
@@ -327,4 +325,4 @@ echo "=== Node ===" && node --version
 echo "=== Python ===" && python3 --version 2>&1
 ```
 
-This gives any human or agent enough context to diagnose the issue in one read.
+این به هر انسان یا عاملی زمینهٔ کافی می‌دهد تا مسئله را در یک خواندن تشخیص دهد.

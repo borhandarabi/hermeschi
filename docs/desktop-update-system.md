@@ -1,50 +1,50 @@
-# HermesChi Desktop Update System
+# سیستم به‌روزرسانی دسکتاپ HermesChi
 
-This branch introduces the update contract that the DMG/EXE packaging should use.
+این شاخه قرارداد به‌روزرسانی را معرفی می‌کند که بسته‌بندی DMG/EXE باید از آن استفاده کند.
 
-## Products
+## محصولات
 
-Hermes ships two separately updateable products:
+Hermes دو محصول جداگانه با قابلیت به‌روزرسانی مستقل ارسال می‌کند:
 
-1. **HermesChi**: the UI/server shell.
-2. **Hermes Agent**: the local agent/gateway runtime.
+۱. **HermesChi**: پوستهٔ رابط کاربری/سرور.
+۲. **Hermes Agent**: زمان‌اجرا و دروازه/عامل محلی.
 
-They must not be modeled as two remotes in the same git checkout. The Workspace updater updates Workspace. The Agent updater updates the installed/bundled Agent.
+این دو نباید به‌عنوان دو remote در یک checkout یکسان git مدل شوند. به‌روزرسان Workspace، Workspace را به‌روزرسانی می‌کند. به‌روزرسان Agent، Agent نصب‌شده/باندل‌شده را به‌روزرسانی می‌کند.
 
 ## API
 
 - `GET /api/update/status`
-  - returns Workspace + Agent version/install/update state.
+  - نسخهٔ Workspace + Agent و وضعیت نصب/به‌روزرسانی را برمی‌گرداند.
 - `POST /api/update/workspace`
-  - applies a Workspace update only when safe.
+  - به‌روزرسانی Workspace را فقط در شرایط امن اعمال می‌کند.
 - `POST /api/update/agent`
-  - applies an Agent update only when safe.
+  - به‌روزرسانی Agent را فقط در شرایط امن اعمال می‌کند.
 
-## Install kinds
+## انواع نصب
 
-Current implementation detects:
+پیاده‌سازی فعلی موارد زیر را شناسایی می‌کند:
 
-- `git`: development/source checkout.
-- `docker`: running in container, update is not applied in-process.
-- `desktop`: reserved for DMG/EXE auto-updater integration.
-- `unknown`: cannot safely update automatically.
+- `git`: checkout توسعه/سورس.
+- `docker`: اجرا در container، به‌روزرسانی درون‌فرآیندی اعمال نمی‌شود.
+- `desktop`: رزرو‌شده برای یکپارچه‌سازی auto-updater با DMG/EXE.
+- `unknown`: به‌روزرسانی خودکار به‌صورت امن ممکن نیست.
 
-## Git/dev behavior
+## رفتار Git/توسعه
 
-For git installs:
+برای نصب‌های git:
 
-- Workspace updates use `origin/<branch>` and require a clean, fast-forwardable checkout.
-- Agent updates call the Agent's own `hermes update` command and require a clean Agent checkout.
-- Dirty or non-fast-forward states are blocked and surfaced as review-required, not as a copy-command primary path.
+- به‌روزرسانی‌های Workspace از `origin/<branch>` استفاده می‌کنند و نیازمند checkout تمیز و fast-forwardable هستند.
+- به‌روزرسانی‌های Agent از دستور `hermes update` خود Agent فراخوانی می‌کنند و نیازمند checkout تمیز Agent هستند.
+- حالت‌های کثیف یا غیر fast-forward مسدود شده و به‌عنوان نیازمند بازبینی نمایش داده می‌شوند، نه به‌عنوان مسیر اصلی copy-command.
 
-## Desktop behavior to wire next
+## رفتار دسکتاپ برای اتصال در گام بعدی
 
-The packaged app should set `HERMESCHI_DESKTOP=1` and provide a desktop updater bridge that:
+اپ بسته‌بندی‌شده باید `HERMESCHI_DESKTOP=1` را تنظیم کند و یک پل به‌روزرسان دسکتاپ ارائه دهد که:
 
-1. Checks a signed update manifest or GitHub Release.
-2. Downloads the Workspace app update through Electron auto-updater or equivalent.
-3. Updates the bundled Hermes Agent payload separately.
-4. Restarts Workspace + Agent after update.
-5. Stores release notes for the first screen after update.
+۱. یک manifest به‌روزرسانی امضاشده یا GitHub Release را بررسی می‌کند.
+۲. به‌روزرسانی اپ Workspace را از طریق Electron auto-updater یا معادل آن دانلود می‌کند.
+۳. payload مربوط به Hermes Agent باندل‌شده را جداگانه به‌روزرسانی می‌کند.
+۴. پس از به‌روزرسانی، Workspace + Agent را راه‌اندازی مجدد می‌کند.
+۵. یادداشت‌های انتشار را برای نخستین صفحه پس از به‌روزرسانی ذخیره می‌کند.
 
-The UI already expects product-level update status and release notes, so the desktop bridge should map into the same `/api/update/*` contract.
+رابط کاربری هم‌اکنون وضعیت به‌روزرسانی در سطح محصول و یادداشت‌های انتشار را انتظار دارد، بنابراین پل دسکتاپ باید به همان قرارداد `/api/update/*` نگاشت شود.

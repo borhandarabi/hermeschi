@@ -1,65 +1,65 @@
-# 技术设计：目录文件大小统计工具 (dirsize-tool)
+# طراحی فنی: ابزار آمار اندازهٔ فایل‌های دایرکتوری (dirsize-tool)
 
-## 1. 概述
+## ۱. مرور کلی
 
-轻量 Python CLI 工具，递归统计指定目录下所有文件的总大小。设计目标：纯读、快速、输出结构化，可作为 @mention 修复测试的验证工具。
+ابزار CLI سبک Python که مجموع اندازهٔ تمام فایل‌های زیر یک دایرکتوری مشخص را به‌صورت بازگشتی محاسبه می‌کند. اهداف طراحی: فقط خواندن، سریع، خروجی ساختاریافته، می‌تواند به‌عنوان ابزار اعتبارسنجی برای آزمون اصلاح @mention استفاده شود.
 
-## 2. CLI 接口
+## ۲. رابط CLI
 
 ```bash
 python scripts/dirsize.py <path> [options]
 ```
 
-### 参数
+### پارامترها
 
-| 参数 | 类型 | 默认值 | 说明 |
+| پارامتر | نوع | پیش‌فرض | توضیح |
 |------|------|--------|------|
-| `path` | 位置参数 | 必填 | 目标目录路径 |
-| `--unit`, `-u` | 字符串 | `auto` | 显示单位：`auto`, `B`, `KB`, `MB`, `GB` |
-| `--exclude` | 字符串列表 | 无 | 排除的模式（可多次使用），如 `--exclude node_modules --exclude .git` |
-| `--json` | 标志位 | `false` | 输出 JSON 格式供自动化使用 |
-| `--max-depth` | 整数 | 无限制 | 最大递归深度 |
-| `--ignore-permission-denied` | 标志位 | `false` | 跳过权限不足的目录 |
-| `--disk-usage` | 标志位 | `false` | 使用 `stat.st_blocks` 计算磁盘占用，而非 apparent size |
+| `path` | آرگومان موقعیتی | الزامی | مسیر دایرکتوری هدف |
+| `--unit`, `-u` | رشته | `auto` | واحد نمایش: `auto`, `B`, `KB`, `MB`, `GB` |
+| `--exclude` | فهرست رشته | ندارد | الگوهای مستثنی‌شده (قابل استفاده چندباره)، مانند `--exclude node_modules --exclude .git` |
+| `--json` | flag | `false` | خروجی با فرمت JSON برای استفادهٔ خودکار |
+| `--max-depth` | عدد صحیح | بدون محدودیت | حداکثر عمق بازگشت |
+| `--ignore-permission-denied` | flag | `false` | پرش از دایرکتوری‌های با دسترسی ناکافی |
+| `--disk-usage` | flag | `false` | استفاده از `stat.st_blocks` برای محاسبهٔ اشغال دیسک، به‌جای اندازهٔ ظاهری |
 
-### 退出码
+### کدهای خروج
 
-| 退出码 | 含义 |
+| کد خروج | معنا |
 |--------|------|
-| 0 | 成功 |
-| 1 | 参数错误 |
-| 2 | 路径不存在 |
-| 3 | 权限不足（未使用 `--ignore-permission-denied`） |
+| ۰ | موفق |
+| ۱ | خطای پارامتر |
+| ۲ | مسیر وجود ندارد |
+| ۳ | دسترسی ناکافی (بدون استفاده از `--ignore-permission-denied`) |
 
-### 使用示例
+### نمونه‌های استفاده
 
 ```bash
-# 默认输出
+# خروجی پیش‌فرض
 python scripts/dirsize.py /some/dir
 # Total: 117.7 MB (42 files)
 
-# JSON 格式供自动化使用
+# فرمت JSON برای استفادهٔ خودکار
 python scripts/dirsize.py /some/dir --json
 # {"path":"/some/dir","total_bytes":123456789,"human_size":"117.7 MB",...}
 
-# 排除 node_modules 和 .git
+# مستثنی کردن node_modules و .git
 python scripts/dirsize.py . --exclude node_modules --exclude .git
 
-# 限制深度
+# محدود کردن عمق
 python scripts/dirsize.py /deep/tree --max-depth 3
 
-# 磁盘占用（而非 apparent size）
+# اشغال دیسک (به‌جای اندازهٔ ظاهری)
 python scripts/dirsize.py /some/dir --disk-usage
 ```
 
-### 输出格式
+### قالب خروجی
 
-**默认（人类可读）**：
+**پیش‌فرض (انسانی-خوانا)**:
 ```
 Total: 117.7 MB (42 files)
 ```
 
-**JSON 模式**：
+**حالت JSON**:
 ```json
 {
   "path": "/path/to/dir",
@@ -71,7 +71,7 @@ Total: 117.7 MB (42 files)
 }
 ```
 
-## 3. 核心算法
+## ۳. الگوریتم اصلی
 
 ```python
 import os
@@ -94,34 +94,34 @@ def get_dir_size(path, follow_symlinks=False, disk_usage=False):
     return total, count
 ```
 
-**性能优化**：
-- 对大目录可用 `os.scandir` + 递归替代 `os.walk`，减少 stat 调用
-- `--max-depth` 限制递归层数，避免意外遍历过深
+**بهینه‌سازی عملکرد**:
+- برای دایرکتوری‌های بزرگ می‌توان از `os.scandir` + بازگشت به‌جای `os.walk` استفاده کرد تا فراخوانی‌های stat کاهش یابد
+- `--max-depth` تعداد سطوح بازگشت را محدود می‌کند تا از پیمایش بیش‌ازحد عمیق جلوگیری شود
 
-## 4. 性能预期
+## ۴. انتظارات عملکرد
 
-| 文件数 | 耗时 |
+| تعداد فایل | زمان |
 |--------|------|
-| 1,000 | < 10ms |
-| 100,000 | ~200ms |
-| 1,000,000 | ~2s |
-| 10,000,000 | ~20s (建议加 `--max-depth`) |
+| ۱٬۰۰۰ | < ۱۰ms |
+| ۱۰۰٬۰۰۰ | ~۲۰۰ms |
+| ۱٬۰۰۰٬۰۰۰ | ~۲s |
+| ۱۰٬۰۰۰٬۰۰۰ | ~۲۰s (پیشنهاد: افزودن `--max-depth`) |
 
-## 5. 文件定位
+## ۵. مکان فایل
 
 ```bash
 scripts/dirsize.py
 ```
 
-归属路径待 Carlo 确认（`~/hermeschi/scripts/` 或全局 `~/.hermes/scripts/`）。
+مسیر مالکیت باید توسط Carlo تأیید شود (`~/hermeschi/scripts/` یا سراسری `~/.hermes/scripts/`).
 
-## 6. 实现计划
+## ۶. برنامهٔ پیاده‌سازی
 
-1. 创建 `scripts/dirsize.py` 文件
-2. 实现 `os.walk` + `argparse` 基础功能
-3. 添加 `--json` 输出
-4. 添加 `--exclude`, `--max-depth`, `--ignore-permission-denied` 等特性
-5. 添加 `--disk-usage` 选项
-6. 提交 PR / 直接合并（视归属路径而定）
+۱. ایجاد فایل `scripts/dirsize.py`
+۲. پیاده‌سازی قابلیت پایهٔ `os.walk` + `argparse`
+۳. افزودن خروجی `--json`
+۴. افزودن ویژگی‌هایی مانند `--exclude`، `--max-depth`، `--ignore-permission-denied`
+۵. افزودن گزینهٔ `--disk-usage`
+۶. ارسال PR / merge مستقیم (بسته به مسیر مالکیت)
 
-预估工作量：15-30 分钟。
+تخمین تلاش: ۱۵-۳۰ دقیقه.

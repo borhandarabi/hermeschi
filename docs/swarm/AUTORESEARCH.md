@@ -1,46 +1,46 @@
-# Autoresearch Mode
+# حالت Autoresearch
 
-Autoresearch is a bounded optimization harness for Hermes Agents. It is not the default research workflow.
+Autoresearch یک harness bounded optimization برای Hermes Agentهاست. workflow پیش‌فرض research نیست.
 
-Use it only when the system can mechanically decide whether an iteration improved.
+فقط وقتی از آن استفاده کنید که سیستم بتواند به‌صورت مکانیکی تصمیم بگیرد آیا یک iteration بهبود یافته یا نه.
 
 ```text
 normal research     = gather evidence -> synthesize -> recommend
 autoresearch mode   = mutate one target -> verify metric -> keep/revert -> repeat
 ```
 
-## Source pattern
+## الگوی منبع
 
-The useful pattern from Karpathy-style autoresearch and downstream Claude/Codex ports is stable:
+الگوی مفید از autoresearch سبک Karpathy و portهای downstream Claude/Codex پایدار است:
 
-1. Lock the scope.
-2. Lock the evaluation surface.
-3. Pick one scalar metric.
-4. Mutate one narrow target.
-5. Run a mechanical verifier.
-6. Keep improvements.
-7. Revert worse/crashing/guard-failing changes.
-8. Log every iteration.
-9. Stop at the configured budget.
+1. قفل کردن scope.
+2. قفل کردن سطح ارزیابی.
+3. انتخاب یک scalar metric.
+4. mutate کردن یک target باریک.
+5. اجرای یک verifier مکانیکی.
+6. نگه‌داشتن بهبودها.
+7. revert کردن تغییرات بدتر/crash/guard-fail.
+8. ثبت هر iteration.
+9. توقف در budget پیکربندی‌شده.
 
-If you cannot evaluate it mechanically, do not autoresearch it.
+اگر نمی‌توانید آن را به‌صورت مکانیکی ارزیابی کنید، آن را autoresearch نکنید.
 
-## When to use `researcher:quick`
+## زمان استفاده از `researcher:quick`
 
-Use normal researcher mode for:
+از حالت researcher معمولی برای موارد زیر استفاده کنید:
 
-- web/GitHub/X/Reddit/Medium/YouTube/source collection
-- market/model/library scans
-- literature review
-- qualitative synthesis
-- tradeoff notes
-- recommendations where judgment matters
+- جمع‌آوری web/GitHub/X/Reddit/Medium/YouTube/source
+- scan market/model/library
+- بازبینی literature
+- synthesis کیفی
+- یادداشت‌های tradeoff
+- توصیه‌هایی که قضاوت اهمیت دارد
 
-`researcher:quick` may produce an autoresearch config, but it should not start the loop unless the contract below is filled.
+`researcher:quick` ممکن است یک config autoresearch تولید کند، اما نباید حلقه را شروع کند مگر اینکه قرارداد زیر پر شده باشد.
 
-## Autoresearch entry contract
+## قرارداد ورود autoresearch
 
-A loop may start only when these fields are explicit:
+یک حلقه فقط زمانی می‌تواند شروع شود که این فیلدها صریح باشند:
 
 ```yaml
 goal: <one sentence outcome>
@@ -58,11 +58,11 @@ rollback: revert worse, crashing, unparsable, or guard-failing changes
 greenlight: required for destructive, public, credential, account, push, deploy, merge, or bulk edits
 ```
 
-Do not infer missing fields silently. If a field is unknown, run `autoresearch:plan` / planning mode first.
+فیلدهای گمشده را به‌صورت خاموش infer نکنید. اگر یک فیلد ناشناخته است، ابتدا `autoresearch:plan` / حالت planning را اجرا کنید.
 
-## Iteration discipline
+## discipline iteration
 
-Each iteration should follow this shape:
+هر iteration باید این شکل را دنبال کند:
 
 ```text
 1. Read current state, prior results log, and recent git history.
@@ -77,35 +77,35 @@ Each iteration should follow this shape:
 10. Continue until iteration/time budget is exhausted.
 ```
 
-Use simplicity as a tie-breaker: equal metric with less code/complexity may be kept; equal metric with more complexity must be reverted.
+از سادگی به‌عنوان tie-breaker استفاده کنید: metric مساوی با کد/پیچیدگی کمتر می‌تواند نگه‌داشته شود؛ metric مساوی با پیچیدگی بیشتر باید revert شود.
 
-## Required log shape
+## شکل log مورد نیاز
 
-Use TSV or JSONL. TSV default:
+از TSV یا JSONL استفاده کنید. پیش‌فرض TSV:
 
 ```tsv
-iteration	commit	metric	delta	status	summary	verify	guard
-0	baseline	42	0	baseline	initial metric	pass	pass
-1	abc123	39	-3	keep	reduced failing lint count in parser	pass	pass
-2	-	45	+6	revert	broadened change broke type guard	pass	fail
+iteration       commit  metric  delta   status  summary verify  guard
+0       baseline        42      0       baseline        initial metric  pass    pass
+1       abc123  39      -3      keep    reduced failing lint count in parser    pass    pass
+2       -       45      +6      revert  broadened change broke type guard       pass    fail
 ```
 
-Keep failures visible. Reverting a failed experiment is part of the evidence trail, not a problem to hide.
+failureها را قابل‌مشاهده نگه دارید. revert کردن یک آزمایش fail‌شده بخشی از evidence trail است، نه مشکلی برای پنهان‌کردن.
 
-## Role ownership
+## مالکیت role
 
-- `orchestrator`: approves entering autoresearch, locks scope/eval/metric/budget, and decides whether the loop may run in durable/background mode.
-- `researcher:quick`: gathers external/internal evidence and may draft the contract.
-- `researcher:autoresearch`: runs the loop after the contract is complete.
-- `reviewer`: checks kept changes for metric hacking, overfitting, security regressions, and hidden scope expansion.
-- `qa`: replays final verification and any browser/API smoke.
-- `km-agent`: promotes durable lessons/results into RAZSOC/GBrain after review.
+- `orchestrator`: ورود به autoresearch را تأیید می‌کند، scope/eval/metric/budget را قفل می‌کند و تصمیم می‌گیرد آیا حلقه می‌تواند در حالت durable/background اجرا شود.
+- `researcher:quick`: evidence خارجی/داخلی را جمع‌آوری می‌کند و ممکن است قرارداد را draft کند.
+- `researcher:autoresearch`: پس از تکمیل قرارداد حلقه را اجرا می‌کند.
+- `reviewer`: تغییرات نگه‌داشته‌شده را برای metric hacking، overfitting، regression امنیتی و گسترش پنهان scope بررسی می‌کند.
+- `qa`: تأیید نهایی و هر smoke مرورگر/API را replay می‌کند.
+- `km-agent`: درس‌ها/نتایج پایدار را پس از بازبینی در RAZSOC/GBrain ارتقا می‌دهد.
 
-## Good targets for this stack
+## targetهای خوب برای این stack
 
-### 1. Hermes skill optimization
+### ۱. بهینه‌سازی Hermes skill
 
-Improve one skill against fixed prompts and binary rubric checks.
+بهبود یک skill در برابر promptهای ثابت و checkهای rubric باینری.
 
 ```yaml
 goal: Improve reviewer-core bug catching without increasing false positives.
@@ -122,9 +122,9 @@ guard: hermes chat -Q -t reviewer:gate -q 'load reviewer-core and summarize read
 iterations: 3
 ```
 
-### 2. Profile prompt optimization
+### ۲. بهینه‌سازی prompt profile
 
-Tune one profile against fixed briefs.
+تنظیم یک profile در برابر briefهای ثابت.
 
 ```yaml
 goal: Make researcher choose GBrain-first lookup reliably before web search.
@@ -141,9 +141,9 @@ guard: hermes chat -Q -t researcher:quick -q 'respond with mode readiness only'
 iterations: 3
 ```
 
-### 3. GBrain retrieval routing
+### ۳. مسیریابی بازیابی GBrain
 
-Optimize route rules/prompts against known-answer fixtures. The corpus and answer key are locked.
+بهینه‌سازی rule/promptهای route در برابر fixtureهای known-answer. corpus و answer key قفل‌شده‌اند.
 
 ```yaml
 goal: Improve citation-correct answers for RAZSOC/GBrain architecture questions.
@@ -161,9 +161,9 @@ guard: gbrain stats >/dev/null
 iterations: 3
 ```
 
-### 4. Repo cleanup loop
+### ۴. حلقهٔ پاک‌سازی repo
 
-Reduce one failure class with focused guards.
+کاهش یک class failure با guardهای متمرکز.
 
 ```yaml
 goal: Reduce no-explicit-any count in changed TypeScript files.
@@ -181,9 +181,9 @@ guard: pnpm exec vitest run <focused-tests>
 iterations: 5
 ```
 
-### 5. Browser/QA harness improvement
+### ۵. بهبود harness مرورگر/QA
 
-Use only deterministic checks.
+فقط از checkهای deterministic استفاده کنید.
 
 ```yaml
 goal: Increase deterministic /swarm smoke coverage.
@@ -201,43 +201,43 @@ guard: pnpm exec vitest run src/server/swarm-health.test.ts
 iterations: 3
 ```
 
-## Bad targets / red flags
+## targetهای بد / red flagها
 
-Do not run autoresearch when:
+autoresearch را اجرا نکنید وقتی:
 
-- the loop can edit the eval, dataset, scorer, or answer key
-- the metric is a proxy that can be gamed easily
-- the desired improvement is mostly taste or strategy
-- the work touches secrets, account settings, public posting, deploys, merges, or destructive cleanup
-- the scope is broad enough to rewrite the vault/repo
-- the verification command is slow, flaky, or manually judged
-- the agent cannot parse the metric deterministically
+- حلقه می‌تواند eval، dataset، scorer یا answer key را ویرایش کند
+- metric یک proxy است که به‌راحتی قابل بازی است
+- بهبود مطلوب عمدتاً taste یا strategy است
+- کار با secretها، تنظیمات account، پست عمومی، deploy، merge یا پاک‌سازی مخرب سر و کار دارد
+- scope آن‌قدر وسیع است که vault/repo را بازنویسی کند
+- command تأیید کندند، flaky یا دستی قضاوت می‌شود
+- agent نمی‌تواند metric را به‌صورت deterministic parse کند
 
-Common reward-hacking examples:
+نمونه‌های رایج reward-hacking:
 
-- deleting hard tests to improve pass rate
-- changing a rubric/answer key instead of behavior
-- caching fixture outputs instead of solving the task
-- suppressing errors instead of fixing causes
-- narrowing search to known examples only
-- adding brittle sleeps/retries to hide flake
+- حذف testهای سخت برای بهبود pass rate
+- تغییر rubric/answer key به‌جای رفتار
+- cache کردن خروجی fixture به‌جای حل task
+- سرکوب error به‌جای رفع cause
+- تنگ‌کردن search به نمونه‌های شناخته‌شده فقط
+- افزودن sleep/retry شکننده برای پنهان‌کردن flake
 
-## Pilot before background
+## pilot قبل از background
 
-Default wedge:
+wedge پیش‌فرض:
 
-1. Run `researcher:quick` to draft the contract.
-2. Run `reviewer` on the contract for metric-hacking risk.
-3. Run `researcher:autoresearch` for 3 iterations foreground/durable-session only.
-4. Run `reviewer` on kept diffs.
-5. Run `qa` or focused verification.
-6. Let `km-agent` capture only durable lessons.
+1. `researcher:quick` را برای draft قرارداد اجرا کنید.
+2. `reviewer` را روی قرارداد برای ریسک metric-hacking اجرا کنید.
+3. `researcher:autoresearch` را برای ۳ iteration فقط foreground/durable-session اجرا کنید.
+4. `reviewer` را روی diffهای نگه‌داشته‌شده اجرا کنید.
+5. `qa` یا تأیید متمرکز را اجرا کنید.
+6. اجازه دهید `km-agent` فقط درس‌های پایدار را ضبط کند.
 
-Only after a clean pilot should an orchestrator approve a longer or background loop.
+فقط پس از یک pilot تمیز باید یک ارکستریتور حلقهٔ طولانی‌تر یا background را تأیید کند.
 
-## Exit report
+## گزارش خروج
 
-Every run must finish with:
+هر اجرا باید با موارد زیر تمام شود:
 
 ```text
 Goal:

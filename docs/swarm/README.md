@@ -1,99 +1,99 @@
-# Swarm Mode
+# حالت Swarm
 
-Swarm Mode is the HermesChi control plane for Hermes Agents: persistent workers, a standing orchestrator, a review gate, and enough runtime visibility that the system is understandable instead of mystical.
+حالت Swarm صفحهٔ کنترلی هرمزچی برای Hermes Agentهاست: کارگرهای پایدار، یک ارکستریتور دائمی، یک دروازهٔ بازبینی، و آن‌قدر دیدگاه زمان‌اجرایی که سیستم قابل فهم باشد، نه عرفانی.
 
-The release promise is simple:
+قول نسخه ساده است:
 
-- Unlimited Hermes Agents can exist.
-- One orchestrator translates intent into dispatch.
-- Zero humans have to manually route every task.
-- Every worker has a role, a profile, a mission, and a checkpoint contract.
-- Every risky action still routes through the Greenlight Gate.
+- تعداد نامحدودی Hermes Agent می‌توانند وجود داشته باشند.
+- یک ارکستریتور intent را به dispatch ترجمه می‌کند.
+- هیچ انسانی مجبور نیست هر task را به‌صورت دستی route کند.
+- هر کارگر یک role، یک profile، یک mission و یک قرارداد checkpoint دارد.
+- هر اقدام پرخطر همچنان از دروازهٔ Greenlight عبور می‌کند.
 
-This is not a chat wrapper with tabs. It is the operating surface for a local agent swarm.
+این یک chat wrapper با تب نیست. این صفحهٔ عملیاتی برای یک swarm از agentهای محلی است.
 
-## Start here
+## از اینجا شروع کنید
 
-- [QUICKSTART.md](./QUICKSTART.md) — clone, run, detect profiles, spawn workers, dispatch the first task.
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — loop, SwarmBrief shape, notification routing, lanes, review, repair.
-- [AUTORESEARCH.md](./AUTORESEARCH.md) — bounded optimization-loop contract for `researcher:autoresearch`.
-- [SKILLS.md](./SKILLS.md) — bundled swarm skills, auto-loading, and custom skill conventions.
-- [ROLES.md](./ROLES.md) — role presets used by the Add Swarm dialog and the canonical project specs.
+- [QUICKSTART.md](./QUICKSTART.md) — کلون، اجرا، شناسایی profileها، spawn کردن کارگرها، dispatch اولین task.
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — حلقه، ساختار SwarmBrief، مسیریابی اعلان‌ها، laneها، بازبینی، repair.
+- [AUTORESEARCH.md](./AUTORESEARCH.md) — قرارداد bounded optimization-loop برای `researcher:autoresearch`.
+- [SKILLS.md](./SKILLS.md) — skillهای swarm بسته‌بندی‌شده، بارگذاری خودکار، و قراردادهای skill سفارشی.
+- [ROLES.md](./ROLES.md) — presetهای نقش که در dialog افزودن Swarm و specهای canonical پروژه استفاده می‌شوند.
 
-## The 30-second model
+## مدل ۳۰ ثانیه‌ای
 
-Eric talks to Aurora. Aurora turns intent into a brief. The orchestrator routes that brief to the right Hermes Agent. Workers execute inside persistent tmux sessions, checkpoint with proof, and the orchestrator decides whether to continue, repair, escalate, or put a card in the Inbox.
+اریک با Aurora صحبت می‌کند. Aurora intent را به یک brief تبدیل می‌کند. ارکستریتور آن brief را به Hermes Agent درست route می‌کند. کارگرها در sessionهای tmux پایدار اجرا می‌شوند، با proof checkpoint می‌گیرند، و ارکستریتور تصمیم می‌گیرد که ادامه دهد، repair کند، escalate کند یا یک کارت در Inbox قرار دهد.
 
 ```text
 Eric -> Aurora -> orchestrator -> role workers -> checkpoints -> reports/inbox -> review/escalation
 ```
 
-The important move is that dispatch becomes a system, not a vibe. The worker is not just "another model call." It is a named lane with memory, runtime state, default skills, a profile, and a job.
+حرکت مهم این است که dispatch به یک سیستم تبدیل می‌شود، نه یک vibe. کارگر فقط «یک فراخوانی مدل دیگر» نیست. یک lane نام‌گذاری‌شده با حافظه، state زمان‌اجرایی، skillهای پیش‌فرض، یک profile و یک job است.
 
-## What ships in v1
+## آنچه در v1 عرضه می‌شود
 
 ### Orchestrator Chat
 
-The orchestrator chat is the main command surface. Use it to ask for one action, a decomposed plan, or a broadcast. It can route to specific workers, create missions, wait for checkpoints, and push follow-up prompts when a worker drifts.
+ارکستریتور chat سطح فرمان اصلی است. از آن برای درخواست یک اقدام، یک plan تجزیه‌شده، یا یک broadcast استفاده کنید. می‌تواند به کارگرهای خاص route کند، mission بسازد، منتظر checkpoint بماند و follow-up prompt بفرستد وقتی یک کارگر drift می‌کند.
 
-### Multi-Agent Control Plane
+### صفحهٔ کنترل چند‌Agentی
 
-The Swarm surface shows workers as operational cards: role, state, current task, model, recent signal, room membership, and action affordances. You can inspect the topology instead of guessing which agent is alive.
+سطح Swarm کارگرها را به‌صورت کارت‌های عملیاتی نشان می‌دهد: role، state، task فعلی، مدل، سیگنال اخیر، membership اتاق و affordanceهای اقدام. می‌توانید topology را بررسی کنید به‌جای اینکه حدس بزنید کدام agent زنده است.
 
 ### Kanban TaskBoard
 
-The TaskBoard gives the swarm a planning surface: backlog, ready, running, review, blocked, done. It is intentionally boring. Boring task state beats a beautiful graveyard of half-finished chats.
+TaskBoard یک سطح برنامه‌ریزی به swarm می‌دهد: backlog، ready، running، review، blocked، done. عمداً خسته‌کننده است. state خسته‌کنندهٔ task بهتر از یک گورستان زیبای chatهای نیمه‌تمام است.
 
 ### Reports + Inbox
 
-Reports and Inbox are where the swarm becomes reviewable. Checkpoints with `NEEDS_REVIEW`, blockers, handoffs, and escalation-worthy summaries land here so Eric can approve the few things that need judgment.
+Reports و Inbox جایی هستند که swarm قابل بازبینی می‌شود. checkpointهای با `NEEDS_REVIEW`، blockerها، handoffها و خلاصه‌های قابل escalation در اینجا قرار می‌گیرند تا اریک بتواند موارد معدودی که نیاز به قضاوت دارند را تأیید کند.
 
-### TUI View built in
+### نمای TUI داخلی
 
-Runtime view attaches to tmux-backed workers when available. If tmux is not available, the workspace falls back to a shell or log tail. The goal is direct observability: if a Hermes Agent is doing something, you can see the lane.
+نمای زمان‌اجرایی به کارگرهای tmux-backed متصل می‌شود وقتی در دسترس باشند. اگر tmux در دسترس نباشد، workspace به shell یا log tail برمی‌گردد. هدف observability مستقیم است: اگر یک Hermes Agent کاری انجام می‌دهد، می‌توانید lane را ببینید.
 
-## Core terms
+## اصطلاحات اصلی
 
-| Term | Meaning |
+| اصطلاح | معنی |
 | --- | --- |
-| Hermes Agent | A named, persistent worker with a role, profile, skills, and runtime state. |
-| Orchestrator | The Hermes Agent responsible for dispatch, drift detection, routing, and escalation. |
-| SwarmBrief | The canonical task shape sent from orchestrator to worker. |
-| Standing mission | A permanent responsibility a worker resumes when idle. |
-| Ad-hoc dispatch | A one-off task sent through the same checkpoint contract. |
-| Checkpoint | The proof-bearing status block returned by a worker. |
-| Greenlight Gate | Human approval boundary for irreversible or externally visible actions. |
-| Repair playbook | Known failures mapped to safe repairs before escalation. |
+| Hermes Agent | یک کارگر پایدار و نام‌گذاری‌شده با role، profile، skillها و state زمان‌اجرایی. |
+| Orchestrator | Hermes Agent مسئول dispatch، drift detection، routing و escalation. |
+| SwarmBrief | شکل canonical task که از ارکستریتور به کارگر ارسال می‌شود. |
+| Standing mission | یک مسئولیت دائمی که کارگر در زمان idle از سر می‌گیرد. |
+| Ad-hoc dispatch | یک task یک‌بارمصرف که از همان قرارداد checkpoint عبور می‌کند. |
+| Checkpoint | بلوک وضعیتی همراه با proof که کارگر برمی‌گرداند. |
+| Greenlight Gate | مرز تأیید انسانی برای اقدامات غیرقابل‌بازگشت یا خارجاً قابل‌مشاهده. |
+| Repair playbook | failureهای شناخته‌شده که به repairهای امن قبل از escalation نگاشت شده‌اند. |
 
-## Mental model for users
+## مدل ذهنی برای کاربران
 
-The workspace gives you three levels of control:
+workspace سه سطح کنترل به شما می‌دهد:
 
-1. Ask the orchestrator for an outcome.
-2. Inspect and steer the mission from the control plane.
-3. Drop into the worker runtime only when you need exact evidence.
+1. از ارکستریتور یک outcome درخواست کنید.
+2. mission را از صفحهٔ کنترل بررسی و هدایت کنید.
+3. فقط زمانی که به evidence دقیق نیاز دارید، وارد runtime کارگر شوید.
 
-You should not need to babysit every step. You should be able to ask for a release doc pass, see the docs worker take it, watch the checkpoint land, send the reviewer lane next, and approve the PR only when the review says it is real.
+نباید مجبور باشید هر مرحله را babysit کنید. باید بتوانید یک pass روی release doc درخواست کنید، ببینید docs worker آن را می‌گیرد، تماشا کنید که checkpoint می‌رسد، reviewer lane را بعد بفرستید، و PR را فقط وقتی تأیید کنید که بازبینی می‌گوید واقعی است.
 
-## What Swarm Mode is good at
+## آنچه حالت Swarm در آن خوب است
 
-- Release trains with docs, build, review, QA, and PR steps.
-- Autonomous issue triage with bounded repair lanes.
-- Research + build loops where one worker scouts and another ships.
-- Long-running lab experiments that should not pollute the product lane.
-- Handoffs where context preservation matters more than raw model cleverness.
+- release trainها با مراحل docs، build، review، QA و PR.
+- triage خودکار issueها با laneهای bounded repair.
+- حلقه‌های research + build که در آن یک کارگر scout می‌کند و دیگری ship می‌کند.
+- آزمایش‌های lab طولانی‌مدت که نباید product lane را آلوده کنند.
+- handoffهایی که حفظ context مهم‌تر از هوش خام مدل است.
 
-## What Swarm Mode deliberately does not do
+## آنچه حالت Swarm عمداً انجام نمی‌دهد
 
-- It does not remove human approval for irreversible external actions.
-- It does not make workers talk directly to Eric.
-- It does not require every worker to run on the same machine forever.
-- It does not pretend chat history is a project management system.
-- It does not solve bad specs. It makes bad specs visible faster. Which is less romantic, but more useful.
+- تأیید انسانی برای اقدامات خارجی غیرقابل‌بازگشت را حذف نمی‌کند.
+- کارگرها را مستقیماً با اریک صحبت نمی‌کند.
+- نیازی ندارد هر کارگر برای همیشه روی یک ماشین اجرا شود.
+- وانمود نمی‌کند که chat history یک سیستم مدیریت پروژه است.
+- specهای بد را حل نمی‌کند. specهای بد را سریع‌تر قابل‌مشاهده می‌کند. کمتر رمانتیک است، اما مفیدتر.
 
-## Release-path docs
+## اسناد مسیر release
 
-Read these in order if you are testing the v1 release:
+اگر در حال تست نسخه v1 هستید، این‌ها را به ترتیب بخوانید:
 
 1. [QUICKSTART.md](./QUICKSTART.md)
 2. [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -101,6 +101,6 @@ Read these in order if you are testing the v1 release:
 4. [ROLES.md](./ROLES.md)
 5. [SKILLS.md](./SKILLS.md)
 
-## Canonical spec
+## spec canonical
 
-The canonical runtime contract is `SWARM_SPEC.md` in the swarm specs directory. This docs set explains the public surface; the spec wins when implementation details conflict.
+قرارداد canonical runtime فایل `SWARM_SPEC.md` در دایرکتوری swarm specs است. این مجموعه docs سطح عمومی را توضیح می‌دهد؛ spec پیروز می‌شود وقتی جزئیات پیاده‌سازی تعارض دارند.

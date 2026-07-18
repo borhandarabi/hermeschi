@@ -1,36 +1,36 @@
-# Workspace Chat Session Routing
+# مسیریابی سشن گفتگوی Workspace
 
-## Purpose
+## هدف
 
-HermesChi supports a portable chat path through OpenAI-compatible `/v1/chat/completions`. In this mode, the browser route alone is not enough to preserve conversational context: Workspace must forward a stable server-side session identifier to the Hermes Agent gateway.
+HermesChi یک مسیر گفتگوی portable از طریق `/v1/chat/completions` سازگار با OpenAI پشتیبانی می‌کند. در این حالت، مسیر مرورگر به‌تنهایی برای حفظ زمینهٔ گفتگو کافی نیست: Workspace باید یک شناسهٔ سشن پایدار سمت سرور را به دروازهٔ Hermes Agent ارسال کند.
 
-This document records the routing contract and the failure mode that caused related turns and attachments to be stored as separate `api-*` sessions.
+این سند، قرارداد مسیریابی و حالت شکستی را که باعث می‌شد نوبت‌های مرتبط و ضمائم به‌عنوان سشن‌های `api-*` جداگانه ذخیره شوند، ثبت می‌کند.
 
-## Routing Contract
+## قرارداد مسیریابی
 
-There are two distinct header layers:
+دو لایهٔ header متمایز وجود دارد:
 
-| Layer | Headers | Purpose |
+| لایه | Headerها | هدف |
 | --- | --- | --- |
-| Workspace UI route resolution | `X-Hermes-Session-Key`, `X-Hermes-Friendly-Id` | Tells the browser which Workspace chat route/friendly ID is resolved for the visible conversation. |
-| Hermes Agent gateway continuation | `X-Hermes-Session-Id`, `X-Claude-Session-Id` | Tells the gateway which server-side Hermes session should receive the next chat completion request. |
+| تفکیک مسیر رابط کاربری Workspace | `X-Hermes-Session-Key`، `X-Hermes-Friendly-Id` | به مرورگر می‌گوید کدام مسیر گفتگو/ID دوستانه Workspace برای گفتگوی قابل‌مشاهده تفکیک شده است. |
+| ادامه دروازهٔ Hermes Agent | `X-Hermes-Session-Id`، `X-Claude-Session-Id` | به دروازه می‌گوید کدام سشن سمت سرور Hermes باید درخواست تکمیل گفتگوی بعدی را دریافت کند. |
 
-Do not conflate these. A response can correctly resolve a Workspace route while the next gateway request still loses server-side context if `X-Hermes-Session-Id` is missing.
+این‌ها را با هم اشتباه نگیرید. یک پاسخ می‌تواند به‌درستی یک مسیر Workspace را تفکیک کند، در حالی که درخواست بعدی دروازه همچنان زمینهٔ سمت سرور را از دست می‌دهد اگر `X-Hermes-Session-Id` غایب باشد.
 
-## Portable OpenAI-Compatible Flow
+## جریان portable سازگار با OpenAI
 
-1. `src/routes/api/send-stream.ts` receives `sessionKey`, `friendlyId`, `message`, `history`, and optional `attachments` from the UI.
-2. It resolves a persistent Workspace `sessionKey`.
-3. It builds OpenAI-compatible messages, including multimodal image parts when attachments are present.
-4. It calls `openaiChat(..., { sessionId: portableSessionKey })`.
-5. `src/server/openai-compat-api.ts` forwards that session ID to the gateway via:
+۱. `src/routes/api/send-stream.ts` مقادیر `sessionKey`، `friendlyId`، `message`، `history` و `attachments` اختیاری را از رابط کاربری دریافت می‌کند.
+۲. یک `sessionKey` پایدار Workspace را تفکیک می‌کند.
+۳. پیام‌های سازگار با OpenAI را می‌سازد، از جمله بخش‌های تصویر چندوجهی هنگام وجود ضمائم.
+۴. `openaiChat(..., { sessionId: portableSessionKey })` را فراخوانی می‌کند.
+۵. `src/server/openai-compat-api.ts` آن شناسهٔ سشن را از طریق موارد زیر به دروازه ارسال می‌کند:
    - `X-Hermes-Session-Id`
-   - `X-Claude-Session-Id` as a legacy/back-compat alias.
-6. Hermes Agent uses the provided session ID for continuity instead of deriving a fresh deterministic `api-*` session from the request payload.
+   - `X-Claude-Session-Id` به‌عنوان نام مستعار legacy/back-compat.
+۶. Hermes Agent به‌جای استخراج یک سشن `api-*` قطعی جدید از payload درخواست، از شناسهٔ سشن ارائه‌شده برای پیوستگی استفاده می‌کند.
 
-## Failure Mode
+## حالت شکست
 
-The bug was coupling session-continuity headers to bearer-token presence:
+باگ، گره زدن headerهای پیوستگی سشن به حضور bearer-token بود:
 
 ```ts
 if (options.sessionId && bearer) {
@@ -39,11 +39,11 @@ if (options.sessionId && bearer) {
 }
 ```
 
-That made routing depend on auth configuration. If a bearer token was unavailable or not used, Workspace still had a local session key, but the gateway never received it. The gateway then derived sessions such as `api-*` from request content, which could split related turns and attachment-only/image requests across separate API sessions.
+این کار مسیریابی را وابسته به پیکربندی auth می‌کرد. اگر bearer token در دسترس نبود یا استفاده نمی‌شد، Workspace همچنان یک کلید سشن محلی داشت، اما دروازه هرگز آن را دریافت نمی‌کرد. سپس دروازه سشن‌هایی مانند `api-*` را از محتوای درخواست استخراج می‌کرد، که می‌توانست نوبت‌های مرتبط و درخواست‌های فقط-ضمیمه/تصویر را در سشن‌های API جداگانه تقسیم کند.
 
-## Correct Behavior
+## رفتار صحیح
 
-Session routing is independent of whether a bearer token is configured. If the gateway requires auth, its auth check enforces the bearer token separately.
+مسیریابی سشن مستقل از این است که آیا bearer token پیکربندی شده یا خیر. اگر دروازه نیازمند auth باشد، بررسی auth آن bearer token را جداگانه اعمال می‌کند.
 
 ```ts
 const bearer = getBearerToken()
@@ -57,42 +57,42 @@ if (options.sessionId) {
 }
 ```
 
-## Regression Coverage
+## پوشش regression
 
-`src/server/openai-compat-api.test.ts` should cover both cases:
+`src/server/openai-compat-api.test.ts` باید هر دو مورد را پوشش دهد:
 
-- session headers are sent when a bearer token is present
-- session headers are still sent when no bearer token is present
+- headerهای سشن هنگام وجود bearer token ارسال می‌شوند
+- headerهای سشن همچنان هنگام عدم وجود bearer token ارسال می‌شوند
 
-`src/server/chat-backends.ts` should forward `options.sessionId` into `openaiChat(...)` for both streaming and non-streaming OpenAI-compatible calls.
+`src/server/chat-backends.ts` باید `options.sessionId` را برای هر دو فراخوانی streaming و non-streaming سازگار با OpenAI به `openaiChat(...)` ارسال کند.
 
-## Manual Verification Recipe
+## دستورالعمل راستی‌آزمایی دستی
 
-1. Run the targeted test:
+۱. آزمون هدفمند را اجرا کنید:
 
    ```bash
    pnpm vitest run src/server/openai-compat-api.test.ts
    ```
 
-2. Build production assets:
+۲. assetهای تولید را build کنید:
 
    ```bash
    pnpm build
    ```
 
-3. Restart Workspace where deployed:
+۳. Workspace را در محل استقرار راه‌اندازی مجدد کنید:
 
    ```bash
    systemctl --user restart hermeschi.service
    systemctl --user is-active hermeschi.service
    ```
 
-4. Send two `/api/send-stream` turns with the same `sessionKey` and a unique token in the first prompt.
-5. Search session history for that token. Both turns should appear under the same `session_id` equal to the supplied Workspace session key, not separate `api-*` sessions.
-6. Send an image attachment with the same `sessionKey`; session history should show `[screenshot]` in that same session.
+۴. دو نوبت `/api/send-stream` با همان `sessionKey` و یک token منحصربه‌فرد در پرامپت اول ارسال کنید.
+۵. تاریخچهٔ سشن را برای آن token جستجو کنید. هر دو نوبت باید تحت همان `session_id` برابر با کلید سشن Workspace عرضه‌شده ظاهر شوند، نه سشن‌های `api-*` جداگانه.
+۶. یک ضمیمه تصویر با همان `sessionKey` ارسال کنید؛ تاریخچهٔ سشن باید `[screenshot]` را در همان سشن نشان دهد.
 
-## Operational Notes
+## یادداشت‌های عملیاتی
 
-- Keep credentials redacted when inspecting `.env`, service files, or built bundles.
-- In zero-fork deployments, Workspace commonly talks to Hermes Agent gateway on `127.0.0.1:8642` and Dashboard on `127.0.0.1:9119`.
-- A successful `/health` probe means the gateway is reachable; it does not prove session continuity is wired correctly. Verify the actual chat path.
+- هنگام بازرسی `.env`، فایل‌های سرویس یا bundleهای buildشده، اعتبارنامه‌ها را redact نگه دارید.
+- در استقرارهای zero-fork، Workspace معمولاً با دروازهٔ Hermes Agent روی `127.0.0.1:8642` و داشبورد روی `127.0.0.1:9119` صحبت می‌کند.
+- یک probe موفق `/health` به‌معنای قابل‌دسترس بودن دروازه است؛ این اثبات نمی‌کند که پیوستگی سشن به‌درستی سیم‌کشی شده است. مسیر گفتگوی واقعی را راستی‌آزمایی کنید.

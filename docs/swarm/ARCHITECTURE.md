@@ -1,8 +1,8 @@
-# Swarm Architecture
+# معماری Swarm
 
-Swarm Mode is built around a durable loop: intent enters through Aurora, dispatch flows through the orchestrator, workers execute in persistent sessions, checkpoints return to the control plane, and only judgment-worthy decisions reach Eric.
+حالت Swarm حول یک حلقهٔ پایدار ساخته شده است: intent از طریق Aurora وارد می‌شود، dispatch از ارکستریتور عبور می‌کند، کارگرها در sessionهای پایدار اجرا می‌شوند، checkpointها به صفحهٔ کنترل برمی‌گردند، و فقط تصمیمات قابل قضاوت به اریک می‌رسند.
 
-## The loop
+## حلقه
 
 ```text
 ┌────────┐
@@ -40,22 +40,22 @@ Swarm Mode is built around a durable loop: intent enters through Aurora, dispatc
 └─────────────────────────────────────┘
 ```
 
-The key rule: workers do not free-style message Eric. They checkpoint. The orchestrator routes. Aurora handles judgment. Eric approves the few things that matter.
+قاعدهٔ کلیدی: کارگرها به اریک پیام free-style نمی‌فرستند. آن‌ها checkpoint می‌گیرند. ارکستریتور route می‌کند. Aurora قضاوت را مدیریت می‌کند. اریک چیزهای معدودی که اهمیت دارند را تأیید می‌کند.
 
-## Canonical flow
+## جریان canonical
 
-1. Eric states an outcome.
-2. Aurora names the work and frames it into a SwarmBrief.
-3. The orchestrator selects the right worker or decomposes the work.
-4. The worker executes inside its persistent profile and tmux runtime.
-5. The worker returns a canonical checkpoint.
-6. The notification router sends the checkpoint to the orchestrator by default.
-7. The orchestrator decides whether to continue, repair, hand off, review, or escalate.
-8. Reports and Inbox make the state inspectable.
+1. اریک یک outcome بیان می‌کند.
+2. Aurora نام کار را تعیین کرده و آن را در یک SwarmBrief قالب‌بندی می‌کند.
+3. ارکستریتور کارگر درست را انتخاب می‌کند یا کار را تجزیه می‌کند.
+4. کارگر در profile پایدار خود و runtime tmux اجرا می‌کند.
+5. کارگر یک checkpoint canonical برمی‌گرداند.
+6. notification router به‌طور پیش‌فرض checkpoint را به ارکستریتور می‌فرستد.
+7. ارکستریتور تصمیم می‌گیرد ادامه دهد، repair کند، hand off دهد، review کند یا escalate کند.
+8. Reports و Inbox state را قابل بررسی می‌کنند.
 
-## SwarmBrief shape
+## شکل SwarmBrief
 
-The canonical YAML lives in `SWARM_SPEC.md` section 3. This is the public shape:
+YAML canonical در بخش ۳ `SWARM_SPEC.md` قرار دارد. این شکل عمومی است:
 
 ```yaml
 brief_id: brief-<timestamp>-<slug>
@@ -85,11 +85,11 @@ budget:
   wall_clock_hours: 2
 ```
 
-A brief is not a prompt dump. It is the smallest operating contract that lets a worker execute without inventing scope.
+یک brief یک prompt dump نیست. کوچک‌ترین قرارداد عملیاتی است که به کارگر اجازه می‌دهد بدون اختراع scope اجرا شود.
 
-## Checkpoint contract
+## قرارداد checkpoint
 
-Workers return this block:
+کارگرها این بلوک را برمی‌گردانند:
 
 ```text
 STATE: DONE | BLOCKED | NEEDS_INPUT | HANDOFF | IN_PROGRESS | NEEDS_REVIEW
@@ -100,136 +100,136 @@ BLOCKER: blocker or none
 NEXT_ACTION: exact recommended next action
 ```
 
-Good checkpoints contain evidence. Bad checkpoints contain adjectives. The swarm optimizes for evidence.
+checkpointهای خوب حاوی evidence هستند. checkpointهای بد حاوی صفت‌ها هستند. swarm برای evidence بهینه می‌شود.
 
-## Notification routing
+## مسیریابی اعلان‌ها
 
-The notification router lives in `src/server/swarm-notifications.ts`.
+notification router در `src/server/swarm-notifications.ts` قرار دارد.
 
-Current behavior:
+رفتار فعلی:
 
-- Checkpoints route to the orchestrator worker by default.
-- The default orchestrator worker is `orchestrator`.
-- The tmux target is `swarm-orchestrator`.
-- Duplicate raw checkpoints are suppressed via `runtime.json`.
-- `NEEDS_INPUT` escalates to the main session.
-- If the orchestrator tmux session is unreachable, the checkpoint escalates to the main session.
-- `DONE`, `HANDOFF`, and `BLOCKED` go to the orchestrator first.
-- The main session receives direct escalation only when human input is needed or the orchestrator cannot be reached.
+- checkpointها به‌طور پیش‌فرض به کارگر ارکستریتور route می‌شوند.
+- کارگر ارکستریتور پیش‌فرض `orchestrator` است.
+- target tmux برابر `swarm-orchestrator` است.
+- checkpointهای raw تکراری از طریق `runtime.json` سرکوب می‌شوند.
+- `NEEDS_INPUT` به session اصلی escalate می‌شود.
+- اگر session tmux ارکستریتور در دسترس نباشد، checkpoint به session اصلی escalate می‌شود.
+- `DONE`، `HANDOFF` و `BLOCKED` ابتدا به ارکستریتور می‌روند.
+- session اصلی فقط وقتی input انسانی لازم باشد یا ارکستریتور در دسترس نباشد، escalation مستقیم دریافت می‌کند.
 
-That split matters. Without it, the main chat becomes a trash fire of worker trivia. Technical term.
+این تفکیک مهم است. بدون آن، chat اصلی به یک آتش‌زباله‌ای از trivia کارگر تبدیل می‌شود. اصطلاح فنی.
 
-## Standing missions vs ad-hoc dispatches
+## standing missionها در مقابل ad-hoc dispatchها
 
-### Standing missions
+### standing missionها
 
-A standing mission is a worker's permanent responsibility. Examples:
+یک standing mission مسئولیت دائمی کارگر است. نمونه‌ها:
 
-- Scribe maintains docs and handoffs.
-- Reviewer owns the byte-verified review gate.
-- Triage works the PR/issues lane.
-- Lab runs model/runtime experiments.
-- Foundation maintains health and repair infrastructure.
+- Scribe نگهداری docs و handoffها.
+- Reviewer مالک دروازهٔ بازبینی byte-verified است.
+- Triage روی lane PR/issues کار می‌کند.
+- Lab آزمایش‌های model/runtime را اجرا می‌کند.
+- Foundation نگهداری health و infrastructure تعمیر.
 
-Standing missions are how idle workers stay useful without waiting for Eric to invent busywork.
+standing missionها چیزهایی هستند که کارگرهای idle بدون منتظر ماندن برای اینکه اریک busywork اختراع کند، مفید می‌مانند.
 
-### Ad-hoc dispatches
+### ad-hoc dispatchها
 
-An ad-hoc dispatch is a bounded task. It still uses the same profile, same role, same checkpoint format, and same Greenlight Gate.
+یک ad-hoc dispatch یک task bounded است. همچنان از همان profile، همان role، همان فرمت checkpoint و همان Greenlight Gate استفاده می‌کند.
 
-Examples:
+نمونه‌ها:
 
-- "Update docs/swarm/QUICKSTART.md for the new Add Swarm dialog."
-- "Review PR #42 and return APPROVED/CHANGES_REQUESTED with byte evidence."
-- "Reproduce issue #17 and write a minimal failing test."
+- «docs/swarm/QUICKSTART.md را برای dialog جدید Add Swarm به‌روزرسانی کن.»
+- «PR #42 را بازبینی کن و APPROVED/CHANGES_REQUESTED با byte evidence برگردان.»
+- «issue #17 را بازتولید کن و یک failing test مینیمال بنویس.»
 
-The system should treat ad-hoc dispatches as missions with smaller blast radius, not as casual chat requests.
+سیستم باید ad-hoc dispatchها را به‌عنوان missionهایی با blast radius کوچک‌تر در نظر بگیرد، نه درخواست‌های chat غیررسمی.
 
-## The three permanent lanes
+## سه lane دائمی
 
-### Lane A — Launch / demo / creative build lane
+### Lane A — lane راه‌اندازی / demo / build خلاقانه
 
-Purpose: ship coordinated launch artifacts, demos, media, and release-facing assets.
+هدف: ship کردن artifactهای راه‌اندازی هماهنگ، demo، media و assetهای روبه‌release.
 
-Typical owners:
+مالک‌های معمول:
 
-- Builder for implementation
-- Mirror Integrations for assets
-- Sage for narrative and research
-- QA for smoke checks
-- Scribe for README/showcase copy
+- Builder برای پیاده‌سازی
+- Mirror Integrations برای assetها
+- Sage برای narrative و research
+- QA برای smoke checkها
+- Scribe برای کپی README/showcase
 
-### Lane B — Issues + PR autopilot
+### Lane B — issues + PR autopilot
 
-Purpose: keep open GitHub issues and PRs moving.
+هدف: حفظ حرکت GitHub issueها و PRهای باز.
 
-Typical owners:
+مالک‌های معمول:
 
-- Triage as primary processor
-- Overflow for backup
-- Reviewer for gatekeeping
-- QA for regression proof
+- Triage به‌عنوان processor اصلی
+- Overflow به‌عنوان پشتیبان
+- Reviewer برای gatekeeping
+- QA برای regression proof
 
-Core loop:
+حلقهٔ اصلی:
 
 ```text
 scan -> score -> reproduce -> patch -> test -> PR -> review -> human approval
 ```
 
-### Lane C — Lab / experiments
+### Lane C — Lab / آزمایش‌ها
 
-Purpose: run experiments without destabilizing the product lane.
+هدف: اجرای آزمایش‌ها بدون بی‌ثبات‌کردن product lane.
 
-Typical owner:
+مالک معمول:
 
 - Lab
 
-Examples:
+نمونه‌ها:
 
-- local-model benchmark runs
-- runtime comparisons
-- speculative performance experiments
-- prototype loops
+- اجرای benchmark مدل محلی
+- مقایسه‌های runtime
+- آزمایش‌های speculative performance
+- حلقه‌های prototype
 
-Lab gets autonomy because isolation lowers risk. The product lane gets evidence when Lab finds something real.
+Lab خودمختاری می‌گیرد زیرا isolation ریسک را کاهش می‌دهد. product lane evidence می‌گیرد وقتی Lab چیزی واقعی پیدا می‌کند.
 
 ## Greenlight Gate
 
-The swarm can prepare risky actions. It cannot silently take them.
+swarm می‌تواند اقدامات پرخطر را آماده کند. نمی‌تواند آن‌ها را به‌صورت خاموش انجام دهد.
 
-Require explicit human approval before:
+قبل از موارد زیر به تأیید صریح انسانی نیاز است:
 
 - `git push --force`
-- PR merge or close
-- issue close without explicit instruction
-- release creation
-- npm/pnpm publish
-- public X/Discord/blog posts
-- financial transactions
-- destructive file operations
-- core service restarts
+- merge یا close کردن PR
+- close کردن issue بدون دستور صریح
+- ایجاد release
+- publish کردن npm/pnpm
+- پست‌های عمومی X/Discord/blog
+- تراکنش‌های مالی
+- عملیات مخرب فایل
+- restart سرویس‌های core
 
-Docs and local files can be drafted aggressively. Externally visible actions stay gated.
+docs و فایل‌های محلی می‌توانند به‌طور تهاجمی draft شوند. اقدامات خارجاً قابل‌مشاهده gated می‌مانند.
 
-## Auto-repair playbook
+## playbook auto-repair
 
-The repair playbook maps known failure modes to safe fixes. The orchestrator should consult it before escalating.
+playbook تعمیر، failure modeهای شناخته‌شده را به fixهای امن نگاشت می‌کند. ارکستریتور باید قبل از escalation به آن مراجعه کند.
 
-Examples of repair classes:
+نمونه‌ای از classهای تعمیر:
 
-- missing tmux session
-- stale worker runtime
-- profile path mismatch
-- build/test failure with known command
-- checkpoint timeout
-- auth/token unavailable
+- tmux session گمشده
+- runtime کارگر stale
+- عدم تطابق مسیر profile
+- failure build/test با command شناخته‌شده
+- timeout checkpoint
+- در دسترس نبودن auth/token
 - branch drift
 
-Repair is bounded. If a fix would become destructive, externally visible, or speculative, escalate.
+تعمیر bounded است. اگر یک fix مخرب، خارجاً قابل‌مشاهده یا speculative شود، escalate کنید.
 
-## Runtime state
+## state زمان‌اجرایی
 
-Each worker has a runtime record with fields like:
+هر کارگر یک رکورد runtime با فیلدهایی مانند زیر دارد:
 
 - worker ID
 - role
@@ -246,65 +246,65 @@ Each worker has a runtime record with fields like:
 - task counts
 - cron counts
 
-The UI uses this to render cards, Reports, Inbox, and runtime attach targets.
+UI از این برای render کردن کارت‌ها، Reports، Inbox و targetهای attach runtime استفاده می‌کند.
 
-## Control-plane endpoints
+## endpointهای صفحهٔ کنترل
 
-Important endpoints:
+endpointهای مهم:
 
-| Endpoint | Purpose |
+| Endpoint | هدف |
 | --- | --- |
-| `GET /api/swarm-roster` | Return configured Hermes Agents and role metadata. |
-| `GET /api/swarm-runtime` | Return runtime state and tmux attachability. |
-| `GET /api/swarm-missions` | Return mission and assignment history. |
-| `POST /api/swarm-dispatch` | Send work to one or more Hermes Agents. |
-| `POST /api/swarm-tmux-start` | Start a tmux-backed worker session. |
-| `POST /api/swarm-tmux-stop` | Stop a worker tmux session. |
-| `POST /api/swarm-tmux-scroll` | Scroll a tmux session from the UI. |
-| `GET /api/swarm-health` | Summarize local swarm health. |
+| `GET /api/swarm-roster` | بازگرداندن Hermes Agentهای پیکربندی‌شده و متادیتای role. |
+| `GET /api/swarm-runtime` | بازگرداندن state زمان‌اجرایی و tmux attachability. |
+| `GET /api/swarm-missions` | بازگرداندن تاریخچهٔ mission و assignment. |
+| `POST /api/swarm-dispatch` | ارسال کار به یک یا چند Hermes Agent. |
+| `POST /api/swarm-tmux-start` | شروع session کارگر tmux-backed. |
+| `POST /api/swarm-tmux-stop` | توقف session tmux کارگر. |
+| `POST /api/swarm-tmux-scroll` | scroll کردن یک session tmux از UI. |
+| `GET /api/swarm-health` | خلاصه‌ای از health swarm محلی. |
 
-## Failure philosophy
+## فلسفهٔ failure
 
-The system should fail in ways that tell the next actor exactly what to do.
+سیستم باید به روش‌هایی fail شود که به actor بعدی دقیقاً بگوید چه کاری انجام دهد.
 
-Good blocker:
+blocker خوب:
 
 ```text
 BLOCKER: gh auth status failed with missing token; cannot create PR.
 NEXT_ACTION: Provide a GitHub token or run gh auth login, then re-run PR creation.
 ```
 
-Bad blocker:
+blocker بد:
 
 ```text
 BLOCKER: sandbox issue.
 ```
 
-No. Absolutely not. The machine either has the tool, token, file, process, or it does not. Name the exact missing piece.
+نه. مطلقاً نه. ماشین یا ابزار را دارد، یا token را، یا فایل را، یا process را، یا ندارد. قطعهٔ گمشدهٔ دقیق را نام ببرید.
 
-## Review gate
+## دروازهٔ بازبینی
 
-The review lane exists because autonomous work without review is just entropy in a nice jacket.
+lane بازبینی وجود دارد زیرا کار خودمختار بدون بازبینی فقط entropy در یک کت زیباست.
 
-Reviewer expectations:
+انتظارات Reviewer:
 
-- read the diff
-- run tests/build/smoke
-- byte-check naming-sensitive changes when needed
-- verify generated files are intentional
-- produce a verdict
-- never merge without approval
+- diff را بخواند
+- tests/build/smoke را اجرا کند
+- در صورت لزوم تغییرات naming-sensitive را byte-check کند
+- بررسی کند فایل‌های generated عمدی هستند
+- یک verdict تولید کند
+- هرگز بدون تأیید merge نکند
 
-## Release architecture checklist
+## چک‌لیست معماری release
 
-Before calling a Swarm v1 release credible:
+قبل از اینکه یک release Swarm v1 را credible بنامید:
 
-- Orchestrator can dispatch workers.
-- Workers persist in tmux sessions.
-- Workers have role metadata and profiles.
-- Runtime view can attach or fall back.
-- Reports shows checkpoints.
-- Inbox surfaces review/input items.
-- `NEEDS_INPUT` escalates to the main session.
-- Greenlight Gate is documented and respected.
-- Docs explain how to run it without tribal knowledge.
+- ارکستریتور می‌تواند کارگرها را dispatch کند.
+- کارگرها در sessionهای tmux پایدار می‌مانند.
+- کارگرها متادیتای role و profile دارند.
+- نمای runtime می‌تواند attach یا fallback کند.
+- Reports checkpointها را نشان می‌دهد.
+- Inbox موارد review/input را نمایش می‌دهد.
+- `NEEDS_INPUT` به session اصلی escalate می‌شود.
+- Greenlight Gate مستند و رعایت شده است.
+- docs توضیح می‌دهند چگونه بدون tribal knowledge آن را اجرا کنند.

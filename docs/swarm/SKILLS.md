@@ -1,46 +1,46 @@
-# Swarm Skills
+# Skillهای Swarm
 
-Skills are the reusable operating knowledge behind Swarm Mode. A role preset names the skills a worker should load; the profile and skills path make those skills available at runtime.
+skillها دانش عملیاتی قابل استفادهٔ مجدد پشت حالت Swarm هستند. یک preset نقش نام skillهایی را که یک کارگر باید بارگذاری کند تعیین می‌کند؛ profile و مسیر skillها آن skillها را در زمان اجرا در دسترس قرار می‌دهند.
 
-A skill is not a vibe. It is a procedure: when to use it, what commands to run, what files matter, what pitfalls exist, and how to verify the result.
+یک skill یک vibe نیست. یک رویه است: چه زمانی استفاده شود، چه commandهایی اجرا شوند، چه فایل‌هایی مهم باشند، چه pitfallsهایی وجود دارند و چگونه نتیجه را تأیید کنید.
 
-## Bundled swarm skills
+## skillهای swarm بسته‌بندی‌شده
 
-| Skill | Use it for |
+| Skill | استفاده برای |
 | --- | --- |
-| `swarm-orchestrator` | Orchestrator loop, dispatch, drift detection, re-prompts, escalation, mission routing. |
-| `swarm-worker-core` | Base worker contract: phases, checkpoints, runtime state, blockers, handoffs. |
-| `swarm-review-learning-loop` | Capture review learnings, recurring failures, and skill improvements after tasks. |
-| `byte-verified-code-review` | Review diffs with byte-level proof for naming-sensitive and generated-file changes. |
-| `swarm-bench-worker` | Benchmark/lab work for local models, runtime experiments, and result logging. |
-| `swarm-pr-worker` | GitHub issue/PR workflow, triage, patching, PR prep, review feedback. |
-| `swarm-ui-worker` | UI implementation lane for HermesChi surfaces. |
-| `swarm-dev-runtime` | Runtime contracts, backend APIs, lifecycle, health, and repair wiring. |
-| `swarm-memory` | File-backed memory expectations for workers and orchestrator history. |
-| `swarm-orchestration-loop` | Canonical orchestration/review loop for persistent worker fleets. |
-| `swarm-review-learning-loop` | Shared loop for turning task outcomes into durable improvements. |
+| `swarm-orchestrator` | حلقهٔ ارکستریتور، dispatch، drift detection، re-prompt، escalation، routing mission. |
+| `swarm-worker-core` | قرارداد پایهٔ کارگر: phaseها، checkpointها، state زمان‌اجرایی، blockerها، handoffها. |
+| `swarm-review-learning-loop` | ضبط learningهای بازبینی، failureهای تکراری و بهبودهای skill پس از taskها. |
+| `byte-verified-code-review` | بازبینی diffها با proof سطح byte برای تغییرات naming-sensitive و generated-file. |
+| `swarm-bench-worker` | کار benchmark/lab برای مدل‌های محلی، آزمایش‌های runtime و ثبت نتایج. |
+| `swarm-pr-worker` | workflow GitHub issue/PR، triage، patching، آماده‌سازی PR، feedback بازبینی. |
+| `swarm-ui-worker` | lane پیاده‌سازی UI برای surfaceهای هرمزچی. |
+| `swarm-dev-runtime` | قراردادهای runtime، APIهای backend، lifecycle، health و wiring تعمیر. |
+| `swarm-memory` | انتظارات حافظهٔ file-backed برای کارگرها و تاریخچهٔ ارکستریتور. |
+| `swarm-orchestration-loop` | حلقهٔ canonical orchestration/review برای ناوگان کارگر پایدار. |
+| `swarm-review-learning-loop` | حلقهٔ مشترک برای تبدیل outcomeهای task به بهبودهای پایدار. |
 
-Some installations may name the byte review skill differently. If the exact skill is not present, use the available review skill that enforces byte checks, diff review, tests, build, smoke, and verdict discipline.
+برخی installationها ممکن است skill بازبینی byte را متفاوت نام‌گذاری کنند. اگر skill دقیق موجود نیست، از skill بازبینی موجودی استفاده کنید که byte check، diff review، تست، build، smoke و discipline verdict را اعمال می‌کند.
 
-## How skills auto-load
+## نحوهٔ بارگذاری خودکار skillها
 
-When you clone the repo and run the workspace, worker sessions load skills from the configured Hermes Agent profile. In Eric's release environment, profiles point at a shared skills directory, commonly exposed to workers as:
+وقتی repo را کلون می‌کنید و workspace را اجرا می‌کنید، sessionهای کارگر skillها را از profile پیکربندی‌شدهٔ Hermes Agent بارگذاری می‌کنند. در محیط release اریک، profileها به یک دایرکتوری skill مشترک اشاره می‌کنند، که معمولاً برای کارگرها به این شکل در دسترس است:
 
 ```text
 ~/.ocplatform/workspace/skills/
 ```
 
-A worker profile can also carry profile-local skills under:
+یک profile کارگر همچنین می‌تواند skillهای profile-local را در زیر داشته باشد:
 
 ```text
 ~/.hermes/profiles/<workerId>/skills/
 ```
 
-The important rule is that the worker's runtime must be able to resolve the skill name from its profile. The UI can display a role's default skills, but the worker still needs the skill files available locally.
+قاعدهٔ مهم این است که runtime کارگر باید بتواند نام skill را از profile خود حل کند. UI می‌تواند default skillهای یک role را نمایش دهد، اما کارگر همچنان به فایل‌های skill به‌صورت محلی نیاز دارد.
 
-## Role-to-skill defaults
+## defaultهای role-to-skill
 
-| Role | Default skills |
+| Role | default skillها |
 | --- | --- |
 | Orchestrator | `swarm-orchestrator`, `swarm-worker-core`, `swarm-review-learning-loop`, `self-improvement` |
 | Builder | `swarm-worker-core`, `byte-verified-code-review` |
@@ -52,96 +52,96 @@ The important rule is that the worker's runtime must be able to resolve the skil
 | Foundation | `swarm-worker-core` |
 | QA | `swarm-worker-core`, `byte-verified-code-review` |
 | Mirror Integrations | `swarm-worker-core`, `claude-promo`, `songwriting-and-ai-music` |
-| Custom | no default skills |
+| Custom | بدون default skill |
 
-## What each core skill contributes
+## سهم هر skill core
 
 ### swarm-worker-core
 
-Base contract for every Hermes Agent:
+قرارداد پایه برای هر Hermes Agent:
 
-- understand the task
-- set phase
-- execute the next meaningful step
-- verify
+- فهمیدن task
+- تنظیم phase
+- اجرای next meaningful step
+- تأیید
 - checkpoint
-- continue, escalate, or stop cleanly
+- ادامه، escalation یا توقف تمیز
 
-If a worker has only one skill, it should have this one.
+اگر یک کارگر فقط یک skill داشته باشد، باید این را داشته باشد.
 
 ### swarm-orchestrator
 
-Used by the orchestrator lane. It owns:
+توسط lane ارکستریتور استفاده می‌شود. مالک:
 
-- mission decomposition
-- role-based routing
+- تجزیهٔ mission
+- routing بر اساس role
 - drift detection
-- checkpoint interpretation
-- re-prompting
+- تفسیر checkpoint
+- re-prompt
 - escalation
-- lane priority
-- handoff hygiene
+- اولویت lane
+- hygiene handoff
 
-The orchestrator should not be the best coder in the room. It should be the worker that makes every other worker useful.
+ارکستریتور نباید بهترین coder در اتاق باشد. باید کارگری باشد که هر کارگر دیگر را مفید می‌کند.
 
 ### swarm-review-learning-loop
 
-Used after completed work and reviews to convert outcome into memory or skill improvements. This prevents the swarm from repeatedly stepping on the same rake and calling it research.
+پس از کارهای تکمیل‌شده و بازبینی‌ها برای تبدیل outcome به حافظه یا بهبودهای skill استفاده می‌شود. این مانع می‌شود swarm بارها و بارها روی همان بیل بپرد و آن را research بنامد.
 
 ### byte-verified-code-review
 
-Used for review gates. It forces proof instead of "looks fine":
+برای gateهای بازبینی استفاده می‌شود. به‌جای «خوب به‌نظر می‌رسد»، proof را الزامی می‌کند:
 
-- inspect exact diff
-- byte-check fragile naming or generated output
-- run tests/build/smoke
-- state verdict
-- document blockers precisely
+- بررسی diff دقیق
+- byte-check naming شکننده یا خروجی generated
+- اجرای tests/build/smoke
+- بیان verdict
+- مستندسازی دقیق blockerها
 
 ### swarm-bench-worker
 
-Used by Lab for local-model and runtime experiments:
+توسط Lab برای آزمایش‌های مدل محلی و runtime استفاده می‌شود:
 
-- benchmark plan
-- controlled run
-- result capture
-- reproducibility notes
-- escalation threshold
+- plan benchmark
+- اجرای کنترل‌شده
+- ضبط نتیجه
+- یادداشت‌های reproducibility
+- آستانهٔ escalation
 
 ### swarm-pr-worker
 
-Used by PR/issues lanes:
+توسط laneهای PR/issues استفاده می‌شود:
 
-- issue scan
+- scan issue
 - scoring
-- reproduction
-- branch discipline
-- fix/test/PR prep
-- review feedback handling
+- بازتولید
+- discipline branch
+- آماده‌سازی fix/test/PR
+- مدیریت feedback بازبینی
 
 ### swarm-ui-worker
 
-Used by UI builders:
+توسط UI builderها استفاده می‌شود:
 
-- route inspection
-- component boundaries
+- بررسی route
+- مرزهای component
 - visual state
-- smoke checks
-- build verification
+- smoke checkها
+- تأیید build
 
 ### swarm-dev-runtime
 
-Used by Foundation/runtime lanes:
+توسط laneهای Foundation/runtime استفاده می‌شود:
 
-- API contracts
-- profile/runtime state
-- health checks
-- lifecycle repair
-- tmux/gateway integration
+- قراردادهای API
+- state profile/runtime
+- health checkها
+- تعمیر lifecycle
+- ادغام tmux/gateway
 
-## Adding custom skills
+## افزودن skillهای سفارشی
 
-Create a skill directory with a `SKILL.md` file:
+یک دایرکتوری skill با فایل `SKILL.md` بسازید:
 
 ```text
 skills/my-skill/
@@ -151,7 +151,7 @@ skills/my-skill/
   scripts/
 ```
 
-Recommended frontmatter:
+frontmatter پیشنهادی:
 
 ```yaml
 ---
@@ -160,7 +160,7 @@ description: One sentence explaining when a worker must load this skill.
 ---
 ```
 
-Recommended sections:
+بخش‌های پیشنهادی:
 
 ```markdown
 # My Skill
@@ -181,47 +181,47 @@ When to use it.
 What the worker must return.
 ```
 
-## Adding a custom skill to a worker
+## افزودن یک skill سفارشی به کارگر
 
-1. Add the skill folder to the shared skills directory or the worker profile's `skills/` directory.
-2. Add the skill name to the role preset or worker roster entry.
-3. Restart or rotate the worker session so the profile reloads.
-4. Dispatch a small task that requires the skill.
-5. Verify the checkpoint names the skill and returns proof.
+1. پوشهٔ skill را به دایرکتوری skill مشترک یا دایرکتوری `skills/` profile کارگر اضافه کنید.
+2. نام skill را به preset نقش یا ورودی roster کارگر اضافه کنید.
+3. session کارگر را restart یا rotate کنید تا profile بارگذاری مجدد شود.
+4. یک task کوچک که نیاز به skill دارد dispatch کنید.
+5. تأیید کنید checkpoint نام skill را می‌آورد و proof برمی‌گرداند.
 
-## Skill hygiene rules
+## قواعد hygiene skill
 
-A skill should be patched when:
+یک skill باید patch شود وقتی:
 
-- a command is stale
-- a path changed
-- a setup assumption is wrong
-- a worker hit a recurring error not documented there
-- the user's preferred workflow changed
-- a better verification step exists
+- یک command stale شده
+- یک مسیر تغییر کرده
+- یک فرض setup اشتباه است
+- یک کارگر با یک error تکراری مواجه شده که آنجا مستند نشده
+- workflow ترجیحی کاربر تغییر کرده
+- یک مرحلهٔ تأیید بهتر وجود دارد
 
-Do not create a memory note for a procedure that belongs in a skill. Memory stores durable facts; skills store repeatable workflows.
+برای رویه‌ای که در skill قرار دارد، memory note نسازید. memory factهای پایدار را ذخیره می‌کند؛ skill workflowهای قابل تکرار را ذخیره می‌کند.
 
-## Skill loading checklist
+## چک‌لیست بارگذاری skill
 
-Before blaming a worker:
+قبل از مقصر دانستن یک کارگر:
 
-- Does the skill exist by exact name?
-- Does the worker profile have access to the skills directory?
-- Did the session start after the skill was added?
-- Does the role preset include the skill?
-- Did the task require the worker to load it?
-- Did the checkpoint show evidence that the procedure was followed?
+- آیا skill با نام دقیق وجود دارد؟
+- آیا profile کارگر به دایرکتوری skillها دسترسی دارد؟
+- آیا session پس از اضافه‌شدن skill شروع شد؟
+- آیا preset نقش شامل skill است؟
+- آیا task نیازمند بارگذاری skill توسط کارگر بود؟
+- آیا checkpoint evidence نشان داد که رویه دنبال شده؟
 
-## Minimum viable skill for Swarm v1
+## skill حداقل viable برای Swarm v1
 
-For a useful worker:
+برای یک کارگر مفید:
 
 ```text
 swarm-worker-core
 ```
 
-For a useful orchestrator:
+برای یک ارکستریتور مفید:
 
 ```text
 swarm-orchestrator
@@ -229,7 +229,7 @@ swarm-worker-core
 swarm-review-learning-loop
 ```
 
-For a useful reviewer:
+برای یک reviewer مفید:
 
 ```text
 swarm-worker-core
@@ -237,4 +237,4 @@ byte-verified-code-review
 swarm-review-learning-loop
 ```
 
-Everything else is specialization.
+هر چیز دیگری تخصص‌گرایی است.

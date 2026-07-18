@@ -1,45 +1,45 @@
-# Multi-Gateway Pool Architecture
-## HermesChi — Profile-Parallel Agent Execution
+# معماری استخر چند-دروازه‌ای
+## HermesChi — اجرای عامل موازی-بر-پروفایل
 
-### Status: Design Document — PR Proposal
-
----
-
-## 1. Problem Statement
-
-HermesChi currently operates as a **single-gateway, single-profile UI**. The gateway loads one `HERMES_HOME` at startup and all chat sessions, operations, and memory access flow through that one process.
-
-For multi-profile users (the primary Claude use case), this means:
-- **No parallel agent execution**: Cannot brainstorm with Nous while Jules orchestrates Architect and Sentinel in Operations
-- **No profile identity in chat**: The "agent" is always whoever the single gateway was launched as
-- **Terminal fragmentation**: Users must open separate terminal windows per profile to achieve true multi-agent workflows
-- **Session pollution**: All sessions pile into one pool regardless of which agent personality created them
-
-### User Story
-
-> "I think strategically with Nous about Ascent Performance features while Jules orchestrates building with Architect and Sentinel. I want to quick-switch between these agent conversations in the same workspace window, with each agent maintaining its own memory, skills, and session context."
+### وضعیت: سند طراحی — پیشنهاد PR
 
 ---
 
-## 2. First-Principles Design
+## ۱. بیان مسئله
 
-**Core truth**: Each Hermes profile is a **distinct cognitive agent** — different SOUL.md, different skills, different memory, different purpose. They are not "modes" of one agent. They are parallel agents.
+HermesChi در حال حاضر به‌عنوان یک **رابط کاربری تک‌دروازه‌ای، تک‌پروفایلی** عمل می‌کند. دروازه یک `HERMES_HOME` را در زمان شروع بارگذاری می‌کند و همهٔ سشن‌های گفتگو، عملیات و دسترسی memory از همان یک فرآیند عبور می‌کنند.
 
-**Implication**: The workspace must be an **agent orchestrator**, not just a UI skin over one gateway.
+برای کاربران چندپروفایلی (مورد استفادهٔ اصلی Claude)، این یعنی:
+- **بدون اجرای موازی عامل**: نمی‌توان با Nous ایده‌پردازی کرد در حالی که Jules، Architect و Sentinel را در Operations هماهنگ می‌کند
+- **بدون هویت profile در گفتگو**: «عامل» همیشه همان کسی است که دروازهٔ تک‌PROFILE به‌عنوان او راه‌اندازی شده
+- **تکه‌تکه شدن ترمینال**: کاربران باید برای دستیابی به جریان‌های کاری واقعی چندعاملی، پنجرهٔ ترمینال جداگانه‌ای به‌ازای هر profile باز کنند
+- **آلودگی سشن**: همهٔ سشن‌ها فارغ از اینکه کدام شخصیت عامل آن‌ها را ایجاد کرده، در یک استخر انباشته می‌شوند
 
-**Constraint**: Hermes Agent gateway is designed as a single-tenant process. It cannot dynamically reload profiles. Each profile needs its own gateway instance.
+### داستان کاربر
 
-**Solution**: The workspace maintains a **gateway pool** — one gateway process per active profile, each on its own port, all health-monitored, all routable from the UI.
-
-**Design principles:**
-1. **Profile-count agnostic**: Works for 1 profile or 100. No hardcoded limits, arrays, or switch statements enumerating specific profiles.
-2. **Privacy by design**: No PII, API keys, passwords, or secrets in code, logs, or PRs. All sensitive data stays in profile-local `.env` files.
-3. **Backward compatible**: Single-profile users unaffected. Pool mode is opt-in.
-4. **Fail-safe**: A dead gateway does not crash the workspace. Graceful fallback always available.
+> «من با Nous به‌طور راهبردی دربارهٔ ویژگی‌های Ascent Performance فکر می‌کنم در حالی که Jules ساختن با Architect و Sentinel را هماهنگ می‌کند. می‌خواهم در همان پنجرهٔ workspace به‌سرعت میان این گفتگوهای عامل تعویض کنم، با هر عامل که memory، skills و زمینهٔ سشن خود را حفظ می‌کند.»
 
 ---
 
-## 3. Architecture Overview
+## ۲. طراحی بر اساس اصول اولیه
+
+**حقیقت بنیادی**: هر profile هرمس یک **عامل شناختی متمایز** است — SOUL.md متفاوت، skills متفاوت، memory متفاوت، هدف متفاوت. آن‌ها «حالت‌های» یک عامل نیستند. آن‌ها عامل‌های موازی هستند.
+
+**نتیجه**: workspace باید یک **هماهنگ‌کنندهٔ عامل** باشد، نه فقط یک پوستهٔ رابط کاربری روی یک دروازه.
+
+**محدودیت**: دروازهٔ Hermes Agent به‌عنوان یک فرآیند تک‌مستأجر طراحی شده است. نمی‌تواند profileها را به‌صورت پویا reload کند. هر profile به نمونهٔ دروازهٔ خود نیاز دارد.
+
+**راه‌حل**: workspace یک **استخر دروازه** را نگه می‌دارد — یک فرآیند دروازه به‌ازای هر profile فعال، هر کدام روی پورت خود، همگی تحت نظارت سلامت، همگی قابل مسیریابی از رابط کاربری.
+
+**اصول طراحی:**
+۱. **مستقل از تعداد profile**: برای ۱ profile یا ۱۰۰ کار می‌کند. بدون محدودیت‌های hardcodeشده، آرایه‌ها، یا دستورات switch که profileهای خاص را برمی‌شمرند.
+۲. **حریم خصوصی بر اساس طراحی**: بدون PII، کلید API، رمز عبور یا secret در کد، لاگ یا PR. تمام داده‌های حساس در فایل‌های `.env` محلی-پروفایل باقی می‌مانند.
+۳. **سازگار به‌عقب**: کاربران تک‌پروفایلی تحت‌تأثیر قرار نمی‌گیرند. حالت استخر opt-in است.
+۴. **fail-safe**: یک دروازهٔ مرده workspace را crash نمی‌کند. fallback ایمن همیشه در دسترس است.
+
+---
+
+## ۳. مرور کلی معماری
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -76,9 +76,9 @@ For multi-profile users (the primary Claude use case), this means:
 
 ---
 
-## 4. Gateway Pool Manager
+## ۴. مدیر استخر دروازه
 
-### 4.1 Port Assignment Convention
+### ۴.۱ قرارداد تخصیص پورت
 
 ```typescript
 const BASE_PORT = 8642
@@ -88,22 +88,22 @@ function getGatewayPort(profileName: string, profiles: string[]): number {
 }
 ```
 
-Profiles are sorted alphabetically to ensure stable port assignment. A persistence file (`gateway-pool.json`) remembers assignments across restarts.
+profileها به‌ترتیب الفبایی مرتب می‌شوند تا تخصیص پورت پایدار تضمین شود. یک فایل persistence (`gateway-pool.json`) تخصیص‌ها را در طول restart به یاد می‌سپارد.
 
-**Profile-count agnostic**: The pool manager discovers profiles dynamically from the filesystem (`~/.hermes/profiles/*`). There is no hardcoded list, no maximum count, and no special-casing of specific profile names. A user with 2 profiles and a user with 50 profiles use the exact same code path.
+**مستقل از تعداد profile**: مدیر استخر profileها را به‌صورت پویا از فایل‌سیستم (`~/.hermes/profiles/*`) کشف می‌کند. هیچ فهرست hardcodeشده‌ای، هیچ تعداد حداکثری، و هیچ special-casing نام profile خاصی وجود ندارد. کاربری با ۲ profile و کاربری با ۵۰ profile از دقیقاً همان مسیر کد استفاده می‌کنند.
 
-### 4.2 Gateway Lifecycle States
+### ۴.۲ وضعیت‌های چرخهٔ حیات دروازه
 
 ```typescript
 type GatewayState = 
-  | 'spawning'      // Process starting
-  | 'healthy'       // Responded to /health within 5s
-  | 'degraded'      // Slow responses (>2s)
-  | 'dead'          // Failed health check 3x
-  | 'stopped'       // User explicitly stopped
+  | 'spawning'      // فرآیند در حال شروع
+  | 'healthy'       // در ۵s به /health پاسخ داد
+  | 'degraded'      // پاسخ‌های کند (>۲s)
+  | 'dead'          // شکست ۳ باره در بررسی سلامت
+  | 'stopped'       // کاربر صریحاً متوقف کرد
 ```
 
-### 4.3 Spawn Protocol
+### ۴.۳ پروتکل spawn
 
 ```typescript
 function spawnGateway(profileName: string, port: number): ChildProcess {
@@ -118,44 +118,44 @@ function spawnGateway(profileName: string, port: number): ChildProcess {
 }
 ```
 
-**Note**: The gateway must be spawned via `hermes gateway`, not via the workspace's internal gateway.ts. The workspace becomes an orchestrator, not a gateway host.
+**یادداشت**: دروازه باید از طریق `hermes gateway` spawn شود، نه از طریق gateway.ts داخلی workspace. workspace به یک هماهنگ‌کننده تبدیل می‌شود، نه یک میزبان دروازه.
 
-### 4.4 Health Monitor
+### ۴.۴ ناظر سلامت
 
-- Poll each gateway `GET /health` every 30s
-- 3 consecutive failures → mark `dead`, auto-restart (with backoff)
-- Slow response (>2s) → mark `degraded`, log warning
-- Recovery → mark `healthy`
+- هر دروازه `GET /health` را هر ۳۰s poll کنید
+- ۳ شکست متوالی → علامت‌گذاری به‌عنوان `dead`، restart خودکار (با backoff)
+- پاسخ کند (>۲s) → علامت‌گذاری به‌عنوان `degraded`، لاگ هشدار
+- بازیابی → علامت‌گذاری به‌عنوان `healthy`
 
-### 4.5 Shutdown Protocol
+### ۴.۵ پروتکل خاموشی
 
-On workspace exit (SIGTERM):
-1. Send graceful shutdown to all gateways (`POST /shutdown`)
-2. Wait 10s
-3. SIGKILL any remaining
-4. Persist gateway-pool.json state
+هنگام خروج workspace (SIGTERM):
+۱. ارسال خاموشی ایمن به همهٔ دروازه‌ها (`POST /shutdown`)
+۲. ۱۰s منتظر بمانید
+۳. SIGKILL هر چیزی که باقی مانده
+۴. persist کردن وضعیت gateway-pool.json
 
 ---
 
-## 5. Request Routing Layer
+## ۵. لایه مسیریابی درخواست
 
-### 5.1 API Route Changes
+### ۵.۱ تغییرات مسیر API
 
-All workspace API routes gain **profile context**:
+تمام مسیرهای API workspace به **زمینهٔ profile** مجهز می‌شوند:
 
 ```typescript
-// Current: /api/chat/completions
-// New:    /api/chat/completions?profile=nous
-//         or header: X-Claude-Profile: nous
+// فعلی: /api/chat/completions
+// جدید:    /api/chat/completions?profile=nous
+//         یا header: X-Claude-Profile: nous
 
-// Gateway proxy routes:
+// مسیرهای proxy دروازه:
 // /api/gateway/{profile}/chat/completions
 // /api/gateway/{profile}/sessions
 // /api/gateway/{profile}/memory
-// etc.
+// و غیره.
 ```
 
-### 5.2 Router Implementation
+### ۵.۲ پیاده‌سازی روتر
 
 ```typescript
 // src/server/gateway-router.ts
@@ -173,22 +173,22 @@ export async function proxyToGateway(
 }
 ```
 
-### 5.3 Backward Compatibility
+### ۵.۳ سازگاری به‌عقب
 
-When no profile is specified:
-- Default to `activeProfile` (from `~/.hermes/active_profile` file)
-- If that file doesn't exist, default to first available profile
-- Single-profile users see **zero behavioral change**
+هنگامی که هیچ profile مشخص نشده:
+- پیش‌فرض به `activeProfile` (از فایل `~/.hermes/active_profile`)
+- اگر آن فایل وجود نداشت، پیش‌فرض به نخستین profile موجود
+- کاربران تک‌پروفایلی **هیچ تغییر رفتاری نمی‌بینند**
 
 ---
 
-## 6. Session Isolation Model
+## ۶. مدل جداسازی سشن
 
-### 6.1 Session Storage
+### ۶.۱ ذخیره‌سازی سشن
 
-Currently: All sessions in `~/.hermes/sessions/` (or profile's sessions dir)
+در حال حاضر: همهٔ سشن‌ها در `~/.hermes/sessions/` (یا دایرکتوری سشن‌های profile)
 
-With multi-gateway: Each gateway manages its own sessions in its own profile directory. The workspace **aggregates** them for display but **routes** them per-profile.
+با چند-دروازه: هر دروازه سشن‌های خود را در دایرکتوری profile خود مدیریت می‌کند. workspace آن‌ها را برای نمایش **تجمیع** می‌کند اما به‌ازای هر profile **مسیریابی** می‌کند.
 
 ```typescript
 // src/server/sessions-aggregator.ts
@@ -211,99 +211,99 @@ export async function listAllSessions(): Promise<SessionMeta[]> {
 }
 ```
 
-### 6.2 Session Display
+### ۶.۲ نمایش سشن
 
-Sessions in sidebar are **grouped by profile** with visual distinction:
+سشن‌ها در sidebar **بر اساس profile گروه‌بندی** می‌شوند با تمایز بصری:
 
 ```
 SESSIONS
-▼ nous (green dot)
+▼ nous (نقطهٔ سبز)
   ├─ Hello from workspace test · 3:05 PM
   └─ Email triage architecture · Apr 22
-▼ jules (blue dot)
+▼ jules (نقطهٔ آبی)
   ├─ Ascent build orchestration · 2:30 PM
   └─ PR #118 coordination · Apr 21
-▼ architect (purple dot)
+▼ architect (نقطهٔ بنفش)
   └─ Gateway pool refactor · Apr 20
 ```
 
 ---
 
-## 7. UI Changes
+## ۷. تغییرات رابط کاربری
 
-### 7.1 Profile Selector (Global Header)
+### ۷.۱ انتخابگر profile (سراسری header)
 
-A persistent pill/button in the top-left (next to sidebar toggle):
+یک pill/button پایدار در بالا-چپ (کنار toggle sidebar):
 
 ```
 [☰] [ nous ▼ ]              HermesChi
 ```
 
-- Dropdown lists all profiles with status indicators
-- Green dot = gateway healthy
-- Yellow dot = degraded
-- Red dot = dead/stopped
-- Clicking switches active profile for the **current panel**
-- `Cmd+Shift+1..6` keyboard shortcuts for rapid switching
+- dropdown همهٔ profileها را با نشانگرهای وضعیت فهرست می‌کند
+- نقطهٔ سبز = دروازهٔ سالم
+- نقطهٔ زرد = degraded
+- نقطهٔ قرمز = dead/stopped
+- کلیک، profile فعال را برای **پنل فعلی** تعویض می‌کند
+- میانبرهای کیبورد `Cmd+Shift+1..6` برای تعویض سریع
 
-### 7.2 Chat Screen
+### ۷.۲ صفحهٔ گفتگو
 
-- Empty state shows active profile name + model (already implemented in PR #118)
-- Session list shows profile-colored dots per session
-- Composer sends to active profile's gateway
-- "New Session" creates session scoped to active profile
+- حالت خالی نام profile فعال + مدل را نشان می‌دهد (هم‌اکنون در PR #118 پیاده‌سازی شده)
+- فهرست سشن نقطه‌های رنگی profile را به‌ازای هر سشن نشان می‌دهد
+- composer به دروازهٔ profile فعال ارسال می‌کند
+- «New Session» سشن معکوب به profile فعال ایجاد می‌کند
 
-### 7.3 Operations / Conductor
+### ۷.۳ Operations / Conductor
 
-- Task cards show which profile they're running on
-- "Run on" dropdown when creating tasks
-- Operations dashboard aggregates tasks across all profiles
+- کارت‌های وظیفه نشان می‌دهند روی کدام profile در حال اجرا هستند
+- dropdown «Run on» هنگام ایجاد وظایف
+- داشبورد Operations وظایف را در همهٔ profileها تجمیع می‌کند
 
-### 7.4 Memory Browser
+### ۷.۴ مرورگر memory
 
-- Memory entries tagged with profile
-- Filter by profile
-- Cross-profile memory search (optional, user-configurable)
-
----
-
-## 8. File Changes Required
-
-### New Files
-```
-src/server/gateway-pool.ts          # Core pool manager
-src/server/gateway-pool.test.ts     # Pool tests
-src/server/gateway-router.ts        # Request routing layer
-src/server/sessions-aggregator.ts   # Multi-profile session aggregation
-src/components/profile-selector.tsx # Global profile switcher
-src/components/profile-badge.tsx    # Small profile indicator
-src/hooks/use-gateway-pool.ts       # React hook for pool state
-src/routes/api/gateway-pool.ts      # Pool status API
-```
-
-### Modified Files
-```
-src/server/profiles-browser.ts      # Add gateway port field
-src/routes/api/profiles/list.ts     # Include gateway status
-src/routes/api/chat.ts              # Route to correct gateway
-src/routes/api/sessions.ts          # Aggregate across gateways
-src/screens/chat/chat-screen.tsx    # Pass profile context
-src/screens/chat/components/chat-header.tsx  # Show profile badge
-src/screens/chat/components/chat-empty-state.tsx  # Already done
-src/components/workspace-shell.tsx  # Add profile selector
-src/server/local-provider-discovery.ts  # Multi-gateway provider discovery
-```
+- ورودی‌های memory با profile برچسب‌گذاری می‌شوند
+- فیلتر بر اساس profile
+- جستجوی memory بین‌پروفایلی (اختیاری، قابل پیکربندی توسط کاربر)
 
 ---
 
-## 9. Configuration
+## ۸. تغییرات فایل مورد نیاز
 
-### Environment Variables
+### فایل‌های جدید
+```
+src/server/gateway-pool.ts          # مدیر استخر هسته
+src/server/gateway-pool.test.ts     # آزمون‌های استخر
+src/server/gateway-router.ts        # لایه مسیریابی درخواست
+src/server/sessions-aggregator.ts   # تجمیع سشن چندپروفایلی
+src/components/profile-selector.tsx # انتخابگر سراسری profile
+src/components/profile-badge.tsx    # نشانگر کوچک profile
+src/hooks/use-gateway-pool.ts       # hook ری‌اکت برای وضعیت استخر
+src/routes/api/gateway-pool.ts      # API وضعیت استخر
+```
+
+### فایل‌های تغییر یافته
+```
+src/server/profiles-browser.ts      # افزودن فیلد پورت دروازه
+src/routes/api/profiles/list.ts     # شامل وضعیت دروازه
+src/routes/api/chat.ts              # مسیریابی به دروازهٔ صحیح
+src/routes/api/sessions.ts          # تجمیع در طول دروازه‌ها
+src/screens/chat/chat-screen.tsx    # ارسال زمینهٔ profile
+src/screens/chat/components/chat-header.tsx  # نمایش badge profile
+src/screens/chat/components/chat-empty-state.tsx  # هم‌اکنون انجام شده
+src/components/workspace-shell.tsx  # افزودن انتخابگر profile
+src/server/local-provider-discovery.ts  # کشف provider چند-دروازه‌ای
+```
+
+---
+
+## ۹. پیکربندی
+
+### متغیرهای محیطی
 ```bash
-CLAUDE_GATEWAY_POOL_ENABLED=true   # Enable multi-gateway mode
-CLAUDE_GATEWAY_BASE_PORT=8642      # Starting port
-CLAUDE_GATEWAY_POOL_MAX=10         # Max concurrent gateways
-CLAUDE_GATEWAY_HEALTH_INTERVAL=30  # Health check seconds
+CLAUDE_GATEWAY_POOL_ENABLED=true   # فعال‌سازی حالت چند-دروازه‌ای
+CLAUDE_GATEWAY_BASE_PORT=8642      # پورت شروع
+CLAUDE_GATEWAY_POOL_MAX=10         # حداکثر دروازه‌های همزمان
+CLAUDE_GATEWAY_HEALTH_INTERVAL=30  # ثانیه‌های بررسی سلامت
 ```
 
 ### workspace-overrides.json
@@ -322,79 +322,79 @@ CLAUDE_GATEWAY_HEALTH_INTERVAL=30  # Health check seconds
 
 ---
 
-## 10. Error Handling & Edge Cases
+## ۱۰. مدیریت خطا و موارد مرزی
 
-| Scenario | Behavior |
+| سناریو | رفتار |
 |----------|----------|
-| Gateway fails to spawn | Show error toast, allow retry, fallback to active profile |
-| Port already in use | Auto-increment port, log warning |
-| Profile deleted while gateway running | Stop gateway, remove from pool |
-| Workspace crashes | On restart, check for orphaned gateways, adopt or kill |
-| Single-profile user | Pool mode off by default, zero impact |
-| Gateway version mismatch | Log warning, attempt spawn anyway |
-| Memory pressure | Allow user to stop idle gateways, keep active ones |
+| شکست در spawn دروازه | نمایش toast خطا، اجازه retry، fallback به profile فعال |
+| پورت هم‌اکنون در حال استفاده | افزایش خودکار پورت، لاگ هشدار |
+| حذف profile در حین اجرای دروازه | توقف دروازه، حذف از استخر |
+| crash شدن workspace | در restart، بررسی دروازه‌های orphan، adopt یا kill |
+| کاربر تک‌پروفایلی | حالت استخر به‌طور پیش‌فرض خاموش، بدون تأثیر |
+| ناهماهنگی نسخهٔ دروازه | لاگ هشدار، تلاش spawn به‌هر حال |
+| فشار memory | اجازه به کاربر برای توقف دروازه‌های idle، نگه‌داری دروازه‌های فعال |
 
 ---
 
-## 11. Security & Privacy Considerations
+## ۱۱. ملاحظات امنیتی و حریم خصوصی
 
-- Gateways bind to `127.0.0.1` only (already default)
-- No cross-profile memory leakage (each gateway has its own `HERMES_HOME`)
-- Profile selector respects auth middleware
-- Admin-only: ability to spawn/stop gateways
-- **No secrets in code or PRs**: API keys, passwords, tokens, and PII must never appear in source code, test fixtures, log output, or PR descriptions. All sensitive configuration lives in profile-local `.env` files which are `.gitignore`d.
-- **Sanitized examples**: Architecture diagrams and examples use fictional profile names (e.g., `agent-alpha`, `agent-beta`) or generic placeholders, never real user profile names, paths, or credentials.
-- **No hardcoded paths**: Port assignments, profile directories, and gateway URLs are resolved dynamically. No `/Users/...` or `C:\Users\...` paths in code.
-- **Log safety**: Gateway pool logs must redact any env vars containing `KEY`, `TOKEN`, `SECRET`, or `PASSWORD`.
+- دروازه‌ها فقط به `127.0.0.1` bind می‌شوند (هم‌اکنون پیش‌فرض)
+- بدون نشت memory بین‌پروفایلی (هر دروازه `HERMES_HOME` خود را دارد)
+- انتخابگر profile به middleware auth احترام می‌گذارد
+- فقط ادمین: قابلیت spawn/stop دروازه‌ها
+- **بدون secret در کد یا PR**: کلیدهای API، رمزهای عبور، tokenها و PII هرگز نباید در کد منبع، fixtureهای آزمون، خروجی لاگ یا توصیف PR ظاهر شوند. تمام پیکربندی حساس در فایل‌های `.env` محلی-پروفایل قرار دارد که `.gitignore` شده‌اند.
+- **نمونه‌های sanitizeشده**: نمودارهای معماری و نمونه‌ها از نام‌های profile خیالی (مثلاً `agent-alpha`، `agent-beta`) یا placeholder عمومی استفاده می‌کنند، هرگز نام profile کاربر واقعی، مسیرها یا اعتبارنامه‌ها.
+- **بدون مسیرهای hardcodeشده**: تخصیص پورت، دایرکتوری‌های profile و URLهای دروازه به‌صورت پویا resolve می‌شوند. هیچ مسیر `/Users/...` یا `C:\Users\...` در کد نیست.
+- **ایمنی لاگ**: لاگ‌های استخر دروازه باید هر متغیر محیطی حاوی `KEY`، `TOKEN`، `SECRET` یا `PASSWORD` را redact کنند.
 
 ---
 
-## 12. Performance
+## ۱۲. عملکرد
 
-| Metric | Target |
+| معیار | هدف |
 |--------|--------|
-| Gateway spawn time | < 3s |
-| Profile switch latency | < 200ms (no spawn needed) |
-| Health check overhead | < 10ms per gateway |
-| Memory per gateway | ~100-200MB |
-| Max recommended profiles | 10 (configurable) |
+| زمان spawn دروازه | < ۳s |
+| تأخیر تعویض profile | < ۲۰۰ms (بدون نیاز به spawn) |
+| overhead بررسی سلامت | < ۱۰ms به‌ازای هر دروازه |
+| memory به‌ازای هر دروازه | ~۱۰۰-۲۰۰MB |
+| حداکثر profileهای پیشنهادی | ۱۰ (قابل پیکربندی) |
 
 ---
 
-## 13. Backward Compatibility
+## ۱۳. سازگاری به‌عقب
 
-- **Single-profile users**: Completely unaffected. Pool mode off by default.
-- **Multi-profile users (current)**: Pool mode can be toggled in Settings. When off, behavior matches current single-gateway mode.
-- **Existing sessions**: Preserved. Each session already lives in its profile directory. The workspace just aggregates them properly.
-- **API contracts**: All existing `/api/*` routes work unchanged when no profile specified.
-
----
-
-## 14. Migration Path
-
-1. **Phase 1 (This PR)**: Pool manager + routing layer + profile selector in chat
-2. **Phase 2 (Follow-up)**: Session aggregation with profile grouping
-3. **Phase 3 (Follow-up)**: Operations/Conductor multi-profile support
-4. **Phase 4 (Follow-up)**: Memory browser cross-profile search
+- **کاربران تک‌پروفایلی**: کاملاً تحت‌تأثیر قرار نمی‌گیرند. حالت استخر به‌طور پیش‌فرض خاموش است.
+- **کاربران چندپروفایلی (فعلی)**: حالت استخر می‌تواند در تنظیمات toggle شود. هنگامی که خاموش است، رفتار با حالت تک‌دروازهٔ فعلی مطابقت دارد.
+- **سشن‌های موجود**: حفظ می‌شوند. هر سشن هم‌اکنون در دایرکتوری profile خود زندگی می‌کند. workspace فقط آن‌ها را به‌درستی تجمیع می‌کند.
+- **قراردادهای API**: تمام مسیرهای `/api/*` موجود هنگامی که هیچ profile مشخص نشده، بدون تغییر کار می‌کنند.
 
 ---
 
-## 15. Related Work
+## ۱۴. مسیر مهاجرت
 
-- PR #118: Profile-aware config (merged) — provides `HERMES_HOME` resolution and profile listing
-- Issue #?: Multi-profile session management (to be created)
-- Issue #?: Gateway lifecycle hooks (to be created)
-
----
-
-## 16. Open Questions for Discussion
-
-1. Should the workspace auto-spawn all profile gateways on startup, or only on first use?
-2. Should there be a "workspace default" profile that's always active, or should each panel remember its last profile?
-3. How should the Conductor page handle tasks that span multiple profiles (e.g., Jules delegates to Architect)?
-4. Should profiles share a unified notification stream, or should each profile have its own notification badge?
+۱. **فاز ۱ (این PR)**: مدیر استخر + لایه مسیریابی + انتخابگر profile در گفتگو
+۲. **فاز ۲ (پیگیری)**: تجمیع سشن با گروه‌بندی profile
+۳. **فاز ۳ (پیگیری)**: پشتیبانی چندپروفایلی Operations/Conductor
+۴. **فاز ۴ (پیگیری)**: جستجوی بین‌پروفایلی مرورگر memory
 
 ---
 
-*Authored by Nous (Vivere Vitalis) for the HermesChi project.*
-*First-principles architecture: if each profile is a distinct agent, the workspace must be an agent orchestrator.*
+## ۱۵. کارهای مرتبط
+
+- PR #118: پیکربندی آگاه از profile (merge شده) — `HERMES_HOME` resolution و فهرست‌کردن profile را فراهم می‌کند
+- Issue #?: مدیریت سشن چندپروفایلی (برای ایجاد)
+- Issue #?: hookهای چرخهٔ حیات دروازه (برای ایجاد)
+
+---
+
+## ۱۶. سوالات باز برای بحث
+
+۱. آیا workspace باید همهٔ دروازه‌های profile را در startup به‌صورت خودکار spawn کند، یا فقط در نخستین استفاده؟
+۲. آیا باید یک profile «پیش‌فرض workspace» همیشه فعال باشد، یا هر پنل باید آخرین profile خود را به یاد بیاورد؟
+۳. صفحهٔ Conductor چگونه باید با وظایفی که چندین profile را در بر می‌گیرند رفتار کند (مثلاً Jules به Architect delegate می‌کند)؟
+۴. آیا profileها باید یک جریان اعلان متحد داشته باشند، یا هر profile باید badge اعلان خود را داشته باشد؟
+
+---
+
+*تألیف شده توسط Nous (Vivere Vitalis) برای پروژهٔ HermesChi.*
+*معماری بر اساس اصول اولیه: اگر هر profile یک عامل متمایز است، workspace باید یک هماهنگ‌کنندهٔ عامل باشد.*

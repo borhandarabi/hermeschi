@@ -1,40 +1,40 @@
-# Claude-Workspace v2.1.0 — Swarm
+# Claude-Workspace نسخهٔ ۲.۱.۰ — Swarm
 
-Claude-Workspace 2.1.0 introduces **Swarm**, a built-in multi-agent orchestration surface for running a main ClaudeAgent with persistent worker agents.
+Claude-Workspace ۲.۱.۰ **Swarm** را معرفی می‌کند، یک سطح هماهنگی چندعاملی داخلی برای اجرای یک ClaudeAgent اصلی با عامل‌های worker پایدار.
 
-## Highlights
+## نکات برجسته
 
-- **Swarm Mode**
-  - route work from a main ClaudeAgent into a live worker swarm
-  - persistent tmux-backed workers
-  - role-aware dispatch and orchestration surfaces
+- **حالت Swarm**
+  - مسیریابی کار از یک ClaudeAgent اصلی به یک swarm زندهٔ worker
+  - workerهای پایدار با پشتیبانی tmux
+  - سطح‌های dispatch و هماهنگی آگاه از نقش
 
-- **Board, reports, and inbox flow**
-  - Board / Kanban support for swarm work
-  - reports and checkpoint routing
-  - inbox-style handling for blocked and review-ready work
+- **جریان Board، گزارش‌ها و inbox**
+  - پشتیبانی از Board / Kanban برای کار swarm
+  - مسیریابی گزارش‌ها و checkpoint
+  - مدیریت به‌سبک inbox برای کارهای مسدودشده و آماده بازبینی
 
-- **Orchestrator routing**
-  - worker checkpoints route through the orchestrator first
-  - cleaner reviewer flow and better control over escalation
+- **مسیریابی Orchestrator**
+  - checkpointهای worker ابتدا از طریق orchestrator مسیریابی می‌شوند
+  - جریان بازبینی‌کنندهٔ پاکتر و کنترل بهتر بر esclation
 
-- **Reliability improvements**
-  - long-running SSE chat streams survive silent agent processing windows
-  - approval banner wiring is fixed so tool approvals are visible again
-  - local-only portable sessions can be deleted correctly
-  - dashboard fallback added for session create/update/fork flows
-  - workspace reliability patches preserved
+- **بهبود قابلیت اطمینان**
+  - استریم‌های SSE گفتگوی طولانی‌مدت پنجره‌های پردازش خاموش عامل را تحمل می‌کنند
+  - سیم‌کشی بنر تأیید اصلاح شد تا تأییدهای ابزار دوباره قابل‌مشاهده باشند
+  - سشن‌های portable فقط‌محلی به‌درستی قابل حذف هستند
+  - fallback داشبورد برای جریان‌های ایجاد/به‌روزرسانی/fork سشن افزوده شد
+  - وصله‌های قابلیت اطمینان workspace حفظ شدند
 
-- **Claude path + environment fixes**
-  - canonical Claude root handling
-  - improved home/env handling for profiles and run storage
+- **اصلاحات مسیر Claude + محیط**
+  - مدیریت رسمی root Claude
+  - بهبود مدیریت home/env برای profileها و ذخیره‌سازی اجرا
 
-- **Docs and security**
-  - Swarm docs added
-  - Docker Skills Hub fallback docs clarified
-  - SECURITY disclosure path updated
+- **مستندات و امنیت**
+  - مستندات Swarm افزوده شد
+  - مستندات fallback Docker Skills Hub شفاف‌سازی شد
+  - مسیر افشای SECURITY به‌روزرسانی شد
 
-## Included PRs
+## PRهای گنجانده‌شده
 
 - #192
 - #196
@@ -48,21 +48,21 @@ Claude-Workspace 2.1.0 introduces **Swarm**, a built-in multi-agent orchestratio
 - #211
 - #215
 
-## Suggested short release description
+## توضیح کوتاه پیشنهادی انتشار
 
-Claude-Workspace 2.1.0 ships Swarm: a built-in multi-agent control surface for persistent worker agents, orchestrator-first routing, Board + reports + inbox flows, and a set of reliability fixes across chat streaming, approvals, sessions, and Claude path handling.
+Claude-Workspace ۲.۱.۰ Swarm را ارسال می‌کند: یک سطح کنترل چندعاملی داخلی برای عامل‌های worker پایدار، مسیریابی orchestrator-first، جریان‌های Board + گزارش‌ها + inbox، و مجموعه‌ای از اصلاحات قابلیت اطمینان در استریم گفتگو، تأییدها، سشن‌ها و مدیریت مسیر Claude.
 
-## Suggested launch post
+## پست راه‌اندازی پیشنهادی
 
-Claude-Workspace 2.1.0 is out.
+Claude-Workspace ۲.۱.۰ منتشر شد.
 
-It ships **Swarm**: a built-in multi-agent workspace where one ClaudeAgent can orchestrate persistent worker agents with live checkpoints, Board, inbox/review flow, and better routing between orchestrator and workers.
+این نسخه **Swarm** را ارسال می‌کند: یک workspace چندعاملی داخلی که در آن یک ClaudeAgent می‌تواند عامل‌های worker پایدار را با checkpointهای زنده، Board، جریان inbox/review و مسیریابی بهتر میان orchestrator و workerها هماهنگ کند.
 
-Also in 2.1.0:
-- stronger long-run SSE chat reliability
-- approval banner fix
-- portable session deletion fix
-- dashboard fallback for session actions
-- Claude path handling improvements
+همچنین در ۲.۱.۰:
+- قابلیت اطمینان قوی‌تر گفتگوی SSE طولانی‌مدت
+- اصلاح بنر تأیید
+- اصلاح حذف سشن portable
+- fallback داشبورد برای عملیات سشن
+- بهبود مدیریت مسیر Claude
 
-If you want multi-agent control without leaving your workspace, this is the release.
+اگر کنترل چندعاملی بدون ترک workspace خود می‌خواهید، این همان نسخه است.

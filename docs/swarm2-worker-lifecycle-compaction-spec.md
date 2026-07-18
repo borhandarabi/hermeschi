@@ -1,43 +1,43 @@
-# Swarm2 Worker Lifecycle + Compaction Spec
+# مشخصات چرخه حیات کارگر + فشرده‌سازی Swarm2
 
-Date: 2026-04-28
-Status: staged implementation
+تاریخ: 2026-04-28
+وضعیت: پیاده‌سازی مرحله‌بندی‌شده
 
-## Problem
+## مسئله
 
-Swarm workers are persistent Claude agents with their own profiles, sessions, tmux panes, runtime state, and memory. That is the right architecture, but long-running workers will eventually degrade when context approaches the model window.
+کارگران swarm عامل‌های Claude پایدار با پروفایل‌ها، جلسات، پنل‌های tmux، وضعیت runtime و حافظه خودشان هستند. این معماری درست است، اما کارگران طولانی‌مدت در نهایت وقتی زمینه به پنجره مدل نزدیک می‌شود تنزل پیدا می‌کنند.
 
-We need an automatic lifecycle system so workers can:
+ما به یک سیستم چرخه حیات خودکار نیاز داریم تا کارگران بتوانند:
 
-1. run with large context budgets,
-2. checkpoint before quality drops,
-3. write durable handoffs,
-4. restart/new themselves cleanly,
-5. resume from handoff and mission state,
-6. keep the orchestrator informed.
+۱. با بودجه زمینه بزرگ اجرا شوند،
+۲. قبل از افت کیفیت چک‌پوینت دهند،
+۳. تحویل‌های پایدار بنویسند،
+۴. خودشان را تمیز restart/جدید کنند،
+۵. از تحویل و وضعیت ماموریت resume کنند،
+۶. هماهنگ‌کننده را مطلع نگه دارند.
 
-## Target behavior
+## رفتار هدف
 
-Each worker gets a context policy:
+هر کارگر یک سیاست زمینه دریافت می‌کند:
 
-- soft limit: 250k tokens, request concise checkpoint soon
-- handoff limit: 400k tokens, write full handoff before more work
-- hard limit: 500k tokens, stop accepting new work until renewed
+- حد نرم: ۲۵۰k توکن، درخواست چک‌پوینت مختصر به‌زودی
+- حد تحویل: ۴۰۰k توکن، نوشتن تحویل کامل قبل از کار بیشتر
+- حد سخت: ۵۰۰k توکن، توقف پذیرش کار جدید تا renew
 
-Exact numbers should be configurable per model/profile, but default policy should be safe.
+اعداد دقیق باید برای هر مدل/پروفایل قابل پیکربندی باشند، اما سیاست پیش‌فرض باید ایمن باشد.
 
-## Lifecycle states
+## وضعیت‌های چرخه حیات
 
-- `healthy`: under soft limit
-- `watch`: over soft limit, continue but monitor
-- `handoff_required`: over handoff limit, ask worker to write handoff
-- `renew_required`: over hard limit or repeatedly stale/fragmented
-- `renewing`: handoff was requested and tmux/session is being restarted
-- `blocked`: renewal failed or handoff missing
+- `healthy`: زیر حد نرم
+- `watch`: بالای حد نرم، ادامه با پایش
+- `handoff_required`: بالای حد تحویل، درخواست نوشتن تحویل از کارگر
+- `renew_required`: بالای حد سخت یا به‌طور مکرر stale/تکه‌تکه
+- `renewing`: تحویل درخواست شده و tmux/جلسه در حال restart است
+- `blocked`: renew ناموفق یا تحویل مفقود
 
-## Handoff contract
+## قرارداد تحویل
 
-Before renewal, worker must write or return a handoff containing:
+قبل از renew، کارگر باید تحویلی بنویسد یا برگرداند شامل:
 
 ```text
 STATE: HANDOFF
@@ -48,60 +48,60 @@ BLOCKER: blocker or none
 NEXT_ACTION: exact next step after renewal
 ```
 
-Durable handoff path:
+مسیر تحویل پایدار:
 
 ```text
 /Users/aurora/.openclaw/workspace/memory/handoffs/swarm/<workerId>-latest.md
 ```
 
-Optional timestamped archive can exist later, but `latest.md` is the resume source.
+آرشیو timestamped اختیاری بعداً می‌تواند وجود داشته باشد، اما `latest.md` منبع resume است.
 
-## Renewal sequence
+## توالی renew
 
-1. Detect context pressure from Claude `state.db` session token counts.
-2. Ask worker for handoff via tmux dispatch.
-3. Parse handoff checkpoint from chat.
-4. Save handoff into durable memory path.
-5. Stop worker tmux session.
-6. Start clean Claude session with same profile and cwd.
-7. Send resume prompt containing handoff summary + active mission assignment.
-8. Mark runtime state healthy/executing.
+۱. تشخیص فشار زمینه از شمارش توکن جلسه `state.db` Claude.
+۲. درخواست تحویل از کارگر از طریق dispatch tmux.
+۳. parse چک‌پوینت تحویل از چت.
+۴. ذخیره تحویل در مسیر حافظه پایدار.
+۵. توقف جلسه tmux کارگر.
+۶. شروع جلسه تمیز Claude با همان پروفایل و cwd.
+۷. ارسال پرامپت resume شامل خلاصه تحویل + تخصیص ماموریت فعال.
+۸. علامت‌گذاری وضعیت runtime به‌عنوان healthy/executing.
 
-## Product requirements
+## الزامات محصول
 
-Swarm2 UI should show:
+UI Swarm2 باید نمایش دهد:
 
-- context state per worker
-- current session token estimate
-- lifecycle status
-- last handoff time
-- renew button
-- automatic renewal status
+- وضعیت زمینه برای هر کارگر
+- تخمین توکن جلسه جاری
+- وضعیت چرخه حیات
+- زمان آخرین تحویل
+- دکمه renew
+- وضعیت renew خودکار
 
-## Safety rules
+## قوانین ایمنی
 
-- Never auto-renew while worker is actively writing unless hard limit is reached.
-- Never start destructive execution after renewal without mission policy allowing it.
-- Handoff must be complete before restart unless human forces renewal.
-- If handoff parse fails, mark worker `blocked` and ask orchestrator/human.
+- هرگز هنگام نوشتن فعال کارگر auto-renew نکن مگر اینکه حد سخت رسیده باشد.
+- هرگز پس از renew اجرای مخرب را بدون اجازه سیاست ماموریت شروع نکن.
+- تحویل باید قبل از restart کامل شود مگر اینکه انسان renew را اجبار کند.
+- اگر parse تحویل ناموفق بود، کارگر را `blocked` علامت بزن و از هماهنگ‌کننده/انسان بخواه.
 
-## Stage 1 implementation
+## پیاده‌سازی مرحله ۱
 
-- Add lifecycle status API.
-- Read latest session token counts from `state.db`.
-- Return lifecycle state and recommended action.
-- Add request-handoff action that sends a strict handoff prompt to tmux.
-- Add renew action, but require `force: true` for now.
-- Normalize swarm wrappers to use `/Users/aurora/hermeschi` cwd.
+- افزودن API وضعیت چرخه حیات.
+- خواندن شمارش توکن آخرین جلسه از `state.db`.
+- برگرداندن وضعیت چرخه حیات و اقدام توصیه‌شده.
+- افزودن اقدام request-handoff که یک پرامپت تحویل سخت‌گیرانه به tmux ارسال می‌کند.
+- افزودن اقدام renew، اما برای اکنون نیاز به `force: true` دارد.
+- نرمال‌سازی wrapperهای swarm برای استفاده از cwd `/Users/aurora/hermeschi`.
 
-## Stage 2
+## مرحله ۲
 
-- Parse handoff checkpoints into durable handoff files.
-- Add runtime.json fields for `contextTokens`, `contextState`, `lastHandoffAt`.
-- Add Swarm2 UI lifecycle badges.
+- parse چک‌پوینت‌های تحویل به فایل‌های تحویل پایدار.
+- افزودن فیلدهای runtime.json برای `contextTokens`، `contextState`، `lastHandoffAt`.
+- افزودن badgeهای چرخه حیات UI Swarm2.
 
-## Stage 3
+## مرحله ۳
 
-- Automatic renewal loop.
-- Resume prompt with mission state.
-- Per-model context policies.
+- حلقه renew خودکار.
+- پرامپت resume با وضعیت ماموریت.
+- سیاست‌های زمینه per-model.

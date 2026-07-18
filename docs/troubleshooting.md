@@ -1,169 +1,169 @@
-# Troubleshooting — HermesChi
+# عیب‌یابی — HermesChi
 
-Common setup issues and how to fix them.
+مسائل رایج راه‌اندازی و نحوهٔ رفع آن‌ها.
 
 ---
 
-## 1. Gateway starts but API server never binds (port 8642 not listening)
+## ۱. دروازه شروع می‌شود اما سرور API هرگز bind نمی‌شود (پورت 8642 در حال گوش‌دادن نیست)
 
-**Symptom:** `hermes gateway run` appears to start, but `curl http://127.0.0.1:8642/health` fails. `ss -tlnp | grep 8642` shows nothing.
+**علامت:** به‌نظر می‌رسد `hermes gateway run` شروع می‌شود، اما `curl http://127.0.0.1:8642/health` شکست می‌خورد. `ss -tlnp | grep 8642` چیزی نشان نمی‌دهد.
 
-**Cause:** `API_SERVER_ENABLED` is not set — or is set with the wrong env var name.
+**علت:** `API_SERVER_ENABLED` تنظیم نشده است — یا با نام متغیر محیطی اشتباه تنظیم شده است.
 
-**Fix:**
+**رفع:**
 
 ```bash
-# Find your Hermes env file
+# یافتن فایل env هرمس شما
 hermes config env-path
-# Usually: ~/.hermes/.env
+# معمولاً: ~/.hermes/.env
 
-# Check for the key
+# بررسی کلید
 grep -i API_SERVER ~/.hermes/.env
 ```
 
-The env var must be **exactly** `API_SERVER_ENABLED=true` — with underscores. Common mistakes:
+متغیر محیطی باید **دقیقاً** `API_SERVER_ENABLED=true` باشد — با underscore. اشتباهات رایج:
 
-| Wrong | Right |
+| اشتباه | درست |
 |---|---|
 | `APISERVERENABLED=true` | `API_SERVER_ENABLED=true` |
 | `APISERVERHOST=0.0.0.0` | `API_SERVER_HOST=127.0.0.1` |
 | `ApiServerEnabled=true` | `API_SERVER_ENABLED=true` |
 
-After fixing, restart the gateway: `hermes gateway run --replace`
+پس از رفع، دروازه را راه‌اندازی مجدد کنید: `hermes gateway run --replace`
 
-**Also:** setting `API_SERVER_HOST=0.0.0.0` without `API_SERVER_KEY` causes a silent refusal. Use `127.0.0.1` for local access, or set a key for network access.
+**همچنین:** تنظیم `API_SERVER_HOST=0.0.0.0` بدون `API_SERVER_KEY` باعث امتناع خاموش می‌شود. برای دسترسی محلی از `127.0.0.1` استفاده کنید، یا برای دسترسی شبکه‌ای یک کلید تنظیم کنید.
 
 ---
 
-## 2. Workspace shows "Connect Backend" / "Skip setup" (mode=disconnected)
+## ۲. workspace «Connect Backend» / «Skip setup» را نشان می‌دهد (mode=disconnected)
 
-**Symptom:** Browser shows the onboarding welcome screen instead of the chat UI. Dev server logs show `mode=disconnected`.
+**علامت:** مرورگر به‌جای رابط کاربری گفتگو، صفحهٔ خوش‌آمدگویی onboarding را نشان می‌دهد. لاگ‌های dev server `mode=disconnected` را نشان می‌دهند.
 
-**Cause:** Workspace can't reach the gateway HTTP API.
+**علت:** workspace نمی‌تواند به HTTP API دروازه برسد.
 
-**Checklist (in order):**
+**چک‌لیست (به‌ترتیب):**
 
-1. Is the gateway running? `hermes gateway status` or `pgrep -af "hermes.*gateway"`
-2. Is port 8642 bound? `curl -sf http://127.0.0.1:8642/health`
-3. Is Workspace `.env` correct? `grep HERMES_API_URL ~/hermeschi/.env`
-   - Should be: `HERMES_API_URL=http://127.0.0.1:8642`
-4. Restart Workspace: `pnpm dev`
+۱. آیا دروازه در حال اجراست؟ `hermes gateway status` یا `pgrep -af "hermes.*gateway"`
+۲. آیا پورت 8642 bind شده است؟ `curl -sf http://127.0.0.1:8642/health`
+۳. آیا `.env` workspace درست است؟ `grep HERMES_API_URL ~/hermeschi/.env`
+   - باید باشد: `HERMES_API_URL=http://127.0.0.1:8642`
+۴. workspace را راه‌اندازی مجدد کنید: `pnpm dev`
 
-If the gateway is running and healthy but Workspace still disconnects, check for port conflicts (another process on 8642) or firewall rules.
+اگر دروازه در حال اجرا و سالم است اما workspace همچنان قطع است، تعارض پورت (فرآیند دیگری روی 8642) یا قوانین firewall را بررسی کنید.
 
-Before starting a second gateway, verify the workspace probe directly:
+پیش از شروع یک دروازهٔ دوم، probe مستقیم workspace را راستی‌آزمایی کنید:
 
 ```bash
 curl http://127.0.0.1:3000/api/sessions
 ```
 
-If that returns sessions (or an empty list), the backend pairing is already alive and the UI needs a refresh/reprobe — **do not start another gateway**.
+اگر این سشن‌ها را (یا یک فهرست خالی) برمی‌گرداند، pairing بک‌اند هم‌اکنون زنده است و رابط کاربری به refresh/reprobe نیاز دارد — **دروازهٔ دیگری شروع نکنید**.
 
 ---
 
-## 3. Port 8642 already in use
+## ۳. پورت 8642 هم‌اکنون در حال استفاده است
 
-**Symptom:** Gateway fails to start with "Address already in use" or silently exits.
+**علامت:** دروازه با «Address already in use» شکست می‌خورد یا به‌صورت خاموش خارج می‌شود.
 
-**Fix:**
+**رفع:**
 
 ```bash
-# Find what's using the port
+# یافتن آنچه پورت را در دست دارد
 lsof -i :8642    # macOS
 ss -tlnp | grep 8642   # Linux
 
-# Kill the stale process
+# پایان دادن به فرآیند stale
 kill <PID>
 
-# Restart
+# راه‌اندازی مجدد
 hermes gateway run --replace
 ```
 
 ---
 
-## 4. Dashboard not running (sessions / skills / jobs missing)
+## ۴. داشبورد در حال اجرا نیست (سشن‌ها / skills / jobs غایب)
 
-**Symptom:** Chat works, but Sessions/Skills/Jobs stay offline or `/api/sessions` says the backend does not support the sessions API.
+**علامت:** گفتگو کار می‌کند، اما Sessions/Skills/Jobs آفلاین می‌مانند یا `/api/sessions` می‌گوید بک‌اند از API سشن‌ها پشتیبانی نمی‌کند.
 
-**Cause:** `hermes dashboard` is not running on port 9119.
+**علت:** `hermes dashboard` روی پورت 9119 اجرا نمی‌شود.
 
-**Fix:**
+**رفع:**
 
 ```bash
 hermes dashboard
 curl -sf http://127.0.0.1:9119/ && echo "dashboard ok"
 ```
 
-Workspace needs both:
+workspace به هر دو نیاز دارد:
 
-- `hermes gateway run` on `:8642`
-- `hermes dashboard` on `:9119`
+- `hermes gateway run` روی `:8642`
+- `hermes dashboard` روی `:9119`
 
 ---
 
-## 5. Codex / GPT-5.4 chat fails with missing access token
+## ۵. شکست گفتگوی Codex / GPT-5.4 با access token گمشده
 
-**Symptom:** Sending chat through Workspace fails with an error like `Codex auth is missing access_token`.
+**علامت:** ارسال گفتگو از طریق workspace با خطایی مانند `Codex auth is missing access_token` شکست می‌خورد.
 
-**Cause:** The default model is `gpt-5.4` / `openai-codex`, but the local Codex CLI login is stale or missing.
+**علت:** مدل پیش‌فرض `gpt-5.4` / `openai-codex` است، اما login محلی Codex CLI stale یا غایب است.
 
-**Fix:**
+**رفع:**
 
 ```bash
 codex login
 ```
 
-Then retry the chat. Do not restart the gateway unless auth still fails after re-login.
+سپس گفتگو را دوباره امتحان کنید. دروازه را راه‌اندازی مجدد نکنید مگر آنکه auth پس از login مجدد همچنان شکست بخورد.
 
 ---
 
-## 6. WSL: Gateway health check times out on first boot
+## ۶. WSL: بررسی سلامت دروازه در بوت نخست timeout می‌شود
 
-**Symptom:** Workspace starts, checks the gateway, reports "disconnected". But if you wait 15 seconds and refresh, it works.
+**علامت:** workspace شروع می‌شود، دروازه را بررسی می‌کند، «disconnected» را گزارش می‌دهد. اما اگر ۱۵ ثانیه صبر کنید و refresh کنید، کار می‌کند.
 
-**Cause:** Python cold-start on WSL is slower (8–15s) due to filesystem overhead. Workspace's health check times out before the gateway is ready.
+**علت:** cold-start Python روی WSL به‌دلیل overhead فایل‌سیستم کندتر است (۸-۱۵s). بررسی سلامت workspace پیش از آماده‌شدن دروازه timeout می‌شود.
 
-**Fix:** Start in two separate terminals:
+**رفع:** در دو ترمینال جداگانه شروع کنید:
 
 ```bash
-# Terminal 1 — start gateway first, wait for it
+# ترمینال ۱ — ابتدا دروازه را شروع کنید، منتظر بمانید
 hermes gateway run
-# Wait until you see "Uvicorn running on http://127.0.0.1:8642"
+# منتظر بمانید تا "Uvicorn running on http://127.0.0.1:8642" را ببینید
 
-# Terminal 2 — then start workspace
+# ترمینال ۲ — سپس workspace را شروع کنید
 cd ~/hermeschi && pnpm dev
 ```
 
 ---
 
-## 7. Dev server crashes immediately after boot
+## ۷. dev server بلافاصله پس از بوت crash می‌شود
 
-**Symptom:** `pnpm dev` starts, shows the Vite banner, then crashes with ELIFECYCLE or a stack trace.
+**علامت:** `pnpm dev` شروع می‌شود، بنر Vite را نشان می‌دهد، سپس با ELIFECYCLE یا یک stack trace crash می‌کند.
 
-**Common causes:**
+**علل رایج:**
 
-- **Merge conflict markers in source files:** `grep -r "<<<<<<" src/` — if you find any, resolve them or `git checkout -- <file>`.
-- **Missing node_modules:** `pnpm install`
-- **Node version too old:** `node --version` — requires Node 22+.
-- **Port already in use:** `lsof -i :3000` (macOS) or `ss -tlnp | grep 3000` (Linux) — kill the stale process.
-
----
-
-## 8. "No compatible backend detected" in onboarding
-
-**Symptom:** Clicked "Connect Backend", health check runs, shows error.
-
-This means the Vite SSR server tried `GET /api/gateway-status` which internally probes the gateway. The probe failed.
-
-**Most likely:** the gateway API server isn't running. See issue #1 above.
-
-**Less likely:** `.env` has the wrong `HERMES_API_URL` (e.g. wrong port, `https` instead of `http`, `localhost` instead of `127.0.0.1` on WSL).
+- **علامگرهای تعارض merge در فایل‌های سورس:** `grep -r "<<<<<<" src/` — اگر چیزی یافتید، آن‌ها را رفع کنید یا `git checkout -- <file>`.
+- **node_modules گمشده:** `pnpm install`
+- **نسخهٔ Node خیلی قدیمی:** `node --version` — به Node 22+ نیاز دارد.
+- **پورت هم‌اکنون در حال استفاده:** `lsof -i :3000` (macOS) یا `ss -tlnp | grep 3000` (Linux) — فرآیند stale را ببندید.
 
 ---
 
-## Diagnostic bundle
+## ۸. «No compatible backend detected» در onboarding
 
-If nothing above helps, run this and share the output:
+**علامت:** روی «Connect Backend» کلیک شده، بررسی سلامت اجرا می‌شود، خطا را نشان می‌دهد.
+
+این یعنی سرور SSR Vite `GET /api/gateway-status` را امتحان کرده که به‌طور داخلی دروازه را probe می‌کند. probe شکست خورده است.
+
+**محتمل‌ترین:** سرور API دروازه در حال اجرا نیست. به مسئلهٔ #۱ بالا مراجعه کنید.
+
+**کم‌تر محتمل:** `.env` دارای `HERMES_API_URL` اشتباه است (مثلاً پورت اشتباه، `https` به‌جای `http`، `localhost` به‌جای `127.0.0.1` روی WSL).
+
+---
+
+## بستهٔ تشخیصی
+
+اگر هیچ‌کدام از موارد بالا کمکی نکرد، این را اجرا کنید و خروجی را به اشتراک بگذارید:
 
 ```bash
 echo "=== hermes version ===" && hermes --version 2>&1

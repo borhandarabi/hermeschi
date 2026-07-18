@@ -1,10 +1,10 @@
-# HermesChi Naming Contract
+# قرارداد نام‌گذاری HermesChi
 
-This repo is for **HermesChi** and **Hermes Agent** work.
+این مخزن برای کارهای **HermesChi** و **Hermes Agent** است.
 
-## Canonical product names
+## نام‌های محصول رسمی
 
-Use these names in all new UI, docs, skills, prompts, tests, review comments, and handoffs:
+از این نام‌ها در تمام رابط‌های کاربری، مستندات، skills، پرامپت‌ها، آزمون‌ها، نظرات بازبینی و تحویل‌های جدید استفاده کنید:
 
 - **HermesChi**
 - **Hermes Agent**
@@ -13,58 +13,58 @@ Use these names in all new UI, docs, skills, prompts, tests, review comments, an
 - **HERMES_HOME**
 - `~/.hermes`
 
-## Forbidden new references
+## ارجاعات جدید ممنوع
 
-Do **not** introduce these in new work unless quoting legacy history or compatibility behavior:
+این موارد را در کارهای جدید **معرفی نکنید** مگر آن‌که در حال نقل قول تاریخچهٔ موروثی یا رفتار سازگاری باشید:
 
 - HermesChi
 - Hermes Agent
 - Claude swarm
-- Claude-native paths
+- مسیرهای Claude-native
 - `HERMES_HOME`
 - `~/.hermes`
 
-## Legacy compatibility rule
+## قانون سازگاری موروثی
 
-If older code, docs, tests, or handoffs contain Claude-era wording, treat it as legacy residue.
+اگر کد، مستندات، آزمون‌ها یا تحویل‌های قدیمی شامل واژگان دوران Claude هستند، آن‌ها را به‌عنوان بقایای موروثی در نظر بگیرید.
 
-Default action:
-- normalize it to Claude naming
-- preserve old wording only when explicitly documenting migration or backwards compatibility
+اقدام پیش‌فرض:
+- آن‌ها را به نام‌گذاری Claude نرمال‌سازی کنید
+- واژگان قدیمی را فقط هنگام مستندسازی صریح مهاجرت یا سازگاری به‌عقب حفظ کنید
 
-## Runtime/path rules
+## قوانین زمان‌اجرا/مسیر
 
-For Claude-native runtime work, prefer:
+برای کارهای زمان‌اجرا Claude-native، ترجیح دهید:
 
 - `HERMES_HOME`
 - `~/.hermes/profiles/<workerId>`
 - `claude`
-- Hermes worker sessions
+- سشن‌های worker هرمس
 
-Do not suggest Claude-specific runtime wrappers or profile paths for live HermesChi behavior.
+برای رفتار زندهٔ HermesChi، wrapper‌های زمان‌اجرا یا مسیرهای profile مختص Claude را پیشنهاد ندهید.
 
-## Swarm/UI language rules
+## قوانین زبان Swarm/UI
 
-Prefer:
-- **Ready** not person-specific hardcoded labels
-- **Board / Cards / List** for reports views
-- **HermesChi** and **Hermes Agent** in update/config/status UI
+ترجیح دهید:
+- **Ready** به‌جای برچسب‌های hardcode‌شدهٔ وابسته به شخص
+- **Board / Cards / List** برای نماهای گزارش‌ها
+- **HermesChi** و **Hermes Agent** در رابط کاربری به‌روزرسانی/پیکربندی/وضعیت
 
-Avoid:
-- person-specific product labels baked into UI
-- Claude-branded wording in HermesChi surfaces
+پرهیز کنید از:
+- برچسب‌های محصول وابسته به شخص که در رابط کاربری baked شده‌اند
+- واژگان برند Claude در سطوح HermesChi
 
-## Reviewer rule
+## قانون بازبینی‌کننده
 
-Any PR or patch that introduces new Claude-branded naming into HermesChi should be treated as a regression unless it is:
-- a legacy compatibility note
-- a migration guide
-- a quoted historical artifact
+هر PR یا patch که نام‌گذاری برند Claude را به HermesChi معرفی می‌کند، باید به‌عنوان regression در نظر گرفته شود مگر آنکه:
+- یک یادداشت سازگاری موروثی باشد
+- یک راهنمای مهاجرت باشد
+- یک artifact تاریخی نقل‌شده باشد
 
-## Agent instruction rule
+## قانون دستورالعمل عامل
 
-When an agent is working in this repo:
-- assume Claude naming is canonical
-- rewrite Claude-era references to Claude by default
-- do not invent Claude-branded paths, products, or wrapper guidance
-- if uncertain, prefer repo-native Claude terminology over historical aliases
+هنگامی که یک عامل در این مخزن کار می‌کند:
+- فرض کنید نام‌گذاری Claude رسمی است
+- ارجاعات دوران Claude را به‌طور پیش‌فرض به Claude بازنویسی کنید
+- مسیرها، محصولات یا راهنمایی wrapper با برند Claude را اختراع نکنید
+- در صورت عدم اطمینان، ترجیح دهید از واژگان Claude بومی مخزن نسبت به نام‌های مستعار تاریخی استفاده کنید

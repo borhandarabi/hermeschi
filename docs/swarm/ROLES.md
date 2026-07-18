@@ -1,42 +1,42 @@
-# Swarm Role Presets
+# Presetهای نقش Swarm
 
-The Add Swarm dialog ships with role presets so new Hermes Agents start with a real operating contract instead of a blank textarea and optimism. Pick the closest preset, tune the mission, then start the worker.
+dialog افزودن Swarm با presetهای نقش عرضه می‌شود تا Hermes Agentهای جدید با یک قرارداد عملیاتی واقعی شروع کنند به‌جای یک textarea خالی و خوش‌بینی. نزدیک‌ترین preset را انتخاب کنید، mission را تنظیم کنید، سپس کارگر را شروع کنید.
 
-Each role has:
+هر role دارای:
 
 - specialty
 - default skills
 - default model
-- when to use it
-- canonical spec reference
+- زمان استفاده از آن
+- ارجاع spec canonical
 
-Canonical project specs live in the swarm specs directory at:
+specهای canonical پروژه در دایرکتوری swarm specs قرار دارند:
 
 ```text
 /swarm-specs/projects/<worker>.md
 ```
 
-Use those specs as the source of truth for standing missions. The role preset is the fast-start shape; the project spec is the durable contract.
+از آن specها به‌عنوان منبع حقیقت برای standing missionها استفاده کنید. preset نقش شکل fast-start است؛ spec پروژه قرارداد پایدار است.
 
-## Preset summary
+## خلاصهٔ presetها
 
-| Preset | Default model | Use when |
+| Preset | مدل پیش‌فرض | زمان استفاده |
 | --- | --- | --- |
-| Orchestrator | GPT-5.4 | You need dispatch, routing, drift detection, and escalation. |
-| Builder | GPT-5.5 | You need product code shipped with tests/build proof. |
-| Reviewer | GPT-5.4 | You need byte-verified review and merge readiness. |
-| Triage | GPT-5.5 | You need issues/PRs scored, reproduced, patched, or prepared. |
-| Lab | GPT-5.4 | You need isolated experiments or local-model benchmarking. |
-| Sage | GPT-5.5 | You need research, synthesis, scripts, or launch copy. |
-| Scribe | GPT-5.5 | You need docs, specs, handoffs, skills hygiene, memory curation. |
-| Foundation | GPT-5.4 | You need runtime, repair, infra, health, or lifecycle work. |
-| QA | GPT-5.4 | You need regression, smoke, expected-vs-actual verification. |
-| Mirror Integrations | GPT-5.4 | You need upstream sync, integrations, or asset packs. |
-| Custom | user-selected | You are creating a lane that does not fit an existing preset. |
+| Orchestrator | GPT-5.4 | وقتی به dispatch، routing، drift detection و escalation نیاز دارید. |
+| Builder | GPT-5.5 | وقتی به کد محصول ship‌شده با proof تست/build نیاز دارید. |
+| Reviewer | GPT-5.4 | وقتی به بازبینی byte-verified و merge readiness نیاز دارید. |
+| Triage | GPT-5.5 | وقتی به score/reproduce/patch یا آماده‌سازی issue/PR نیاز دارید. |
+| Lab | GPT-5.4 | وقتی به آزمایش‌های ایزوله یا benchmarking مدل محلی نیاز دارید. |
+| Sage | GPT-5.5 | وقتی به research، synthesis، script یا launch copy نیاز دارید. |
+| Scribe | GPT-5.5 | وقتی به docs، spec، handoff، skills hygiene، memory curation نیاز دارید. |
+| Foundation | GPT-5.4 | وقتی به کار runtime، repair، infra، health یا lifecycle نیاز دارید. |
+| QA | GPT-5.4 | وقتی به regression، smoke، تأیید expected-vs-actual نیاز دارید. |
+| Mirror Integrations | GPT-5.4 | وقتی به upstream sync، integrations یا asset pack نیاز دارید. |
+| Custom | انتخاب کاربر | وقتی در حال ساخت lane هستید که با preset موجود نمی‌سازد. |
 
 ## Orchestrator
 
-Specialty: control-plane state, dispatch, drift detection, escalation.
+Specialty: state صفحهٔ کنترل، dispatch، drift detection، escalation.
 
 Default skills:
 
@@ -45,25 +45,25 @@ Default skills:
 - `swarm-review-learning-loop`
 - `self-improvement`
 
-Default model: GPT-5.4
+مدل پیش‌فرض: GPT-5.4
 
-When to use:
+زمان استفاده:
 
-- routing multi-worker missions
-- translating intent into SwarmBriefs
-- interpreting checkpoints
-- detecting drift
-- re-prompting workers
-- escalating blockers
-- managing standing missions
+- routing missionهای multi-worker
+- ترجمهٔ intent به SwarmBriefها
+- تفسیر checkpointها
+- تشخیص drift
+- re-prompt کردن کارگرها
+- escalate کردن blockerها
+- مدیریت standing missionها
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/orchestrator.md
 ```
 
-Good checkpoint:
+checkpoint خوب:
 
 ```text
 STATE: HANDOFF
@@ -73,36 +73,36 @@ NEXT_ACTION: Wait for swarm7 NEEDS_REVIEW checkpoint, then dispatch swarm6 byte-
 
 ## Builder
 
-Specialty: full-stack implementation, fast ship cycles.
+Specialty: پیاده‌سازی full-stack، حلقه‌های ship سریع.
 
 Default skills:
 
 - `swarm-worker-core`
 - `byte-verified-code-review`
 
-Default model: GPT-5.5
+مدل پیش‌فرض: GPT-5.5
 
-When to use:
+زمان استفاده:
 
-- product UI
-- backend endpoints
+- UI محصول
+- backend endpointها
 - integrations
-- bug fixes
-- feature slices
-- focused refactors
+- bug fixها
+- feature sliceها
+- refactorهای متمرکز
 
-Canonical spec examples:
+نمونه‌های spec canonical:
 
 ```text
 /swarm-specs/projects/swarm5.md
 /swarm-specs/projects/swarm10.md
 ```
 
-Builder should ship narrow diffs, not renovate the cathedral because a button looked lonely.
+Builder باید diffهای باریک ship کند، نه اینکه کلیسا را به‌خاطر یک دکمهٔ تنها به‌نظررسیده بازسازی کند.
 
 ## Reviewer
 
-Specialty: byte-verified code review, naming, tests, build gate.
+Specialty: بازبینی کد byte-verified، naming، تست، build gate.
 
 Default skills:
 
@@ -110,24 +110,24 @@ Default skills:
 - `byte-verified-code-review`
 - `swarm-review-learning-loop`
 
-Default model: GPT-5.4
+مدل پیش‌فرض: GPT-5.4
 
-When to use:
+زمان استفاده:
 
-- PR readiness
-- release branch gates
-- generated-file sanity checks
-- fragile naming changes
-- regression review
-- build/test verification
+- آمادگی PR
+- gateهای release branch
+- sanity checkهای generated-file
+- تغییرات naming شکننده
+- بازبینی regression
+- تأیید build/test
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/swarm6.md
 ```
 
-Reviewer verdicts should be one of:
+verdictهای Reviewer باید یکی از موارد زیر باشد:
 
 - APPROVED
 - CHANGES_REQUESTED
@@ -135,7 +135,7 @@ Reviewer verdicts should be one of:
 
 ## Triage
 
-Specialty: autonomous PR/issues processor.
+Specialty: processor خودمختار PR/issues.
 
 Default skills:
 
@@ -143,29 +143,29 @@ Default skills:
 - `byte-verified-code-review`
 - `swarm-review-learning-loop`
 
-Default model: GPT-5.5
+مدل پیش‌فرض: GPT-5.5
 
-When to use:
+زمان استفاده:
 
-- issue backlog scan
-- PR feedback triage
-- reproduction notes
-- minimal failing tests
-- small fix branches
-- issue ranking
+- scan backlog issue
+- triage feedback PR
+- یادداشت‌های بازتولید
+- failing testهای مینیمال
+- branchهای fix کوچک
+- رتبه‌بندی issue
 
-Canonical spec examples:
+نمونه‌های spec canonical:
 
 ```text
 /swarm-specs/projects/swarm12.md
 /swarm-specs/projects/swarm1.md
 ```
 
-Triage should never silently merge or close. It prepares the work and asks for the gate.
+Triage هرگز نباید به‌صورت خاموش merge یا close کند. کار را آماده می‌کند و درخواست gate می‌کند.
 
 ## Lab
 
-Specialty: local-model R&D, spec-dec, benchmarking.
+Specialty: R&D مدل محلی، spec-dec، benchmarking.
 
 Default skills:
 
@@ -173,27 +173,27 @@ Default skills:
 - `pc1-ollama-gguf-bench`
 - `swarm-bench-worker`
 
-Default model: GPT-5.4
+مدل پیش‌فرض: GPT-5.4
 
-When to use:
+زمان استفاده:
 
-- local model testing
-- throughput comparisons
-- speculative runtime improvements
-- isolated prototypes
-- experiment logs
+- تست مدل محلی
+- مقایسه‌های throughput
+- بهبودهای speculative runtime
+- prototypeهای ایزوله
+- logهای آزمایش
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/swarm9.md
 ```
 
-Lab is allowed to be weird because it is isolated. Product lanes are not.
+به Lab اجازه داده می‌شود عجیب باشد زیرا ایزوله است. product laneها عجیب نیستند.
 
 ## Sage
 
-Specialty: research, scripts, X content, creative briefs.
+Specialty: research، script، محتوای X، creative brief.
 
 Default skills:
 
@@ -201,28 +201,28 @@ Default skills:
 - `last30days`
 - `pdf-and-paper-deep-reading`
 
-Default model: GPT-5.5
+مدل پیش‌فرض: GPT-5.5
 
-When to use:
+زمان استفاده:
 
-- technical research
-- market/model scan
-- launch angles
-- thread drafts
-- creative briefs
-- citations
+- research فنی
+- scan market/model
+- زاویه‌های launch
+- thread draft
+- creative brief
+- citationها
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/swarm4.md
 ```
 
-Sage drafts; humans approve public posting. Use normal research for evidence gathering and synthesis. Use autoresearch only for bounded optimization loops with an explicit Goal/Scope/Metric/Verify/Guard/Iterations contract; see [AUTORESEARCH.md](./AUTORESEARCH.md).
+Sage draft می‌کند؛ انسان‌ها پست عمومی را تأیید می‌کنند. از research معمولی برای جمع‌آوری evidence و synthesis استفاده کنید. از autoresearch فقط برای حلقه‌های bounded optimization با قرارداد صریح Goal/Scope/Metric/Verify/Guard/Iterations استفاده کنید؛ به [AUTORESEARCH.md](./AUTORESEARCH.md) مراجعه کنید.
 
 ## Scribe
 
-Specialty: docs, skills hygiene, memory curation.
+Specialty: docs، skills hygiene، memory curation.
 
 Default skills:
 
@@ -230,87 +230,87 @@ Default skills:
 - `last30days`
 - `creative-writing`
 
-Default model: GPT-5.5
+مدل پیش‌فرض: GPT-5.5
 
-When to use:
+زمان استفاده:
 
-- README updates
-- docs trees
-- release notes
-- handoffs
-- specs
-- runbooks
-- skill documentation
-- memory hygiene reports
+- به‌روزرسانی README
+- درخت docs
+- release note
+- handoffها
+- specها
+- runbookها
+- مستندسازی skill
+- گزارش‌های memory hygiene
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/swarm7.md
 ```
 
-Scribe makes the system legible. This is less glamorous than building the system and usually more responsible for whether anyone can use it.
+Scribe سیستم را legible می‌کند. این کم‌جلوه‌تر از build کردن سیستم است و معمولاً بیشتر مسئول است که آیا کسی می‌تواند از آن استفاده کند یا نه.
 
 ## Foundation
 
-Specialty: infra, repair playbook, autopilot wiring.
+Specialty: infra، repair playbook، wiring autopilot.
 
 Default skills:
 
 - `swarm-worker-core`
 
-Default model: GPT-5.4
+مدل پیش‌فرض: GPT-5.4
 
-When to use:
+زمان استفاده:
 
-- runtime APIs
-- health checks
-- tmux lifecycle
-- profile detection
-- repair playbook updates
-- orchestrator loop wiring
-- backend contracts
+- APIهای runtime
+- health checkها
+- lifecycle tmux
+- تشخیص profile
+- به‌روزرسانی repair playbook
+- wiring حلقهٔ ارکستریتور
+- قراردادهای backend
 
-Canonical spec examples:
+نمونه‌های spec canonical:
 
 ```text
 /swarm-specs/projects/swarm8.md
 /swarm-specs/projects/swarm2.md
 ```
 
-Foundation keeps the floor from turning into soup.
+Foundation مانع می‌شود کف به سوپ تبدیل شود.
 
 ## QA
 
-Specialty: regression QA, render verification, expected-vs-actual checks.
+Specialty: QA regression، تأیید render، checkهای expected-vs-actual.
 
 Default skills:
 
 - `swarm-worker-core`
 - `byte-verified-code-review`
 
-Default model: GPT-5.4
+مدل پیش‌فرض: GPT-5.4
 
-When to use:
+زمان استفاده:
 
-- smoke tests
-- regression checks
-- UI expected-vs-actual passes
-- artifact verification
-- post-build confidence
-- release sanity
+- smoke test
+- checkهای regression
+- passهای UI expected-vs-actual
+- تأیید artifact
+- اطمینان post-build
+- sanity release
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/swarm11.md
 ```
 
-QA should say exactly what was checked, exactly what failed, and exactly how to reproduce it.
+QA باید دقیقاً بگوید چه چیزی بررسی شد، دقیقاً چه چیزی fail شد، و دقیقاً چگونه بازتولید شود.
 
 ## Mirror Integrations
 
-Specialty: asset packs, upstream sync, integrations.
+Specialty: asset pack، upstream sync، integrations.
 
 Default skills:
 
@@ -318,83 +318,83 @@ Default skills:
 - `claude-promo`
 - `songwriting-and-ai-music`
 
-Default model: GPT-5.4
+مدل پیش‌فرض: GPT-5.4
 
-When to use:
+زمان استفاده:
 
-- upstream diff watching
-- integration packaging
-- asset collection
-- creative asset generation
-- cross-lane support
+- watch upstream diff
+- بسته‌بندی integration
+- جمع‌آوری asset
+- تولید creative asset
+- پشتیبانی cross-lane
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/swarm10.md
 ```
 
-Mirror Integrations is the lane for portable useful things, not random shiny distractions. There will be random shiny distractions. They are sneaky.
+Mirror Integrations lane چیزهای مفید قابل‌حمل است، نه حواس‌پرتی‌های درخشان تصادفی. حواس‌پرتی‌های درخشان تصادفی وجود خواهند داشت. آن‌ها sneaky هستند.
 
 ## Custom
 
-Specialty: user-defined.
+Specialty: تعریف‌شده توسط کاربر.
 
-Default skills: none.
+Default skills: هیچ‌کدام.
 
-Default model: user-selected.
+مدل پیش‌فرض: انتخاب کاربر.
 
-When to use:
+زمان استفاده:
 
-- the worker does not fit an existing role
-- you are testing a new lane
-- you need temporary specialization
-- a future preset is being prototyped
+- کارگر در یک role موجود نمی‌گنجد
+- در حال تست یک lane جدید هستید
+- به تخصص موقت نیاز دارید
+- یک preset آینده در حال prototype است
 
-Canonical spec:
+Spec canonical:
 
 ```text
 /swarm-specs/projects/<new-worker>.md
 ```
 
-Custom workers should still get:
+کارگرهای Custom همچنان باید داشته باشند:
 
 - `swarm-worker-core`
-- a role description
-- a specialty
-- a mission
-- a checkpoint contract
-- a clear approval boundary
+- یک توصیف role
+- یک specialty
+- یک mission
+- یک قرارداد checkpoint
+- یک مرز تأیید واضح
 
-Blank custom workers become expensive autocomplete. Add structure first.
+کارگرهای Custom خالی به autocomplete گران‌قیمت تبدیل می‌شوند. اول structure اضافه کنید.
 
-## Choosing the right role
+## انتخاب role درست
 
-Use this routing rule:
+از این قاعدهٔ routing استفاده کنید:
 
-| If the work is mostly... | Send it to... |
+| اگر کار عمدتاً... | ارسال به... |
 | --- | --- |
-| deciding who should do what | Orchestrator |
-| changing product code | Builder |
-| proving a branch is safe | Reviewer |
-| chewing through issues/PRs | Triage |
-| experimenting away from release | Lab |
-| researching or drafting narrative | Sage |
-| explaining, documenting, preserving context | Scribe |
-| runtime/health/repair infrastructure | Foundation |
-| checking behavior and regressions | QA |
+| تصمیم درباره اینکه چه کسی چه کاری انجام دهد | Orchestrator |
+| تغییر کد محصول | Builder |
+| اثبات امن بودن یک branch | Reviewer |
+| جویدن issue/PRها | Triage |
+| آزمایش به‌دور از release | Lab |
+| research یا draft کردن narrative | Sage |
+| توضیح، مستندسازی، حفظ context | Scribe |
+| infrastructure runtime/health/repair | Foundation |
+| بررسی رفتار و regressionها | QA |
 | upstream/integration/assets | Mirror Integrations |
-| none of the above | Custom |
+| هیچ‌کدام از موارد بالا | Custom |
 
-## Adding a new role preset
+## افزودن preset نقش جدید
 
-1. Define the role in the UI preset list.
-2. Give it a one-line specialty.
-3. Give it a standing mission.
-4. Choose default skills.
-5. Choose default model.
-6. Create a canonical project spec.
-7. Add it to this document.
-8. Dispatch a tiny smoke task and verify a checkpoint.
+1. نقش را در فهرست preset UI تعریف کنید.
+2. یک specialty یک‌خطی به آن بدهید.
+3. یک standing mission به آن بدهید.
+4. default skillها را انتخاب کنید.
+5. default model را انتخاب کنید.
+6. یک spec canonical پروژه بسازید.
+7. آن را به این سند اضافه کنید.
+8. یک task کوچک smoke dispatch کنید و یک checkpoint را تأیید کنید.
 
-If step 6 feels like too much work, the role probably is not real yet.
+اگر مرحلهٔ ۶ زیاد کار به‌نظر می‌رسد، نقش احتمالاً هنوز واقعی نیست.

@@ -1,50 +1,50 @@
-# Contributing UI translations
+# مشارکت در ترجمه‌های رابط کاربری
 
-HermesChi uses a lightweight, dependency-free i18n module that supports English (`en`) and Persian (`fa`) locales. Persian renders right-to-left; English renders left-to-right. The document direction is coupled to the active locale, so switching language in Settings immediately flips the layout.
+HermesChi از یک ماژول i18n سبک و بدون وابستگی استفاده می‌کند که از localeهای انگلیسی (`en`) و فارسی (`fa`) پشتیبانی می‌کند. فارسی راست‌به‌چپ رندر می‌شود؛ انگلیسی چپ‌به‌راست. جهت سند به locale فعال گره خورده است، بنابراین تعویض زبان در تنظیمات بلافاصله چیدمان را برمی‌گرداند.
 
-## Translation file
+## فایل ترجمه
 
-All translation state lives in:
+تمام وضعیت ترجمه در:
 
 ```text
 src/lib/i18n.ts
 ```
 
-The important pieces are:
+قرار دارد. بخش‌های مهم عبارت‌اند از:
 
-- `LocaleId`: the union type of supported locale ids (`'en' | 'fa'`).
-- `EN`: the source-of-truth English keys. Every new key is added here first.
-- `FA`: the Persian translation table, mirroring every key in `EN`.
-- `RTL_LOCALES`: a `Set<LocaleId>` that marks which locales render RTL. Currently `{'fa'}`.
-- `LOCALES`: maps locale id → translation table.
-- `LOCALE_LABELS`: human-readable labels shown in the language selector.
-- `getDir(locale)`: returns `'rtl'` for Persian, `'ltr'` for everything else.
-- `applyDocumentDir(locale)`: writes `dir`, `lang`, and `data-dir` onto `<html>`.
-- `setLocale(id)`: persists the locale to `localStorage`, calls `applyDocumentDir`, and dispatches the `'locale-change'` event so subscribers re-render.
-- `t(key, params?)`: returns the translated string for the active locale, with optional `{placeholder}` interpolation.
+- `LocaleId`: نوع union از idهای locale پشتیبانی‌شده (`'en' | 'fa'`).
+- `EN`: کلیدهای انگلیسی به‌عنوان منبع حقیقت. هر کلید جدید اول اینجا اضافه می‌شود.
+- `FA`: جدول ترجمهٔ فارسی، که هر کلید در `EN` را منعکس می‌کند.
+- `RTL_LOCALES`: یک `Set<LocaleId>` که مشخص می‌کند کدام localeها RTL رندر می‌شوند. در حال حاضر `{'fa'}`.
+- `LOCALES`: نگاشت id locale → جدول ترجمه.
+- `LOCALE_LABELS`: برچسب‌های انسانی-خوانا که در انتخابگر زبان نشان داده می‌شوند.
+- `getDir(locale)`: برای فارسی `'rtl'` و برای هر چیز دیگر `'ltr'` برمی‌گرداند.
+- `applyDocumentDir(locale)`: `dir`، `lang` و `data-dir` را روی `<html>` می‌نویسد.
+- `setLocale(id)`: locale را در `localStorage` ذخیره می‌کند، `applyDocumentDir` را فراخوانی می‌کند و رویداد `'locale-change'` را dispatch می‌کند تا subscriberها دوباره رندر شوند.
+- `t(key, params?)`: رشتهٔ ترجمه‌شده برای locale فعال را با placeholder `{placeholder}` اختیاری برمی‌گرداند.
 
-## Supported locales
+## localeهای پشتیبانی‌شده
 
-| Locale id | Label     | Direction | Status             |
+| id locale | برچسب    | جهت | وضعیت               |
 | --------- | --------- | --------- | ------------------ |
-| `en`      | English   | LTR       | Source of truth    |
-| `fa`      | فارسی     | RTL       | Actively translated |
+| `en`      | English   | LTR       | منبع حقیقت          |
+| `fa`      | فارسی     | RTL       | در حال ترجمه فعال |
 
-To add a new locale:
+برای افزودن یک locale جدید:
 
-1. Add its id to the `LocaleId` union type.
-2. If it renders right-to-left (Arabic, Hebrew, Urdu, etc.), add it to the `RTL_LOCALES` set.
-3. Author a translation table that satisfies `LocaleTranslations` (every key in `EN` must be present).
-4. Register it in `LOCALES` and `LOCALE_LABELS`.
-5. Add a test case to `src/lib/i18n.test.ts` that asserts at least a few keys resolve correctly under the new locale.
+۱. id آن را به union type `LocaleId` اضافه کنید.
+۲. اگر راست‌به‌چپ رندر می‌شود (عربی، عبری، اردو و غیره)، آن را به set `RTL_LOCALES` اضافه کنید.
+۳. یک جدول ترجمه بسازید که `LocaleTranslations` را ارضا کند (هر کلید در `EN` باید حضور داشته باشد).
+۴. آن را در `LOCALES` و `LOCALE_LABELS` ثبت کنید.
+۵. یک مورد آزمون به `src/lib/i18n.test.ts` اضافه کنید که ادعا کند حداقل چند کلید تحت locale جدید به‌درستی resolve می‌شوند.
 
-## Adding or improving Persian translations
+## افزودن یا بهبود ترجمه‌های فارسی
 
-1. Open `src/lib/i18n.ts`.
-2. Find the `FA` object.
-3. Update the value on the right side of each key. Use the standard Iranian Persian register and proper zero-width non-joiners (e.g. `نمایه‌ها`, not `نمایه ها`).
+۱. `src/lib/i18n.ts` را باز کنید.
+۲. شیء `FA` را پیدا کنید.
+۳. مقدار سمت راست هر کلید را به‌روزرسانی کنید. از رجیستر فارسی استاندارد ایرانی و نیم‌فاصله‌های صحیح استفاده کنید (مثلاً `نمایه‌ها`، نه `نمایه ها`).
 
-Example:
+نمونه:
 
 ```ts
 const FA: LocaleTranslations = {
@@ -53,17 +53,17 @@ const FA: LocaleTranslations = {
 }
 ```
 
-Keep the key names exactly the same. Only edit the translated text.
+نام کلیدها را دقیقاً یکسان نگه دارید. فقط متن ترجمه‌شده را ویرایش کنید.
 
-## Adding new translatable UI text
+## افزودن متن جدید رابط کاربری قابل‌ترجمه
 
-If you find hardcoded English UI text:
+اگر متن سخت‌کدشدهٔ انگلیسی رابط کاربری یافتید:
 
-1. Add a new key to `EN` (the source of truth).
-2. Add the same key to the `FA` table.
-3. Replace the hardcoded text in the component with `t('your.newKey')`.
+۱. یک کلید جدید به `EN` (منبع حقیقت) اضافه کنید.
+۲. همان کلید را به جدول `FA` اضافه کنید.
+۳. متن سخت‌کدشده در کامپوننت را با `t('your.newKey')` جایگزین کنید.
 
-Example:
+نمونه:
 
 ```ts
 // src/lib/i18n.ts
@@ -76,7 +76,7 @@ const FA: LocaleTranslations = {
 }
 ```
 
-Then in the component:
+سپس در کامپوننت:
 
 ```tsx
 import { t } from '@/lib/i18n'
@@ -84,11 +84,11 @@ import { t } from '@/lib/i18n'
 ;<button>{t('common.retry')}</button>
 ```
 
-Because `LocaleTranslations = Record<TranslationKey, string>` and `TranslationKey = keyof typeof EN`, TypeScript will refuse to compile if the `FA` table is missing a key. This is intentional — it prevents the Persian table from drifting out of sync with `EN`.
+از آنجا که `LocaleTranslations = Record<TranslationKey, string>` و `TranslationKey = keyof typeof EN`، TypeScript از کامپایل امتناع می‌کند اگر جدول `FA` کلیدی را گم کرده باشد. این عمدی است — از drift جدول فارسی نسبت به `EN` جلوگیری می‌کند.
 
-## Interpolation
+## جای‌گذاری
 
-For strings that contain dynamic values, use `{placeholder}` tokens in the translation string and pass `params` as the second argument to `t()`:
+برای رشته‌هایی که شامل مقادیر پویا هستند، از توکن‌های `{placeholder}` در رشتهٔ ترجمه استفاده کنید و `params` را به‌عنوان آرگومان دوم به `t()` ارسال کنید:
 
 ```ts
 // src/lib/i18n.ts
@@ -109,7 +109,7 @@ import { t } from '@/lib/i18n'
 // FA: '5 خوانده‌نشده'
 ```
 
-Multiple placeholders are supported:
+چندین placeholder پشتیبانی می‌شوند:
 
 ```ts
 t('chat.contextBar.tokens', { count: 500, max: 8000 })
@@ -117,19 +117,19 @@ t('chat.contextBar.tokens', { count: 500, max: 8000 })
 // FA: '500 / 8000 توکن'
 ```
 
-Unmatched placeholders (no corresponding key in `params`) are left intact — translators can include literal `{braces}` in copy if needed.
+placeholderهای بدون تطابق (بدون کلید متناظر در `params`) دست‌نخورده باقی می‌مانند — مترجم‌ها می‌توانند در صورت نیاز `{braces}` تحت‌اللفظی در کپی قرار دهند.
 
-Numbers are stringified via `String(value)`, not `Intl.NumberFormat`. This is deliberate so callers control digit rendering. Most technical UIs want ASCII digits even under Persian to avoid mixed Latin/Persian numerals in copy-pasted identifiers.
+اعداد از طریق `String(value)` stringify می‌شوند، نه `Intl.NumberFormat`. این عمدی است تا callerها رندر ارقام را کنترل کنند. بیشتر رابط‌های کاربری فنی حتی تحت فارسی ارقام ASCII را می‌خواهند تا از ارقام ترکیبی لاتین/فارسی در شناسه‌های copy-paste جلوگیری شود.
 
-## RTL conventions
+## قراردادهای RTL
 
-The app is RTL-aware by construction. Follow these rules when writing components:
+اپ به‌صورت ذاتی آگاه از RTL است. هنگام نوشتن کامپوننت‌ها از این قوانین پیروی کنید:
 
-### DO use logical CSS properties
+### از ویژگی‌های منطقی CSS استفاده کنید
 
-Tailwind v4 ships logical-property utilities that automatically flip based on the `dir` attribute. Always prefer these over their physical counterparts:
+Tailwind v4 با ابزارهای ویژگی منطقی عرضه می‌شود که به‌طور خودکار بر اساس ویژگی `dir` برمی‌گردند. همیشه این‌ها را به‌جای همتایان فیزیکی ترجیح دهید:
 
-| Physical (avoid) | Logical (use)  | CSS property            |
+| فیزیکی (پرهیز)   | منطقی (استفاده) | ویژگی CSS               |
 | ---------------- | -------------- | ----------------------- |
 | `ml-`            | `ms-`          | margin-inline-start     |
 | `mr-`            | `me-`          | margin-inline-end       |
@@ -144,19 +144,19 @@ Tailwind v4 ships logical-property utilities that automatically flip based on th
 | `rounded-l-*`    | `rounded-s-*`  | border-start-radius     |
 | `rounded-r-*`    | `rounded-e-*`  | border-end-radius       |
 
-### DO use `rtl:` / `ltr:` variants for one-off overrides
+### از variantهای `rtl:` / `ltr:` برای overrideهای یک‌باره استفاده کنید
 
-When a logical property isn't enough (e.g. an animation that needs to flip direction, or a transform that should only apply in one direction), use Tailwind's built-in `rtl:` and `ltr:` variants:
+هنگامی که یک ویژگی منطقی کافی نیست (مثلاً یک انیمیشن که نیازمند برگرداندن جهت است، یا یک transform که فقط باید در یک جهت اعمال شود)، از variantهای داخلی `rtl:` و `ltr:` Tailwind استفاده کنید:
 
 ```tsx
 <div className="animate-in slide-in-from-right-5 rtl:slide-in-from-left-5">
 ```
 
-The `@variant rtl` and `@variant ltr` declarations in `src/styles.css` document this intent explicitly.
+اعلان‌های `@variant rtl` و `@variant ltr` در `src/styles.css` این نیت را صریحاً مستند می‌کنند.
 
-### DO use `useLocaleDirection()` for reactive direction-aware logic
+### از `useLocaleDirection()` برای منطق واکنش‌گرای آگاه از جهت استفاده کنید
 
-For components that need to know the active direction at runtime (e.g. to pick between two different layouts, or to compute a position), use the reactive hook:
+برای کامپوننت‌هایی که نیازمند دانستن جهت فعال در زمان‌اجرا هستند (مثلاً انتخاب میان دو چیدمان متفاوت، یا محاسبهٔ یک موقعیت)، از hook واکنش‌گرا استفاده کنید:
 
 ```tsx
 import { useLocaleDirection } from '@/hooks/use-locale-direction'
@@ -167,74 +167,74 @@ function MyComponent() {
 }
 ```
 
-The hook subscribes to the `'locale-change'` event and re-renders automatically when the user switches language. It also re-syncs on cross-tab `storage` events.
+hook به رویداد `'locale-change'` مشترک می‌شود و هنگامی که کاربر زبان را تعویض می‌کند، به‌طور خودکار دوباره رندر می‌شود. همچنین روی رویدادهای `storage` بین‌زبانه‌ای دوباره sync می‌شود.
 
-### DON'T set `dir` yourself
+### `dir` را خودتان تنظیم نکنید
 
-The `dir` attribute on `<html>` is the single source of truth. It is set:
+ویژگی `dir` روی `<html>` منبع حقیقت واحد است. این تنظیم می‌شود:
 
-1. By the inline `themeScript` in `src/routes/__root.tsx` before React hydrates (so first paint is already in the right direction).
-2. By `setLocale()` → `applyDocumentDir()` when the user switches language.
-3. By a `useEffect` in `RootLayout` that re-applies it whenever `useLocaleDirection()` reports a change.
+۱. توسط `themeScript` inline در `src/routes/__root.tsx` پیش از hydration ری‌اکت (تا نخستین paint هم‌اکنون در جهت درست باشد).
+۲. توسط `setLocale()` → `applyDocumentDir()` هنگامی که کاربر زبان را تعویض می‌کند.
+۳. توسط یک `useEffect` در `RootLayout` که آن را هرگاه `useLocaleDirection()` تغییری را گزارش می‌کند، دوباره اعمال می‌کند.
 
-Never write `<div dir="rtl">` or `element.dir = 'rtl'` in component code. If you need a direction-aware container, rely on the inherited `dir` from `<html>`.
+هرگز `<div dir="rtl">` یا `element.dir = 'rtl'` را در کد کامپوننت ننویسید. اگر یک ظرف آگاه از جهت نیاز دارید، به `dir` ارث‌رسیده از `<html>` تکیه کنید.
 
-### DON'T use `Intl.DateTimeFormat('en-US', ...)` or `toLocaleDateString('en-US', ...)`
+### از `Intl.DateTimeFormat('en-US', ...)` یا `toLocaleDateString('en-US', ...)` استفاده نکنید
 
-Hardcoding `'en-US'` makes dates render in US English format regardless of the active locale. Either:
+سخت‌کد کردن `'en-US'` باعث می‌شود تاریخ‌ها فارغ از locale فعال، با فرمت انگلیسی آمریکا رندر شوند. یا:
 
-- Pass `undefined` as the locale so the browser uses `navigator.language`: `new Intl.DateTimeFormat(undefined, { ... })`
-- Or pass the active locale explicitly: `new Intl.DateTimeFormat(getLocale(), { ... })`
+- `undefined` را به‌عنوان locale ارسال کنید تا مرورگر از `navigator.language` استفاده کند: `new Intl.DateTimeFormat(undefined, { ... })`
+- یا locale فعال را صریحاً ارسال کنید: `new Intl.DateTimeFormat(getLocale(), { ... })`
 
-The second approach is preferred when you want the date to follow the user's app-locale choice (which may differ from their browser locale).
+رویکرد دوم زمانی ترجیح داده می‌شود که بخواهید تاریخ از انتخاب locale اپ کاربر پیروی کند (که ممکن است با locale مرورگر او متفاوت باشد).
 
-### DON'T use physical-property Tailwind classes in new code
+### از کلاس‌های Tailwind ویژگی فیزیکی در کد جدید استفاده نکنید
 
-A future ESLint rule will warn on `ml-`, `mr-`, `pl-`, `pr-`, `left-`, `right-`, `text-left`, `text-right` in new code. Until that rule ships, please self-review your diff for these classes before opening a PR. You can grep your changes:
+یک قانون ESLint آینده روی `ml-`، `mr-`، `pl-`، `pr-`، `left-`، `right-`، `text-left`، `text-right` در کد جدید هشدار خواهد داد. تا زمان انتشار آن قانون، لطفاً diff خود را برای این کلاس‌ها پیش از باز کردن PR بازبینی کنید. می‌توانید تغییرات خود را grep کنید:
 
 ```bash
 git diff main...HEAD -- '*.tsx' '*.ts' | grep -E '^\+.*\b(ml-|mr-|pl-|pr-|left-|right-|text-left|text-right)\b'
 ```
 
-If the grep returns anything, prefer the logical-property equivalent unless you have a specific reason (and document it in the code comment).
+اگر grep چیزی برگرداند، معادل ویژگی منطقی را ترجیح دهید مگر دلیل خاصی داشته باشید (و آن را در کامنت کد مستند کنید).
 
-## Persian-specific guidance
+## راهنمای خاص فارسی
 
-### Numerals
+### ارقام
 
-Keep ASCII digits (`0123456789`) in:
+ارقام ASCII (`0123456789`) را نگه دارید در:
 
-- Code blocks and inline code
-- Identifiers, paths, file names
-- Token counts and other technical UI strings that users might copy-paste
-- Interpolation parameters (they get stringified via `String(value)`)
+- بلاک‌های کد و کد inline
+- شناسه‌ها، مسیرها، نام فایل‌ها
+- شمارش توکن و سایر رشته‌های فنی رابط کاربری که کاربر ممکن است copy-paste کند
+- پارامترهای جای‌گذاری (آن‌ها از طریق `String(value)` stringify می‌شوند)
 
-Use Persian digits (`۰۱۲۳۴۵۶۷۸۹`) only in:
+ارقام فارسی (`۰۱۲۳۴۵۶۷۸۹`) را فقط در:
 
-- Prose body text where the number is part of a sentence (and only if the team decides to adopt Persian digits — currently we keep ASCII for consistency)
+- متن بدنهٔ نثر که عدد بخشی از جمله است (و فقط اگر تیم تصمیم به اتخاذ ارقام فارسی بگیرد — در حال حاضر برای یکدستی ASCII را نگه می‌داریم)
 
-### Punctuation
+### نشانه‌گذاری
 
-- Use the Persian comma `،` (U+060C) instead of the ASCII comma `,` inside Persian text.
-- Use `؛` (U+061B) instead of `;` for semicolons in Persian text.
-- Use «» (Persian guillemets) instead of `""` for quotes around Persian text.
-- Use `…` (U+2026) for ellipsis — it renders correctly in both LTR and RTL.
-- The colon `:` is fine to use as-is in Persian.
+- از کامای فارسی `،` (U+060C) به‌جای کامای ASCII `,` درون متن فارسی استفاده کنید.
+- از `؛` (U+061B) به‌جای `;` برای نقطه‌ویرگول در متن فارسی استفاده کنید.
+- از «» (گیومه فارسی) به‌جای `""` برای نقل‌قول دور متن فارسی استفاده کنید.
+- از `…` (U+2026) برای علامت حذف استفاده کنید — در هر دو LTR و RTL به‌درستی رندر می‌شود.
+- دو نقطه `:` به‌همین شکل در فارسی قابل‌استفاده است.
 
-### Zero-width non-joiner (ZWNJ)
+### نیم‌فاصله (ZWNJ)
 
-Persian uses ZWNJ (`\u200c`, rendered invisibly) to separate words that should not be joined. Always include it where it belongs:
+فارسی از ZWNJ (`\u200c`، نامرئی رندر می‌شود) برای جدا کردن واژگانی که نباید به هم بپیوندند، استفاده می‌کند. همیشه آن را در جای درستش قرار دهید:
 
-- ✅ `نمایه‌ها` (correct)
-- ❌ `نمایه ها` (wrong — the two words appear stuck together)
-- ✅ `می‌خواهم` (correct)
-- ❌ `میخواهم` (wrong)
+- ✅ `نمایه‌ها` (درست)
+- ❌ `نمایه ها` (اشتباه — دو واژه به‌هم چسبیده به‌نظر می‌رسند)
+- ✅ `می‌خواهم` (درست)
+- ❌ `میخواهم` (اشتباه)
 
-Most Persian IMEs insert ZWNJ automatically. If you're typing translations in a non-Persian keyboard layout, be careful to include them.
+بیشتر IMEهای فارسی ZWNJ را به‌طور خودکار درج می‌کنند. اگر ترجمه‌ها را در یک چیدمان کیبورد غیرفارسی تایپ می‌کنید، مراقب باشید که آن‌ها را قرار دهید.
 
-## Testing locally
+## آزمون محلی
 
-Run:
+اجرا کنید:
 
 ```bash
 pnpm exec vitest run src/lib/i18n.test.ts
@@ -242,69 +242,69 @@ pnpm exec tsc --noEmit
 pnpm build
 ```
 
-Then open Settings → Language and switch to فارسی. Verify:
+سپس تنظیمات → زبان را باز کرده و به فارسی تعویض کنید. راستی‌آزمایی کنید:
 
-1. The `<html>` element has `dir="rtl"` and `lang="fa"` (check via DevTools).
-2. The sidebar appears on the right side of the screen.
-3. Text alignment is right-justified where appropriate.
-4. Vazirmatn font is loaded (check the Fonts tab in DevTools).
-5. No LTR flash on initial page load (the `themeScript` should have set `dir` before hydration).
+۱. عنصر `<html>` دارای `dir="rtl"` و `lang="fa"` است (از طریق DevTools بررسی کنید).
+۲. sidebar در سمت راست صفحه ظاهر می‌شود.
+۳. تراز متن در صورت لزوم راست‌چین است.
+۴. فونت Vazirmatn بارگذاری شده است (تب Fonts در DevTools را بررسی کنید).
+۵. هیچ فلش LTR در بارگذاری اولیهٔ صفحه وجود ندارد (`themeScript` باید پیش از hydration `dir` را تنظیم کرده باشد).
 
-For component-specific RTL testing, look at `src/lib/i18n.test.ts` for patterns. Tests that exercise `setLocale()` are safe to run in Node (no DOM required) — DOM assertions are guarded with `typeof document !== 'undefined'`.
+برای آزمون RTL خاص کامپوننت، به `src/lib/i18n.test.ts` برای الگوها نگاه کنید. آزمون‌هایی که `setLocale()` را اجرا می‌کنند، در Node امن هستند (DOM لازم نیست) — assertions مبتنی بر DOM با `typeof document !== 'undefined'` محافظت می‌شوند.
 
-## Architecture notes
+## یادداشت‌های معماری
 
-### Why no ICU MessageFormat?
+### چرا بدون ICU MessageFormat؟
 
-We deliberately do not use `Intl.MessageFormat` or any other ICU-style message syntax. Plurals are handled at the call site by choosing a different key:
+ما به‌طور عمدی از `Intl.MessageFormat` یا هر نحو پیام به‌سبک ICU استفاده نمی‌کنیم. جمع‌ها در محل فراخوانی با انتخاب یک کلید متفاوت مدیریت می‌شوند:
 
 ```ts
 // EN
 'messages.unread.one': '1 unread message',
 'messages.unread.many': '{count} unread messages',
 
-// Call site
+// محل فراخوانی
 const key = count === 1 ? 'messages.unread.one' : 'messages.unread.many'
 return t(key, { count })
 ```
 
-This keeps the i18n module small and dependency-free. The trade-off is that translators must author multiple keys for plural forms, but in practice this is rare in our UI.
+این ماژول i18n را کوچک و بدون وابستگی نگه می‌دارد. نتیجهٔ متقابل این است که مترجم‌ها باید چندین کلید برای فرم‌های جمع بسازند، اما در عمل این در رابط کاربری ما نادر است.
 
-### Why not react-i18next?
+### چرا نه react-i18next؟
 
-The app's i18n needs are simple: ~250 keys, two locales, no lazy-loading, no namespace splitting. `react-i18next` would add ~30KB to the bundle for features we don't use. The current `t()` function is a one-liner that reads from a pre-built in-memory map; it's impossible to make it meaningfully faster.
+نیازهای i18n اپ ساده است: ~۲۵۰ کلید، دو locale، بدون lazy-loading، بدون تقسیم namespace. `react-i18next` ~۳۰KB به bundle برای ویژگی‌هایی که استفاده نمی‌کنیم اضافه می‌کند. تابع `t()` فعلی یک‌خطی است که از یک نقشهٔ درون‌حافظه‌ای از پیش ساخته‌شده می‌خواند؛ ساختن آن به‌طور معناداری سریع‌تر غیرممکن است.
 
-If the locale count grows beyond ~5, or if we need lazy-loaded namespace splitting, revisit this decision.
+اگر تعداد localeها از ~۵ فراتر رود، یا به تقسیم namespace با lazy-loading نیاز داشتیم، این تصمیم را بازبینی کنید.
 
-### Why does the `themeScript` duplicate the RTL_LOCALES list?
+### چرا `themeScript` فهرست RTL_LOCALES را تکثیر می‌کند؟
 
-The `themeScript` in `src/routes/__root.tsx` runs as an inline `<script>` tag before React hydrates. It has no access to the module graph, so it can't import `RTL_LOCALES` from `src/lib/i18n.ts`. The list is duplicated (with a comment explaining why) so that the document direction is set before first paint, avoiding an LTR flash for Persian-locale users.
+`themeScript` در `src/routes/__root.tsx` به‌عنوان یک تگ `<script>` inline پیش از hydration ری‌اکت اجرا می‌شود. این به module graph دسترسی ندارد، بنابراین نمی‌تواند `RTL_LOCALES` را از `src/lib/i18n.ts` import کند. فهرست تکثیر شده (با یک کامنت توضیحی) تا جهت سند پیش از نخستین paint تنظیم شود، و از فلش LTR برای کاربران locale فارسی جلوگیری کند.
 
-If you add a new RTL locale, you MUST update both:
-1. `RTL_LOCALES` in `src/lib/i18n.ts`
-2. The `RTL_LOCALES` array in the `themeScript` string in `src/routes/__root.tsx`
+اگر یک locale RTL جدید اضافه کنید، باید هر دو را به‌روز کنید:
+۱. `RTL_LOCALES` در `src/lib/i18n.ts`
+۲. آرایهٔ `RTL_LOCALES` در رشتهٔ `themeScript` در `src/routes/__root.tsx`
 
-The pre-existing test suite does not catch drift between these two lists. A follow-up TODO is to extract the script body into a separate `.ts` file that the build inlines, so the same source serves both contexts.
+مجموعه آزمون موجود drift میان این دو فهرست را شناسایی نمی‌کند. یک TODO پیگیری این است که بدنهٔ اسکریپت را در یک فایل `.ts` جداگانه استخراج کنیم که build آن را inline می‌کند، تا همان منبع هر دو زمینه را سرو کند.
 
-## Current status
+## وضعیت فعلی
 
-The following screen groups have been migrated to `t()`:
+گروه‌های صفحهٔ زیر به `t()` مهاجرت کرده‌اند:
 
-- ✅ Chat screen (composer, header, empty state, message list, message item, sidebar, providers dialog, session dialogs, tool labels)
-- ✅ Settings screen (section titles, language selector)
-- ✅ Shared components (mobile tab bar, workspace shell)
-- ✅ Tasks/Profiles screen titles
-- ✅ RTL infrastructure (themeScript, useLocaleDirection, @variant rtl, Vazirmatn font)
-- ✅ i18n module (interpolation, getDir, applyDocumentDir)
+- ✅ صفحهٔ گفتگو (composer، header، حالت خالی، فهرست پیام، آیتم پیام، sidebar، دیالوگ providerها، دیالوگ سشن‌ها، برچسب‌های ابزار)
+- ✅ صفحهٔ تنظیمات (عناوین بخش‌ها، انتخابگر زبان)
+- ✅ کامپوننت‌های مشترک (نوار تب موبایل، workspace shell)
+- ✅ عناوین صفحهٔ Tasks/Profiles
+- ✅ زیرساخت RTL (themeScript، useLocaleDirection، @variant rtl، فونت Vazirmatn)
+- ✅ ماژول i18n (جای‌گذاری، getDir، applyDocumentDir)
 
-The following screen groups still have hardcoded English strings (planned for follow-up work):
+گروه‌های صفحهٔ زیر هنوز رشته‌های انگلیسی سخت‌کدشده دارند (برای کار پیگیری برنامه‌ریزی شده‌اند):
 
-- ⚠️ Settings screen individual row labels and form inputs (~250 strings)
-- ⚠️ Dashboard card components (~200 strings)
-- ⚠️ Agents / Swarm2 / Gateway screens (~560 strings combined)
-- ⚠️ MCP / Memory / Skills / Files screens (~385 strings combined)
-- ⚠️ Playground / Agora / Echo-Studio screens (~240 strings combined)
-- ⚠️ Toast messages in chat-composer.tsx and other action handlers
-- ⚠️ Form input placeholders across all screens
+- ⚠️ برچسب‌های ردیف فردی و ورودی‌های فرم صفحهٔ تنظیمات (~۲۵۰ رشته)
+- ⚠️ کامپوننت‌های کارت داشبورد (~۲۰۰ رشته)
+- ⚠️ صفحه‌های Agents / Swarm2 / Gateway (~۵۶۰ رشته ترکیبی)
+- ⚠️ صفحه‌های MCP / Memory / Skills / Files (~۳۸۵ رشته ترکیبی)
+- ⚠️ صفحه‌های Playground / Agora / Echo-Studio (~۲۴۰ رشته ترکیبی)
+- ⚠️ پیام‌های toast در chat-composer.tsx و سایر handlerهای action
+- ⚠️ placeholderهای ورودی فرم در همهٔ صفحه‌ها
 
-If text remains in English after switching languages, it likely means that component still has hardcoded text and needs to be wired to `t(...)`. The namespaces (`chat.*`, `common.*`, `dashboard.*`, `agents.*`, etc.) are already in place — only the call-site wiring remains.
+اگر متن پس از تعویض زبان همچنان انگلیسی می‌ماند، احتمالاً به این معناست که آن کامپوننت هنوز متن سخت‌کدشده دارد و نیازمند سیم‌کشی به `t(...)` است. namespaceها (`chat.*`، `common.*`، `dashboard.*`، `agents.*` و غیره) هم‌اکنون در جای خود هستند — فقط سیم‌کشی محل فراخوانی باقی مانده است.

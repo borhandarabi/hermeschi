@@ -1,53 +1,53 @@
-# Tool Output Artifacts / Context Bloat Plan
+# برنامهٔ artifactهای خروجی ابزار / پ‌رشدی زمینه
 
-Date: 2026-04-24
+تاریخ: ۲۰۲۶-۰۴-۲۴
 
-## Problem
+## مسئله
 
-Hermes Agent sessions fill context extremely fast during normal tool-heavy workflows. In one Workspace session (`cda915a9-fbf6-4bbf-9617-e7e9d26f40be`):
+سشن‌های Hermes Agent در جریان کارهای معمول مبتنی بر ابزار، زمینه را به‌سرعت پر می‌کنند. در یک سشن Workspace (`cda915a9-fbf6-4bbf-9617-e7e9d26f40be`):
 
-- 256 messages total
-- 7 user messages
-- 117 assistant messages
-- 132 tool messages
-- ~603k chars of tool output
-- ~152k rough tokens
+- مجموعاً ۲۵۶ پیام
+- ۷ پیام کاربر
+- ۱۱۷ پیام دستیار
+- ۱۳۲ پیام ابزار
+- ~۶۰۳k کاراکتر خروجی ابزار
+- ~۱۵۲k token تقریبی
 
-The bloat is not user/assistant conversation. It is mostly persisted execution trace:
+پ‌رشدی، گفتگوی کاربر/دستیار نیست. بیشتر رد اجرای ذخیره‌شده است:
 
-- large `read_file` chunks
-- terminal/test logs
-- full `skill_view` docs
-- GitHub issue/PR listings
-- patch/diff outputs
+- chunkهای بزرگ `read_file`
+- لاگ‌های terminal/test
+- مستندات کامل `skill_view`
+- فهرست‌های issue/PR گیت‌هاب
+- خروجی‌های patch/diff
 
-This causes:
+این باعث می‌شود:
 
-1. Context window fills quickly despite normal Claude behavior.
-2. Auto-compaction warnings appear early/often.
-3. Workspace chat UI becomes dominated by tool cards and looks like user/assistant messages disappeared.
-4. The model is force-fed large tool outputs every turn even when it only needs pointers/summaries.
+۱. پنجرهٔ زمینه با وجود رفتار عادی Claude به‌سرعت پر می‌شود.
+۲. هشدارهای auto-compaction زود و مکرر ظاهر می‌شوند.
+۳. رابط کاربری گفتگوی Workspace توسط کارت‌های ابزار تسلط می‌یابد و به‌نظر می‌رسد پیام‌های کاربر/دستیار ناپدید شده‌اند.
+۴. مدل در هر نوبت خروجی‌های بزرگ ابزار را به‌اجبار دریافت می‌کند حتی وقتی فقط به pointers/خلاصه‌ها نیاز دارد.
 
-## Key Insight
+## بینش کلیدی
 
-Claude currently blends two separate concepts:
+Claude در حال حاضر دو مفهوم جداگانه را درهم می‌آمیزد:
 
-1. **Conversation/model context** — what the LLM needs to reason.
-2. **Execution trace/artifacts** — full tool outputs, logs, file contents, diffs, skill docs.
+۱. **زمینهٔ گفتگو/مدل** — آنچه LLM برای استدلال نیاز دارد.
+۲. **رد اجرا/artifactها** — خروجی‌های کامل ابزار، لاگ‌ها، محتوای فایل، diffها، مستندات skill.
 
-They should be separated.
+این‌ها باید جدا شوند.
 
-## Desired Architecture
+## معماری مطلوب
 
-Use **artifact-backed tool outputs + compact context projection**.
+استفاده از **خروجی‌های ابزار مبتنی بر artifact + پیش‌نگاشت زمینهٔ فشرده**.
 
-### Chat transcript should contain
+### رونوشت گفتگو باید شامل باشد
 
-- user messages
-- assistant final messages
-- compact tool summaries/pointers
+- پیام‌های کاربر
+- پیام‌های نهایی دستیار
+- خلاصه‌های/pointerهای فشردهٔ ابزار
 
-Example compact tool message:
+نمونه پیام فشرده ابزار:
 
 ```json
 {
@@ -62,9 +62,9 @@ Example compact tool message:
 }
 ```
 
-### Inspector artifacts should contain
+### artifactهای Inspector باید شامل باشند
 
-Full tool outputs/logs/artifacts, lazily loaded:
+خروجی‌های/لاگ‌ها/artifactهای کامل ابزار، با بارگذاری تنبل:
 
 ```ts
 type InspectorArtifact = {
@@ -81,9 +81,9 @@ type InspectorArtifact = {
 }
 ```
 
-### Model context should receive
+### زمینهٔ مدل باید دریافت کند
 
-Only compact summaries by default:
+فقط خلاصه‌های فشرده به‌طور پیش‌فرض:
 
 ```txt
 Tool read_file completed.
@@ -92,28 +92,28 @@ Full output stored as artifact toolout_abc123.
 Use artifact_read(toolout_abc123, offset, limit) if needed.
 ```
 
-## Current Workspace Inspector State
+## وضعیت فعلی Inspector Workspace
 
-Checked code:
+کد بررسی‌شده:
 
 - `src/components/inspector/activity-store.ts`
-  - Zustand in-memory store only
-  - stores `{ type, time, text }`
-  - not durable; gone on refresh
+  - فقط Zustand in-memory store
+  - `{ type, time, text }` را ذخیره می‌کند
+  - دوام‌ندارد؛ با refresh از بین می‌رود
 - `src/components/inspector/inspector-panel.tsx`
-  - Artifacts tab filters `events.filter(e => e.type === 'artifact')`
-  - displays text/time only
-  - no full content, IDs, previews, or lazy loading
+  - تب Artifacts، `events.filter(e => e.type === 'artifact')` را فیلتر می‌کند
+  - فقط متن/زمان را نمایش می‌دهد
+  - بدون محتوای کامل، ID، preview، یا بارگذاری تنبل
 
-So the right panel is the correct UX destination, but needs a durable backing store.
+پس پنل سمت راست مقصد UX درست است، اما به یک backing store دوام‌دار نیاز دارد.
 
-## Implementation Options
+## گزینه‌های پیاده‌سازی
 
-### Option A — Canonical Hermes Agent artifact store
+### گزینهٔ A — artifact store رسمی Hermes Agent
 
-Best long-term because all clients benefit: CLI, gateway, Workspace, future WebUI.
+بهترین بلندمدت زیرا همهٔ کلاینت‌ها سود می‌برند: CLI، دروازه، Workspace، WebUI آینده.
 
-Add a table/store to Hermes Agent:
+افزودن یک table/store به Hermes Agent:
 
 ```sql
 tool_artifacts (
@@ -130,110 +130,110 @@ tool_artifacts (
 )
 ```
 
-Large content on disk:
+محتوای بزرگ روی دیسک:
 
 ```txt
 ~/.hermes/sessions/artifacts/<session_id>/<artifact_id>.json
 ```
 
-API endpoints:
+endpointهای API:
 
 ```txt
 GET /api/sessions/:sessionId/artifacts
 GET /api/artifacts/:artifactId
 ```
 
-### Option B — Workspace MVP artifact cache
+### گزینهٔ B — cache artifact MVP فقط Workspace
 
-Faster Workspace-only patch.
+patch سریع‌تر فقط Workspace.
 
-Store artifacts under:
+ذخیرهٔ artifactها زیر:
 
 ```txt
 ~/hermeschi/.runtime/artifacts/<session_id>/<artifact_id>.json
 ```
 
-or a small local DB/JSON index.
+یا یک DB/JSON index محلی کوچک.
 
-Workspace `/api/history` or `/api/send-stream` externalizes oversized tool results before rendering/sending to React.
+Workspace `/api/history` یا `/api/send-stream` خروجی‌های ابزار بیش‌ازحد بزرگ را پیش از رندر/ارسال به React بیرونی می‌کند.
 
-Good MVP, but not enough for canonical model-context bloat unless Hermes Agent context builder also stops reinjecting the full tool payload.
+MVP خوبی است، اما برای پ‌رشدی زمینهٔ مدل رسمی کافی نیست مگر آنکه context builder Hermes Agent نیز تزریق مجدد payload کامل ابزار را متوقف کند.
 
-## Policy Proposal
+## پیشنهاد سیاست
 
-Use a size threshold:
+استفاده از آستانهٔ اندازه:
 
 ```ts
 const INLINE_TOOL_OUTPUT_LIMIT = 4_000
 ```
 
-If tool output <= 4k chars:
+اگر خروجی ابزار <= ۴k کاراکتر:
 
-- keep inline
+- inline نگه داشته شود
 
-If > 4k chars:
+اگر > ۴k کاراکتر:
 
-- store full output as artifact
-- replace chat/session content with summary + artifact pointer
-- show compact card in chat
-- full content available from Inspector
+- ذخیرهٔ خروجی کامل به‌عنوان artifact
+- جایگزینی محتوای chat/session با خلاصه + pointer artifact
+- نمایش کارت فشرده در گفتگو
+- محتوای کامل از Inspector قابل‌دسترس
 
-## Per-tool Defaults
+## پیش‌فرض‌های هر ابزار
 
-| Tool type | Context policy |
+| نوع ابزار | سیاست زمینه |
 |---|---|
-| `read_file` | Store full as artifact; context gets file path, line range, preview/excerpts |
-| `search_files` | Keep compact matches inline |
-| `terminal` success | Store full log; context gets command, exit code, last ~20 lines |
-| `terminal` failure | Store full log; context gets command, exit code, relevant error/tail |
-| `skill_view` | Store/reference skill doc; context gets skill name/version/summary/hash |
-| `browser_snapshot` | Store full snapshot/artifact; context gets page summary |
-| `patch` | Keep summary/full diff if small; externalize large diffs |
-| `todo` | Compact state only |
-| GitHub issue/PR lists | Store full list; context gets counts/top N |
+| `read_file` | ذخیرهٔ کامل به‌عنوان artifact؛ زمینه مسیر فایل، بازهٔ خط، preview/گزیده‌ها را دریافت می‌کند |
+| `search_files` | تطابق‌های فشرده را inline نگه دارید |
+| `terminal` موفق | ذخیرهٔ لاگ کامل؛ زمینه دستور، کد خروج، ~۲۰ خط آخر را دریافت می‌کند |
+| `terminal` ناموفق | ذخیرهٔ لاگ کامل؛ زمینه دستور، کد خروج، خطای مرتبط/دم را دریافت می‌کند |
+| `skill_view` | ذخیره/ارجاع مستند skill؛ زمینه نام/نسخه/خلاصه/hash skill را دریافت می‌کند |
+| `browser_snapshot` | ذخیرهٔ snapshot/artifact کامل؛ زمینه خلاصهٔ صفحه را دریافت می‌کند |
+| `patch` | نگه‌داری خلاصه/diff کامل اگر کوچک است؛ diffهای بزرگ را بیرونی کنید |
+| `todo` | فقط وضعیت فشرده |
+| فهرست‌های issue/PR گیت‌هاب | ذخیرهٔ فهرست کامل؛ زمینه تعدادها/top N را دریافت می‌کند |
 
-## Workspace UI Fixes Already Started
+## رفع‌های رابط کاربری Workspace آغازشده
 
-Files touched in current worktree:
+فایل‌های دست‌خورده در worktree فعلی:
 
 - `src/stores/chat-store.ts`
-  - fixed persisted order: prefer `__historyIndex` before role-rank when timestamps tie
+  - ترتیب ذخیره‌شده اصلاح شد: در صورت تساوی timestampها، ترجیح `__historyIndex` بر role-rank
 - `src/stores/chat-store.test.ts`
-  - regression for user → assistant → user order with tied timestamps
+  - regression برای ترتیب user → assistant → user با timestampهای مساوی
 - `src/screens/chat/components/chat-message-list.tsx`
-  - stopped trailing tool-only assistant turns from attaching to the last text reply
-  - added a terminal fallback assistant status card when persisted history ends with tool-only entries and no final assistant response was saved
+  - نوبت‌های دستیار فقط-ابزار انتهایی از پیوست به آخرین پاسخ متنی متوقف شدند
+  - یک کارت وضعیت دستیار fallback ترمینالی هنگامی که تاریخچهٔ ذخیره‌شده با ورودی‌های فقط-ابزار خاتمه می‌یابد و هیچ پاسخ نهایی دستیار ذخیره نشده بود، افزوده شد
 - `src/screens/chat/components/chat-message-list.test.tsx`
-  - regression for trailing tool-only messages not dominating last text reply
-  - regression for detecting a hidden tool-only tail so Workspace can render a human-readable end-state
+  - regression برای عدم تسلط پیام‌های فقط-ابزار انتهایی بر آخرین پاسخ متنی
+  - regression برای شناسایی دم فقط-ابزار پنهان تا Workspace بتواند یک وضعیت پایانی قابل‌فهم برای انسان رندر کند
 
-## Workspace MVP Artifact Store Implemented
+## artifact store MVP Workspace پیاده‌سازی شد
 
-Added in the continuation pass:
+افزوده شده در pass ادامه:
 
 - `src/server/tool-artifacts-store.ts`
-  - durable local artifact index under `.runtime/tool-artifacts/index.json`
-  - full tool outputs stored under `.runtime/tool-artifacts/<session_id>/<artifact_id>.json`
-  - stable artifact IDs from session/message/tool/content hash to avoid duplicates on repeated history fetches
+  - index artifact محلی دوام‌دار زیر `.runtime/tool-artifacts/index.json`
+  - خروجی‌های کامل ابزار زیر `.runtime/tool-artifacts/<session_id>/<artifact_id>.json` ذخیره می‌شوند
+  - IDهای artifact پایدار از hash session/message/tool/content برای جلوگیری از تکرار در fetchهای مکرر تاریخچه
   - `INLINE_TOOL_OUTPUT_LIMIT = 4_000`
-  - `externalizeLargeToolOutput(sessionId, message)` replaces oversized tool results with compact summaries and artifact pointers
+  - `externalizeLargeToolOutput(sessionId, message)` نتایج ابزار بیش‌ازحد بزرگ را با خلاصه‌های فشرده و pointerهای artifact جایگزین می‌کند
 - `src/routes/api/artifacts.ts`
-  - lists artifact metadata, optional `?sessionId=` filter
+  - metadata artifact را فهرست می‌کند، با فیلتر `?sessionId=` اختیاری
 - `src/routes/api/artifacts.$artifactId.ts`
-  - lazy-loads full artifact content by ID
+  - محتوای artifact کامل را بر اساس ID بارگذاری تنبل می‌کند
 - `src/routes/api/history.ts`
-  - externalizes oversized tool/toolResult messages during history normalization
-  - applies the same externalization path to local portable-session fallback messages
+  - پیام‌های tool/toolResult بیش‌ازحد بزرگ را در طول نرمال‌سازی تاریخچه بیرونی می‌کند
+  - همان مسیر بیرونی‌سازی را به پیام‌های fallback سشن portable محلی اعمال می‌کند
 - `src/server/claude-api.ts`
-  - normalizes backend `role: "tool"` to frontend `role: "toolResult"`
-  - hoists `toolCallId` / `toolName` so result maps and tool cards can find outputs
+  - `role: "tool"` بک‌اند را به `role: "toolResult"` فرانت‌اند نرمال می‌کند
+  - `toolCallId` / `toolName` را بالا می‌کشد تا نقشهٔ نتایج و کارت‌های ابزار بتوانند خروجی‌ها را پیدا کنند
 - `src/components/inspector/inspector-panel.tsx`
-  - Artifacts tab now reads durable artifacts from `/api/artifacts`
-  - clicking an artifact lazy-loads full content from `/api/artifacts/:artifactId`
+  - تب Artifacts اکنون artifactهای دوام‌دار را از `/api/artifacts` می‌خواند
+  - کلیک روی یک artifact، محتوای کامل را از `/api/artifacts/:artifactId` بارگذاری تنبل می‌کند
 - `src/server/tool-artifacts-store.test.ts`
-  - regression for compact pointer replacement and stable artifact IDs
+  - regression برای جایگزینی pointer فشرده و IDهای artifact پایدار
 
-Verified:
+راستی‌آزمایی‌شده:
 
 ```bash
 pnpm vitest run src/server/tool-artifacts-store.test.ts src/screens/chat/components/chat-message-list.test.tsx src/stores/chat-store.test.ts src/screens/chat/components/message-item.test.ts
@@ -241,36 +241,36 @@ pnpm exec tsc --noEmit --pretty false
 pnpm build
 ```
 
-All passed. Build only emitted existing chunk-size / sourcemap warnings.
+همه گذر کردند. build فقط هشدارهای موجود chunk-size / sourcemap را منتشر کرد.
 
-## Current Diagnosis: Workspace vs Hermes Agent
+## تشخیص فعلی: Workspace در مقابل Hermes Agent
 
-The trailing “Tool work completed” card is a Workspace guardrail, not the desired steady state.
+کارت انتهایی «Tool work completed» یک guardrail Workspace است، نه وضعیت مطلوب پایدار.
 
-Likely responsibility split:
+تقسیم مسئولیت احتمالی:
 
-1. **Hermes Agent / session persistence is the root source** when stored history ends with tool messages and no final assistant text. A healthy agent transcript should end each tool-using turn with one user-visible assistant outcome: final answer, error, interrupted/cancelled, no-op, or compact tool-work summary.
-2. **Workspace had UI/rendering bugs** that made the source problem worse:
-   - backend `role: "tool"` was not normalized to frontend `toolResult`
-   - `toolCallId` / `toolName` were not hoisted consistently
-   - trailing tool-only rows could visually dominate the chat
-   - giant tool outputs were rendered inline instead of artifact-backed
-3. **Our current setup/session amplifies it** because this conversation is extremely tool-heavy and near context max; dev/tool actions after a human-readable assistant response can leave persisted tool rows at the tail.
+۱. **Hermes Agent / persisting سشن منبع ریشه‌ای است** زمانی که تاریخچهٔ ذخیره‌شده با پیام‌های ابزار و بدون متن نهایی دستیار خاتمه می‌یابد. یک رونوشت عامل سالم باید هر نوبت مبتنی بر ابزار را با یک نتیجهٔ دستیار قابل‌مشاهده برای کاربر خاتمه دهد: پاسخ نهایی، خطا، interrupted/cancelled، no-op، یا خلاصهٔ فشردهٔ کار ابزار.
+۲. **Workspace باگ‌های UI/رندر داشت** که مشکل منبع را بدتر می‌کرد:
+   - `role: "tool"` بک‌اند به `toolResult` فرانت‌اند نرمال نمی‌شد
+   - `toolCallId` / `toolName` به‌طور یکدست بالا کشیده نمی‌شدند
+   - ردیف‌های فقط-ابزار انتهایی می‌توانستند به‌صورت بصری بر گفتگو تسلط یابند
+   - خروجی‌های بزرگ ابزار به‌جای مبتنی بر artifact، inline رندر می‌شدند
+۳. **راه‌اندازی/سشن فعلی ما آن را تقویت می‌کند** زیرا این گفتگو به‌شدت مبتنی بر ابزار است و نزدیک حداکثر زمینه است؛ اقدامات dev/ابزار پس از یک پاسخ دستیار قابل‌فهم برای انسان می‌توانند ردیف‌های ابزار ذخیره‌شده در دم به‌جا بگذارند.
 
-Conclusion: Workspace should defensively collapse/tool-summary this state, but the canonical fix belongs in Hermes Agent’s stream/session writer: never persist a completed chat turn that ends only with tool output.
+نتیجه: Workspace باید این وضعیت را به‌صورت دفاعی جمع/خلاصه-ابزار کند، اما رفع رسمی در stream/session writer Hermes Agent تعلق دارد: هرگز یک نوبت گفتگوی تکمیل‌شده را که فقط با خروجی ابزار خاتمه می‌یابد، ذخیره نکنید.
 
-## Hermes Agent Fix Implemented
+## رفع Hermes Agent پیاده‌سازی شد
 
-Patched `/Users/aurora/hermes-agent`:
+`/Users/aurora/hermes-agent` وصله شد:
 
 - `run_agent.py`
-  - `_persist_session()` now calls `_ensure_terminal_assistant_message()` before writing JSON/SQLite.
-  - If an exit path leaves the transcript ending with `role: "tool"`, Claude appends one compact synthetic assistant message instead of persisting a raw tool tail.
-  - `_handle_max_iterations()` now appends fallback summary/failure messages to history in all fallback branches, not just the happy summary path.
+  - `_persist_session()` اکنون پیش از نوشتن JSON/SQLite، `_ensure_terminal_assistant_message()` را فراخوانی می‌کند.
+  - اگر یک مسیر خروج، رونوشت را با خاتمهٔ `role: "tool"` باقی بگذارد، Claude به‌جای persist کردن یک دم خاموش ابزار، یک پیام دستیار مصنوعی فشرده ضمیمه می‌کند.
+  - `_handle_max_iterations()` اکنون پیام‌های خلاصه/شکست fallback را در همهٔ شاخه‌های fallback به history اضافه می‌کند، نه فقط در مسیر خلاصهٔ خوش‌بینانه.
 - `tests/run_agent/test_860_dedup.py`
-  - Added regression: repeated `_persist_session()` calls on a tool-tail transcript append exactly one terminal assistant message and do not duplicate rows.
+  - regression افزوده شد: فراخوانی‌های مکرر `_persist_session()` روی یک رونوشت tool-tail دقیقاً یک پیام دستیار ترمینال ضمیمه می‌کنند و ردیف‌ها را تکرار نمی‌کنند.
 
-Verified:
+راستی‌آزمایی‌شده:
 
 ```bash
 ./.venv/bin/python -m pytest tests/run_agent/test_860_dedup.py -o 'addopts=' -q
@@ -278,17 +278,17 @@ Verified:
 ./.venv/bin/python -m py_compile run_agent.py
 ```
 
-Result: all targeted tests pass.
+نتیجه: همهٔ آزمون‌های هدفمند گذر کردند.
 
-## Recommended Next Steps
+## گام‌های بعدی پیشنهادی
 
-1. Keep Workspace fallback, but treat it as edge-state handling.
-2. Continue canonical artifact work in Hermes Agent: externalize oversized tool outputs before they enter persisted/model context, not only before Workspace renders history.
-3. Continue Workspace polish:
-   - explicit “Open artifact” action on compact tool-result cards
-   - deep-link Inspector Artifacts tab
-   - artifact cleanup/retention policy
+۱. fallback Workspace را نگه دارید، اما آن را به‌عنوان مدیریت وضعیت لبه در نظر بگیرید.
+۲. کار artifact رسمی را در Hermes Agent ادامه دهید: خروجی‌های ابزار بیش‌ازحد بزرگ را پیش از آنکه وارد زمینهٔ ذخیره‌شده/مدل شوند، بیرونی کنید، نه فقط پیش از آنکه Workspace تاریخچه را رندر کند.
+۳. ادامهٔ پولیش Workspace:
+   - اکشن صریح «Open artifact» روی کارت‌های فشردهٔ tool-result
+   - deep-link به تب Inspector Artifacts
+   - سیاست cleanup/retention برای artifact
 
-## Key Principle
+## اصل کلیدی
 
-Full tool output belongs in artifacts/logs; model context should get summaries, pointers, and lazy-loaded excerpts only.
+خروجی کامل ابزار متعلق به artifactها/لاگ‌هاست؛ زمینهٔ مدل باید فقط خلاصه‌ها، pointerها و گزیده‌های بارگذاری‌شدهٔ تنبل را دریافت کند.
