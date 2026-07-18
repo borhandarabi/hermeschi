@@ -1,15 +1,15 @@
 # Skillهای Swarm
 
-skillها دانش عملیاتی قابل استفادهٔ مجدد پشت حالت Swarm هستند. یک preset نقش نام skillهایی را که یک کارگر باید بارگذاری کند تعیین می‌کند؛ profile و مسیر skillها آن skillها را در زمان اجرا در دسترس قرار می‌دهند.
+skillها دانش عملیاتی قابل استفادهٔ مجدد پشت حالت Swarm هستند. یک preset نقش، نام skillهایی را که یک کارگر باید بارگذاری کند تعیین می‌کند؛ profile و مسیر skillها آن skillها را در زمان اجرا در دسترس قرار می‌دهند.
 
-یک skill یک vibe نیست. یک رویه است: چه زمانی استفاده شود، چه commandهایی اجرا شوند، چه فایل‌هایی مهم باشند، چه pitfallsهایی وجود دارند و چگونه نتیجه را تأیید کنید.
+یک skill، یک vibe نیست. یک رویه است: چه زمانی استفاده شود، چه commandهایی اجرا شوند، چه فایل‌هایی مهم باشند، چه pitfallsهایی وجود دارند و چگونه نتیجه را تأیید کنید.
 
 ## skillهای swarm بسته‌بندی‌شده
 
 | Skill | استفاده برای |
 | --- | --- |
 | `swarm-orchestrator` | حلقهٔ ارکستریتور، dispatch، drift detection، re-prompt، escalation، routing mission. |
-| `swarm-worker-core` | قرارداد پایهٔ کارگر: phaseها، checkpointها، state زمان‌اجرایی، blockerها، handoffها. |
+| `swarm-worker-core` | قرارداد پایهٔ کارگر: phaseها، checkpointها، state زمان اجرا، blockerها، handoffها. |
 | `swarm-review-learning-loop` | ضبط learningهای بازبینی، failureهای تکراری و بهبودهای skill پس از taskها. |
 | `byte-verified-code-review` | بازبینی diffها با proof سطح byte برای تغییرات naming-sensitive و generated-file. |
 | `swarm-bench-worker` | کار benchmark/lab برای مدل‌های محلی، آزمایش‌های runtime و ثبت نتایج. |
@@ -24,7 +24,7 @@ skillها دانش عملیاتی قابل استفادهٔ مجدد پشت حا
 
 ## نحوهٔ بارگذاری خودکار skillها
 
-وقتی repo را کلون می‌کنید و workspace را اجرا می‌کنید، sessionهای کارگر skillها را از profile پیکربندی‌شدهٔ Hermes Agent بارگذاری می‌کنند. در محیط release اریک، profileها به یک دایرکتوری skill مشترک اشاره می‌کنند، که معمولاً برای کارگرها به این شکل در دسترس است:
+وقتی repo را کلون می‌کنید و فضای کار را اجرا می‌کنید، نشست‌های کارگر skillها را از profile پیکربندی‌شدهٔ Hermes Agent بارگذاری می‌کنند. در محیط release اریک، profileها به یک دایرکتوری skill مشترک اشاره می‌کنند، که معمولاً برای کارگرها به این شکل در دسترس است:
 
 ```text
 ~/.ocplatform/workspace/skills/
@@ -36,7 +36,7 @@ skillها دانش عملیاتی قابل استفادهٔ مجدد پشت حا
 ~/.hermes/profiles/<workerId>/skills/
 ```
 
-قاعدهٔ مهم این است که runtime کارگر باید بتواند نام skill را از profile خود حل کند. UI می‌تواند default skillهای یک role را نمایش دهد، اما کارگر همچنان به فایل‌های skill به‌صورت محلی نیاز دارد.
+قاعدهٔ مهم این است که runtime کارگر باید بتواند نام skill را از profile خود حل کند. UI می‌تواند default skillهای یک role را نمایش دهد، ولی کارگر همچنان به فایل‌های skill به‌صورت محلی نیاز دارد.
 
 ## defaultهای role-to-skill
 
@@ -183,11 +183,11 @@ What the worker must return.
 
 ## افزودن یک skill سفارشی به کارگر
 
-1. پوشهٔ skill را به دایرکتوری skill مشترک یا دایرکتوری `skills/` profile کارگر اضافه کنید.
-2. نام skill را به preset نقش یا ورودی roster کارگر اضافه کنید.
-3. session کارگر را restart یا rotate کنید تا profile بارگذاری مجدد شود.
-4. یک task کوچک که نیاز به skill دارد dispatch کنید.
-5. تأیید کنید checkpoint نام skill را می‌آورد و proof برمی‌گرداند.
+۱. پوشهٔ skill را به دایرکتوری skill مشترک یا دایرکتوری `skills/` profile کارگر اضافه کنید.
+۲. نام skill را به preset نقش یا ورودی roster کارگر اضافه کنید.
+۳. نشست کارگر را restart یا rotate کنید تا profile بارگذاری مجدد شود.
+۴. یک task کوچک که نیاز به skill دارد dispatch کنید.
+۵. تأیید کنید checkpoint نام skill را می‌آورد و proof برمی‌گرداند.
 
 ## قواعد hygiene skill
 
@@ -208,7 +208,7 @@ What the worker must return.
 
 - آیا skill با نام دقیق وجود دارد؟
 - آیا profile کارگر به دایرکتوری skillها دسترسی دارد؟
-- آیا session پس از اضافه‌شدن skill شروع شد؟
+- آیا نشست پس از اضافه‌شدن skill شروع شد؟
 - آیا preset نقش شامل skill است؟
 - آیا task نیازمند بارگذاری skill توسط کارگر بود؟
 - آیا checkpoint evidence نشان داد که رویه دنبال شده؟

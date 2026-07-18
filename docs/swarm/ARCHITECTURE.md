@@ -1,6 +1,6 @@
 # معماری Swarm
 
-حالت Swarm حول یک حلقهٔ پایدار ساخته شده است: intent از طریق Aurora وارد می‌شود، dispatch از ارکستریتور عبور می‌کند، کارگرها در sessionهای پایدار اجرا می‌شوند، checkpointها به صفحهٔ کنترل برمی‌گردند، و فقط تصمیمات قابل قضاوت به اریک می‌رسند.
+حالت Swarm حول یک حلقهٔ پایدار ساخته شده است: intent از طریق Aurora وارد می‌شود، dispatch از ارکستریتور عبور می‌کند، کارگرها در نشست‌های پایدار اجرا می‌شوند، checkpointها به صفحهٔ کنترل برمی‌گردند، و فقط تصمیمات قابل قضاوت به اریک می‌رسند.
 
 ## حلقه
 
@@ -44,14 +44,14 @@
 
 ## جریان canonical
 
-1. اریک یک outcome بیان می‌کند.
-2. Aurora نام کار را تعیین کرده و آن را در یک SwarmBrief قالب‌بندی می‌کند.
-3. ارکستریتور کارگر درست را انتخاب می‌کند یا کار را تجزیه می‌کند.
-4. کارگر در profile پایدار خود و runtime tmux اجرا می‌کند.
-5. کارگر یک checkpoint canonical برمی‌گرداند.
-6. notification router به‌طور پیش‌فرض checkpoint را به ارکستریتور می‌فرستد.
-7. ارکستریتور تصمیم می‌گیرد ادامه دهد، repair کند، hand off دهد، review کند یا escalate کند.
-8. Reports و Inbox state را قابل بررسی می‌کنند.
+۱. اریک یک outcome بیان می‌کند.
+۲. Aurora نام کار را تعیین کرده و آن را در یک SwarmBrief قالب‌بندی می‌کند.
+۳. ارکستریتور کارگر درست را انتخاب می‌کند یا کار را تجزیه می‌کند.
+۴. کارگر در profile پایدار خود و runtime tmux اجرا می‌کند.
+۵. کارگر یک checkpoint canonical برمی‌گرداند.
+۶. notification router به‌طور پیش‌فرض checkpoint را به ارکستریتور می‌فرستد.
+۷. ارکستریتور تصمیم می‌گیرد ادامه دهد، repair کند، hand off دهد، review کند یا escalate کند.
+۸. Reports و Inbox state را قابل بررسی می‌کنند.
 
 ## شکل SwarmBrief
 
@@ -85,7 +85,7 @@ budget:
   wall_clock_hours: 2
 ```
 
-یک brief یک prompt dump نیست. کوچک‌ترین قرارداد عملیاتی است که به کارگر اجازه می‌دهد بدون اختراع scope اجرا شود.
+یک brief، یک prompt dump نیست. کوچک‌ترین قرارداد عملیاتی است که به کارگر اجازه می‌دهد بدون اختراع scope اجرا شود.
 
 ## قرارداد checkpoint
 
@@ -112,10 +112,10 @@ notification router در `src/server/swarm-notifications.ts` قرار دارد.
 - کارگر ارکستریتور پیش‌فرض `orchestrator` است.
 - target tmux برابر `swarm-orchestrator` است.
 - checkpointهای raw تکراری از طریق `runtime.json` سرکوب می‌شوند.
-- `NEEDS_INPUT` به session اصلی escalate می‌شود.
-- اگر session tmux ارکستریتور در دسترس نباشد، checkpoint به session اصلی escalate می‌شود.
-- `DONE`، `HANDOFF` و `BLOCKED` ابتدا به ارکستریتور می‌روند.
-- session اصلی فقط وقتی input انسانی لازم باشد یا ارکستریتور در دسترس نباشد، escalation مستقیم دریافت می‌کند.
+- `NEEDS_INPUT` به نشست اصلی escalate می‌شود.
+- اگر نشست tmux ارکستریتور در دسترس نباشد، checkpoint به نشست اصلی escalate می‌شود.
+- `DONE`، `HANDOFF` و `BLOCKED` اول به ارکستریتور می‌روند.
+- نشست اصلی فقط وقتی input انسانی لازم باشد یا ارکستریتور در دسترس نباشد، escalation مستقیم دریافت می‌کند.
 
 این تفکیک مهم است. بدون آن، chat اصلی به یک آتش‌زباله‌ای از trivia کارگر تبدیل می‌شود. اصطلاح فنی.
 
@@ -139,7 +139,7 @@ standing missionها چیزهایی هستند که کارگرهای idle بدو
 
 نمونه‌ها:
 
-- «docs/swarm/QUICKSTART.md را برای dialog جدید Add Swarm به‌روزرسانی کن.»
+- «docs/swarm/QUICKSTART.md را برای دیالوگ جدید Add Swarm به‌روزرسانی کن.»
 - «PR #42 را بازبینی کن و APPROVED/CHANGES_REQUESTED با byte evidence برگردان.»
 - «issue #17 را بازتولید کن و یک failing test مینیمال بنویس.»
 
@@ -227,9 +227,9 @@ playbook تعمیر، failure modeهای شناخته‌شده را به fixها
 
 تعمیر bounded است. اگر یک fix مخرب، خارجاً قابل‌مشاهده یا speculative شود، escalate کنید.
 
-## state زمان‌اجرایی
+## state زمان اجرا
 
-هر کارگر یک رکورد runtime با فیلدهایی مانند زیر دارد:
+هر کارگر یک رکورد runtime با فیلدهایی مثل زیر دارد:
 
 - worker ID
 - role
@@ -248,19 +248,19 @@ playbook تعمیر، failure modeهای شناخته‌شده را به fixها
 
 UI از این برای render کردن کارت‌ها، Reports، Inbox و targetهای attach runtime استفاده می‌کند.
 
-## endpointهای صفحهٔ کنترل
+## اندپوینت‌های صفحهٔ کنترل
 
-endpointهای مهم:
+اندپوینت‌های مهم:
 
 | Endpoint | هدف |
 | --- | --- |
 | `GET /api/swarm-roster` | بازگرداندن Hermes Agentهای پیکربندی‌شده و متادیتای role. |
-| `GET /api/swarm-runtime` | بازگرداندن state زمان‌اجرایی و tmux attachability. |
+| `GET /api/swarm-runtime` | بازگرداندن state زمان اجرا و tmux attachability. |
 | `GET /api/swarm-missions` | بازگرداندن تاریخچهٔ mission و assignment. |
 | `POST /api/swarm-dispatch` | ارسال کار به یک یا چند Hermes Agent. |
-| `POST /api/swarm-tmux-start` | شروع session کارگر tmux-backed. |
-| `POST /api/swarm-tmux-stop` | توقف session tmux کارگر. |
-| `POST /api/swarm-tmux-scroll` | scroll کردن یک session tmux از UI. |
+| `POST /api/swarm-tmux-start` | شروع نشست کارگر tmux-backed. |
+| `POST /api/swarm-tmux-stop` | توقف نشست tmux کارگر. |
+| `POST /api/swarm-tmux-scroll` | scroll کردن یک نشست tmux از UI. |
 | `GET /api/swarm-health` | خلاصه‌ای از health swarm محلی. |
 
 ## فلسفهٔ failure
@@ -300,11 +300,11 @@ lane بازبینی وجود دارد زیرا کار خودمختار بدون 
 قبل از اینکه یک release Swarm v1 را credible بنامید:
 
 - ارکستریتور می‌تواند کارگرها را dispatch کند.
-- کارگرها در sessionهای tmux پایدار می‌مانند.
+- کارگرها در نشست‌های tmux پایدار می‌مانند.
 - کارگرها متادیتای role و profile دارند.
 - نمای runtime می‌تواند attach یا fallback کند.
 - Reports checkpointها را نشان می‌دهد.
 - Inbox موارد review/input را نمایش می‌دهد.
-- `NEEDS_INPUT` به session اصلی escalate می‌شود.
+- `NEEDS_INPUT` به نشست اصلی escalate می‌شود.
 - Greenlight Gate مستند و رعایت شده است.
 - docs توضیح می‌دهند چگونه بدون tribal knowledge آن را اجرا کنند.

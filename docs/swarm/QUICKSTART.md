@@ -12,9 +12,9 @@
 - tmux برای کارگرهای پایدار TUI-backed
 - یک profile پیکربندی‌شدهٔ Hermes Agent در `~/.hermes/profiles/`
 
-workspace همچنان می‌تواند بدون tmux render شود، اما tmux است که sessionهای کارگر را به‌جای یک‌بارمصرف و دورریختنی، زنده نشان می‌دهد.
+فضای کار همچنان می‌تواند بدون tmux render شود، ولی tmux است که نشست‌های کارگر را به‌جای یک‌بارمصرف و دورریختنی، زنده نگه می‌دارد.
 
-## ۱. کلون کردن workspace
+## ۱. کلون کردن فضای کار
 
 ```bash
 git clone https://github.com/outsourc-e/hermeschi.git
@@ -27,7 +27,7 @@ cd hermeschi
 pnpm install
 ```
 
-## ۳. شروع workspace
+## ۳. شروع فضای کار
 
 ```bash
 pnpm dev
@@ -39,11 +39,11 @@ URL محلی چاپ‌شده توسط Vite/TanStack Start را باز کنید. 
 http://localhost:3000
 ```
 
-برخی از laneهای release روی `:3002` اجرا می‌شوند؛ به خروجی terminal اعتماد کنید اگر متفاوت بود.
+برخی laneهای release روی `:3002` اجرا می‌شوند؛ به خروجی terminal اعتماد کنید اگر متفاوت بود.
 
 ## ۴. تشخیص profile در اولین اجرا
 
-در اولین اجرا، workspace به دنبال profileهای Hermes Agent در این مسیر می‌گردد:
+در اولین اجرا، فضای کار به دنبال profileهای Hermes Agent در این مسیر می‌گردد:
 
 ```text
 ~/.hermes/profiles/
@@ -61,22 +61,22 @@ http://localhost:3000
   skills/
 ```
 
-APIهای roster و runtime از آن شکل profile برای پر کردن کارت‌های کارگر، state زمان‌اجرایی، برچسب‌های مدل، نام‌های session tmux، وضعیت checkpoint و خلاصه‌های اخیر استفاده می‌کنند.
+APIهای roster و runtime از آن شکل profile برای پر کردن کارت‌های کارگر، state زمان اجرا، برچسب‌های مدل، نام‌های نشست tmux، وضعیت checkpoint و خلاصه‌های اخیر استفاده می‌کنند.
 
-اگر یک کارگر در roster وجود دارد اما profile محلی ندارد، همچنان می‌تواند به‌صورت roster-only ظاهر شود. قبل از انتظار به حافظهٔ پایدار، بارگذاری skill یا راه‌اندازی tmux، profile را بسازید یا import کنید.
+اگر یک کارگر در roster وجود دارد ولی profile محلی ندارد، همچنان می‌تواند به‌صورت roster-only ظاهر شود. قبل از انتظار به حافظهٔ پایدار، بارگذاری skill یا راه‌اندازی tmux، profile را بسازید یا import کنید.
 
 ## ۵. spawn کردن یک کارگر tmux-backed
 
-### dialog افزودن Swarm
+### دیالوگ افزودن Swarm
 
-در workspace:
+در فضای کار:
 
-1. حالت Swarm را باز کنید.
-2. Add Swarm را انتخاب کنید.
-3. یک preset نقش انتخاب کنید.
-4. worker ID، display name، model، specialty، mission و skillها را تنظیم کنید.
-5. ذخیره کنید.
-6. session کارگر را از کارت یا نمای Runtime شروع کنید.
+۱. حالت Swarm را باز کنید.
+۲. Add Swarm را انتخاب کنید.
+۳. یک preset نقش انتخاب کنید.
+۴. worker ID، display name، model، specialty، mission و skillها را تنظیم کنید.
+۵. ذخیره کنید.
+۶. نشست کارگر را از کارت یا نمای Runtime شروع کنید.
 
 presetهای نقش defaultهای مهم را پر می‌کنند: role، specialty، mission، system prompt، skillها و default model. می‌توانید قبل از ذخیره آن‌ها را ویرایش کنید.
 
@@ -135,7 +135,7 @@ curl -X POST http://localhost:3000/api/swarm-dispatch   -H 'Content-Type: applic
 }
 ```
 
-اگر `waitForCheckpoint` درست باشد، API برای یک checkpoint تازه از state زمان‌اجرایی یا chat کارگر منتظر می‌ماند. اگر timeout شود، کارگر ممکن است همچنان در حال اجرا باشد؛ قبل از فرض fail بودن، نمای Runtime را بررسی کنید.
+اگر `waitForCheckpoint` درست باشد، API برای یک checkpoint تازه از state زمان اجرا یا chat کارگر منتظر می‌ماند. اگر timeout شود، کارگر ممکن است همچنان در حال اجرا باشد؛ قبل از فرض fail بودن، نمای Runtime را بررسی کنید.
 
 ## ۷. مشاهدهٔ Reports + Inbox
 
@@ -155,13 +155,13 @@ Inbox جایی است که swarm به‌جای شجاع‌بودن در انظا
 
 ## ۸. استفاده از Kanban TaskBoard
 
-برای برنامه‌ریزی به view Kanban تغییر دهید. board زمانی مفید است که یک صف بصری می‌خواهید اما همچنان می‌خواهید dispatch از طریق ارکستریتور انجام شود.
+برای برنامه‌ریزی به view Kanban تغییر دهید. board زمانی مفید است که یک صف بصری می‌خواهید ولی همچنان می‌خواهید dispatch از طریق ارکستریتور انجام شود.
 
 معانی پیشنهادی laneها:
 
 | Lane | معنی |
 | --- | --- |
-| Backlog | مفید اما آماده نیست. |
+| Backlog | مفید ولی آماده نیست. |
 | Ready | به‌اندازهٔ کافی واضح برای dispatch. |
 | Running | کارگر آن را در اختیار دارد. |
 | Review | نیاز به reviewer یا اریک دارد. |
@@ -170,7 +170,7 @@ Inbox جایی است که swarm به‌جای شجاع‌بودن در انظا
 
 ## ۹. افزودن کارگر با presetهای نقش
 
-dialog افزودن Swarm شامل این presetهاست:
+دیالوگ افزودن Swarm شامل این presetهاست:
 
 - Orchestrator
 - Builder
@@ -184,7 +184,7 @@ dialog افزودن Swarm شامل این presetهاست:
 - Mirror Integrations
 - Custom
 
-ابتدا نزدیک‌ترین role را انتخاب کنید، سپس تنظیم کنید. از شروع با Custom پرهیز کنید مگر اینکه عمداً در حال ساخت یک lane جدید باشید. presetها قرارداد عملیاتی را رمزگذاری می‌کنند تا کارگر بداند آیا مجاز است build کند، بازبینی کند، triage کند، research کند یا فقط گزارش دهد.
+اول نزدیک‌ترین role را انتخاب کنید، سپس تنظیم کنید. از شروع با Custom پرهیز کنید مگر اینکه عمداً در حال ساخت یک lane جدید باشید. presetها قرارداد عملیاتی را رمزگذاری می‌کنند تا کارگر بداند آیا مجاز است build کند، بازبینی کند، triage کند، research کند یا فقط گزارش دهد.
 
 ## ۱۰. چک‌لیست اولین task
 
@@ -200,7 +200,7 @@ dialog افزودن Swarm شامل این presetهاست:
 
 ## ۱۱. رفع‌های رایج
 
-### کارت کارگر وجود دارد اما TUI متصل نمی‌شود
+### کارت کارگر وجود دارد ولی TUI متصل نمی‌شود
 
 tmux را بررسی کنید:
 
@@ -208,13 +208,13 @@ tmux را بررسی کنید:
 tmux ls
 ```
 
-نام session مورد انتظار:
+نام نشست مورد انتظار:
 
 ```text
 swarm-<workerId>
 ```
 
-اگر session گمشده است، کارگر را شروع یا rotate کنید.
+اگر نشست گمشده است، کارگر را شروع یا rotate کنید.
 
 ### dispatch برمی‌گرداند timeout
 
@@ -229,7 +229,7 @@ swarm-<workerId>
 
 ### کارگر role/model/skill اشتباه دارد
 
-Add Swarm را باز کنید یا config roster را ویرایش کنید، سپس session کارگر را restart کنید. role، model و skillها بخشی از هویت کارگرند؛ تغییر آن‌ها در میانهٔ task ghostهای عجیب می‌سازد. ghostهای عجیب گران هستند.
+Add Swarm را باز کنید یا config roster را ویرایش کنید، سپس نشست کارگر را restart کنید. role، model و skillها بخشی از هویت کارگرند؛ تغییر آن‌ها در میانهٔ task ghostهای عجیب می‌سازد. ghostهای عجیب گران هستند.
 
 ## ۱۲. مرز عملیاتی امن
 

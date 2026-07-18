@@ -8,13 +8,14 @@
 
 | سرویس | پورت | فایل پیکربندی |
 |---|---|---|
-| دروازهٔ Hermes Agent | ۸۶۴۲ | `C:\Users\<you>\AppData\Local\hermes\.env` |
+| دروازهٔ Hermes Agent | 8642 | `C:\Users\<you>\AppData\Local\hermes\.env` |
 | ابزارهای CLI Hermes | — | `C:\Users\<you>\.hermes\.env` |
-| داشبورد Workspace | ۳۰۰۰ | `C:\Users\<you>\hermeschi\.env` |
+| داشبورد فضای کار | 3000 | `C:\Users\<you>\hermeschi\.env` |
 
 ## محتوای مورد نیاز .env
 
 ### `AppData\Local\hermes\.env` (دروازه)
+
 ```
 OPENROUTER_API_KEY=<your-key>
 OPENROUTER_API_KEY_1=<your-key-2>
@@ -25,9 +26,11 @@ API_SERVER_KEY=<generate-a-random-hex-string>
 ```
 
 ### `~/.hermes\.env` (ابزارهای CLI)
-مانند بالا — همان کلیدها، همان API_SERVER_KEY.
+
+مانند بالا — همان کلیدها، همان `API_SERVER_KEY`.
 
 ### `hermeschi\.env` (داشبورد)
+
 ```
 OPENROUTER_API_KEY=<your-key>
 HERMES_API_URL=http://127.0.0.1:8642
@@ -45,8 +48,8 @@ HOST=127.0.0.1
 # 1. sqlite3 CLI (برای kanban/tasks)
 winget install SQLite.SQLite --accept-package-agreements --accept-source-agreements
 # سپس sqlite3.exe را در یک دایرکتوری PATH از Git Bash کپی کنید:
-# منبع: C:\Users\<you>\AppData\Local\Microsoft\WinGet\Packages\SQLite.SQLite_...\sqlite3.exe
-# مقصد:   C:\Users\<you>\bin\sqlite3.exe
+# منبع:  C:\Users\<you>\AppData\Local\Microsoft\WinGet\Packages\SQLite.SQLite_...\sqlite3.exe
+# مقصد:  C:\Users\<you>\bin\sqlite3.exe
 
 # 2. Claude CLI (برای Claude Tasks / Conductor)
 npm install -g @anthropic-ai/claude-code
@@ -70,10 +73,10 @@ pnpm dev
 # باز کنید http://127.0.0.1:3000
 ```
 
-## رفع تعارض پورت
+## رفع تداخل پورت
 
 ```powershell
-# یافتن آنچه پورت را در دست دارد
+# پیدا کردن آنچه پورت را اشغال کرده
 netstat -ano | findstr :8642
 netstat -ano | findstr :3000
 
@@ -83,22 +86,22 @@ Stop-Process -Id <PID> -Force
 
 ## نصب PWA
 
-۱. `http://127.0.0.1:3000` را در Chrome یا Edge باز کنید
-۲. آیکون نصب (⊕) را در نوار آدرس کلیک کنید
-۳. پنجرهٔ اختصاصی + آیکون taskbar دریافت می‌کند
+۱. `http://127.0.0.1:3000` را در Chrome یا Edge باز کنید.
+۲. آیکون نصب (⊕) را در نوار آدرس کلیک کنید.
+۳. پنجرهٔ اختصاصی + آیکون taskbar دریافت می‌کنید.
 
 **یادداشت:** PWA فقط زمانی کار می‌کند که `pnpm dev` در حال اجرا باشد.
 
 ## خطاهای رایج
 
-| خطا | رفع |
+| خطا | راه‌حل |
 |---|---|
 | `API_SERVER_KEY is required` | `API_SERVER_KEY=<value>` را به `AppData\Local\hermes\.env` اضافه کنید |
 | `spawnSync sqlite3 ENOENT` | sqlite3 را از طریق winget نصب کنید، exe را در PATH کپی کنید |
 | `which: no claude in` | `npm install -g @anthropic-ai/claude-code` |
 | `Port 3000 already in use` | فرآیند stale را از طریق `netstat -ano` + `Stop-Process` ببندید |
 | `Slack invalid_auth` | در صورت عدم پیکربندی Slack مورد انتظار است — نادیده بگیرید |
-| داشبورد "not available on this backend" را نشان می‌دهد | سرور API دروازه اجرا نمی‌شود یا HERMES_API_TOKEN ناهماهنگ است |
+| داشبورد «not available on this backend» را نشان می‌دهد | سرور API دروازه اجرا نمی‌شود یا `HERMES_API_TOKEN` ناهماهنگ است |
 
 ## مرجع مکان فایل‌ها
 
@@ -106,9 +109,9 @@ Stop-Process -Id <PID> -Force
 |---|---|
 | env دروازه | `C:\Users\<you>\AppData\Local\hermes\.env` |
 | env CLI | `C:\Users\<you>\.hermes\.env` |
-| env Workspace | `C:\Users\<you>\hermeschi\.env` |
+| env فضای کار | `C:\Users\<you>\hermeschi\.env` |
 | DB Kanban | `C:\Users\<you>\AppData\Local\hermes\kanban.db` |
 | کد دروازه | `C:\Users\<you>\AppData\Local\hermes\hermes-agent\` |
-| کد Workspace | `C:\Users\<you>\hermeschi\` |
+| کد فضای کار | `C:\Users\<you>\hermeschi\` |
 | skillهای سفارشی | `C:\Users\<you>\AppData\Local\hermes\skills\` |
 | پیکربندی Hermes | `C:\Users\<you>\.hermes\config.yaml` |

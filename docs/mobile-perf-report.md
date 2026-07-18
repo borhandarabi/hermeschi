@@ -2,7 +2,7 @@
 
 شاخه: `perf/mobile-bundle-split`
 پایه: `origin/perf/playground-engine-pass-1`
-ممیزی viewport/FPS: شبیه‌سازی موبایل ۳۹۰x۸۴۴، ۴x CPU throttle، پروفایل شبکهٔ ۴G throttled، `/play/?debug=perf`.
+ممیزی viewport/FPS: شبیه‌سازی موبایل ۳۹۰×۸۴۴، ۴× CPU throttle، پروفایل شبکهٔ ۴G throttled، `/play/?debug=perf`.
 
 ## باندل standalone استاتیک
 
@@ -33,11 +33,11 @@ chunkهای معوق‌شدهٔ ایجادشده توسط split استاتیک s
 | chunk مسیر Playground خام | ~۳۷٫۶ KB | ~۳۷٫۷ KB | عملاً تخت |
 | chunk مسیر Playground gzip | ~۷٫۱ KB | ~۷٫۲ KB | عملاً تخت |
 
-موفقیت معنادار، مسیر standalone استاتیک HermesWorld است؛ مسیر اپ هم‌اکنون توسط Vite split شده بود.
+موفقیت معنادار، مسیر standalone استاتیک HermesWorld است؛ مسیر اپ همین حالا توسط Vite split شده بود.
 
 ## Lighthouse موبایل، سرور استاتیک محلی
 
-پروفایل دستور: throttle پیش‌فرض موبایل Lighthouse در برابر سرور استاتیک Python.
+پروفایل دستور: throttle پیش‌فرض موبایل Lighthouse در برابر سرور استاتیک پایتون.
 
 | معیار | پایه | پس از |
 | --- | ---: | ---: |
@@ -52,11 +52,11 @@ chunkهای معوق‌شدهٔ ایجادشده توسط split استاتیک s
 | شاخص سرعت | ۲۵٫۶s | ۲۳٫۳s |
 | TTI | ۲۵٫۸s | ۲۴٫۲s |
 
-یادداشت: امتیاز به‌دلیل نوسان TBT در Lighthouse روی Chrome محلی headless افت کرد؛ زمان‌بندی‌های paint/interactive بهبود یافتند. امتیاز را تا اجرای مجدد پشت سرور/CDN فشرده‌شدهٔ شبیه تولید، به‌عنوان پر‌نویز در نظر بگیرید.
+یادداشت: امتیاز به‌خاطر نوسان TBT در Lighthouse روی Chrome محلی headless افت کرد؛ زمان‌بندی‌های paint/interactive بهبود یافتند. امتیاز را تا اجرای مجدد پشت سرور/CDN فشرده‌شدهٔ شبیه production، به‌عنوان پُرنویز در نظر بگیرید.
 
 ## ممیزی FPS موبایل
 
-اسکریپت CDP با viewport ۳۹۰px، ۴x CPU throttle، ۴G throttled، نمونه‌گیری ۱۰s RAF پس از بارگذاری scene.
+اسکریپت CDP با viewport ۳۹۰px، ۴× CPU throttle، ۴G throttled، نمونه‌گیری ۱۰s RAF پس از بارگذاری scene.
 
 | معیار | پایه | پس از |
 | --- | ---: | ---: |

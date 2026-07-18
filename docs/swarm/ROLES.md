@@ -1,6 +1,6 @@
 # Presetهای نقش Swarm
 
-dialog افزودن Swarm با presetهای نقش عرضه می‌شود تا Hermes Agentهای جدید با یک قرارداد عملیاتی واقعی شروع کنند به‌جای یک textarea خالی و خوش‌بینی. نزدیک‌ترین preset را انتخاب کنید، mission را تنظیم کنید، سپس کارگر را شروع کنید.
+دیالوگ افزودن Swarm با presetهای نقش عرضه می‌شود تا Hermes Agentهای جدید با یک قرارداد عملیاتی واقعی شروع کنند، به‌جای یک textarea خالی و خوش‌بینی. نزدیک‌ترین preset را انتخاب کنید، mission را تنظیم کنید، سپس کارگر را شروع کنید.
 
 هر role دارای:
 
@@ -98,7 +98,7 @@ Default skills:
 /swarm-specs/projects/swarm10.md
 ```
 
-Builder باید diffهای باریک ship کند، نه اینکه کلیسا را به‌خاطر یک دکمهٔ تنها به‌نظررسیده بازسازی کند.
+Builder باید diffهای باریک ship کند، نه اینکه برای یک دکمهٔ تنها، کل پروژه را بازسازی کند.
 
 ## Reviewer
 
@@ -388,13 +388,13 @@ Spec canonical:
 
 ## افزودن preset نقش جدید
 
-1. نقش را در فهرست preset UI تعریف کنید.
-2. یک specialty یک‌خطی به آن بدهید.
-3. یک standing mission به آن بدهید.
-4. default skillها را انتخاب کنید.
-5. default model را انتخاب کنید.
-6. یک spec canonical پروژه بسازید.
-7. آن را به این سند اضافه کنید.
-8. یک task کوچک smoke dispatch کنید و یک checkpoint را تأیید کنید.
+۱. نقش را در فهرست preset UI تعریف کنید.
+۲. یک specialty یک‌خطی به آن بدهید.
+۳. یک standing mission به آن بدهید.
+۴. default skillها را انتخاب کنید.
+۵. default model را انتخاب کنید.
+۶. یک spec canonical پروژه بسازید.
+۷. آن را به این سند اضافه کنید.
+۸. یک task کوچک smoke dispatch کنید و یک checkpoint را تأیید کنید.
 
 اگر مرحلهٔ ۶ زیاد کار به‌نظر می‌رسد، نقش احتمالاً هنوز واقعی نیست.

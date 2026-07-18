@@ -40,7 +40,7 @@ PORT=3123 HOST=127.0.0.1 scripts/install-dashboard-service.sh
 
 ## macOS launchd
 
-نصب‌کننده می‌نویسد:
+نصب‌کننده این فایل را می‌نویسد:
 
 ```text
 ~/Library/LaunchAgents/com.hermeschi.workspace.plist
@@ -56,7 +56,7 @@ tail -f logs/hermeschi.out.log logs/hermeschi.err.log
 
 ## سرویس کاربر systemd لینوکس
 
-نصب‌کننده می‌نویسد:
+نصب‌کننده این فایل را می‌نویسد:
 
 ```text
 ~/.config/systemd/user/hermeschi.service
@@ -70,7 +70,7 @@ journalctl --user -u hermeschi -f
 systemctl --user restart hermeschi
 ```
 
-اگر پس از خروج در لینوکس به سرویس نیاز دارید، یک‌بار lingering را فعال کنید:
+اگر بعد از logout در لینوکس به سرویس نیاز دارید، یک‌بار lingering را فعال کنید:
 
 ```bash
 loginctl enable-linger "$USER"
@@ -84,4 +84,4 @@ scripts/install-dashboard-service.sh uninstall
 
 ## یادداشت امنیتی
 
-به `0.0.0.0` متصل نشوید مگر آنکه `HERMESCHI_PASSWORD` و راه‌اندازی reverse-proxy/auth شما پیکربندی شده باشد. Workspace فایل‌ها، ترمینال‌ها و کنترل‌های عامل را در معرض قرار می‌دهد، بنابراین loopback پیش‌فرض امن است.
+به `0.0.0.0` متصل نشوید مگر اینکه `HERMESCHI_PASSWORD` و راه‌اندازی reverse-proxy/auth شما پیکربندی شده باشد. فضای کار فایل‌ها، ترمینال‌ها و کنترل‌های عامل را در معرض قرار می‌دهد، بنابراین loopback پیش‌فرض امن است.

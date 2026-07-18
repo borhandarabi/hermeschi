@@ -13,15 +13,15 @@ autoresearch mode   = mutate one target -> verify metric -> keep/revert -> repea
 
 الگوی مفید از autoresearch سبک Karpathy و portهای downstream Claude/Codex پایدار است:
 
-1. قفل کردن scope.
-2. قفل کردن سطح ارزیابی.
-3. انتخاب یک scalar metric.
-4. mutate کردن یک target باریک.
-5. اجرای یک verifier مکانیکی.
-6. نگه‌داشتن بهبودها.
-7. revert کردن تغییرات بدتر/crash/guard-fail.
-8. ثبت هر iteration.
-9. توقف در budget پیکربندی‌شده.
+۱. قفل کردن scope.
+۲. قفل کردن سطح ارزیابی.
+۳. انتخاب یک scalar metric.
+۴. mutate کردن یک target باریک.
+۵. اجرای یک verifier مکانیکی.
+۶. نگه‌داشتن بهبودها.
+۷. revert کردن تغییرات بدتر/crash/guard-fail.
+۸. ثبت هر iteration.
+۹. توقف در budget پیکربندی‌شده.
 
 اگر نمی‌توانید آن را به‌صورت مکانیکی ارزیابی کنید، آن را autoresearch نکنید.
 
@@ -36,7 +36,7 @@ autoresearch mode   = mutate one target -> verify metric -> keep/revert -> repea
 - یادداشت‌های tradeoff
 - توصیه‌هایی که قضاوت اهمیت دارد
 
-`researcher:quick` ممکن است یک config autoresearch تولید کند، اما نباید حلقه را شروع کند مگر اینکه قرارداد زیر پر شده باشد.
+`researcher:quick` ممکن است یک config autoresearch تولید کند، ولی نباید حلقه را شروع کند مگر اینکه قرارداد زیر پر شده باشد.
 
 ## قرارداد ورود autoresearch
 
@@ -58,7 +58,7 @@ rollback: revert worse, crashing, unparsable, or guard-failing changes
 greenlight: required for destructive, public, credential, account, push, deploy, merge, or bulk edits
 ```
 
-فیلدهای گمشده را به‌صورت خاموش infer نکنید. اگر یک فیلد ناشناخته است، ابتدا `autoresearch:plan` / حالت planning را اجرا کنید.
+فیلدهای گمشده را به‌صورت خاموش infer نکنید. اگر یک فیلد ناشناخته است، اول `autoresearch:plan` / حالت planning را اجرا کنید.
 
 ## discipline iteration
 
@@ -105,7 +105,7 @@ failureها را قابل‌مشاهده نگه دارید. revert کردن یک
 
 ### ۱. بهینه‌سازی Hermes skill
 
-بهبود یک skill در برابر promptهای ثابت و checkهای rubric باینری.
+بهبود یک skill در برابر پرامپت‌های ثابت و checkهای rubric باینری.
 
 ```yaml
 goal: Improve reviewer-core bug catching without increasing false positives.
@@ -122,7 +122,7 @@ guard: hermes chat -Q -t reviewer:gate -q 'load reviewer-core and summarize read
 iterations: 3
 ```
 
-### ۲. بهینه‌سازی prompt profile
+### ۲. بهینه‌سازی پرامپت profile
 
 تنظیم یک profile در برابر briefهای ثابت.
 
@@ -143,7 +143,7 @@ iterations: 3
 
 ### ۳. مسیریابی بازیابی GBrain
 
-بهینه‌سازی rule/promptهای route در برابر fixtureهای known-answer. corpus و answer key قفل‌شده‌اند.
+بهینه‌سازی rule/پرامپت‌های route در برابر fixtureهای known-answer. corpus و answer key قفل‌شده‌اند.
 
 ```yaml
 goal: Improve citation-correct answers for RAZSOC/GBrain architecture questions.
@@ -210,8 +210,8 @@ autoresearch را اجرا نکنید وقتی:
 - بهبود مطلوب عمدتاً taste یا strategy است
 - کار با secretها، تنظیمات account، پست عمومی، deploy، merge یا پاک‌سازی مخرب سر و کار دارد
 - scope آن‌قدر وسیع است که vault/repo را بازنویسی کند
-- command تأیید کندند، flaky یا دستی قضاوت می‌شود
-- agent نمی‌تواند metric را به‌صورت deterministic parse کند
+- command تأیید کندن، flaky یا دستی قضاوت می‌شود
+- عامل نمی‌تواند metric را به‌صورت deterministic parse کند
 
 نمونه‌های رایج reward-hacking:
 
@@ -226,12 +226,12 @@ autoresearch را اجرا نکنید وقتی:
 
 wedge پیش‌فرض:
 
-1. `researcher:quick` را برای draft قرارداد اجرا کنید.
-2. `reviewer` را روی قرارداد برای ریسک metric-hacking اجرا کنید.
-3. `researcher:autoresearch` را برای ۳ iteration فقط foreground/durable-session اجرا کنید.
-4. `reviewer` را روی diffهای نگه‌داشته‌شده اجرا کنید.
-5. `qa` یا تأیید متمرکز را اجرا کنید.
-6. اجازه دهید `km-agent` فقط درس‌های پایدار را ضبط کند.
+۱. `researcher:quick` را برای draft قرارداد اجرا کنید.
+۲. `reviewer` را روی قرارداد برای ریسک metric-hacking اجرا کنید.
+۳. `researcher:autoresearch` را برای ۳ iteration فقط foreground/durable-session اجرا کنید.
+۴. `reviewer` را روی diffهای نگه‌داشته‌شده اجرا کنید.
+۵. `qa` یا تأیید متمرکز را اجرا کنید.
+۶. اجازه دهید `km-agent` فقط درس‌های پایدار را ضبط کند.
 
 فقط پس از یک pilot تمیز باید یک ارکستریتور حلقهٔ طولانی‌تر یا background را تأیید کند.
 
