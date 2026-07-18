@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { useWorkspaceStore } from '@/stores/workspace-store'
+import { t } from '@/lib/i18n'
 import type { PlaygroundWorldId } from '../lib/playground-rpg'
 import { botsFor } from '../lib/playground-bots'
 
@@ -158,7 +159,7 @@ function PlaygroundChatInner({ worldId, messages, onSend, collapsed = false, onT
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               maxLength={140}
-              placeholder="Press Enter to send human chat…"
+              placeholder={t('playground.chat.placeholder')}
               className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-[12px] outline-none"
             />
             <button

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { t } from '@/lib/i18n'
 
 export const SHORTCUTS = [
   ['WASD/arrows', 'move'],
@@ -51,7 +52,7 @@ export function KeyboardShortcutsOverlay() {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Keyboard shortcuts"
+        aria-label={t('playground.shortcuts.title')}
         className="w-[min(92vw,520px)] rounded-3xl border-2 p-5 text-white shadow-2xl"
         style={{
           borderColor: 'rgba(241,197,109,.7)',
