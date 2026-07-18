@@ -12,6 +12,7 @@ import {
   ViewIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import { WorkflowHelpModal } from '@/components/workflow-help-modal'
 import {
   getOnlineStatus,
@@ -64,9 +65,9 @@ function useUpdatedAgo(fetchedAt: number | null): string {
     function update() {
       if (!fetchedAt) return setLabel('')
       const diff = Math.floor((Date.now() - fetchedAt) / 1000)
-      if (diff < 5) setLabel('just now')
-      else if (diff < 60) setLabel(`${diff}s ago`)
-      else setLabel(`${Math.floor(diff / 60)}m ago`)
+      if (diff < 5) setLabel(t('time.justNow'))
+      else if (diff < 60) setLabel(t('time.secondsAgo', { count: diff }))
+      else setLabel(t('time.minutesAgo', { count: Math.floor(diff / 60) }))
     }
     update()
     const id = setInterval(update, 5_000)
@@ -84,12 +85,12 @@ function shellCommandForRuntime(runtime: RuntimeEntry | undefined): string[] {
 }
 
 function relative(ts: number | null | undefined): string {
-  if (!ts) return 'never'
+  if (!ts) return t('swarm.runtime.never')
   const d = Date.now() - ts
-  if (d < 60_000) return `${Math.floor(d / 1000)}s ago`
-  if (d < 3_600_000) return `${Math.floor(d / 60_000)}m ago`
-  if (d < 86_400_000) return `${Math.floor(d / 3_600_000)}h ago`
-  return `${Math.floor(d / 86_400_000)}d ago`
+  if (d < 60_000) return t('time.secondsAgo', { count: Math.floor(d / 1000) })
+  if (d < 3_600_000) return t('time.minutesAgo', { count: Math.floor(d / 60_000) })
+  if (d < 86_400_000) return t('time.hoursAgo', { count: Math.floor(d / 3_600_000) })
+  return t('time.daysAgo', { count: Math.floor(d / 86_400_000) })
 }
 
 export function SwarmScreen() {
@@ -218,12 +219,12 @@ export function SwarmScreen() {
           <div className="flex size-7 items-center justify-center rounded-lg border border-emerald-400/40 bg-emerald-500/10 text-emerald-300">
             <HugeiconsIcon icon={CpuIcon} size={14} />
           </div>
-          <div className="text-sm font-bold tracking-tight text-white">Swarm OS</div>
+          <div className="text-sm font-bold tracking-tight text-white">{t('swarm.screen.os')}</div>
         </div>
-        <Chip icon={ChartLineData02Icon} label="Model" value={workspaceModel} />
-        <Chip icon={Activity01Icon} label="Provider" value={provider} />
-        <Chip icon={FlashIcon} label="Auth errors 24h" value={String(authErrors)} tone={authErrors === 0 ? 'good' : 'warn'} />
-        <Chip icon={ViewIcon} label="Online" value={`${onlineCount}/${swarmMembers.length} agents`} tone="good" />
+        <Chip icon={ChartLineData02Icon} label={t('swarm.screen.model')} value={workspaceModel} />
+        <Chip icon={Activity01Icon} label={t('swarm.screen.provider')} value={provider} />
+        <Chip icon={FlashIcon} label={t('swarm.screen.authErrors24h')} value={String(authErrors)} tone={authErrors === 0 ? 'good' : 'warn'} />
+        <Chip icon={ViewIcon} label={t('swarm.screen.online')} value={t('swarm.screen.onlineCount', { online: onlineCount, total: swarmMembers.length })} tone="good" />
         {pingResult ? (
           <div className={cn('truncate rounded-full border px-3 py-1 text-[11px]', pingResult.startsWith('✓') ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200' : 'border-red-500/40 bg-red-500/10 text-red-200')}>
             {pingResult}
@@ -232,34 +233,34 @@ export function SwarmScreen() {
         <div className="ml-auto flex items-center gap-2">
           <WorkflowHelpModal
             compact
-            eyebrow="Swarm"
-            title="How Swarm works"
+            eyebrow={t('swarm.screen.eyebrow')}
+            title={t('swarm.screen.howSwarmWorks')}
             sections={[
               {
-                title: 'What Swarm is for',
+                title: t('swarm.screen.whatSwarmIsFor'),
                 bullets: [
-                  'Swarm is the multi-worker orchestration surface for parallel execution.',
-                  'Use it when one goal should be split across several agents with live visibility and routing.',
+                  t('swarm.screen.bullet1'),
+                  t('swarm.screen.bullet2'),
                 ],
               },
               {
-                title: 'Typical flow',
+                title: t('swarm.screen.typicalFlow'),
                 bullets: [
-                  'Select workers, dispatch targeted tasks, and monitor progress from the hub and cards.',
-                  'Use ping, refresh, and card status to triage stuck or unhealthy workers quickly.',
+                  t('swarm.screen.flowBullet1'),
+                  t('swarm.screen.flowBullet2'),
                 ],
               },
               {
-                title: 'FAQ',
+                title: t('swarm.screen.faq'),
                 bullets: [
-                  'If workers look empty or unhealthy, fix setup and runtime issues in Operations first.',
-                  'Swarm is best for coordination and throughput, not first-time configuration.',
+                  t('swarm.screen.faqBullet1'),
+                  t('swarm.screen.faqBullet2'),
                 ],
               },
             ]}
           />
           <ViewModeToggle mode={viewMode} setMode={setViewMode} />
-          {updatedAgo ? <div className="text-[11px] text-emerald-200/55">Updated {updatedAgo}</div> : null}
+          {updatedAgo ? <div className="text-[11px] text-emerald-200/55">{t('swarm.screen.updatedAgo', { timeAgo: updatedAgo })}</div> : null}
           <button
             type="button"
             onClick={() => void refetch()}
@@ -267,7 +268,7 @@ export function SwarmScreen() {
             className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-emerald-200/70 hover:text-white"
           >
             <HugeiconsIcon icon={RefreshIcon} size={11} className={isFetching ? 'animate-spin' : ''} />
-            Refresh
+            {t('swarm.screen.refresh')}
           </button>
           <button
             type="button"
@@ -276,7 +277,7 @@ export function SwarmScreen() {
             className="inline-flex items-center gap-2 rounded-full border border-emerald-400/35 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-400/20 disabled:opacity-50"
           >
             <HugeiconsIcon icon={ComputerTerminal01Icon} size={12} />
-            Route to {selectedId ?? 'agent'}
+            {selectedId ? t('swarm.screen.routeTo', { id: selectedId }) : t('swarm.screen.routeToAgent')}
           </button>
           <button
             type="button"
@@ -285,7 +286,7 @@ export function SwarmScreen() {
             className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-emerald-300 disabled:opacity-50"
           >
             <HugeiconsIcon icon={FlashIcon} size={12} />
-            {pinging ? 'Pinging…' : `Ping ${selectedId ?? 'selected'}`}
+            {pinging ? t('swarm.screen.pinging') : selectedId ? t('swarm.screen.pingSelected', { id: selectedId }) : t('swarm.screen.pingSelectedFallback')}
           </button>
         </div>
       </header>
@@ -302,20 +303,22 @@ export function SwarmScreen() {
         <section>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.22em] text-emerald-200/65">Agent Workspace</div>
+              <div className="text-[11px] uppercase tracking-[0.22em] text-emerald-200/65">{t('swarm.screen.agentWorkspace')}</div>
               <h2 className="text-xl font-semibold text-white">
-                {viewMode === 'cards' ? 'Active Swarm' : 'Live Agent Terminals'}
+                {viewMode === 'cards' ? t('swarm.screen.activeSwarm') : t('swarm.screen.liveAgentTerminals')}
               </h2>
               <p className="mt-0.5 text-sm text-emerald-50/55">
                 {viewMode === 'cards'
-                  ? 'Operations-style cards, visible room wiring, and inline worker chat.'
-                  : 'Flip into terminal mode to inspect each worker session directly without leaving Swarm.'}
+                  ? t('swarm.screen.cardsDesc')
+                  : t('swarm.screen.terminalsDesc')}
               </p>
             </div>
             <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/55">
               {viewMode === 'cards'
-                ? `${swarmMembers.length} workers`
-                : `${terminalTargets.length || 0} terminal${terminalTargets.length === 1 ? '' : 's'} visible`}
+                ? t('swarm.screen.workersCount', { count: swarmMembers.length })
+                : (terminalTargets.length === 1
+                    ? t('swarm.screen.terminalsVisibleOne', { count: terminalTargets.length || 0 })
+                    : t('swarm.screen.terminalsVisibleMany', { count: terminalTargets.length || 0 }))}
             </div>
           </div>
 
@@ -355,15 +358,15 @@ export function SwarmScreen() {
             <div className="space-y-3">
               <div className="rounded-[1.5rem] border border-emerald-400/15 bg-black/35 px-4 py-3 text-sm text-emerald-50/70 backdrop-blur">
                 {roomIds.length > 0
-                  ? `Showing live terminals for the active room: ${roomIds.join(', ')}.`
+                  ? t('swarm.screen.showingRoomTerminals', { ids: roomIds.join(', ') })
                   : selectedId
-                    ? `Showing ${selectedId}. Add workers to the room to monitor several at once.`
-                    : 'Select a worker or add some to the room to open terminals here.'}
+                    ? t('swarm.screen.showingSingle', { id: selectedId })
+                    : t('swarm.screen.selectWorkerPrompt')}
               </div>
 
               {terminalTargets.length === 0 ? (
                 <div className="rounded-[1.5rem] border border-emerald-400/12 bg-emerald-500/5 px-4 py-10 text-center text-sm text-emerald-100/55">
-                  No terminal targets yet.
+                  {t('swarm.screen.noTerminalTargets')}
                 </div>
               ) : (
                 <div className="grid gap-3 xl:grid-cols-2">
@@ -374,9 +377,9 @@ export function SwarmScreen() {
                         <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                           <div>
                             <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/60">{member.id}</div>
-                            <div className="text-base font-semibold text-white">{runtime?.currentTask ?? member.lastSessionTitle ?? 'Idle session'}</div>
+                            <div className="text-base font-semibold text-white">{runtime?.currentTask ?? member.lastSessionTitle ?? t('swarm.screen.idleSession')}</div>
                             <div className="mt-1 text-xs text-emerald-100/50">
-                              {runtime?.tmuxAttachable ? `tmux ${runtime.tmuxSession}` : 'shell fallback'} · last output {relative(runtime?.lastOutputAt)}
+                              {runtime?.tmuxAttachable ? `tmux ${runtime.tmuxSession}` : t('swarm.screen.shellFallback')} · {t('swarm.screen.lastOutputAgo', { time: relative(runtime?.lastOutputAt) })}
                             </div>
                           </div>
                           <button
@@ -385,7 +388,7 @@ export function SwarmScreen() {
                             className="inline-flex items-center gap-1 rounded-full border border-emerald-400/15 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-emerald-200/70 hover:text-white"
                           >
                             <HugeiconsIcon icon={ComputerTerminal01Icon} size={11} />
-                            Focus
+                            {t('swarm.screen.focus')}
                           </button>
                         </div>
                         <SwarmTerminal
@@ -427,7 +430,7 @@ export function SwarmScreen() {
           onClick={() => setMissionOpen(true)}
           className="fixed bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-black shadow-[0_18px_40px_rgba(34,197,94,0.35)] hover:bg-emerald-300"
         >
-          Open Agent Router Chat ↑
+          {t('swarm.screen.openRouterChat')}
         </button>
       ) : null}
     </div>
@@ -442,14 +445,14 @@ function ViewModeToggle({ mode, setMode }: { mode: SwarmViewMode; setMode: (mode
         onClick={() => setMode('cards')}
         className={cn('rounded-full px-3 py-1 transition-colors', mode === 'cards' ? 'bg-emerald-400 text-black' : 'hover:text-white')}
       >
-        Cards
+        {t('swarm.screen.cardsMode')}
       </button>
       <button
         type="button"
         onClick={() => setMode('terminals')}
         className={cn('rounded-full px-3 py-1 transition-colors', mode === 'terminals' ? 'bg-emerald-400 text-black' : 'hover:text-white')}
       >
-        Terminals
+        {t('swarm.screen.terminalsMode')}
       </button>
     </div>
   )
