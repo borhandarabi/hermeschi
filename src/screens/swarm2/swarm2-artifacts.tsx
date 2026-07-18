@@ -11,6 +11,7 @@ import {
   PackageIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type Swarm2Artifact = {
   id: string
@@ -139,16 +140,16 @@ export function Swarm2Artifacts({
         <div className="mb-1.5 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-muted)]">
           <span className="inline-flex items-center gap-1">
             <HugeiconsIcon icon={Files01Icon} size={11} />
-            {showingChangedFiles ? 'Changed files' : 'Output'}
+            {showingChangedFiles ? t('swarm.artifacts.changedFiles') : t('swarm.artifacts.output')}
           </span>
           <span className="font-medium normal-case tracking-normal">
             {showingChangedFiles
-              ? `${allArtifacts.length} changed`
+              ? t('swarm.artifacts.changedCount', { count: allArtifacts.length })
               : declaredArtifacts.length > 0
-                ? `${allArtifacts.length} artifacts`
-                : '0 artifacts'}
+                ? t('swarm.artifacts.artifactsCount', { count: allArtifacts.length })
+                : t('swarm.artifacts.zeroArtifacts')}
             {' · '}
-            {allPreviews.length} previews
+            {t('swarm.artifacts.previewsCount', { count: allPreviews.length })}
           </span>
         </div>
       ) : null}
@@ -156,10 +157,10 @@ export function Swarm2Artifacts({
       <div className={cn('space-y-2', centered && 'text-center')}>
         <p className={cn('text-[11px] leading-relaxed text-[var(--theme-muted)]', centered && 'mx-auto max-w-2xl')}>
           {isEmpty
-            ? `No artifacts yet for ${workerId}. Will surface as the agent writes files, diffs, or build outputs.`
+            ? t('swarm.artifacts.emptyForWorker', { workerId })
             : showingChangedFiles
-              ? 'Inferred from git changes in the worker project. Real artifacts will replace this when the worker publishes them.'
-              : 'Published by the worker runtime. Files, diffs, reports, and previews share the same card slot.'}
+              ? t('swarm.artifacts.inferredFromGit')
+              : t('swarm.artifacts.publishedByRuntime')}
         </p>
 
         {visibleArtifacts.length > 0 ? (
@@ -179,7 +180,7 @@ export function Swarm2Artifacts({
             })}
             {overflowArtifacts > 0 ? (
               <span className="inline-flex items-center rounded-full border border-dashed border-[var(--theme-border)] px-2 py-1 text-[10px] text-[var(--theme-muted)]">
-                +{overflowArtifacts} more
+                {t('swarm.artifacts.moreCount', { count: overflowArtifacts })}
               </span>
             ) : null}
           </div>
