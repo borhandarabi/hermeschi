@@ -16,6 +16,7 @@ import { Markdown } from '@/components/prompt-kit/markdown'
 import { toast } from '@/components/ui/toast'
 import { runCronJob, toggleCronJob } from '@/lib/cron-api'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import { useAgentChat, type OperationsChatMessage } from '../hooks/use-agent-chat'
 import type { OperationsAgent } from '../hooks/use-operations'
 
@@ -24,7 +25,7 @@ function getStatusStyles(status: OperationsAgent['status']) {
     return {
       dot: 'bg-red-500',
       ring: 'text-red-500',
-      label: 'Error',
+      label: t('agents.card.statusError'),
     }
   }
 
@@ -32,14 +33,14 @@ function getStatusStyles(status: OperationsAgent['status']) {
     return {
       dot: 'bg-emerald-500',
       ring: 'text-emerald-500',
-      label: 'Active',
+      label: t('agents.card.statusActive'),
     }
   }
 
   return {
     dot: 'bg-primary-300',
     ring: 'text-primary-300',
-    label: 'Idle',
+    label: t('agents.card.statusIdle'),
   }
 }
 
@@ -130,7 +131,7 @@ export function OperationsInlineChat({
           </div>
         ) : (
           <p className="text-center text-xs text-[var(--theme-muted)]">
-            Send a message...
+            {t('agents.card.sendPlaceholder')}
           </p>
         )}
       </div>
@@ -148,7 +149,7 @@ export function OperationsInlineChat({
                 void handleSend()
               }
             }}
-            placeholder={`Message ${stripEmojiPrefix(agentName)}...`}
+            placeholder={t('agents.card.messageAgentPlaceholder', { name: stripEmojiPrefix(agentName) })}
             className="h-8 flex-1 bg-transparent px-1.5 text-xs text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)]"
           />
           <Button
@@ -156,7 +157,7 @@ export function OperationsInlineChat({
             className="rounded-lg bg-[var(--theme-accent)] text-primary-950 hover:bg-[var(--theme-accent-strong)]"
             onClick={() => void handleSend()}
             disabled={!draft.trim() || isSending}
-            aria-label={isSending ? 'Sending message' : 'Send message'}
+            aria-label={isSending ? t('agents.card.sendingAria') : t('agents.card.sendAria')}
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={15} strokeWidth={1.8} />
           </Button>
@@ -192,7 +193,7 @@ export function OperationsAgentCard({
       toast(
         mutationError instanceof Error
           ? mutationError.message
-          : 'Failed to update cron job',
+          : t('agents.jobs.toast.updateFailed'),
         { type: 'error' },
       )
     },
@@ -202,11 +203,11 @@ export function OperationsAgentCard({
     mutationFn: async (jobId: string) => runCronJob(jobId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['operations', 'cron'] })
-      toast('Cron job started', { type: 'success' })
+      toast(t('agents.jobs.toast.started'), { type: 'success' })
     },
     onError: (mutationError) => {
       toast(
-        mutationError instanceof Error ? mutationError.message : 'Failed to run cron job',
+        mutationError instanceof Error ? mutationError.message : t('agents.jobs.toast.runFailed'),
         { type: 'error' },
       )
     },
@@ -219,7 +220,7 @@ export function OperationsAgentCard({
     }
 
     setIsPaused(false)
-    await sendMessage('Run your primary task now')
+    await sendMessage(t('agents.card.runPrimaryTask'))
   }
 
   return (
@@ -230,8 +231,8 @@ export function OperationsAgentCard({
             type="button"
             aria-label={
               cronJobCount > 0
-                ? `${cronJobCount} cron jobs for ${displayName}`
-                : `No cron jobs for ${displayName}`
+                ? t('agents.card.cronJobsFor', { count: cronJobCount, name: displayName })
+                : t('agents.card.noCronJobsFor', { name: displayName })
             }
             onClick={() => setShowCronPanel((value) => !value)}
             className={cn(
@@ -270,8 +271,8 @@ export function OperationsAgentCard({
             type="button"
             aria-label={
               agent.needsSetup
-                ? `Configure ${displayName} before running`
-                : isActive ? `Pause ${displayName}` : `Run ${displayName} now`
+                ? t('agents.card.configureBeforeRun', { name: displayName })
+                : isActive ? t('agents.card.pauseAgent', { name: displayName }) : t('agents.card.runAgentNow', { name: displayName })
             }
             onClick={() => {
               if (agent.needsSetup) {
@@ -283,7 +284,7 @@ export function OperationsAgentCard({
             disabled={(isSending && !isActive)}
             title={
               agent.needsSetup
-                ? 'No model configured — open settings to set one up'
+                ? t('agents.card.noModelConfigured')
                 : undefined
             }
             className={cn(
@@ -302,7 +303,7 @@ export function OperationsAgentCard({
 
           <button
             type="button"
-            aria-label={`Open settings for ${displayName}`}
+            aria-label={t('agents.card.openSettingsFor', { name: displayName })}
             onClick={() => onOpenSettings(agent.id)}
             className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)]"
           >
@@ -337,20 +338,20 @@ export function OperationsAgentCard({
         </div>
 
         <p className="w-full truncate text-[11px] text-[var(--theme-muted)]">
-          {agent.meta.description || 'No description'}
+          {agent.meta.description || t('agents.card.noDescription')}
         </p>
         <p className="w-full truncate text-[10px] text-[var(--theme-muted)]/80">
-          {agent.jobs.length > 0 ? `${agent.jobs.length} scheduled job${agent.jobs.length === 1 ? '' : 's'}` : 'Manual only'}
+          {agent.jobs.length > 0 ? t(agent.jobs.length === 1 ? 'agents.card.scheduledJob' : 'agents.card.scheduledJobs', { count: agent.jobs.length }) : t('agents.card.manualOnly')}
         </p>
         {agent.needsSetup ? (
           <button
             type="button"
             onClick={() => onOpenSettings(agent.id)}
             className="mt-1 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-200 transition-colors hover:bg-amber-300/20"
-            title="This agent has no model configured. Click to set one up."
+            title={t('agents.card.needsSetupTooltip')}
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-300" />
-            Needs setup — click to configure
+            {t('agents.card.needsSetup')}
           </button>
         ) : null}
       </div>
@@ -385,7 +386,7 @@ export function OperationsAgentCard({
                               })
                             }
                             className="peer sr-only"
-                            aria-label={job.enabled ? 'Disable job' : 'Enable job'}
+                            aria-label={job.enabled ? t('agents.card.disableJob') : t('agents.card.enableJob')}
                           />
                           <span className="h-5 w-9 rounded-full bg-primary-200 transition-colors peer-checked:bg-[var(--theme-accent)]" />
                           <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-[var(--theme-card)] shadow-sm transition-transform peer-checked:translate-x-4" />
@@ -403,7 +404,7 @@ export function OperationsAgentCard({
                           variant="secondary"
                           className="h-7 w-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-card)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
                           onClick={() => runCronMutation.mutate(job.id)}
-                          aria-label={`Run ${displayJobName(job.name, agent.id)} now`}
+                          aria-label={t('agents.card.runJobNow', { name: displayJobName(job.name, agent.id) })}
                         >
                           <HugeiconsIcon icon={PlayIcon} size={14} strokeWidth={1.9} />
                         </Button>
@@ -416,21 +417,21 @@ export function OperationsAgentCard({
                       variant="secondary"
                       className="h-8 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 text-xs font-medium text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
                     >
-                      + Add Job
+                      {t('agents.card.addJob')}
                     </Button>
                   </div>
                 </>
               ) : (
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs text-[var(--theme-muted)]">
-                    No scheduled jobs
+                    {t('agents.card.noScheduledJobs')}
                   </p>
                   <Button
                     render={<a href="/jobs" />}
                     variant="secondary"
                     className="h-8 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 text-xs font-medium text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
                   >
-                    + Add Job
+                    {t('agents.card.addJob')}
                   </Button>
                 </div>
               )}

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast'
 import { toggleCronJob, upsertCronJob } from '@/lib/cron-api'
 import { formatRelativeTime } from '@/screens/dashboard/lib/formatters'
-import { getLocale } from '@/lib/i18n'
+import { getLocale, t } from '@/lib/i18n'
 
 function displayJobName(job: CronJob, agentId: string): string {
   const prefix = `ops:${agentId}:`
@@ -41,7 +41,7 @@ export function OperationsAgentJobs({
     },
     onError: (error) => {
       toast(
-        error instanceof Error ? error.message : 'Failed to update cron job',
+        error instanceof Error ? error.message : t('agents.jobs.toast.updateFailed'),
         { type: 'error' },
       )
     },
@@ -68,11 +68,11 @@ export function OperationsAgentJobs({
       setDescription('')
       setAdding(false)
       await queryClient.invalidateQueries({ queryKey: ['operations', 'cron'] })
-      toast('Cron job created', { type: 'success' })
+      toast(t('agents.jobs.toast.created'), { type: 'success' })
     },
     onError: (error) => {
       toast(
-        error instanceof Error ? error.message : 'Failed to create cron job',
+        error instanceof Error ? error.message : t('agents.jobs.toast.createFailed'),
         { type: 'error' },
       )
     },
@@ -83,10 +83,10 @@ export function OperationsAgentJobs({
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-[var(--theme-text)]">
-            Scheduled Jobs
+            {t('agents.jobs.scheduledJobs')}
           </h3>
           <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-            Jobs tagged with `ops:{agentId}:*`
+            {t('agents.jobs.taggedWith', { agentId })}
           </p>
         </div>
         <Button
@@ -95,7 +95,7 @@ export function OperationsAgentJobs({
           onClick={() => setAdding((value) => !value)}
         >
           <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />
-          Add Job
+          {t('agents.jobs.add')}
         </Button>
       </div>
 
@@ -122,7 +122,7 @@ export function OperationsAgentJobs({
                         })
                       }
                       className="inline-flex size-5 items-center justify-center rounded border border-[var(--theme-border)] bg-[var(--theme-card)]"
-                      aria-label={job.enabled ? 'Disable job' : 'Enable job'}
+                      aria-label={job.enabled ? t('agents.card.disableJob') : t('agents.card.enableJob')}
                     >
                       {job.enabled ? (
                         <HugeiconsIcon
@@ -161,7 +161,7 @@ export function OperationsAgentJobs({
           })
         ) : (
           <div className="rounded-2xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-6 text-sm text-[var(--theme-muted)]">
-            No cron jobs are linked to this agent yet.
+            {t('agents.jobs.noCronJobs')}
           </div>
         )}
       </div>
@@ -170,16 +170,16 @@ export function OperationsAgentJobs({
         <div className="mt-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] p-4">
           <div className="grid gap-3 md:grid-cols-2">
             <label className="space-y-2">
-              <span className="text-sm font-medium text-[var(--theme-text)]">Job Name</span>
+              <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.jobs.jobName')}</span>
               <input
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
-                placeholder="Daily scan"
+                placeholder={t('agents.jobs.jobNamePlaceholder')}
                 className="w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
               />
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-medium text-[var(--theme-text)]">Schedule</span>
+              <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.jobs.scheduleLabel')}</span>
               <input
                 value={schedule}
                 onChange={(event) => setSchedule(event.target.value)}
@@ -189,11 +189,11 @@ export function OperationsAgentJobs({
             </label>
           </div>
           <label className="mt-3 block space-y-2">
-            <span className="text-sm font-medium text-[var(--theme-text)]">Description</span>
+            <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.jobs.descriptionLabel')}</span>
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="What this job should do"
+              placeholder={t('agents.jobs.descriptionPlaceholder')}
               className="min-h-[96px] w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
             />
           </label>
@@ -203,14 +203,14 @@ export function OperationsAgentJobs({
               className="border border-[var(--theme-border)] bg-[var(--theme-card)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
               onClick={() => setAdding(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               className="bg-[var(--theme-accent)] text-primary-950 hover:bg-[var(--theme-accent-strong)]"
               onClick={() => createMutation.mutate()}
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? 'Creating…' : 'Create Job'}
+              {createMutation.isPending ? t('agents.jobs.creating') : t('agents.jobs.createJob')}
             </Button>
           </div>
         </div>

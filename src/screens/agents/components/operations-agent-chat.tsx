@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Markdown } from '@/components/prompt-kit/markdown'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/screens/dashboard/lib/formatters'
+import { t } from '@/lib/i18n'
 import { useAgentChat } from '../hooks/use-agent-chat'
 
 export function OperationsAgentChat({
@@ -37,9 +38,9 @@ export function OperationsAgentChat({
     <section className="rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-5 shadow-[0_20px_70px_color-mix(in_srgb,var(--theme-shadow)_14%,transparent)]">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-[var(--theme-text)]">Chat</h3>
+          <h3 className="text-lg font-semibold text-[var(--theme-text)]">{t('agents.chat.title')}</h3>
           <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-            Persistent session with {agentName}
+            {t('agents.chat.persistentSession', { name: agentName })}
           </p>
         </div>
         <Button
@@ -53,7 +54,7 @@ export function OperationsAgentChat({
             strokeWidth={1.8}
             className={cn(isRefreshing && 'animate-spin')}
           />
-          Refresh
+          {t('common.refresh')}
         </Button>
       </div>
 
@@ -87,7 +88,7 @@ export function OperationsAgentChat({
           ))
         ) : (
           <p className="text-sm text-[var(--theme-muted)]">
-            No messages yet. Start the conversation with this agent.
+            {t('agents.chat.emptyDetail')}
           </p>
         )}
       </div>
@@ -106,7 +107,7 @@ export function OperationsAgentChat({
               void handleSend()
             }
           }}
-          placeholder="Type a message..."
+          placeholder={t('agents.chat.typePlaceholder')}
           className="min-h-[112px] flex-1 resize-y rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
         />
         <Button
@@ -115,7 +116,7 @@ export function OperationsAgentChat({
           disabled={!draft.trim() || isSending}
         >
           <HugeiconsIcon icon={ArrowUp01Icon} size={16} strokeWidth={1.8} />
-          {isSending ? 'Sending…' : 'Send'}
+          {isSending ? t('agents.chat.sending') : t('agents.chat.send')}
         </Button>
       </div>
     </section>

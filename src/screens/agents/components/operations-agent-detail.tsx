@@ -13,6 +13,7 @@ import {
   type GatewayModelCatalogEntry,
 } from '@/lib/gateway-api'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { OperationsAgent } from '../hooks/use-operations'
 
 type AvailableModel = {
@@ -98,7 +99,7 @@ function ModelSelector({
         className="inline-flex min-h-[3rem] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-left text-sm text-[var(--theme-text)] shadow-[0_8px_24px_color-mix(in_srgb,var(--theme-shadow)_18%,transparent)]"
       >
         <span className="truncate">
-          {selected ? `${selected.provider} / ${selected.name}` : 'Default (auto)'}
+          {selected ? `${selected.provider} / ${selected.name}` : t('agents.operations.settings.modelDefault')}
         </span>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
@@ -125,7 +126,7 @@ function ModelSelector({
                 !value ? 'bg-[var(--theme-accent-soft)]' : 'hover:bg-[var(--theme-bg)]',
               )}
             >
-              Default (auto)
+              {t('agents.operations.settings.modelDefault')}
             </button>
             {models.map((model) => (
               <button
@@ -220,13 +221,13 @@ export function OperationsAgentDetail({
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--theme-muted)]">
-                Agent Settings
+                {t('agents.detail.agentSettings')}
               </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--theme-text)]">
                 {agent.name}
               </h2>
               <p className="mt-2 text-sm text-[var(--theme-muted-2)]">
-                Update this agent without leaving the roster.
+                {t('agents.detail.updateInline')}
               </p>
             </div>
           </div>
@@ -234,7 +235,7 @@ export function OperationsAgentDetail({
             type="button"
             onClick={onClose}
             className="inline-flex size-10 items-center justify-center rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card2)] text-lg text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-accent)] hover:text-[var(--theme-accent-strong)]"
-            aria-label="Close agent settings"
+            aria-label={t('agents.detail.closeSettings')}
           >
             <HugeiconsIcon icon={Cancel01Icon} size={18} strokeWidth={1.8} />
           </button>
@@ -242,7 +243,7 @@ export function OperationsAgentDetail({
 
         <div className="mt-6 grid gap-4 md:grid-cols-[1.2fr_0.6fr]">
           <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--theme-text)]">Name</span>
+            <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.detail.name')}</span>
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -251,7 +252,7 @@ export function OperationsAgentDetail({
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--theme-text)]">Emoji</span>
+            <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.detail.emoji')}</span>
             <input
               value={emoji}
               onChange={(event) => setEmoji(event.target.value)}
@@ -261,13 +262,13 @@ export function OperationsAgentDetail({
         </div>
 
         <label className="mt-4 block space-y-2">
-          <span className="text-sm font-medium text-[var(--theme-text)]">Model</span>
+          <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.detail.model')}</span>
           <ModelSelector value={model} onChange={setModel} models={models} />
         </label>
 
         <label className="mt-4 block space-y-2">
           <span className="text-sm font-medium text-[var(--theme-text)]">
-            System Prompt
+            {t('agents.detail.systemPromptLabel')}
           </span>
           <textarea
             value={systemPrompt}
@@ -284,7 +285,7 @@ export function OperationsAgentDetail({
             disabled={isDeleting || isSaving}
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.8} />
-            {isDeleting ? 'Deleting…' : 'Delete agent'}
+            {isDeleting ? t('agents.detail.deleting') : t('agents.detail.deleteAgent')}
           </Button>
           <div className="flex justify-end gap-3">
             <Button
@@ -293,7 +294,7 @@ export function OperationsAgentDetail({
               onClick={onClose}
               disabled={isDeleting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               className="bg-[var(--theme-accent)] text-primary-950 hover:bg-[var(--theme-accent-strong)]"
@@ -308,7 +309,7 @@ export function OperationsAgentDetail({
               }
               disabled={isSaving || isDeleting}
             >
-              {isSaving ? 'Saving…' : 'Save'}
+              {isSaving ? t('agents.detail.saving') : t('agents.detail.save')}
             </Button>
           </div>
         </div>

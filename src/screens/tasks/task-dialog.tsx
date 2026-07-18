@@ -83,10 +83,10 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
 
         <div className="p-5">
           <DialogTitle className="text-base font-semibold text-[var(--theme-text)] mb-1">
-            {isEdit ? 'Edit Task' : 'New Task'}
+            {isEdit ? t('tasks.dialog.edit') : t('tasks.dialog.new')}
           </DialogTitle>
           <DialogDescription className="text-xs text-[var(--theme-muted)] mb-4">
-            {isEdit ? 'Update the task details below.' : 'Fill in the details for your new task.'}
+            {isEdit ? t('tasks.dialog.editDesc') : t('tasks.dialog.newDesc')}
           </DialogDescription>
 
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -178,12 +178,12 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
                 className={inputClass}
                 value={tags}
                 onChange={e => setTags(e.target.value)}
-                placeholder="frontend, bug, research"
+                placeholder={t('tasks.tagsPlaceholder')}
               />
             </div>
 
             <div className="flex items-center justify-between pt-2">
-              <p className="text-[10px] text-[var(--theme-muted)]">Press Esc to cancel</p>
+              <p className="text-[10px] text-[var(--theme-muted)]">{t('tasks.dialog.pressEsc')}</p>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -192,7 +192,7 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
                   onClick={() => onOpenChange(false)}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -200,7 +200,7 @@ export function TaskDialog({ open, onOpenChange, task, defaultColumn, assignees,
                   disabled={isSubmitting || !title.trim()}
                   style={{ background: 'var(--theme-accent)', color: 'white' }}
                 >
-                  {isSubmitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Task'}
+                  {isSubmitting ? t('tasks.dialog.saving') : isEdit ? t('tasks.dialog.saveChanges') : t('tasks.dialog.createTask')}
                 </Button>
               </div>
             </div>

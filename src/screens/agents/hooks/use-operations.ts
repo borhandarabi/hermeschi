@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/toast'
 import { fetchCronJobs } from '@/lib/cron-api'
 import { fetchSessions, type GatewaySession } from '@/lib/gateway-api'
 import { formatModelName, formatRelativeTime } from '@/screens/dashboard/lib/formatters'
+import { t } from '@/lib/i18n'
 
 // Claude-Workspace adapter: Operations is backed by Hermes profiles
 // (each profile = one persistent agent). Profiles live at ~/.hermes/profiles/<name>/
@@ -605,10 +606,10 @@ export function useOperations() {
         nextRunAt,
         lastActivityAt,
         activityLabel: nextRunAt
-          ? `Next ${formatUpcomingTime(nextRunAt)}`
+          ? t('agents.toast.nextRun', { time: formatUpcomingTime(nextRunAt) })
           : lastActivityAt
-            ? `Last ${formatRelativeTime(lastActivityAt)}`
-            : 'No activity yet',
+            ? t('agents.toast.lastRun', { time: formatRelativeTime(lastActivityAt) })
+            : t('agents.toast.noActivityYet'),
         progressValue: getProgressValue(status, latestSession),
         progressStatus: getProgressStatus(status, latestSession),
         recentOutputs,
@@ -673,10 +674,10 @@ export function useOperations() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['operations', 'config'] })
-      toast('Agent created', { type: 'success' })
+      toast(t('agents.toast.created'), { type: 'success' })
     },
     onError: (error) => {
-      toast(error instanceof Error ? error.message : 'Failed to create agent', {
+      toast(error instanceof Error ? error.message : t('agents.toast.createFailed'), {
         type: 'error',
       })
     },
@@ -708,10 +709,10 @@ export function useOperations() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['operations', 'config'] })
-      toast('Agent settings saved', { type: 'success' })
+      toast(t('agents.toast.agentSettingsSaved'), { type: 'success' })
     },
     onError: (error) => {
-      toast(error instanceof Error ? error.message : 'Failed to save agent', {
+      toast(error instanceof Error ? error.message : t('agents.toast.saveAgentFailed'), {
         type: 'error',
       })
     },
@@ -730,10 +731,10 @@ export function useOperations() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['operations', 'config'] })
       await queryClient.invalidateQueries({ queryKey: ['operations', 'sessions'] })
-      toast('Agent deleted', { type: 'success' })
+      toast(t('agents.toast.deleted'), { type: 'success' })
     },
     onError: (error) => {
-      toast(error instanceof Error ? error.message : 'Failed to delete agent', {
+      toast(error instanceof Error ? error.message : t('agents.toast.deleteFailed'), {
         type: 'error',
       })
     },
@@ -748,7 +749,7 @@ export function useOperations() {
   function saveSettings(nextSettings: OperationsSettings) {
     setSettings(nextSettings)
     persistSettings(nextSettings)
-    toast('Operations settings saved', { type: 'success' })
+    toast(t('agents.toast.operationsSettingsSaved'), { type: 'success' })
   }
 
   return {

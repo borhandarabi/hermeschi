@@ -5,6 +5,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '@/components/ui/button'
 import { fetchModels, type GatewayModelCatalogEntry } from '@/lib/gateway-api'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import type { OperationsSettings } from '../hooks/use-operations'
 
 type AvailableModel = {
@@ -65,7 +66,7 @@ function ModelSelector({
         className="inline-flex min-h-[3rem] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-left text-sm text-[var(--theme-text)] shadow-[0_8px_24px_color-mix(in_srgb,var(--theme-shadow)_18%,transparent)]"
       >
         <span className="truncate">
-          {selected ? `${selected.provider} / ${selected.name}` : 'Default (auto)'}
+          {selected ? `${selected.provider} / ${selected.name}` : t('agents.operations.settings.modelDefault')}
         </span>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
@@ -89,7 +90,7 @@ function ModelSelector({
                 !value ? 'bg-[var(--theme-accent-soft)]' : 'hover:bg-[var(--theme-bg)]',
               )}
             >
-              Default (auto)
+              {t('agents.operations.settings.modelDefault')}
             </button>
             {models.map((model) => (
               <button
@@ -165,10 +166,10 @@ export function OperationsSettingsModal({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-[var(--theme-text)]">
-                Operations Settings
+                {t('agents.operations.settings.title')}
               </h2>
               <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-                Defaults stored locally for the Operations screen.
+                {t('agents.operations.settings.desc')}
               </p>
             </div>
           </div>
@@ -184,7 +185,7 @@ export function OperationsSettingsModal({
         <div className="mt-6 space-y-4">
           <label className="space-y-2">
             <span className="text-sm font-medium text-[var(--theme-text)]">
-              Default model for new agents
+              {t('agents.operations.settings.defaultModel')}
             </span>
             <ModelSelector
               value={draft.defaultModel}
@@ -196,10 +197,10 @@ export function OperationsSettingsModal({
           <label className="flex items-center justify-between rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3">
             <span>
               <span className="block text-sm font-medium text-[var(--theme-text)]">
-                Auto-approve
+                {t('agents.operations.settings.autoApprove')}
               </span>
               <span className="block text-sm text-[var(--theme-muted-2)]">
-                Reserved for future workflow automation.
+                {t('agents.operations.settings.autoApproveDesc')}
               </span>
             </span>
             <input
@@ -217,7 +218,7 @@ export function OperationsSettingsModal({
 
           <label className="space-y-2">
             <span className="text-sm font-medium text-[var(--theme-text)]">
-              Activity feed length
+              {t('agents.operations.settings.activityFeedLength')}
             </span>
             <input
               type="number"
@@ -241,7 +242,7 @@ export function OperationsSettingsModal({
             className="border border-[var(--theme-border)] bg-[var(--theme-bg)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
             onClick={onClose}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             className="bg-[var(--theme-accent)] text-primary-950 hover:bg-[var(--theme-accent-strong)]"
@@ -250,7 +251,7 @@ export function OperationsSettingsModal({
               onClose()
             }}
           >
-            Save Settings
+            {t('agents.operations.settings.saveSettings')}
           </Button>
         </div>
       </div>
