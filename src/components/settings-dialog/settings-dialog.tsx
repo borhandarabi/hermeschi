@@ -1348,7 +1348,7 @@ function _ProfileContent() {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Profile"
+        title={t('settings.profile')}
         description="Your display identity in chat."
       />
       <div className={SETTINGS_CARD_CLASS}>
@@ -1450,7 +1450,7 @@ function AppearanceContent() {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Appearance"
+        title={t('settings.appearance')}
         description="Theme and color accents."
       />
       <div className={SETTINGS_CARD_CLASS}>
@@ -1811,7 +1811,7 @@ function ChatContent() {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Chat"
+        title={t('settings.chat')}
         description="Message visibility and response loader style."
       />
       <div className={SETTINGS_CARD_CLASS}>
@@ -1905,7 +1905,7 @@ function NotificationsContent() {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Notifications"
+        title={t('settings.notifications')}
         description="Simple alerts and threshold controls."
       />
       <div className={SETTINGS_CARD_CLASS}>
@@ -1980,7 +1980,7 @@ function _AdvancedContent() {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Advanced"
+        title={t('settings.advanced')}
         description="Hermes Agent endpoint and connectivity."
       />
       <div className={SETTINGS_CARD_CLASS}>
