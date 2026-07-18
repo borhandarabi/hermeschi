@@ -19,16 +19,16 @@ type ApprovalsPanelProps = {
 }
 
 function timeAgo(ms?: number): string {
-  if (!ms || !Number.isFinite(ms)) return 'unknown'
+  if (!ms || !Number.isFinite(ms)) return t('time.unknown')
   const delta = Math.max(0, Date.now() - ms)
   const seconds = Math.floor(delta / 1000)
-  if (seconds < 60) return `${seconds}s ago`
+  if (seconds < 60) return t('time.secondsAgo', { count: seconds })
   const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 60) return t('time.minutesAgo', { count: minutes })
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
+  if (hours < 24) return t('time.hoursAgo', { count: hours })
   const days = Math.floor(hours / 24)
-  return `${days}d ago`
+  return t('time.daysAgo', { count: days })
 }
 
 // Agent name → badge color (deterministic, cycling)
@@ -60,10 +60,10 @@ function approvalActionText(approval: GatewayApprovalEntry): string {
     try {
       return JSON.stringify(approval.input)
     } catch {
-      return 'Approval requested'
+      return t('gateway.approvals.actionFallback')
     }
   }
-  return 'Approval requested'
+  return t('gateway.approvals.actionFallback')
 }
 
 function approvalContextText(approval: GatewayApprovalEntry): string {
@@ -149,7 +149,7 @@ export function ApprovalsPanel({
   const mergedHistory = useMemo<HistoryEntry[]>(() => {
     const remote: HistoryEntry[] = history.map((entry) => ({
       id: entry.id,
-      agentName: entry.agentName ?? entry.sessionKey ?? 'Gateway',
+      agentName: entry.agentName ?? entry.sessionKey ?? t('gateway.approvals.gatewayFallback'),
       action: approvalActionText(entry),
       status: entry.status === 'approved'
         ? 'approved'
@@ -189,20 +189,20 @@ export function ApprovalsPanel({
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-950">
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
-            Approvals
+            {t('gateway.approvals')}
           </span>
           {pendingCount > 0 ? (
             <span className="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-              {pendingCount} pending
+              {t('gateway.approvals.pendingCount', { count: pendingCount })}
             </span>
           ) : (
             <span className="rounded-full border border-neutral-200 bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
-              All clear
+              {t('gateway.approvals.allClear')}
             </span>
           )}
         </div>
         {pendingCount > 0 && (
-          <span className="text-[10px] text-amber-500 dark:text-amber-400">⚠ Review required</span>
+          <span className="text-[10px] text-amber-500 dark:text-amber-400">{t('gateway.approvals.reviewRequired')}</span>
         )}
       </div>
 
@@ -217,7 +217,7 @@ export function ApprovalsPanel({
         <div className="min-h-0 flex-1 overflow-y-auto">
           {loading && pending.length === 0 ? (
             <div className="flex h-full items-center justify-center p-8">
-              <p className="text-sm text-neutral-500">Loading approvals...</p>
+              <p className="text-sm text-neutral-500">{t('gateway.approvals.loadingApprovals')}</p>
             </div>
           ) : null}
 
@@ -231,7 +231,7 @@ export function ApprovalsPanel({
                 {t('gateway.approvals.empty')}
               </p>
               <p className="mt-1 text-xs text-neutral-400">
-                Agents are running autonomously
+                {t('gateway.approvals.agentsRunning')}
               </p>
             </div>
           </div>
@@ -255,16 +255,16 @@ export function ApprovalsPanel({
         <div className="min-h-0 max-h-64 shrink-0 border-t border-neutral-200 bg-neutral-50/70 dark:border-neutral-800 dark:bg-neutral-900/40">
           <div className="flex items-center justify-between px-4 py-2">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-              History
+              {t('gateway.approvals.history')}
             </p>
             <span className="text-[10px] text-neutral-400">
-              {mergedHistory.length} recent
+              {t('gateway.approvals.recentCount', { count: mergedHistory.length })}
             </span>
           </div>
           <div className="max-h-52 overflow-y-auto px-4 pb-3">
             {mergedHistory.length === 0 ? (
               <p className="py-4 text-center text-xs text-neutral-400">
-                No approval history yet
+                {t('gateway.approvals.noHistory')}
               </p>
             ) : (
               <div className="space-y-1.5">
@@ -319,7 +319,7 @@ function ApprovalCard({
   onDeny: () => void
 }) {
   const isPending = (approval.status ?? 'pending') === 'pending'
-  const agentName = approval.agentName ?? approval.sessionKey ?? 'Gateway'
+  const agentName = approval.agentName ?? approval.sessionKey ?? t('gateway.approvals.gatewayFallback')
   const action = approvalActionText(approval)
   const context = approvalContextText(approval)
 
@@ -367,7 +367,7 @@ function ApprovalCard({
               disabled={disabled}
               className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-all duration-200 hover:bg-emerald-700"
             >
-              ✓ Approve
+              {t('gateway.approvals.approveCta')}
             </button>
             <button
               type="button"
@@ -375,7 +375,7 @@ function ApprovalCard({
               disabled={disabled}
               className="flex-1 rounded-lg border border-red-400 px-3 py-1.5 text-[11px] font-semibold text-red-600 transition-all duration-200 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-950/20"
             >
-              ✕ Deny
+              {t('gateway.approvals.denyCta')}
             </button>
           </div>
         ) : (
@@ -387,7 +387,7 @@ function ApprovalCard({
                 : 'text-red-500 dark:text-red-400',
             )}
           >
-            {approval.status === 'approved' ? '✓ Approved' : '✕ Denied'}
+            {approval.status === 'approved' ? t('gateway.approvals.approvedLabel') : t('gateway.approvals.deniedLabel')}
           </p>
         )}
       </div>

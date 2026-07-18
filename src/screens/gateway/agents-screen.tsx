@@ -137,40 +137,52 @@ const PAUSED_STATUSES = new Set(['paused', 'pause', 'suspended'])
 const ACTIVE_HEARTBEAT_MS = 30_000
 
 // Temporary fallback registry until the gateway exposes a dedicated agent registry schema.
-const FALLBACK_AGENT_REGISTRY: Array<AgentDefinition> = [
-  {
-    id: 'aurora-main',
-    name: 'Main Agent',
-    category: 'Core',
-    role: 'Orchestrator',
-    color: 'orange',
-    aliases: ['aurora-main', 'aurora'],
-  },
-  {
-    id: 'codex',
-    name: 'Codex',
-    category: 'Coding',
-    role: 'Coding specialist',
-    color: 'blue',
-    aliases: ['codex', 'coding'],
-  },
-  {
-    id: 'memory-consolidator',
-    name: 'Memory consolidator',
-    category: 'System',
-    role: 'Memory service',
-    color: 'violet',
-    aliases: ['memory-consolidator', 'memory'],
-  },
-  {
-    id: 'telegram-gateway',
-    name: 'Telegram gateway',
-    category: 'Integrations',
-    role: 'Channel bridge',
-    color: 'cyan',
-    aliases: ['telegram-gateway', 'telegram'],
-  },
-]
+// Implemented as a function so locale changes are picked up on re-render
+// (constants evaluated at module load would freeze the locale).
+function getFallbackAgentRegistry(): Array<AgentDefinition> {
+  return [
+    {
+      id: 'aurora-main',
+      name: t('gateway.agents.fallbackName.main'),
+      category: 'Core',
+      role: t('gateway.agents.role.orchestrator'),
+      color: 'orange',
+      aliases: ['aurora-main', 'aurora'],
+    },
+    {
+      id: 'codex',
+      name: 'Codex',
+      category: 'Coding',
+      role: t('gateway.agents.role.codingSpecialist'),
+      color: 'blue',
+      aliases: ['codex', 'coding'],
+    },
+    {
+      id: 'memory-consolidator',
+      name: t('gateway.agents.fallbackName.memory'),
+      category: 'System',
+      role: t('gateway.agents.role.memoryService'),
+      color: 'violet',
+      aliases: ['memory-consolidator', 'memory'],
+    },
+    {
+      id: 'telegram-gateway',
+      name: t('gateway.agents.fallbackName.telegram'),
+      category: 'Integrations',
+      role: t('gateway.agents.role.channelBridge'),
+      color: 'cyan',
+      aliases: ['telegram-gateway', 'telegram'],
+    },
+  ]
+}
+
+function translateCategory(category: string): string {
+  if (category === 'Core') return t('gateway.agents.category.core')
+  if (category === 'Coding') return t('gateway.agents.category.coding')
+  if (category === 'System') return t('gateway.agents.category.system')
+  if (category === 'Integrations') return t('gateway.agents.category.integrations')
+  return category
+}
 
 function readString(value: unknown): string {
   if (typeof value !== 'string') return ''
@@ -243,10 +255,10 @@ function normalizeCategoryLabel(category: string): string {
 }
 
 function inferRoleFromCategory(category: string): string {
-  if (category === 'Coding') return 'Coding agent'
-  if (category === 'System') return 'System agent'
-  if (category === 'Integrations') return 'Integration agent'
-  return 'Core agent'
+  if (category === 'Coding') return t('gateway.agents.role.coding')
+  if (category === 'System') return t('gateway.agents.role.system')
+  if (category === 'Integrations') return t('gateway.agents.role.integration')
+  return t('gateway.agents.role.core')
 }
 
 function inferColorFromCategory(
@@ -447,7 +459,7 @@ function toAgentDefinition(
 
   return {
     id: fallbackId || `agent-${index + 1}`,
-    name: name || id || `Agent ${index + 1}`,
+    name: name || id || t('gateway.agents.agentFallback', { index: index + 1 }),
     category,
     role: roleRaw || inferRoleFromCategory(category),
     color,
@@ -533,7 +545,7 @@ function getSessionTitle(session: SessionEntry): string {
     readString(session.derivedTitle) ||
     getSessionFriendlyId(session) ||
     readString(session.key) ||
-    'Session'
+    t('gateway.agents.sessionFallback')
   )
 }
 
@@ -604,20 +616,20 @@ function deriveAgentStatus(
 
 function formatRelativeTime(value: unknown): string {
   const timestamp = readTimestamp(value)
-  if (!timestamp) return 'No activity timestamp'
+  if (!timestamp) return t('gateway.agents.noActivityTimestamp')
 
   const diffMs = Math.max(0, Date.now() - timestamp)
   const seconds = Math.floor(diffMs / 1000)
-  if (seconds < 60) return `${seconds}s ago`
+  if (seconds < 60) return t('time.secondsAgo', { count: seconds })
 
   const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 60) return t('time.minutesAgo', { count: minutes })
 
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
+  if (hours < 24) return t('time.hoursAgo', { count: hours })
 
   const days = Math.floor(hours / 24)
-  return `${days}d ago`
+  return t('time.daysAgo', { count: days })
 }
 
 function getSessionTokenCount(session: SessionEntry): number {
@@ -770,7 +782,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
   const registryDefinitions = useMemo(() => {
     const merged = new Map<string, AgentDefinition>()
 
-    FALLBACK_AGENT_REGISTRY.forEach((definition) => {
+    getFallbackAgentRegistry().forEach((definition) => {
       merged.set(definition.id, definition)
     })
 
@@ -949,7 +961,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
       config: AgentConfigPatchPayload
     }) => patchAgentConfig(agentId, config),
     onSuccess: async (_, variables) => {
-      toast('Agent config saved', { type: 'success' })
+      toast(t('gateway.agents.toast.configSaved'), { type: 'success' })
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ['gateway', 'agents', 'config', variables.agentId],
@@ -958,7 +970,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
       ])
     },
     onError: (error) => {
-      toast(error instanceof Error ? error.message : 'Failed to save agent config', {
+      toast(error instanceof Error ? error.message : t('gateway.agents.toast.configSaveFailed'), {
         type: 'error',
       })
     },
@@ -1031,16 +1043,16 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
         readString(payload.friendlyId) || deriveFriendlyIdFromKey(sessionKey)
 
       if (!sessionKey || !resolvedFriendlyId) {
-        throw new Error('Failed to create a session for this agent')
+        throw new Error(t('gateway.agents.toast.createFailed'))
       }
 
-      toast(`${agent.name} session started`, { type: 'success' })
+      toast(t('gateway.agents.toast.sessionStarted', { name: agent.name }), { type: 'success' })
       void sessionsQuery.refetch()
 
       return { sessionKey, friendlyId: resolvedFriendlyId }
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Failed to spawn agent session'
+        error instanceof Error ? error.message : t('gateway.agents.toast.spawnFailed')
       toast(message, { type: 'error' })
       return null
     } finally {
@@ -1087,7 +1099,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
   ) {
     const controlKey = readString(agent.controlKey)
     if (!controlKey) {
-      toast('No control key available for this agent', { type: 'warning' })
+      toast(t('gateway.agents.toast.noControlKey'), { type: 'warning' })
       return
     }
 
@@ -1125,7 +1137,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
         [controlKey]: paused,
       }))
 
-      toast(`${agent.name} ${paused ? 'paused' : 'resumed'}`, {
+      toast(t(`gateway.agents.toast.${paused ? 'paused' : 'resumed'}`, { name: agent.name }), {
         type: 'success',
       })
       void sessionsQuery.refetch()
@@ -1152,7 +1164,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
       const message =
         error instanceof Error
           ? error.message
-          : `Failed to ${nextPaused ? 'pause' : 'resume'} agent`
+          : t(`gateway.agents.toast.${nextPaused ? 'pauseFailed' : 'resumeFailed'}`)
       toast(message, { type: 'error' })
     }
   }
@@ -1241,7 +1253,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
   }
 
   const lastUpdated = agentsQuery.dataUpdatedAt
-    ? new Date(agentsQuery.dataUpdatedAt).toLocaleTimeString()
+    ? new Date(agentsQuery.dataUpdatedAt).toLocaleTimeString(getLocale())
     : null
 
   const agentHubPullIndicatorStyle = agentHubPulling
@@ -1266,14 +1278,14 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                 ].join(' ')}
               />
               <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                {agentHubPullDistance >= agentHubThreshold ? 'Release to refresh' : 'Pull to refresh'}
+                {agentHubPullDistance >= agentHubThreshold ? t('gateway.pullToRefresh.release') : t('gateway.pullToRefresh.pull')}
               </span>
             </div>
           </div>
         ) : null}
         {usingFallbackRegistry ? (
           <div className="border-b border-amber-300/50 bg-amber-50/70 px-6 py-2 text-xs font-medium text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-200">
-            Gateway registry unavailable. Showing fallback definitions.
+            {t('gateway.agents.fallbackNotice')}
           </div>
         ) : null}
         <div className="min-h-0 flex-1">
@@ -1289,21 +1301,21 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
         <header className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-primary-50/80 px-4 py-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <div>
             <h1 className="text-lg font-bold text-primary-900 dark:text-neutral-100 md:text-xl">
-              Gateway Agents
+              {t('gateway.agents.title')}
             </h1>
             <p className="text-xs text-primary-500 dark:text-neutral-400">
-              Registered agents and their status
+              {t('gateway.agents.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             {agentsQuery.isFetching && !agentsQuery.isLoading ? (
               <span className="text-[10px] text-primary-500 animate-pulse">
-                syncing…
+                {t('gateway.agents.syncing')}
               </span>
             ) : null}
             {lastUpdated ? (
               <span className="text-[10px] text-primary-500">
-                Updated {lastUpdated}
+                {t('gateway.agents.lastUpdated', { time: lastUpdated })}
               </span>
             ) : null}
             <span
@@ -1314,7 +1326,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
 
         {usingFallbackRegistry ? (
           <div className="mb-4 rounded-xl border border-amber-300/50 bg-amber-50/70 px-3 py-2 text-xs font-medium text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/20 dark:text-amber-200">
-            Gateway registry unavailable. Showing fallback definitions.
+            {t('gateway.agents.fallbackNotice')}
           </div>
         ) : null}
 
@@ -1323,18 +1335,18 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
             <div className="flex h-32 items-center justify-center">
               <div className="flex items-center gap-2 text-primary-500">
                 <div className="size-4 animate-spin rounded-full border-2 border-primary-300 border-t-primary-600" />
-                <span className="text-sm">Loading registry...</span>
+                <span className="text-sm">{t('gateway.agents.loadingRegistry')}</span>
               </div>
             </div>
           ) : registryDefinitions.length === 0 ? (
             <div className="rounded-2xl border border-white/30 bg-white/60 p-5 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/50">
               <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                Add your first agent
+                {t('gateway.agents.emptyFirstTitle')}
               </h2>
               <ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
-                <li>Create an agent profile</li>
-                <li>Connect a gateway</li>
-                <li>Spawn your first session</li>
+                <li>{t('gateway.agents.emptyFirstStep1')}</li>
+                <li>{t('gateway.agents.emptyFirstStep2')}</li>
+                <li>{t('gateway.agents.emptyFirstStep3')}</li>
               </ul>
               <button
                 type="button"
@@ -1343,7 +1355,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                 }}
                 className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-600 sm:px-4 sm:py-2 sm:text-sm"
               >
-                Open Settings
+                {t('gateway.agents.openSettings')}
               </button>
             </div>
           ) : (
@@ -1352,7 +1364,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                 <section key={section.category} className="space-y-2">
                   <div className="flex items-center justify-between px-1">
                     <h2 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-                      {section.category}
+                      {translateCategory(section.category)}
                     </h2>
                     <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
                       {section.agents.length}
@@ -1381,7 +1393,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                 <section className="space-y-2">
                   <div className="flex items-center justify-between px-1">
                     <h2 className="text-[10px] font-bold uppercase tracking-widest text-primary-400">
-                      Active Sessions
+                      {t('gateway.agents.activeSessions')}
                     </h2>
                     <span className="text-[11px] font-medium text-primary-400">
                       {unmatchedSessions.length}
@@ -1423,7 +1435,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                             ) : (
                               <span />
                             )}
-                            <span>{formatTokenCount(getSessionTokenCount(session))} tokens</span>
+                            <span>{formatTokenCount(getSessionTokenCount(session))} {t('dashboard.label.tokens')}</span>
                             <span>{formatRelativeTime(session.updatedAt)}</span>
                           </div>
 
@@ -1432,7 +1444,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                               href={`/chat/${encodeURIComponent(sessionTarget)}`}
                               className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-3 py-1.5 text-xs font-semibold text-accent-300 transition-colors hover:border-accent-500 hover:text-accent-300 sm:px-4 sm:py-2 sm:text-sm"
                             >
-                              Open Chat
+                              {t('gateway.agents.openChat')}
                             </a>
                           ) : null}
                         </div>
@@ -1460,7 +1472,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-500">
-                    Agent Config
+                    {t('gateway.agents.configLabel')}
                   </p>
                   <h2 className="mt-1 truncate text-xl font-semibold text-primary-900">
                     {selectedConfigAgent.name}
@@ -1484,7 +1496,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                     onClick={handleReloadAgentConfig}
                     disabled={agentConfigQuery.isFetching}
                   >
-                    Reload
+                    {t('gateway.agents.reload')}
                   </Button>
                   <Button
                     size="sm"
@@ -1498,10 +1510,10 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                       saveAgentConfigMutation.isPending
                     }
                   >
-                    {saveAgentConfigMutation.isPending ? 'Saving...' : 'Save'}
+                    {saveAgentConfigMutation.isPending ? t('common.saving') : t('common.save')}
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleCloseAgentConfig}>
-                    Close
+                    {t('common.close')}
                   </Button>
                 </div>
               </div>
@@ -1512,32 +1524,32 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                 <div className="flex h-40 items-center justify-center">
                   <div className="flex items-center gap-2 text-primary-500">
                     <div className="size-4 animate-spin rounded-full border-2 border-primary-300 border-t-primary-600" />
-                    <span className="text-sm">Loading agent config...</span>
+                    <span className="text-sm">{t('gateway.agents.loadingConfig')}</span>
                   </div>
                 </div>
               ) : agentConfigQuery.isError && !selectedAgentConfig ? (
                 <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {agentConfigQuery.error instanceof Error
                     ? agentConfigQuery.error.message
-                    : 'Failed to load agent config'}
+                    : t('gateway.agents.loadConfigFailed')}
                 </div>
               ) : (
                 <Tabs value={detailTab} onValueChange={setDetailTab}>
                   <TabsList className="mb-5 flex w-full flex-wrap gap-2 rounded-2xl border border-primary-200 bg-white p-1 text-primary-500 shadow-sm">
                     <TabsTrigger value="overview" className="min-w-[110px] flex-1">
-                      Overview
+                      {t('gateway.agents.tab.overview')}
                     </TabsTrigger>
                     <TabsTrigger value="tools" className="min-w-[92px] flex-1">
-                      Tools
+                      {t('gateway.agents.tab.tools')}
                     </TabsTrigger>
                     <TabsTrigger value="skills" className="min-w-[92px] flex-1">
-                      Skills
+                      {t('gateway.agents.tab.skills')}
                     </TabsTrigger>
                     <TabsTrigger value="channels" className="min-w-[102px] flex-1">
-                      Channels
+                      {t('gateway.agents.tab.channels')}
                     </TabsTrigger>
                     <TabsTrigger value="cron" className="min-w-[102px] flex-1">
-                      Cron Jobs
+                      {t('gateway.agents.tab.cron')}
                     </TabsTrigger>
                   </TabsList>
 
@@ -1545,7 +1557,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                     <div className="grid gap-3 md:grid-cols-3">
                       <div className="rounded-2xl border border-primary-200 bg-white p-4 shadow-sm">
                         <p className="text-xs font-semibold uppercase tracking-wide text-primary-500">
-                          Agent ID
+                          {t('gateway.agents.field.agentId')}
                         </p>
                         <p className="mt-2 text-sm font-medium text-primary-900">
                           {selectedConfigAgent.id}
@@ -1553,7 +1565,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                       </div>
                       <div className="rounded-2xl border border-primary-200 bg-white p-4 shadow-sm">
                         <p className="text-xs font-semibold uppercase tracking-wide text-primary-500">
-                          Name
+                          {t('common.name')}
                         </p>
                         <p className="mt-2 text-sm font-medium text-primary-900">
                           {selectedAgentConfig?.name || selectedConfigAgent.name}
@@ -1561,10 +1573,10 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                       </div>
                       <div className="rounded-2xl border border-primary-200 bg-white p-4 shadow-sm">
                         <p className="text-xs font-semibold uppercase tracking-wide text-primary-500">
-                          Workspace Path
+                          {t('gateway.agents.field.workspacePath')}
                         </p>
                         <p className="mt-2 break-all text-sm font-medium text-primary-900">
-                          {selectedAgentConfig?.workspacePath || 'Unavailable'}
+                          {selectedAgentConfig?.workspacePath || t('common.unavailable')}
                         </p>
                       </div>
                     </div>
@@ -1573,18 +1585,18 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                       <div className="grid gap-4 md:grid-cols-2">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-primary-500">
-                            Primary Model
+                            {t('gateway.agents.field.primaryModel')}
                           </p>
                           <p className="mt-2 text-sm font-medium text-primary-900">
                             {selectedAgentConfig?.primaryModel
                               ? formatModelName(selectedAgentConfig.primaryModel)
-                              : 'Unavailable'}
+                              : t('common.unavailable')}
                           </p>
                         </div>
 
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-primary-500">
-                            Fallbacks
+                            {t('gateway.agents.field.fallbacks')}
                           </p>
                           <div className="mt-2 flex flex-wrap gap-2">
                             {(selectedAgentConfig?.fallbackModels ?? []).length > 0 ? (
@@ -1597,7 +1609,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                                 </span>
                               ))
                             ) : (
-                              <span className="text-sm text-primary-500">No fallback models</span>
+                              <span className="text-sm text-primary-500">{t('gateway.agents.field.noFallbacks')}</span>
                             )}
                           </div>
                         </div>
@@ -1606,7 +1618,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                       <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                         <label className="block">
                           <span className="text-xs font-semibold uppercase tracking-wide text-primary-500">
-                            Model Override
+                            {t('gateway.agents.field.modelOverride')}
                           </span>
                           <select
                             value={agentConfigDraft?.modelOverride ?? ''}
@@ -1628,7 +1640,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                             }}
                             className="mt-2 h-10 w-full rounded-xl border border-primary-200 bg-primary-50 px-3 text-sm text-primary-900 outline-none transition focus:border-primary-300"
                           >
-                            <option value="">Use agent default</option>
+                            <option value="">{t('gateway.agents.field.useDefault')}</option>
                             {modelOverrideOptions.map((option) => (
                               <option key={option} value={option}>
                                 {formatModelName(option)}
@@ -1639,10 +1651,10 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
 
                         <div className="rounded-xl border border-primary-200 bg-primary-50 px-3 py-2 text-xs text-primary-600">
                           {selectedAgentConfig?.sourceMethod
-                            ? `Loaded via ${selectedAgentConfig.sourceMethod}`
+                            ? t('gateway.agents.loadedVia', { method: selectedAgentConfig.sourceMethod })
                             : selectedAgentConfig?.readOnly
-                              ? 'Read-only fallback display'
-                              : 'Config ready'}
+                              ? t('gateway.agents.readOnlyDisplay')
+                              : t('gateway.agents.configReady')}
                         </div>
                       </div>
                     </div>
@@ -1651,7 +1663,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                   <TabsContent value="tools" className="space-y-3">
                     {(selectedAgentConfig?.tools ?? []).length === 0 ? (
                       <div className="rounded-2xl border border-primary-200 bg-white px-4 py-6 text-sm text-primary-500 shadow-sm">
-                        No tool policy was exposed for this agent.
+                        {t('gateway.agents.noTools')}
                       </div>
                     ) : (
                       selectedAgentConfig?.tools.map((tool) => (
@@ -1665,12 +1677,12 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                             </p>
                             <p className="text-xs text-primary-500">
                               {tool.source === 'allowed'
-                                ? 'Allowed by policy'
+                                ? t('gateway.agents.toolPolicy.allowed')
                                 : tool.source === 'denied'
-                                  ? 'Denied by policy'
+                                  ? t('gateway.agents.toolPolicy.denied')
                                   : tool.source === 'explicit'
-                                    ? 'Explicit per-agent rule'
-                                    : 'Policy source unknown'}
+                                    ? t('gateway.agents.toolPolicy.explicit')
+                                    : t('gateway.agents.toolPolicy.unknown')}
                             </p>
                           </div>
                           <Switch
@@ -1691,7 +1703,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                   <TabsContent value="skills" className="space-y-3">
                     {(selectedAgentConfig?.skills ?? []).length === 0 ? (
                       <div className="rounded-2xl border border-primary-200 bg-white px-4 py-6 text-sm text-primary-500 shadow-sm">
-                        No active skills were exposed for this agent.
+                        {t('gateway.agents.noSkills')}
                       </div>
                     ) : (
                       selectedAgentConfig?.skills.map((skill) => (
@@ -1723,7 +1735,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                   <TabsContent value="channels" className="space-y-3">
                     {(selectedAgentConfig?.channels ?? []).length === 0 ? (
                       <div className="rounded-2xl border border-primary-200 bg-white px-4 py-6 text-sm text-primary-500 shadow-sm">
-                        No per-channel config was exposed for this agent.
+                        {t('gateway.agents.noChannels')}
                       </div>
                     ) : (
                       selectedAgentConfig?.channels.map((channel) => {
@@ -1741,7 +1753,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                                   {prettyLabel(channel.id)}
                                 </p>
                                 <p className="text-xs text-primary-500">
-                                  Responds on {channel.id}
+                                  {t('gateway.agents.respondsOn', { channel: channel.id })}
                                 </p>
                               </div>
                               {channel.enabled !== null ? (
@@ -1757,7 +1769,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                                 />
                               ) : (
                                 <span className="rounded-full border border-primary-200 bg-primary-50 px-2.5 py-1 text-[11px] font-medium text-primary-600">
-                                  Display only
+                                  {t('gateway.agents.displayOnly')}
                                 </span>
                               )}
                             </div>
@@ -1769,7 +1781,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                                 </pre>
                               ) : (
                                 <p className="text-xs text-primary-500">
-                                  No extra channel config provided.
+                                  {t('gateway.agents.noChannelConfig')}
                                 </p>
                               )}
                             </div>
@@ -1783,10 +1795,10 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                     <div className="flex items-center justify-between rounded-2xl border border-primary-200 bg-white px-4 py-3 shadow-sm">
                       <div>
                         <p className="text-sm font-medium text-primary-900">
-                          Assigned cron jobs
+                          {t('gateway.agents.cron.assigned')}
                         </p>
                         <p className="text-xs text-primary-500">
-                          Matched against agent id, name, aliases, payload, and delivery config.
+                          {t('gateway.agents.cron.matchHint')}
                         </p>
                       </div>
                       <Button
@@ -1794,23 +1806,23 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                         size="sm"
                         onClick={() => void navigate({ to: '/jobs' })}
                       >
-                        Open Cron Screen
+                        {t('gateway.agents.cron.openScreen')}
                       </Button>
                     </div>
 
                     {cronJobsQuery.isLoading ? (
                       <div className="rounded-2xl border border-primary-200 bg-white px-4 py-6 text-sm text-primary-500 shadow-sm">
-                        Loading cron jobs...
+                        {t('gateway.agents.cron.loading')}
                       </div>
                     ) : cronJobsQuery.isError ? (
                       <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-700 shadow-sm">
                         {cronJobsQuery.error instanceof Error
                           ? cronJobsQuery.error.message
-                          : 'Failed to load cron jobs'}
+                          : t('gateway.agents.cron.loadFailed')}
                       </div>
                     ) : selectedCronJobs.length === 0 ? (
                       <div className="rounded-2xl border border-primary-200 bg-white px-4 py-6 text-sm text-primary-500 shadow-sm">
-                        No cron jobs matched this agent.
+                        {t('gateway.agents.cron.empty')}
                       </div>
                     ) : (
                       selectedCronJobs.map((job) => (
@@ -1828,31 +1840,31 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                               </p>
                             </div>
                             <span className="rounded-full border border-primary-200 bg-primary-50 px-2.5 py-1 text-[11px] font-medium text-primary-700">
-                              {job.enabled ? 'Enabled' : 'Disabled'}
+                              {job.enabled ? t('common.enabled') : t('common.disabled')}
                             </span>
                           </div>
 
                           <div className="mt-3 grid gap-3 text-sm text-primary-700 md:grid-cols-3">
                             <div>
                               <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-500">
-                                Schedule
+                                {t('common.schedule')}
                               </p>
                               <p className="mt-1">{job.schedule}</p>
                             </div>
                             <div>
                               <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-500">
-                                Status
+                                {t('common.status')}
                               </p>
-                              <p className="mt-1">{job.status || 'Unknown'}</p>
+                              <p className="mt-1">{job.status || t('common.unknown')}</p>
                             </div>
                             <div>
                               <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-500">
-                                Last Run
+                                {t('gateway.agents.cron.lastRun')}
                               </p>
                               <p className="mt-1">
                                 {job.lastRun?.startedAt
                                   ? new Date(job.lastRun.startedAt).toLocaleString(getLocale())
-                                  : 'Never'}
+                                  : t('common.never')}
                               </p>
                             </div>
                           </div>
@@ -1879,20 +1891,20 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
           <div className="absolute inset-x-4 top-[12vh] rounded-2xl border border-white/30 bg-white/90 p-4 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/90">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="truncate pr-2 text-base font-bold text-neutral-900 dark:text-neutral-100">
-                {selectedHistoryAgent.name} history
+                {t('gateway.agents.historyTitle', { name: selectedHistoryAgent.name })}
               </h3>
               <button
                 type="button"
                 className="min-h-11 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 sm:px-4 sm:py-2 sm:text-sm"
                 onClick={() => setHistoryAgentId(null)}
               >
-                Close
+                {t('common.close')}
               </button>
             </div>
 
             {selectedHistoryAgent.matchedSessions.length === 0 ? (
               <p className="text-xs text-neutral-600 dark:text-neutral-300">
-                No recent sessions for this agent yet.
+                {t('gateway.agents.noHistory')}
               </p>
             ) : (
               <div className="max-h-[48vh] space-y-2 overflow-auto">
@@ -1916,8 +1928,8 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                       <div className="mt-1 flex items-center justify-between">
                         <span className="text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
                           {sessionModel
-                            ? `${readString(session.status) || 'unknown'} · ${formatModelName(sessionModel)}`
-                            : readString(session.status) || 'unknown'}
+                            ? `${readString(session.status) || t('gateway.agents.statusUnknown')} · ${formatModelName(sessionModel)}`
+                            : readString(session.status) || t('gateway.agents.statusUnknown')}
                         </span>
                         {friendlyId ? (
                           <button
@@ -1931,7 +1943,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                             }}
                             className="min-h-11 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-accent-700 transition-colors hover:bg-accent-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-accent-300 dark:hover:bg-accent-950/30 sm:px-4 sm:py-2 sm:text-sm"
                           >
-                            Open Chat
+                            {t('gateway.agents.openChat')}
                           </button>
                         ) : null}
                       </div>

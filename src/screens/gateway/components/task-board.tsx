@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 import { emitFeedEvent } from './feed-event-bus'
 export type TaskPriority = 'urgent' | 'high' | 'normal' | 'low'
 export type TaskStatus = 'inbox' | 'assigned' | 'in_progress' | 'review' | 'done'
@@ -29,23 +30,31 @@ type TaskBoardProps = {
   activeMissionId?: string
 }
 const STORAGE_KEY = 'clawsuite:hub-tasks'
-const COLUMNS: Array<{ key: TaskStatus; label: string }> = [
-  { key: 'inbox', label: 'Inbox' },
-  { key: 'assigned', label: 'Assigned' },
-  { key: 'in_progress', label: 'In Progress' },
-  { key: 'review', label: 'Review' },
-  { key: 'done', label: 'Done' },
+const COLUMNS: Array<{ key: TaskStatus; labelKey: TranslationKey }> = [
+  { key: 'inbox', labelKey: 'gateway.taskBoard.column.inbox' },
+  { key: 'assigned', labelKey: 'gateway.taskBoard.column.assigned' },
+  { key: 'in_progress', labelKey: 'gateway.taskBoard.column.inProgress' },
+  { key: 'review', labelKey: 'gateway.taskBoard.column.review' },
+  { key: 'done', labelKey: 'gateway.taskBoard.column.done' },
 ]
 const PRIORITIES: Array<{
   key: TaskPriority
-  label: string
+  labelKey: TranslationKey
   badge: string
 }> = [
-  { key: 'urgent', label: 'Urgent', badge: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300' },
-  { key: 'high', label: 'High', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
-  { key: 'normal', label: 'Normal', badge: 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200' },
-  { key: 'low', label: 'Low', badge: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200' },
+  { key: 'urgent', labelKey: 'gateway.taskBoard.priority.urgent', badge: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300' },
+  { key: 'high', labelKey: 'gateway.taskBoard.priority.high', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
+  { key: 'normal', labelKey: 'gateway.taskBoard.priority.normal', badge: 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200' },
+  { key: 'low', labelKey: 'gateway.taskBoard.priority.low', badge: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200' },
 ]
+function columnLabel(status: TaskStatus): string {
+  const column = COLUMNS.find((c) => c.key === status)
+  return column ? t(column.labelKey) : status
+}
+function priorityLabel(priority: TaskPriority): string {
+  const entry = PRIORITIES.find((p) => p.key === priority)
+  return entry ? t(entry.labelKey) : priority
+}
 function isTaskStatus(value: unknown): value is TaskStatus {
   return COLUMNS.some((column) => column.key === value)
 }
@@ -103,7 +112,7 @@ function createTaskId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 function statusLabel(status: TaskStatus): string {
-  return COLUMNS.find((column) => column.key === status)?.label ?? status
+  return columnLabel(status)
 }
 
 type TaskEditDraft = {
@@ -163,7 +172,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
     nextTasks.forEach((task) => {
       emitFeedEvent({
         type: 'task_created',
-        message: `Task created: ${task.title}`,
+        message: t('gateway.taskBoard.taskCreated', { title: task.title }),
         taskTitle: task.title,
         agentName: task.agentId ? agentNameById.get(task.agentId) : undefined,
       })
@@ -171,7 +180,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
         const agentName = agentNameById.get(task.agentId) ?? task.agentId
         emitFeedEvent({
           type: 'task_assigned',
-          message: `Assigned to ${agentName}`,
+          message: t('gateway.taskBoard.assignedTo', { name: agentName }),
           taskTitle: task.title,
           agentName,
         })
@@ -199,14 +208,14 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
       const agentName = task.agentId ? agentNameById.get(task.agentId) : undefined
       emitFeedEvent({
         type: 'task_moved',
-        message: `${task.title} moved ${statusLabel(task.status)} -> ${statusLabel(nextStatus)}`,
+        message: t('gateway.taskBoard.taskMoved', { title: task.title, from: statusLabel(task.status), to: statusLabel(nextStatus) }),
         taskTitle: task.title,
         agentName,
       })
       if (nextStatus === 'done') {
         emitFeedEvent({
           type: 'task_completed',
-          message: `Task completed: ${task.title}`,
+          message: t('gateway.taskBoard.taskCompleted', { title: task.title }),
           taskTitle: task.title,
           agentName,
         })
@@ -282,14 +291,14 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
     setTasks((previous) => [nextTask, ...previous])
     emitFeedEvent({
       type: 'task_created',
-      message: `Task created: ${nextTask.title}`,
+      message: t('gateway.taskBoard.taskCreated', { title: nextTask.title }),
       taskTitle: nextTask.title,
       agentName: agentId ? agentNameById.get(agentId) : undefined,
     })
     if (agentId) {
       emitFeedEvent({
         type: 'task_assigned',
-        message: `Task assigned: ${nextTask.title}`,
+        message: t('gateway.taskBoard.taskAssigned', { title: nextTask.title }),
         taskTitle: nextTask.title,
         agentName: agentNameById.get(agentId),
       })
@@ -304,9 +313,9 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
       <div className="border-b border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-neutral-100">Tasks</h2>
+            <h2 className="text-sm font-semibold text-neutral-100">{t('gateway.taskBoard.title')}</h2>
             <p className="truncate text-[11px] text-neutral-400">
-              {selectedAgentName ? `Focused agent: ${selectedAgentName}` : 'Showing all agents'}
+              {selectedAgentName ? t('gateway.taskBoard.focusedAgent', { name: selectedAgentName }) : t('gateway.taskBoard.showingAll')}
             </p>
           </div>
           {activeMissionId ? (
@@ -319,9 +328,9 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                   ? 'border-neutral-700 bg-neutral-800 text-neutral-300'
                   : 'border-neutral-800 bg-neutral-900 text-neutral-500 hover:border-neutral-700 hover:text-neutral-300',
               )}
-              title={showAllTasks ? 'Show only current mission tasks' : 'Show tasks from all missions'}
+              title={showAllTasks ? t('gateway.taskBoard.showMissionOnlyTitle') : t('gateway.taskBoard.showAllMissionsTitle')}
             >
-              {showAllTasks ? 'Mission only' : 'Show all'}
+              {showAllTasks ? t('gateway.taskBoard.missionOnly') : t('gateway.taskBoard.showAll')}
             </button>
           ) : null}
         </div>
@@ -333,7 +342,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
             return (
               <div key={column.key} className="min-w-[200px] max-w-[240px] flex-1 rounded-xl border border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-900">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">{column.label}</h3>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">{columnLabel(column.key)}</h3>
                   <div className="flex items-center gap-1.5">
                     {column.key === 'inbox' ? (
                       <button
@@ -346,7 +355,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                             : 'bg-emerald-600 text-white hover:bg-emerald-500',
                         )}
                       >
-                        {isCreating ? 'Cancel' : '+ New Task'}
+                        {isCreating ? t('gateway.taskBoard.cancel') : t('gateway.taskBoard.newTask')}
                       </button>
                     ) : null}
                     <span className="rounded-full bg-neutral-800 px-1.5 text-[10px] text-neutral-300">
@@ -386,14 +395,14 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                         type="text"
                         value={form.title}
                         onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                        placeholder="Task title"
+                        placeholder={t('gateway.taskBoard.titlePlaceholder')}
                         className="w-full rounded-md border border-primary-200 bg-white px-2 py-1.5 text-xs text-primary-900 outline-none ring-accent-400 focus:ring-1 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
                         required
                       />
                       <textarea
                         value={form.description}
                         onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
-                        placeholder="Description (optional)"
+                        placeholder={t('gateway.taskBoard.descriptionPlaceholder')}
                         rows={3}
                         className="w-full resize-none rounded-md border border-primary-200 bg-white px-2 py-1.5 text-xs text-primary-900 outline-none ring-accent-400 focus:ring-1 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
                       />
@@ -410,7 +419,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                                 : 'bg-primary-100 text-primary-500 hover:bg-primary-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700',
                             )}
                           >
-                            {priority.label}
+                            {priorityLabel(priority.key)}
                           </button>
                         ))}
                       </div>
@@ -419,7 +428,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                         onChange={(event) => setForm((prev) => ({ ...prev, agentId: event.target.value }))}
                         className="w-full rounded-md border border-primary-200 bg-white px-2 py-1.5 text-xs text-primary-900 outline-none ring-accent-400 focus:ring-1 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
                       >
-                        <option value="">Unassigned</option>
+                        <option value="">{t('gateway.taskBoard.unassigned')}</option>
                         {agents.map((agent) => (
                           <option key={agent.id} value={agent.id}>{agent.name}</option>
                         ))}
@@ -430,24 +439,24 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                           onClick={closeCreateForm}
                           className="rounded-md px-2 py-1 text-[11px] font-medium text-primary-500 hover:bg-primary-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                         >
-                          Cancel
+                          {t('gateway.taskBoard.cancel')}
                         </button>
                         <button
                           type="submit"
                           disabled={!form.title.trim()}
                           className="rounded-md bg-accent-500 px-2 py-1 text-[11px] font-medium text-white transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          Create
+                          {t('gateway.taskBoard.create')}
                         </button>
                       </div>
                     </form>
                   ) : null}
                   {columnTasks.length === 0 ? (
-                    <p className="py-8 text-center text-[11px] text-neutral-500">Drop tasks here</p>
+                    <p className="py-8 text-center text-[11px] text-neutral-500">{t('gateway.taskBoard.dropTasksHere')}</p>
                   ) : null}
                   {columnTasks.map((task) => {
                     const priority = PRIORITIES.find((item) => item.key === task.priority)
-                    const assignee = task.agentId ? agentNameById.get(task.agentId) ?? task.agentId : 'Unassigned'
+                    const assignee = task.agentId ? agentNameById.get(task.agentId) ?? task.agentId : t('gateway.taskBoard.unassigned')
                     const dimmed = Boolean(selectedAgentId && task.agentId !== selectedAgentId)
                     const isExpanded = expandedTaskId === task.id
                     return (
@@ -487,7 +496,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                         ) : null}
                         <div className="mt-2 flex items-center justify-between gap-2">
                           <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-semibold', priority?.badge)}>
-                            {priority?.label ?? 'Normal'}
+                            {priority ? priorityLabel(priority.key) : t('gateway.taskBoard.priority.normal')}
                           </span>
                           <span className="truncate text-[10px] text-neutral-400">{assignee}</span>
                         </div>
@@ -500,7 +509,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                           >
                             <div>
                               <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-                                Title
+                                {t('gateway.taskBoard.titleField')}
                               </label>
                               <input
                                 type="text"
@@ -515,7 +524,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                             </div>
                             <div>
                               <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-                                Description
+                                {t('gateway.taskBoard.descriptionField')}
                               </label>
                               <textarea
                                 value={taskEditDraft.description}
@@ -525,17 +534,17 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                                   )
                                 }
                                 rows={2}
-                                placeholder="Add a description…"
+                                placeholder={t('gateway.taskBoard.descriptionAddPlaceholder')}
                                 className="w-full resize-none rounded-md border border-primary-200 bg-white px-2 py-1.5 text-xs text-primary-900 outline-none ring-accent-400 focus:ring-1 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
                               />
                             </div>
                             <p className="text-[11px] text-neutral-400">
-                              <span className="font-semibold uppercase tracking-wide">Agent:</span>{' '}
+                              <span className="font-semibold uppercase tracking-wide">{t('gateway.taskBoard.agentField')}</span>{' '}
                               {assignee}
                             </p>
                             <div>
                               <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-                                Priority
+                                {t('gateway.taskBoard.priorityField')}
                               </label>
                               <select
                                 value={taskEditDraft.priority}
@@ -550,14 +559,14 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                               >
                                 {PRIORITIES.map((p) => (
                                   <option key={p.key} value={p.key}>
-                                    {p.label}
+                                    {priorityLabel(p.key)}
                                   </option>
                                 ))}
                               </select>
                             </div>
                             <div>
                               <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-                                Status
+                                {t('gateway.taskBoard.statusField')}
                               </label>
                               <select
                                 value={taskEditDraft.status}
@@ -572,7 +581,7 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                               >
                                 {COLUMNS.map((col) => (
                                   <option key={col.key} value={col.key}>
-                                    {col.label}
+                                    {columnLabel(col.key)}
                                   </option>
                                 ))}
                               </select>
@@ -583,14 +592,14 @@ export function TaskBoard({ agents, initialTasks, selectedAgentId, onRef, onTask
                                 onClick={() => saveTaskDetail(task.id)}
                                 className="rounded-md bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-emerald-500"
                               >
-                                Save
+                                {t('gateway.taskBoard.save')}
                               </button>
                               <button
                                 type="button"
                                 onClick={closeTaskDetail}
                                 className="rounded-md px-2 py-1 text-[11px] font-medium text-neutral-300 transition-colors hover:bg-neutral-800"
                               >
-                                Cancel
+                                {t('gateway.taskBoard.cancel')}
                               </button>
                             </div>
                           </div>

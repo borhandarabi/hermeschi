@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t, getLocale, type TranslationKey } from '@/lib/i18n'
 import type { HubTask, TaskStatus, TaskPriority } from './task-board'
 import { useTaskStore, type Task as StoreTask, type TaskStatus as StoreTaskStatus } from '@/stores/task-store'
 import { addApproval } from '../lib/approvals-store'
@@ -10,28 +11,36 @@ type KanbanColumnStatus = 'backlog' | 'in_progress' | 'review' | 'done'
 
 type KanbanColumn = {
   key: KanbanColumnStatus
-  label: string
+  labelKey: TranslationKey
 }
 
 const DEFAULT_COLUMNS: KanbanColumn[] = [
-  { key: 'backlog', label: 'Backlog' },
-  { key: 'in_progress', label: 'In Progress' },
-  { key: 'review', label: 'Review' },
-  { key: 'done', label: 'Done' },
+  { key: 'backlog', labelKey: 'gateway.taskBoard.column.backlog' },
+  { key: 'in_progress', labelKey: 'gateway.taskBoard.column.inProgress' },
+  { key: 'review', labelKey: 'gateway.taskBoard.column.review' },
+  { key: 'done', labelKey: 'gateway.taskBoard.column.done' },
 ]
 
 const COMPACT_COLUMNS: KanbanColumn[] = [
-  { key: 'backlog', label: 'Todo' },
-  { key: 'in_progress', label: 'WIP' },
-  { key: 'review', label: 'Review' },
-  { key: 'done', label: 'Done' },
+  { key: 'backlog', labelKey: 'gateway.taskBoard.column.todo' },
+  { key: 'in_progress', labelKey: 'gateway.taskBoard.column.wip' },
+  { key: 'review', labelKey: 'gateway.taskBoard.column.review' },
+  { key: 'done', labelKey: 'gateway.taskBoard.column.done' },
 ]
 
-const PRIORITY_LABELS: Record<TaskPriority, string> = {
-  urgent: 'Urgent',
-  high: 'High',
-  normal: 'Normal',
-  low: 'Low',
+const PRIORITY_LABEL_KEYS: Record<TaskPriority, TranslationKey> = {
+  urgent: 'gateway.taskBoard.priority.urgent',
+  high: 'gateway.taskBoard.priority.high',
+  normal: 'gateway.taskBoard.priority.normal',
+  low: 'gateway.taskBoard.priority.low',
+}
+
+function priorityLabel(priority: TaskPriority): string {
+  return t(PRIORITY_LABEL_KEYS[priority])
+}
+
+function columnLabel(column: KanbanColumn): string {
+  return t(column.labelKey)
 }
 
 const PRIORITY_BADGES: Record<TaskPriority, string> = {
@@ -87,23 +96,23 @@ function mapStoreTaskToHubTask(task: StoreTask): HubTask {
 function formatTimeInColumn(updatedAt: number): string {
   const elapsedMs = Math.max(0, Date.now() - updatedAt)
   const totalMinutes = Math.floor(elapsedMs / 60000)
-  if (totalMinutes < 1) return 'Just now'
-  if (totalMinutes < 60) return `${totalMinutes}m in column`
+  if (totalMinutes < 1) return t('gateway.taskBoard.justNow')
+  if (totalMinutes < 60) return t('gateway.taskBoard.minutesInColumn', { count: totalMinutes })
   const hours = Math.floor(totalMinutes / 60)
   if (hours < 24) {
     const minutes = totalMinutes % 60
-    return minutes > 0 ? `${hours}h ${minutes}m in column` : `${hours}h in column`
+    return minutes > 0 ? t('gateway.taskBoard.hoursMinutesInColumn', { hours, minutes }) : t('gateway.taskBoard.hoursInColumn', { count: hours })
   }
   const days = Math.floor(hours / 24)
   const remainingHours = hours % 24
-  return remainingHours > 0 ? `${days}d ${remainingHours}h in column` : `${days}d in column`
+  return remainingHours > 0 ? t('gateway.taskBoard.daysHoursInColumn', { days, hours: remainingHours }) : t('gateway.taskBoard.daysInColumn', { count: days })
 }
 
 function appendNote(description: string, note: string): string {
   const trimmedNote = note.trim()
   if (!trimmedNote) return description
-  const timestamp = new Date().toLocaleString()
-  const entry = `[Note ${timestamp}] ${trimmedNote}`
+  const timestamp = new Date().toLocaleString(getLocale())
+  const entry = `${t('gateway.taskBoard.notePrefix', { timestamp })} ${trimmedNote}`
   return description.trim() ? `${description.trim()}\n\n${entry}` : entry
 }
 
@@ -208,12 +217,12 @@ export function KanbanBoard({
     if (nextColumn === 'review') {
       const task = mergedTasks.find((t) => t.id === taskId)
       if (task) {
-        const agentName = task.agentId ? (agentNameById.get(task.agentId) ?? task.agentId) : 'Unassigned'
+        const agentName = task.agentId ? (agentNameById.get(task.agentId) ?? task.agentId) : t('gateway.taskBoard.unassigned')
         addApproval({
           agentId: task.agentId ?? 'unassigned',
           agentName,
-          action: `Review task: ${task.title}`,
-          context: task.description || `Task "${task.title}" has been moved to Review and is awaiting approval.`,
+          action: t('gateway.taskBoard.reviewTask', { title: task.title }),
+          context: task.description || t('gateway.taskBoard.reviewContext', { title: task.title }),
           source: 'agent',
         })
       }
@@ -252,7 +261,7 @@ export function KanbanBoard({
               >
                 <header className="flex items-center justify-between border-b border-[var(--theme-border)] px-3 py-2.5">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text)]">
-                    {column.label}
+                    {columnLabel(column)}
                   </h3>
                   <span className="rounded-full border border-[var(--theme-border)] bg-[var(--theme-card2)] px-2 py-0.5 text-[11px] font-medium text-[var(--theme-muted)]">
                     {columnTasks.length}
@@ -262,12 +271,12 @@ export function KanbanBoard({
                 <div className="min-h-[12rem] flex-1 space-y-2 overflow-y-auto p-2.5">
                   {columnTasks.length === 0 ? (
                     <p className="rounded-lg border border-dashed border-[var(--theme-border)] px-3 py-6 text-center text-xs text-[var(--theme-muted)]">
-                      Drop tasks here
+                      {t('gateway.taskBoard.dropTasksHere')}
                     </p>
                   ) : null}
 
                   {columnTasks.map((task) => {
-                    const assignee = task.agentId ? agentNameById.get(task.agentId) ?? task.agentId : 'Unassigned'
+                    const assignee = task.agentId ? agentNameById.get(task.agentId) ?? task.agentId : t('gateway.taskBoard.unassigned')
 
                     return (
                       <article
@@ -311,7 +320,7 @@ export function KanbanBoard({
                               compact ? 'px-1.5 py-0.5 text-[9px]' : 'px-2 py-0.5 text-[10px]',
                             )}
                           >
-                            {PRIORITY_LABELS[task.priority]}
+                            {priorityLabel(task.priority)}
                           </span>
                           <span className={cn('truncate text-[var(--theme-muted)]', compact ? 'max-w-[84px] text-[10px]' : 'text-[11px]')}>
                             {assignee}
@@ -320,7 +329,7 @@ export function KanbanBoard({
 
                         {onAssignAgent ? (
                           <div className={cn(compact ? 'mt-1.5' : 'mt-2')}>
-                            <label className={cn('mb-1 block font-medium uppercase tracking-wide text-[var(--theme-muted)]', compact ? 'text-[9px]' : 'text-[10px]')}>Assign</label>
+                            <label className={cn('mb-1 block font-medium uppercase tracking-wide text-[var(--theme-muted)]', compact ? 'text-[9px]' : 'text-[10px]')}>{t('gateway.taskBoard.assignLabel')}</label>
                             <select
                               value={task.agentId ?? ''}
                               onChange={(event) => {
@@ -338,7 +347,7 @@ export function KanbanBoard({
                                 compact ? 'py-1 text-[10px]' : 'py-1 text-[11px]',
                               )}
                             >
-                              <option value="">Unassigned</option>
+                              <option value="">{t('gateway.taskBoard.unassigned')}</option>
                               {agents.map((agent) => (
                                 <option key={agent.id} value={agent.id}>{agent.name}</option>
                               ))}
@@ -368,11 +377,11 @@ export function KanbanBoard({
           }}
           onClick={(event) => event.stopPropagation()}
         >
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--theme-muted)]">Task Actions</p>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--theme-muted)]">{t('gateway.taskBoard.taskActions')}</p>
 
-          <label className="mb-1 block text-[11px] text-[var(--theme-muted)]">Change priority</label>
+          <label className="mb-1 block text-[11px] text-[var(--theme-muted)]">{t('gateway.taskBoard.changePriority')}</label>
           <div className="mb-3 grid grid-cols-2 gap-1">
-            {(Object.keys(PRIORITY_LABELS) as TaskPriority[]).map((priority) => (
+            {(Object.keys(PRIORITY_LABEL_KEYS) as TaskPriority[]).map((priority) => (
               <button
                 key={priority}
                 type="button"
@@ -382,12 +391,12 @@ export function KanbanBoard({
                 }}
                 className={cn('rounded-md border px-2 py-1 text-left text-[11px] font-medium transition-colors', PRIORITY_BADGES[priority], 'hover:brightness-110')}
               >
-                {PRIORITY_LABELS[priority]}
+                {priorityLabel(priority)}
               </button>
             ))}
           </div>
 
-          <label className="mb-1 block text-[11px] text-[var(--theme-muted)]">Reassign agent</label>
+          <label className="mb-1 block text-[11px] text-[var(--theme-muted)]">{t('gateway.taskBoard.reassignAgent')}</label>
           <select
             className="mb-3 w-full rounded-md border border-[var(--theme-border)] bg-[var(--theme-card2)] px-2 py-1.5 text-xs text-[var(--theme-text)] outline-none"
             defaultValue=""
@@ -401,19 +410,19 @@ export function KanbanBoard({
               setMenuTaskId(null)
             }}
           >
-            <option value="">Unassigned</option>
+            <option value="">{t('gateway.taskBoard.unassigned')}</option>
             {agents.map((agent) => (
               <option key={agent.id} value={agent.id}>{agent.name}</option>
             ))}
           </select>
 
-          <label className="mb-1 block text-[11px] text-[var(--theme-muted)]">Add note</label>
+          <label className="mb-1 block text-[11px] text-[var(--theme-muted)]">{t('gateway.taskBoard.addNote')}</label>
           <textarea
             value={noteDraft}
             onChange={(event) => setNoteDraft(event.target.value)}
             rows={3}
             className="mb-2 w-full resize-none rounded-md border border-[var(--theme-border)] bg-[var(--theme-card2)] px-2 py-1.5 text-xs text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)]"
-            placeholder="Leave a note for this task"
+            placeholder={t('gateway.taskBoard.notePlaceholder')}
           />
           <div className="flex items-center justify-between gap-2">
             <button
@@ -424,7 +433,7 @@ export function KanbanBoard({
               }}
               className="rounded-md border border-red-400/40 bg-red-500/10 px-2 py-1 text-[11px] font-medium text-red-300 hover:bg-red-500/20"
             >
-              Delete
+              {t('gateway.taskBoard.delete')}
             </button>
             <button
               type="button"
@@ -440,7 +449,7 @@ export function KanbanBoard({
               }}
               className="rounded-md bg-accent-500 px-2 py-1 text-[11px] font-medium text-white transition-colors hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Save note
+              {t('gateway.taskBoard.saveNote')}
             </button>
           </div>
         </div>

@@ -2,6 +2,7 @@
  * AgoraOnlinePanel — list of online users with status + click-to-profile.
  */
 import type { AgoraUser } from '../lib/agora-types'
+import { t } from '@/lib/i18n'
 
 interface AgoraOnlinePanelProps {
   self: AgoraUser
@@ -27,7 +28,7 @@ export function AgoraOnlinePanel({ self, others, nearbyIds, onSelectUser }: Agor
       }}
     >
       <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: 'var(--theme-border)' }}>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-70">Online</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-70">{t('agora.online')}</span>
         <span className="text-[10px] opacity-50">{all.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
@@ -58,7 +59,7 @@ export function AgoraOnlinePanel({ self, others, nearbyIds, onSelectUser }: Agor
                     style={{ background: STATUS_DOT[u.profile.status] ?? '#9ca3af' }}
                   />
                   <span className="text-[12px] font-medium truncate">{u.profile.displayName}</span>
-                  {u.isSelf && <span className="text-[10px] opacity-50">you</span>}
+                  {u.isSelf && <span className="text-[10px] opacity-50">{t('agora.you')}</span>}
                   {nearby && (
                     <span
                       className="text-[9px] uppercase tracking-[0.15em] rounded px-1"
@@ -67,7 +68,7 @@ export function AgoraOnlinePanel({ self, others, nearbyIds, onSelectUser }: Agor
                         color: 'var(--theme-accent)',
                       }}
                     >
-                      near
+                      {t('agora.near')}
                     </span>
                   )}
                 </div>
