@@ -24,7 +24,7 @@ import { Route as OperationsRouteImport } from './routes/operations'
 import { Route as MemoryRouteImport } from './routes/memory'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as JobsRouteImport } from './routes/jobs'
-import { Route as HermesWorldRouteImport } from './routes/hermes-world'
+import { Route as HermeschiWorldRouteImport } from './routes/hermeschi-world'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as EchoStudioRouteImport } from './routes/echo-studio'
 import { Route as EarlyAccessRouteImport } from './routes/early-access'
@@ -241,9 +241,9 @@ const JobsRoute = JobsRouteImport.update({
   path: '/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HermesWorldRoute = HermesWorldRouteImport.update({
-  id: '/hermes-world',
-  path: '/hermes-world',
+const HermeschiWorldRoute = HermeschiWorldRouteImport.update({
+  id: '/hermeschi-world',
+  path: '/hermeschi-world',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FilesRoute = FilesRouteImport.update({
@@ -962,7 +962,7 @@ export interface FileRoutesByFullPath {
   '/early-access': typeof EarlyAccessRoute
   '/echo-studio': typeof EchoStudioRoute
   '/files': typeof FilesRoute
-  '/hermes-world': typeof HermesWorldRoute
+  '/hermeschi-world': typeof HermeschiWorldRoute
   '/jobs': typeof JobsRoute
   '/mcp': typeof McpRoute
   '/memory': typeof MemoryRoute
@@ -1120,7 +1120,7 @@ export interface FileRoutesByTo {
   '/early-access': typeof EarlyAccessRoute
   '/echo-studio': typeof EchoStudioRoute
   '/files': typeof FilesRoute
-  '/hermes-world': typeof HermesWorldRoute
+  '/hermeschi-world': typeof HermeschiWorldRoute
   '/jobs': typeof JobsRoute
   '/mcp': typeof McpRoute
   '/memory': typeof MemoryRoute
@@ -1278,7 +1278,7 @@ export interface FileRoutesById {
   '/early-access': typeof EarlyAccessRoute
   '/echo-studio': typeof EchoStudioRoute
   '/files': typeof FilesRoute
-  '/hermes-world': typeof HermesWorldRoute
+  '/hermeschi-world': typeof HermeschiWorldRoute
   '/jobs': typeof JobsRoute
   '/mcp': typeof McpRoute
   '/memory': typeof MemoryRoute
@@ -1438,7 +1438,7 @@ export interface FileRouteTypes {
     | '/early-access'
     | '/echo-studio'
     | '/files'
-    | '/hermes-world'
+    | '/hermeschi-world'
     | '/jobs'
     | '/mcp'
     | '/memory'
@@ -1596,7 +1596,7 @@ export interface FileRouteTypes {
     | '/early-access'
     | '/echo-studio'
     | '/files'
-    | '/hermes-world'
+    | '/hermeschi-world'
     | '/jobs'
     | '/mcp'
     | '/memory'
@@ -1753,7 +1753,7 @@ export interface FileRouteTypes {
     | '/early-access'
     | '/echo-studio'
     | '/files'
-    | '/hermes-world'
+    | '/hermeschi-world'
     | '/jobs'
     | '/mcp'
     | '/memory'
@@ -1912,7 +1912,7 @@ export interface RootRouteChildren {
   EarlyAccessRoute: typeof EarlyAccessRoute
   EchoStudioRoute: typeof EchoStudioRoute
   FilesRoute: typeof FilesRoute
-  HermesWorldRoute: typeof HermesWorldRoute
+  HermeschiWorldRoute: typeof HermeschiWorldRoute
   JobsRoute: typeof JobsRoute
   McpRoute: typeof McpRoute
   MemoryRoute: typeof MemoryRoute
@@ -2139,11 +2139,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hermes-world': {
-      id: '/hermes-world'
-      path: '/hermes-world'
-      fullPath: '/hermes-world'
-      preLoaderRoute: typeof HermesWorldRouteImport
+    '/hermeschi-world': {
+      id: '/hermeschi-world'
+      path: '/hermeschi-world'
+      fullPath: '/hermeschi-world'
+      preLoaderRoute: typeof HermeschiWorldRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/files': {
@@ -3334,7 +3334,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarlyAccessRoute: EarlyAccessRoute,
   EchoStudioRoute: EchoStudioRoute,
   FilesRoute: FilesRoute,
-  HermesWorldRoute: HermesWorldRoute,
+  HermeschiWorldRoute: HermeschiWorldRoute,
   JobsRoute: JobsRoute,
   McpRoute: McpRoute,
   MemoryRoute: MemoryRoute,

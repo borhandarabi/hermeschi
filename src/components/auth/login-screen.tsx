@@ -62,7 +62,7 @@ export function LoginScreen() {
                 <circle cx="50" cy="50" r="15" fill="currentColor" />
               </svg>
               <h1 className="text-2xl font-bold tracking-tight text-primary-900">
-                {t('login.hermesWorkspace')}
+                {t('login.hermesChi')}
               </h1>
             </div>
           </div>

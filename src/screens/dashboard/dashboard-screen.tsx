@@ -921,7 +921,7 @@ export function DashboardScreen() {
                 lineHeight: 1.1,
               }}
             >
-              {t('dashboard.screen.hermesWorkspace')}
+              {t('dashboard.screen.hermesChi')}
             </h1>
           </div>
         </div>

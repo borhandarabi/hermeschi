@@ -1433,7 +1433,7 @@ export const FA: LocaleTranslations = {
   'dashboard.logsTail.filterErrors': 'خطاها',
   'dashboard.logsTail.filterWarns': 'هشدارها',
   // ── Dashboard screen ────────────────────────────────────────────
-  'dashboard.screen.hermesWorkspace': 'فضای کار هرمس',
+  'dashboard.screen.hermesChi': 'هرمزچی',
   'dashboard.screen.newChat': 'گفتگوی جدید',
   'dashboard.screen.terminal': 'ترمینال',
   'dashboard.screen.skills': 'مهارت‌ها',
@@ -4216,7 +4216,7 @@ export const FA: LocaleTranslations = {
   'login.authFailed': 'احراز هویت ناموفق بود. دوباره تلاش کنید.',
   'login.enterPassword': 'گذرواژه را وارد کنید',
   'login.protected': 'این فضای کار با گذرواژه محافظت می‌شود',
-  'login.hermesWorkspace': 'فضای کار هرمس',
+  'login.hermesChi': 'هرمزچی',
   'login.poweredBy': 'نیرو گرفته از',
   'login.hermesAgent': 'عامل هرمس',
   // ── Agent view panel ──────────────────────────────────────────────────
@@ -5317,7 +5317,7 @@ export const FA: LocaleTranslations = {
   // ── Chat — sidebar (remaining strings) ────────────────────────────────
   'chat.sidebar.openSidebar': 'باز کردن نوار کناری',
   'chat.sidebar.closeSidebar': 'بستن نوار کناری',
-  'chat.sidebar.hermesWorkspace': 'فضای کار Hermes',
+  'chat.sidebar.hermesChi': 'هرمزچی',
   'chat.sidebar.hermesChiWorld': 'HermesChiWorld',
   'chat.sidebar.hermesAgent': 'عامل هرمس',
   'chat.sidebar.newBadge': 'جدید',

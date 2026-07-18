@@ -964,7 +964,7 @@ function ChatSidebarComponent({
                   className="text-sm font-semibold tracking-tight"
                   style={{ color: 'var(--theme-text)' }}
                 >
-                  {t('chat.sidebar.hermesWorkspace')}
+                  {t('chat.sidebar.hermesChi')}
                 </span>
               </Link>
             </motion.div>

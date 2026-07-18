@@ -1429,7 +1429,7 @@ export const EN = {
   'dashboard.logsTail.filterErrors': 'errors',
   'dashboard.logsTail.filterWarns': 'warns',
   // ── Dashboard screen ────────────────────────────────────────────
-  'dashboard.screen.hermesWorkspace': 'HermesChi',
+  'dashboard.screen.hermesChi': 'HermesChi',
   'dashboard.screen.newChat': 'New Chat',
   'dashboard.screen.terminal': 'Terminal',
   'dashboard.screen.skills': 'Skills',
@@ -4212,7 +4212,7 @@ export const EN = {
   'login.authFailed': 'Authentication failed. Please try again.',
   'login.enterPassword': 'Enter Password',
   'login.protected': 'This workspace is password-protected',
-  'login.hermesWorkspace': 'HermesChi',
+  'login.hermesChi': 'HermesChi',
   'login.poweredBy': 'Powered by',
   'login.hermesAgent': 'Hermes Agent',
   // ── Agent view panel ──────────────────────────────────────────────────
@@ -5313,7 +5313,7 @@ export const EN = {
   // ── Chat — sidebar (remaining strings) ────────────────────────────────
   'chat.sidebar.openSidebar': 'Open Sidebar',
   'chat.sidebar.closeSidebar': 'Close Sidebar',
-  'chat.sidebar.hermesWorkspace': 'HermesChi',
+  'chat.sidebar.hermesChi': 'HermesChi',
   'chat.sidebar.hermesChiWorld': 'HermesChiWorld',
   'chat.sidebar.hermesAgent': 'Hermes Agent',
   'chat.sidebar.newBadge': 'NEW',

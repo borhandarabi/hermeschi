@@ -7,7 +7,7 @@ const HermesChiWorldLanding = GAME_BUILD_ENABLED
   ? lazy(() => import('@/modules/hermeschiworld/screens/playground/hermeschi-world-landing').then((m) => ({ default: m.HermesChiWorldLanding })))
   : null
 
-export const Route = createFileRoute('/hermes-world')({
+export const Route = createFileRoute('/hermeschi-world')({
   ssr: false,
   component: HermesChiWorldRoute,
 })

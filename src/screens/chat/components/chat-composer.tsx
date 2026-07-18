@@ -839,7 +839,7 @@ async function fetchWorkspaceContext(): Promise<WorkspaceDetectionResponse> {
 }
 
 function shortPathLabel(pathValue: string): string {
-  if (!pathValue) return t('chat.sidebar.hermesWorkspace')
+  if (!pathValue) return t('chat.sidebar.hermesChi')
   const parts = pathValue.replace(/\\/g, '/').split('/').filter(Boolean)
   return parts.at(-1) || pathValue
 }
@@ -1188,7 +1188,7 @@ function ChatComposerComponent({
     activeWorkspace?.name ||
     workspaceContextQuery.data?.folderName ||
     shortPathLabel(detectedWorkspacePath) ||
-    t('chat.sidebar.hermesWorkspace')
+    t('chat.sidebar.hermesChi')
 
   const currentModel = currentModelQuery.data ?? ''
 
