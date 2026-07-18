@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { getLocale, t } from '@/lib/i18n'
 
 type VtWorker = {
   workerId: string
@@ -58,7 +59,7 @@ type VtPayload = {
 
 function formatTime(value: number | null | undefined): string {
   if (!value) return '—'
-  return new Date(value).toLocaleString('it-IT', {
+  return new Date(value).toLocaleString(getLocale(), {
     dateStyle: 'short',
     timeStyle: 'short',
   })
@@ -84,12 +85,12 @@ function stateClass(state: string | undefined): string {
 }
 
 function modeLabel(mode: string): string {
-  if (mode === 'observe_only') return 'Modalità osservazione'
+  if (mode === 'observe_only') return t('vtCapital.modeObserveOnly')
   return mode.replaceAll('_', ' ')
 }
 
 function executionLabel(enabled: boolean): string {
-  return enabled ? 'Esecuzione attiva' : 'Esecuzione disattivata'
+  return enabled ? t('vtCapital.executionActive') : t('vtCapital.executionDisabled')
 }
 
 function decisionLabel(entry: Record<string, unknown>): string {
@@ -143,7 +144,7 @@ function MiniEvent({
       </div>
       <div className="mt-1 text-sm font-semibold text-ink">{scopeLine(event)}</div>
       <div className="mt-1 text-xs text-muted">
-        approval {fieldValue(event, 'approval_id')} · stato{' '}
+        {t('vtCapital.approvalLabel')} {fieldValue(event, 'approval_id')} · {t('vtCapital.stateLabel')}{' '}
         {fieldValue(event, 'status') !== '—'
           ? fieldValue(event, 'status')
           : fieldValue(event, 'decision')}
@@ -244,7 +245,7 @@ export function VtCapitalScreen() {
         throw new Error(
           'error' in payload && payload.error
             ? payload.error
-            : 'API VT Capital non disponibile',
+            : t('vtCapital.apiUnavailable'),
         )
       setData(payload)
     } catch (err) {
@@ -275,7 +276,7 @@ export function VtCapitalScreen() {
   if (loading)
     return (
       <div className="flex h-full items-center justify-center text-muted">
-        Carico VT Capital…
+        {t('vtCapital.loading')}
       </div>
     )
   if (error)
@@ -285,7 +286,7 @@ export function VtCapitalScreen() {
           className="text-xl font-semibold"
           style={{ color: 'var(--theme-danger)' }}
         >
-          VT Capital non caricato
+          {t('vtCapital.loadFailed')}
         </h1>
         <p className="max-w-xl text-sm text-muted">{error}</p>
         <button
@@ -297,7 +298,7 @@ export function VtCapitalScreen() {
             color: 'var(--theme-on-accent, white)',
           }}
         >
-          Riprova
+          {t('vtCapital.retry')}
         </button>
       </div>
     )
@@ -343,14 +344,13 @@ export function VtCapitalScreen() {
               </span>
               <div>
                 <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-                  Plugin VT Capital
+                  {t('vtCapital.pluginLabel')}
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  VT Capital Cockpit
+                  {t('vtCapital.cockpitTitle')}
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm text-muted">
-                  Bias crypto, council/precheck, worker Swarm e note vault in
-                  una superficie isolata dal resto della dashboard.
+                  {t('vtCapital.cockpitDesc')}
                 </p>
               </div>
             </div>
@@ -390,7 +390,7 @@ export function VtCapitalScreen() {
                   background: 'var(--theme-card2)',
                 }}
               >
-                Scope: solo plugin
+                {t('vtCapital.scopePluginOnly')}
               </span>
               <span
                 className="rounded-full border px-3 py-1 text-muted"
@@ -407,68 +407,68 @@ export function VtCapitalScreen() {
 
         <div className="grid gap-4 md:grid-cols-4">
           <Metric
-            label="Market bias file"
-            value={data.marketBias.fileExists ? 'online' : 'missing'}
+            label={t('vtCapital.metricMarketBiasFile')}
+            value={data.marketBias.fileExists ? t('vtCapital.metricOnline') : t('vtCapital.metricMissing')}
             tone={data.marketBias.fileExists ? 'good' : 'warn'}
           />
           <Metric
-            label="Council precheck"
+            label={t('vtCapital.metricCouncilPrecheck')}
             value={
               data.council.fileExists
-                ? `${data.council.recent.length} record`
-                : 'missing'
+                ? t('vtCapital.metricRecord', { count: data.council.recent.length })
+                : t('vtCapital.metricMissing')
             }
             tone={data.council.fileExists ? 'good' : 'warn'}
           />
           <Metric
-            label="Worker runtime"
+            label={t('vtCapital.metricWorkerRuntime')}
             value={`${activeWorkers}/${data.workers.length}`}
             tone={activeWorkers > 0 ? 'good' : 'warn'}
           />
-          <Metric label="Ultimo refresh" value={formatTime(data.checkedAt)} />
+          <Metric label={t('vtCapital.metricLastRefresh')} value={formatTime(data.checkedAt)} />
         </div>
 
         {data.guardian ? (
           <Card
-            title="Guardian / OMS"
+            title={t('vtCapital.cardGuardianOms')}
             accent="var(--theme-danger)"
             right={
               <span className="text-xs text-muted">
                 {data.guardian.requireOrderScope
-                  ? 'require_order_scope attivo'
-                  : 'scope legacy'}
+                  ? t('vtCapital.requireOrderScopeActive')
+                  : t('vtCapital.scopeLegacy')}
               </span>
             }
           >
             <div className="grid gap-3 lg:grid-cols-4">
               <Metric
-                label="Modalità executor"
+                label={t('vtCapital.metricExecutorMode')}
                 value={data.guardian.executionMode.replaceAll('_', ' ')}
                 tone={data.guardian.executionEnabled ? 'warn' : 'good'}
               />
               <Metric
-                label="Live trading"
-                value={data.guardian.liveBlocked ? 'bloccato' : 'aperto'}
+                label={t('vtCapital.metricLiveTrading')}
+                value={data.guardian.liveBlocked ? t('vtCapital.liveBlocked') : t('vtCapital.liveOpen')}
                 tone={data.guardian.liveBlocked ? 'good' : 'warn'}
               />
               <Metric
-                label="Ordini aperti demo"
+                label={t('vtCapital.metricOpenDemoOrders')}
                 value={data.guardian.demoState.openOrders}
                 tone={data.guardian.demoState.openOrders > 0 ? 'warn' : 'good'}
               />
               <Metric
-                label="Ordini tracciati"
+                label={t('vtCapital.metricTrackedOrders')}
                 value={data.guardian.demoState.trackedOrders}
               />
             </div>
             <div className="mt-4 grid gap-3 lg:grid-cols-3">
-              <MiniEvent label="Ultimo risk.check" event={data.guardian.lastRiskCheck} />
+              <MiniEvent label={t('vtCapital.lastRiskCheck')} event={data.guardian.lastRiskCheck} />
               <MiniEvent
-                label="Ultimo order.proposed"
+                label={t('vtCapital.lastOrderProposed')}
                 event={data.guardian.lastOrderProposed}
               />
               <MiniEvent
-                label="Ultimo order.executed"
+                label={t('vtCapital.lastOrderExecuted')}
                 event={data.guardian.lastOrderExecuted}
               />
             </div>
@@ -480,7 +480,7 @@ export function VtCapitalScreen() {
                 }}
               >
                 <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
-                  Blocchi recenti
+                  {t('vtCapital.recentBlocks')}
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
                   {data.guardian.recentBlocks.map((block, index) => (
@@ -495,7 +495,7 @@ export function VtCapitalScreen() {
                         color: 'var(--theme-danger)',
                       }}
                     >
-                      {String(block.reason_code ?? block.reason ?? 'BLOCKED')}
+                      {String(block.reason_code ?? block.reason ?? t('vtCapital.blockedFallback'))}
                       {block.symbol ? ` · ${String(block.symbol)}` : ''}
                     </span>
                   ))}
@@ -507,10 +507,10 @@ export function VtCapitalScreen() {
 
         <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
           <Card
-            title="Market Bias BTC/ETH/SOL"
+            title={t('vtCapital.cardMarketBias')}
             right={
               <span className="text-xs text-muted">
-                aggiornato {formatTime(data.marketBias.updatedAt)}
+                {t('vtCapital.updatedAt', { time: formatTime(data.marketBias.updatedAt) })}
               </span>
             }
           >
@@ -532,7 +532,7 @@ export function VtCapitalScreen() {
                           {String(
                             item.asset ??
                               item.symbol ??
-                              `Candidate ${index + 1}`,
+                              t('vtCapital.candidateFallback', { index: index + 1 }),
                           )}
                         </div>
                         <div
@@ -547,7 +547,7 @@ export function VtCapitalScreen() {
                         </div>
                       </div>
                       <div className="mt-2 text-xs text-muted">
-                        confidence{' '}
+                        {t('vtCapital.confidence')}{' '}
                         {String(
                           item.confidence ?? item.confidence_final ?? '—',
                         )}
@@ -578,17 +578,17 @@ export function VtCapitalScreen() {
                 {compactJson(
                   data.marketBias.latest?.raw ??
                     data.marketBias.recent.at(-1) ??
-                    'Nessun candidato recente',
+                    t('vtCapital.noRecentCandidates'),
                 )}
               </pre>
             )}
           </Card>
 
           <Card
-            title="Risk / Council Journal"
+            title={t('vtCapital.cardRiskCouncilJournal')}
             right={
               <span className="text-xs text-muted">
-                {data.council.recent.length} ultimi
+                {t('vtCapital.recentCount', { count: data.council.recent.length })}
               </span>
             }
             accent="var(--theme-warning)"
@@ -596,7 +596,7 @@ export function VtCapitalScreen() {
             <div className="flex max-h-[420px] flex-col gap-2 overflow-auto pr-1">
               {data.council.recent.length === 0 ? (
                 <p className="text-sm text-muted">
-                  Nessun precheck council trovato.
+                  {t('vtCapital.noCouncilPrecheck')}
                 </p>
               ) : (
                 data.council.recent
@@ -612,7 +612,7 @@ export function VtCapitalScreen() {
                       }}
                     >
                       <summary className="cursor-pointer text-sm font-medium text-ink">
-                        {entryTitle(entry, `Record ${index + 1}`)} ·{' '}
+                        {entryTitle(entry, t('vtCapital.recordFallback', { index: index + 1 }))} ·{' '}
                         {decisionLabel(entry)}
                       </summary>
                       <pre className="mt-3 overflow-auto whitespace-pre-wrap text-xs text-muted">
@@ -626,7 +626,7 @@ export function VtCapitalScreen() {
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-          <Card title="Swarm Trading Workers" accent="var(--theme-success)">
+          <Card title={t('vtCapital.cardSwarmTradingWorkers')} accent="var(--theme-success)">
             <div className="grid gap-3 md:grid-cols-2">
               {data.workers.map((worker) => (
                 <div
@@ -644,16 +644,16 @@ export function VtCapitalScreen() {
                     <span
                       className={`rounded-full border px-2 py-0.5 text-xs ${stateClass(worker.state)}`}
                     >
-                      {worker.state ?? 'unknown'}
+                      {worker.state ?? t('vtCapital.unknownState')}
                     </span>
                   </div>
                   <div className="mt-2 text-xs text-muted">
-                    memory {worker.memoryExists ? 'ok' : 'missing'} · identity{' '}
-                    {worker.identityExists ? 'ok' : 'missing'}
+                    {t('vtCapital.memoryLabel')} {worker.memoryExists ? t('vtCapital.memoryOk') : t('vtCapital.metricMissing')} · {t('vtCapital.identityLabel')}{' '}
+                    {worker.identityExists ? t('vtCapital.memoryOk') : t('vtCapital.metricMissing')}
                   </div>
                   {worker.currentTask ? (
                     <div className="mt-2 text-xs text-ink">
-                      Task: {worker.currentTask}
+                      {t('vtCapital.taskLabel', { task: worker.currentTask })}
                     </div>
                   ) : null}
                   {worker.lastSummary ? (
@@ -667,13 +667,13 @@ export function VtCapitalScreen() {
           </Card>
 
           <Card
-            title="Vault / Report recenti"
+            title={t('vtCapital.cardVaultReports')}
             accent="var(--theme-accent-secondary)"
           >
             <div className="flex flex-col gap-2">
               {data.notes.length === 0 ? (
                 <p className="text-sm text-muted">
-                  Nessuna nota VT Capital/crypto trovata.
+                  {t('vtCapital.noVtNotes')}
                 </p>
               ) : (
                 data.notes.map((note) => (
@@ -688,7 +688,7 @@ export function VtCapitalScreen() {
                     <div className="font-medium text-ink">{note.title}</div>
                     <div className="mt-1 text-xs text-muted">
                       {formatTime(note.mtimeMs)} ·{' '}
-                      {Math.round(note.size / 1024)} KB
+                      {Math.round(note.size / 1024)} {t('vtCapital.kb')}
                     </div>
                     <div
                       className="mt-1 truncate text-xs"
