@@ -16,6 +16,7 @@ import {
   CancelIcon,
 } from '@hugeicons/core-free-icons'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t, getLocale } from '@/lib/i18n'
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
 
 export type AnalyticsPeriod = 7 | 14 | 30
@@ -41,7 +42,7 @@ function formatCost(usd: number): string {
 function shortDay(day: string): string {
   const ts = Date.parse(day)
   if (!Number.isFinite(ts)) return day
-  return new Date(ts).toLocaleDateString('en-US', {
+  return new Date(ts).toLocaleDateString(getLocale(), {
     month: 'short',
     day: 'numeric',
   })

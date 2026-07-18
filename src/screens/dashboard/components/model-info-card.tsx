@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { CancelIcon } from '@hugeicons/core-free-icons'
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatContext(n: number): string {
   if (!n || n <= 0) return '—'
@@ -334,7 +335,7 @@ function ModelInventoryModal({
               type="search"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              placeholder="filter…"
+              placeholder={t('common.search')}
               className="rounded border bg-transparent px-2 py-1 font-mono text-[11px]"
               style={{
                 borderColor: 'var(--theme-border)',

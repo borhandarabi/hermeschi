@@ -4,6 +4,7 @@ import {
   type DashboardLayout,
   type WidgetId,
 } from '@/screens/dashboard/lib/use-dashboard-layout'
+import { t } from '@/lib/i18n'
 
 /**
  * Wraps a dashboard widget so it participates in edit mode without
@@ -64,14 +65,14 @@ export function WidgetShell({
             e.stopPropagation()
             layout.hide(id)
           }}
-          className="absolute -right-2 -top-2 z-10 inline-flex size-6 items-center justify-center rounded-full text-[14px] font-bold leading-none shadow-md transition-transform hover:scale-110"
+          className="absolute -end-2 -top-2 z-10 inline-flex size-6 items-center justify-center rounded-full text-[14px] font-bold leading-none shadow-md transition-transform hover:scale-110"
           style={{
             background: 'var(--theme-card)',
             color: 'var(--theme-danger)',
             border: '1px solid var(--theme-border)',
           }}
-          title={`Hide ${meta?.label ?? id}`}
-          aria-label={`Hide widget ${meta?.label ?? id}`}
+          title={t('dashboard.removeWidget')}
+          aria-label={t('dashboard.removeWidget')}
         >
           ×
         </button>
