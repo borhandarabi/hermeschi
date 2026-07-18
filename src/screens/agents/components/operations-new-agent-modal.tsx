@@ -5,6 +5,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '@/components/ui/button'
 import { fetchModels, type GatewayModelCatalogEntry } from '@/lib/gateway-api'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 import { AGENT_PRESETS } from '../agent-presets'
 
 type PresetOption = {
@@ -18,7 +19,7 @@ type PresetOption = {
 const PRESET_OPTIONS: PresetOption[] = [
   {
     id: 'blank',
-    name: 'Blank',
+    name: t('agents.new.presetBlank'),
     emoji: '✨',
     description: '',
     systemPrompt: '',
@@ -92,7 +93,7 @@ function ModelSelector({
         className="inline-flex min-h-[3rem] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-left text-sm text-[var(--theme-text)] shadow-[0_8px_24px_color-mix(in_srgb,var(--theme-shadow)_18%,transparent)]"
       >
         <span className="truncate">
-          {selected ? `${selected.provider} / ${selected.name}` : 'Default (auto)'}
+          {selected ? `${selected.provider} / ${selected.name}` : t('agents.operations.settings.modelDefault')}
         </span>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
@@ -208,10 +209,10 @@ export function OperationsNewAgentModal({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-[var(--theme-text)]">
-                New Agent
+                {t('agents.new.modalTitle')}
               </h2>
               <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-                Add a persistent Operations agent to the roster.
+                {t('agents.new.modalDesc')}
               </p>
             </div>
           </div>
@@ -226,7 +227,7 @@ export function OperationsNewAgentModal({
 
         <div className="mt-6 space-y-2">
           <span className="text-sm font-medium text-[var(--theme-text)]">
-            Start from a template
+            {t('agents.new.startFromTemplate')}
           </span>
           <div className="flex flex-wrap gap-2">
             {PRESET_OPTIONS.map((preset) => (
@@ -247,56 +248,55 @@ export function OperationsNewAgentModal({
             ))}
           </div>
           <p className="text-xs text-[var(--theme-muted)]">
-            Templates fill in emoji, description, and system prompt. You can edit
-            everything before creating.
+            {t('agents.new.templateHint')}
           </p>
         </div>
 
         <div className="mt-4 grid gap-4 md:grid-cols-[1.2fr_0.6fr]">
           <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--theme-text)]">Name</span>
+            <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.new.nameLabel')}</span>
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Sage"
+              placeholder={t('agents.new.namePlaceholderModal')}
               className="w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
             />
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--theme-text)]">Emoji</span>
+            <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.new.emojiLabel')}</span>
             <input
               value={emoji}
               onChange={(event) => setEmoji(event.target.value)}
-              placeholder="🐦"
+              placeholder={t('agents.new.emojiPlaceholder')}
               className="w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
             />
           </label>
         </div>
 
         <label className="mt-4 block space-y-2">
-          <span className="text-sm font-medium text-[var(--theme-text)]">Model</span>
+          <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.new.modelLabel')}</span>
           <ModelSelector value={model} onChange={setModel} models={models} />
         </label>
 
         <label className="mt-4 block space-y-2">
-          <span className="text-sm font-medium text-[var(--theme-text)]">Description</span>
+          <span className="text-sm font-medium text-[var(--theme-text)]">{t('agents.new.descriptionLabel')}</span>
           <input
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="X/Twitter growth agent"
+            placeholder={t('agents.new.descriptionPlaceholderModal')}
             className="w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
           />
         </label>
 
         <label className="mt-4 block space-y-2">
           <span className="text-sm font-medium text-[var(--theme-text)]">
-            System Prompt
+            {t('agents.new.systemPromptLabel')}
           </span>
           <textarea
             value={systemPrompt}
             onChange={(event) => setSystemPrompt(event.target.value)}
-            placeholder="You are Sage, an expert..."
+            placeholder={t('agents.new.systemPromptPlaceholder')}
             className="min-h-[180px] w-full rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3 text-sm text-[var(--theme-text)] outline-none placeholder:text-[var(--theme-muted)] focus:border-[var(--theme-accent)]"
           />
         </label>
@@ -307,7 +307,7 @@ export function OperationsNewAgentModal({
             className="border border-[var(--theme-border)] bg-[var(--theme-bg)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
             onClick={onClose}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             className="bg-[var(--theme-accent)] text-primary-950 hover:bg-[var(--theme-accent-strong)]"
@@ -322,7 +322,7 @@ export function OperationsNewAgentModal({
             }
             disabled={isSaving || !name.trim()}
           >
-            {isSaving ? 'Creating…' : 'Create Agent'}
+            {isSaving ? t('agents.new.creating') : t('agents.new.createAgent')}
           </Button>
         </div>
       </div>

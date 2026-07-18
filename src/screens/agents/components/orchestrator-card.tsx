@@ -5,6 +5,7 @@ import { AgentProgress } from '@/components/agent-view/agent-progress'
 import { PixelAvatar } from '@/components/agent-swarm/pixel-avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 const ChatScreen = lazy(() =>
   import('@/screens/chat/chat-screen').then((m) => ({ default: m.ChatScreen })),
@@ -51,8 +52,8 @@ export function OrchestratorCard({
                     'h-2.5 w-2.5 rounded-full bg-emerald-500',
                     totalAgents > 0 && 'animate-pulse',
                   )}
-                  aria-label="Active"
-                  title="Active"
+                  aria-label={t('agents.orchestrator.statusActive')}
+                  title={t('agents.orchestrator.statusActive')}
                 />
               </span>
             </h2>
@@ -62,8 +63,8 @@ export function OrchestratorCard({
                 type="button"
                 onClick={openSettings}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[var(--theme-muted)] transition-colors hover:text-[var(--theme-text)]"
-                aria-label="Orchestrator settings"
-                title="Orchestrator settings"
+                aria-label={t('agents.orchestrator.settings')}
+                title={t('agents.orchestrator.settings')}
               >
                 <HugeiconsIcon icon={Settings01Icon} size={16} strokeWidth={1.8} />
               </button>
@@ -89,7 +90,7 @@ export function OrchestratorCard({
           </div>
 
           <p className="text-sm text-[var(--theme-muted)]">
-            Orchestrator · {totalAgents} agents reporting
+            {t('agents.orchestrator.reporters', { count: totalAgents })}
           </p>
 
         </div>
@@ -99,7 +100,7 @@ export function OrchestratorCard({
             <Suspense
               fallback={
                 <div className="flex h-full w-full items-center justify-center bg-[var(--theme-card)] px-4 text-sm text-[var(--theme-muted)]">
-                  Loading…
+                  {t('agents.orchestrator.loading')}
                 </div>
               }
             >
@@ -132,10 +133,10 @@ export function OrchestratorCard({
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-[var(--theme-text)]">
-                    Orchestrator Settings
+                    {t('agents.orchestrator.settingsTitle')}
                   </h2>
                   <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-                    Update the display name used on this card.
+                    {t('agents.orchestrator.settingsDesc')}
                   </p>
                 </div>
               </div>
@@ -143,7 +144,7 @@ export function OrchestratorCard({
                 type="button"
                 onClick={() => setSettingsOpen(false)}
                 className="inline-flex size-10 items-center justify-center rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card2)] text-[var(--theme-muted)] transition-colors hover:border-[var(--theme-accent)] hover:text-[var(--theme-accent-strong)]"
-                aria-label="Close orchestrator settings"
+                aria-label={t('agents.orchestrator.closeSettings')}
               >
                 <HugeiconsIcon icon={Cancel01Icon} size={18} strokeWidth={1.8} />
               </button>
@@ -151,7 +152,7 @@ export function OrchestratorCard({
 
             <label className="mt-6 block space-y-2">
               <span className="text-sm font-medium text-[var(--theme-text)]">
-                Display name
+                {t('agents.orchestrator.displayName')}
               </span>
               <input
                 value={draftName}
@@ -163,10 +164,10 @@ export function OrchestratorCard({
 
             <div className="mt-6 flex items-center justify-end gap-3">
               <Button type="button" variant="secondary" onClick={() => setSettingsOpen(false)}>
-                Close
+                {t('common.close')}
               </Button>
               <Button type="button" onClick={saveSettings}>
-                Save
+                {t('common.save')}
               </Button>
             </div>
           </div>

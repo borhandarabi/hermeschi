@@ -14,6 +14,7 @@ import { toast } from '@/components/ui/toast'
 import { runCronJob } from '@/lib/cron-api'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/screens/dashboard/lib/formatters'
+import { t } from '@/lib/i18n'
 import {
   useAgentOutputs,
   type AgentOutput,
@@ -29,7 +30,7 @@ function formatDuration(durationMs?: number) {
 function getStatusPill(output: AgentOutput) {
   if (output.status === 'ok') {
     return {
-      label: output.statusLabel || 'Success',
+      label: output.statusLabel || t('agents.outputs.statusSuccess'),
       icon: '✅',
       className: 'bg-emerald-500/12 text-emerald-700 border-emerald-500/20',
     }
@@ -38,34 +39,34 @@ function getStatusPill(output: AgentOutput) {
   if (output.status === 'error') {
     if (output.failureKind === 'delivery') {
       return {
-        label: output.statusLabel || 'Delivery Failed',
+        label: output.statusLabel || t('agents.outputs.statusDeliveryFailed'),
         icon: '📬',
         className: 'bg-sky-500/12 text-sky-700 border-sky-500/20',
       }
     }
     if (output.failureKind === 'config') {
       return {
-        label: output.statusLabel || 'Config Failed',
+        label: output.statusLabel || t('agents.outputs.statusConfigFailed'),
         icon: '⚙️',
         className: 'bg-violet-500/12 text-violet-700 border-violet-500/20',
       }
     }
     if (output.failureKind === 'approval') {
       return {
-        label: output.statusLabel || 'Needs Approval',
+        label: output.statusLabel || t('agents.outputs.statusNeedsApproval'),
         icon: '✋',
         className: 'bg-amber-500/12 text-amber-700 border-amber-500/20',
       }
     }
     if (output.failureKind === 'runtime') {
       return {
-        label: output.statusLabel || 'Model/Runtime Failed',
+        label: output.statusLabel || t('agents.outputs.statusRuntimeFailed'),
         icon: '🧠',
         className: 'bg-rose-500/12 text-rose-700 border-rose-500/20',
       }
     }
     return {
-      label: output.statusLabel || 'Error',
+      label: output.statusLabel || t('agents.outputs.statusError'),
       icon: '❌',
       className: 'bg-rose-500/12 text-rose-700 border-rose-500/20',
     }
@@ -73,14 +74,14 @@ function getStatusPill(output: AgentOutput) {
 
   if (output.status === 'running') {
     return {
-      label: output.statusLabel || 'Running',
+      label: output.statusLabel || t('agents.outputs.statusRunning'),
       icon: '⏳',
       className: 'bg-amber-500/12 text-amber-700 border-amber-500/20',
     }
   }
 
   return {
-    label: output.statusLabel || 'Unknown',
+    label: output.statusLabel || t('agents.outputs.statusUnknown'),
     icon: '•',
     className: 'bg-primary-200/80 text-primary-700 border-primary-300',
   }
@@ -143,15 +144,15 @@ function OutputCard({ output }: { output: AgentOutput }) {
 
   async function copyText(value: string, label: string) {
     if (!value.trim()) {
-      toast(`No ${label.toLowerCase()} found`, { type: 'warning' })
+      toast(t('agents.outputs.toast.noOutputFound', { label: label.toLowerCase() }), { type: 'warning' })
       return
     }
 
     try {
       await navigator.clipboard.writeText(value)
-      toast(`${label} copied`, { type: 'success' })
+      toast(t('agents.outputs.toast.copied', { label }), { type: 'success' })
     } catch (error) {
-      toast(error instanceof Error ? error.message : `Failed to copy ${label.toLowerCase()}`, {
+      toast(error instanceof Error ? error.message : t('agents.outputs.toast.copyFailed', { label: label.toLowerCase() }), {
         type: 'error',
       })
     }
@@ -162,9 +163,9 @@ function OutputCard({ output }: { output: AgentOutput }) {
     try {
       if (!output.jobId) throw new Error('No job ID associated with this output')
       await runCronJob(output.jobId)
-      toast('Cron job started', { type: 'success' })
+      toast(t('agents.outputs.toast.cronStarted'), { type: 'success' })
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Failed to retry cron job', {
+      toast(error instanceof Error ? error.message : t('agents.outputs.toast.retryFailed'), {
         type: 'error',
       })
     } finally {
@@ -204,15 +205,15 @@ function OutputCard({ output }: { output: AgentOutput }) {
       <div className="mt-4 space-y-3 text-sm text-[var(--theme-text)]">
         <div className="rounded-[1.1rem] border border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3">
           <p className="text-xs font-medium uppercase tracking-wide text-[var(--theme-muted)]">
-            Summary
+            {t('agents.outputs.summary')}
           </p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-[var(--theme-text)]">{output.summary}</p>
           {output.model || output.sessionKey || output.chatSessionKey ? (
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--theme-muted)]">
-              {output.model ? <span>Model: {output.model}</span> : null}
-              {output.sessionKey ? <span>Session: {output.sessionKey}</span> : null}
+              {output.model ? <span>{t('agents.outputs.modelLabel', { model: output.model })}</span> : null}
+              {output.sessionKey ? <span>{t('agents.outputs.sessionLabel', { session: output.sessionKey })}</span> : null}
               {output.chatSessionKey && output.chatSessionKey !== output.sessionKey ? (
-                <span>Chat: {output.chatSessionKey}</span>
+                <span>{t('agents.outputs.chatLabel', { chat: output.chatSessionKey })}</span>
               ) : null}
             </div>
           ) : null}
@@ -241,14 +242,14 @@ function OutputCard({ output }: { output: AgentOutput }) {
             )}
           >
             {output.failureKind === 'delivery'
-              ? `Delivery issue: ${output.error}`
+              ? t('agents.outputs.deliveryIssue', { error: output.error })
               : output.failureKind === 'config'
-                ? `Config issue: ${output.error}`
+                ? t('agents.outputs.configIssue', { error: output.error })
                 : output.failureKind === 'approval'
-                  ? `Approval needed: ${output.error}`
+                  ? t('agents.outputs.approvalIssue', { error: output.error })
                   : output.failureKind === 'runtime'
-                    ? `Runtime issue: ${output.error}`
-                    : `Error: ${output.error}`}
+                    ? t('agents.outputs.runtimeIssue', { error: output.error })
+                    : t('agents.outputs.errorIssue', { error: output.error })}
           </p>
         ) : null}
       </div>
@@ -260,7 +261,7 @@ function OutputCard({ output }: { output: AgentOutput }) {
           onClick={() => void copyText(output.fullOutput, 'Output')}
         >
           <HugeiconsIcon icon={Copy01Icon} size={16} strokeWidth={1.8} />
-          Copy
+          {t('common.copy')}
         </Button>
 
         {output.agentId === 'sage' && sageTweet ? (
@@ -269,7 +270,7 @@ function OutputCard({ output }: { output: AgentOutput }) {
             className="border border-[var(--theme-border)] bg-[var(--theme-card)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
             onClick={() => void copyText(sageTweet, 'Tweet')}
           >
-            Copy Tweet
+            {t('agents.outputs.copyTweet')}
           </Button>
         ) : null}
 
@@ -279,7 +280,7 @@ function OutputCard({ output }: { output: AgentOutput }) {
             className="border border-[var(--theme-border)] bg-[var(--theme-card)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
             onClick={() => void copyText(sagePrompt, 'Image prompt')}
           >
-            Copy Image Prompt
+            {t('agents.outputs.copyImagePrompt')}
           </Button>
         ) : null}
 
@@ -290,7 +291,7 @@ function OutputCard({ output }: { output: AgentOutput }) {
             onClick={() => window.open(sourceUrl, '_blank', 'noopener,noreferrer')}
           >
             <HugeiconsIcon icon={Link01Icon} size={16} strokeWidth={1.8} />
-            Link
+            {t('agents.outputs.link')}
           </Button>
         ) : null}
 
@@ -298,9 +299,9 @@ function OutputCard({ output }: { output: AgentOutput }) {
           <Button
             variant="secondary"
             className="border border-[var(--theme-border)] bg-[var(--theme-card)] text-[var(--theme-text)] hover:bg-[var(--theme-card2)]"
-            onClick={() => toast('Signals view coming soon', { type: 'info' })}
+            onClick={() => toast(t('agents.outputs.signalsComingSoon'), { type: 'info' })}
           >
-            View Signals
+            {t('agents.outputs.viewSignals')}
           </Button>
         ) : null}
 
@@ -311,7 +312,7 @@ function OutputCard({ output }: { output: AgentOutput }) {
             onClick={() => void handleRetry()}
             disabled={isRetrying}
           >
-            {isRetrying ? 'Retrying…' : 'Retry'}
+            {isRetrying ? t('agents.outputs.retrying') : t('agents.outputs.retry')}
           </Button>
         ) : null}
 
@@ -325,7 +326,7 @@ function OutputCard({ output }: { output: AgentOutput }) {
             size={16}
             strokeWidth={1.8}
           />
-          {expanded ? 'Collapse' : 'Expand'}
+          {expanded ? t('common.collapse') : t('common.expand')}
         </Button>
       </div>
     </motion.article>
@@ -339,7 +340,7 @@ export function FullOutputsView() {
   if (loading) {
     return (
       <section className="rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-card)] px-6 py-14 text-center text-sm text-[var(--theme-muted)] shadow-[0_24px_80px_var(--theme-shadow)]">
-        Loading outputs…
+        {t('agents.outputs.loadingOutputs')}
       </section>
     )
   }
@@ -379,16 +380,16 @@ export function FullOutputsView() {
             onClick={() => void refresh()}
           >
             <HugeiconsIcon icon={RefreshIcon} size={16} strokeWidth={1.8} />
-            Refresh
+            {t('common.refresh')}
           </Button>
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between px-1">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--theme-text)]">Outputs</h2>
+          <h2 className="text-lg font-semibold text-[var(--theme-text)]">{t('agents.detail.tabOutputs')}</h2>
           <p className="mt-1 text-sm text-[var(--theme-muted-2)]">
-            {outputs.length} recent {outputs.length === 1 ? 'run' : 'runs'} across the team
+            {t('agents.outputs.recentRuns', { count: outputs.length, runs: t(outputs.length === 1 ? 'agents.outputs.runSingular' : 'agents.outputs.runPlural') })}
           </p>
         </div>
       </div>
@@ -396,7 +397,7 @@ export function FullOutputsView() {
       <div className="mt-4">
         {outputs.length === 0 ? (
           <div className="rounded-[1.5rem] border border-dashed border-[var(--theme-border)] bg-[var(--theme-bg)] px-5 py-12 text-center text-sm text-[var(--theme-muted)]">
-            No agent outputs yet. Configure cron jobs in agent settings to get started.
+            {t('agents.outputs.emptyOutputs')}
           </div>
         ) : (
           <AnimatePresence mode="popLayout">

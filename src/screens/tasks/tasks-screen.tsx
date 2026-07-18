@@ -32,7 +32,7 @@ const QUERY_KEY = ['claude', 'tasks'] as const
 const ASSIGNEES_KEY = ['claude', 'tasks', 'assignees'] as const
 
 export const TASKS_BOARD_HELP_TEXT =
-  'Workspace Tasks is a lightweight task board. Drag cards to change status. Use Dashboard Kanban for native multi-board controls.'
+  t('tasks.boardHelpText')
 
 function SkeletonCard() {
   return (
@@ -118,26 +118,26 @@ export function TasksScreen() {
 
   const createMutation = useMutation({
     mutationFn: createTask,
-    onSuccess: () => { invalidate(); toast('Task created'); setShowCreate(false) },
-    onError: (e) => toast(e instanceof Error ? e.message : 'Failed to create task', { type: 'error' }),
+    onSuccess: () => { invalidate(); toast(t('tasks.toast.created')); setShowCreate(false) },
+    onError: (e) => toast(e instanceof Error ? e.message : t('tasks.toast.createFailed'), { type: 'error' }),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, input }: { id: string; input: CreateTaskInput }) => updateTask(id, input),
-    onSuccess: () => { invalidate(); toast('Task updated'); setEditingTask(null) },
-    onError: (e) => toast(e instanceof Error ? e.message : 'Failed to update task', { type: 'error' }),
+    onSuccess: () => { invalidate(); toast(t('tasks.toast.updated')); setEditingTask(null) },
+    onError: (e) => toast(e instanceof Error ? e.message : t('tasks.toast.updateFailed'), { type: 'error' }),
   })
 
   const deleteMutation = useMutation({
     mutationFn: deleteTask,
-    onSuccess: () => { invalidate(); toast('Task deleted') },
-    onError: (e) => toast(e instanceof Error ? e.message : 'Failed to delete task', { type: 'error' }),
+    onSuccess: () => { invalidate(); toast(t('tasks.toast.deleted')) },
+    onError: (e) => toast(e instanceof Error ? e.message : t('tasks.toast.deleteFailed'), { type: 'error' }),
   })
 
   const moveMutation = useMutation({
     mutationFn: ({ id, column }: { id: string; column: TaskColumn }) => moveTask(id, column, 'user'),
     onSuccess: () => invalidate(),
-    onError: (e) => toast(e instanceof Error ? e.message : 'Failed to move task', { type: 'error' }),
+    onError: (e) => toast(e instanceof Error ? e.message : t('tasks.toast.moveFailed'), { type: 'error' }),
   })
 
   function handleDragStart(e: React.DragEvent, taskId: string) {
@@ -162,7 +162,7 @@ export function TasksScreen() {
     // Hybrid autonomy: if a human reviewer is configured, only they can move
     // tasks into the 'done' column — agents may move to 'review' at most.
     if (targetColumn === 'done' && humanReviewer) {
-      toast(`Only ${humanReviewer} can mark tasks as done`, { type: 'error' })
+      toast(t('tasks.toast.onlyHumanCanDone', { name: humanReviewer }), { type: 'error' })
       setDraggingId(null)
       setDragOverColumn(null)
       return
@@ -202,23 +202,23 @@ export function TasksScreen() {
           )}
           {/* Stats */}
           <div className="flex items-center gap-2 text-xs text-[var(--theme-muted)] flex-wrap">
-            <span>{stats.total} total</span>
+            <span>{t('tasks.stats.total', { count: stats.total })}</span>
             <span className="hidden sm:inline">·</span>
-            <span className="hidden sm:inline">{stats.running} running</span>
+            <span className="hidden sm:inline">{t('tasks.stats.running', { count: stats.running })}</span>
             {stats.blocked > 0 && (
               <>
                 <span className="hidden sm:inline">·</span>
-                <span className="text-red-400">{stats.blocked} blocked</span>
+                <span className="text-red-400">{t('tasks.stats.blocked', { count: stats.blocked })}</span>
               </>
             )}
             {stats.overdue > 0 && (
               <>
                 <span>·</span>
-                <span className="text-red-400">{stats.overdue} overdue</span>
+                <span className="text-red-400">{t('tasks.stats.overdue', { count: stats.overdue })}</span>
               </>
             )}
             <span className="hidden sm:inline">·</span>
-            <span className="hidden sm:inline">{stats.completion}% done</span>
+            <span className="hidden sm:inline">{t('tasks.stats.completion', { percent: stats.completion })}</span>
           </div>
         </div>
 
@@ -232,12 +232,12 @@ export function TasksScreen() {
                 : 'border-[var(--theme-border)] text-[var(--theme-muted)] hover:text-[var(--theme-text)] hover:border-[var(--theme-accent)]',
             )}
           >
-            {showDone ? 'Hide Done' : 'Show Done'}
+            {showDone ? t('tasks.hideDone') : t('tasks.showDone')}
           </button>
           <button
             onClick={invalidate}
             className="rounded-lg p-1.5 transition-colors hover:bg-[var(--theme-hover)]"
-            title="Refresh"
+            title={t('common.refresh')}
           >
             <HugeiconsIcon icon={RefreshIcon} size={16} className="text-[var(--theme-muted)]" />
           </button>
@@ -247,7 +247,7 @@ export function TasksScreen() {
             style={{ background: 'var(--theme-accent)' }}
           >
             <HugeiconsIcon icon={Add01Icon} size={14} />
-            New Task
+            {t('tasks.newTask')}
           </button>
         </div>
       </div>
@@ -297,7 +297,7 @@ export function TasksScreen() {
                 <button
                   onClick={() => { setCreateColumn(col); setShowCreate(true) }}
                   className="rounded p-0.5 hover:bg-[var(--theme-hover)] transition-colors"
-                  title={`Add to ${COLUMN_LABELS[col]}`}
+                  title={t('tasks.addToColumn', { column: COLUMN_LABELS[col] })}
                 >
                   <HugeiconsIcon icon={Add01Icon} size={14} className="text-[var(--theme-muted)]" />
                 </button>
@@ -312,12 +312,12 @@ export function TasksScreen() {
                     animate={{ opacity: 1 }}
                     className="flex flex-col items-center justify-center py-8 gap-2 text-red-400"
                   >
-                    <p className="text-xs font-medium">Failed to load tasks</p>
+                    <p className="text-xs font-medium">{t('tasks.failedToLoad')}</p>
                     <button
                       onClick={() => tasksQuery.refetch()}
                       className="text-xs text-[var(--theme-accent)] hover:underline"
                     >
-                      Retry
+                      {t('common.retry')}
                     </button>
                   </motion.div>
                 ) : tasksQuery.isLoading ? (
@@ -337,8 +337,8 @@ export function TasksScreen() {
                         className="flex flex-col items-center justify-center py-8 gap-2 text-[var(--theme-muted)] opacity-60"
                       >
                         <HugeiconsIcon icon={CheckListIcon} size={22} />
-                        <p className="text-xs font-medium">No tasks</p>
-                        <p className="text-[10px]">Drop here or click + to add</p>
+                        <p className="text-xs font-medium">{t('tasks.noTasks')}</p>
+                        <p className="text-[10px]">{t('tasks.dropHereOrClick')}</p>
                       </motion.div>
                     ) : (
                       colTasks.map(task => (
