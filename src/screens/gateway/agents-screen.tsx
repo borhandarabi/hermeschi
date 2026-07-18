@@ -13,6 +13,7 @@ import { formatModelName } from '@/lib/format-model-name'
 import { fetchCronJobs } from '@/lib/cron-api'
 import { toggleAgentPause } from '@/lib/gateway-api'
 import { toast } from '@/components/ui/toast'
+import { t, getLocale } from '@/lib/i18n'
 import { AgentHubLayout } from './agent-hub-layout'
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
 
@@ -635,7 +636,7 @@ function getSessionModelName(session: SessionEntry): string {
 }
 
 function formatTokenCount(value: number): string {
-  return new Intl.NumberFormat('en-US').format(Math.max(0, Math.floor(value)))
+  return new Intl.NumberFormat(getLocale()).format(Math.max(0, Math.floor(value)))
 }
 
 function getSessionStatusBadgeClasses(session: SessionEntry): string {
@@ -1449,7 +1450,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
         <div className="fixed inset-0 z-[95]">
           <button
             type="button"
-            aria-label="Close agent config"
+            aria-label={t('common.close')}
             className="absolute inset-0 bg-primary-950/25 backdrop-blur-sm"
             onClick={handleCloseAgentConfig}
           />
@@ -1850,7 +1851,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
                               </p>
                               <p className="mt-1">
                                 {job.lastRun?.startedAt
-                                  ? new Date(job.lastRun.startedAt).toLocaleString()
+                                  ? new Date(job.lastRun.startedAt).toLocaleString(getLocale())
                                   : 'Never'}
                               </p>
                             </div>
@@ -1870,7 +1871,7 @@ export function AgentsScreen({ variant = 'mission-control' }: AgentsScreenProps)
         <div className="fixed inset-0 z-[90] md:hidden">
           <button
             type="button"
-            aria-label="Close history"
+            aria-label={t('common.close')}
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setHistoryAgentId(null)}
           />
