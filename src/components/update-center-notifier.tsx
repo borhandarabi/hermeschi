@@ -12,6 +12,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { toast } from '@/components/ui/toast'
+import { t } from '@/lib/i18n'
 
 type ProductId = 'workspace' | 'agent'
 type ProductUpdateStatus = {
@@ -71,7 +72,7 @@ const NOTES_KEY = 'hermes-update-v2-release-notes'
 const NOTES_SEEN_KEY = 'hermes-update-v2-release-notes-seen'
 
 function shortSha(value: string | null | undefined): string {
-  return value ? value.slice(0, 7) : 'unknown'
+  return value ? value.slice(0, 7) : t('updateCenter.unknownSha')
 }
 
 function productDismissKey(product: ProductUpdateStatus): string {
@@ -194,7 +195,7 @@ export function UpdateCenterNotifier() {
         setPhases((prev) => ({ ...prev, [product.id]: 'error' }))
         setErrors((prev) => ({
           ...prev,
-          [product.id]: result.error || `${product.label} update failed`,
+          [product.id]: result.error || t('updateCenter.updateFailed', { label: product.label }),
         }))
         return
       }
@@ -205,7 +206,7 @@ export function UpdateCenterNotifier() {
         : null
       if (stored) setNotes(stored)
       await queryClient.invalidateQueries({ queryKey: ['update-status-v2'] })
-      toast(`${product.label} updated. Restart may be required.`, {
+      toast(t('updateCenter.updatedToast', { label: product.label }), {
         type: 'success',
         duration: 7000,
       })
@@ -263,7 +264,7 @@ function UpdateCard({
     phase === 'error'
       ? error
       : blocked
-        ? product.reason || 'Update requires manual review.'
+        ? product.reason || t('updateCenter.blockedReason')
         : `${shortSha(product.currentHead)} → ${shortSha(product.latestHead)} · ${product.installKind}`
 
   return (
@@ -332,8 +333,8 @@ function UpdateCard({
             style={{ color: 'var(--theme-text)' }}
           >
             {blocked
-              ? `${product.label} update blocked`
-              : `${product.label} update available`}
+              ? t('updateCenter.updateBlocked', { label: product.label })
+              : t('updateCenter.updateAvailable', { label: product.label })}
           </p>
           {/* Don't truncate when blocked — the full reason is what the
               user needs to act on. See #293. */}
@@ -369,7 +370,7 @@ function UpdateCard({
                   className="text-[11px] italic"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  …and {product.blockingFiles.length - 8} more
+                  {t('updateCenter.moreFiles', { count: product.blockingFiles.length - 8 })}
                 </li>
               ) : null}
             </ul>
@@ -384,7 +385,7 @@ function UpdateCard({
               className="rounded-lg px-4 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
               style={{ background: 'var(--theme-accent)' }}
             >
-              {updating ? 'Updating' : 'Update'}
+              {updating ? t('updateCenter.updating') : t('updateCenter.update')}
             </button>
           ) : (
             <span
@@ -394,7 +395,7 @@ function UpdateCard({
                 color: 'var(--theme-muted)',
               }}
             >
-              Review required
+              {t('updateCenter.reviewRequired')}
             </span>
           )}
           <button
@@ -402,7 +403,7 @@ function UpdateCard({
             onClick={onDismiss}
             className="rounded-lg p-1.5 transition-opacity hover:opacity-80"
             style={{ color: 'var(--theme-muted)' }}
-            aria-label={`Dismiss ${product.label} update`}
+            aria-label={t('updateCenter.dismiss', { label: product.label })}
           >
             <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2} />
           </button>
@@ -457,9 +458,9 @@ function ReleaseNotes({
               />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-base font-semibold">Hermes updated</p>
+              <p className="text-base font-semibold">{t('updateCenter.hermesUpdated')}</p>
               <p className="text-sm" style={{ color: 'var(--theme-muted)' }}>
-                What changed in this update.
+                {t('updateCenter.whatChanged')}
               </p>
             </div>
             <button
@@ -489,7 +490,7 @@ function ReleaseNotes({
                 <ul className="space-y-1.5">
                   {(section.commits.length
                     ? section.commits
-                    : ['Updated to the latest available version.']
+                    : [t('updateCenter.defaultCommit')]
                   ).map((commit, index) => (
                     <li
                       key={`${section.product}-${index}-${commit}`}
@@ -513,7 +514,7 @@ function ReleaseNotes({
               className="rounded-lg px-4 py-2 text-sm font-semibold text-white"
               style={{ background: 'var(--theme-accent)' }}
             >
-              Continue
+              {t('updateCenter.continue')}
             </button>
           </div>
         </motion.div>

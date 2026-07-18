@@ -8,6 +8,7 @@ import { PERSONA_COLORS } from './pixel-avatar'
 import type { SwarmSession } from '@/stores/agent-swarm-store'
 import { cn } from '@/lib/utils'
 import { getSwarmSessionDisplayName } from './session-display-name'
+import { t } from '@/lib/i18n'
 
 type ActivityPanelProps = {
   sessions: Array<SwarmSession>
@@ -126,7 +127,7 @@ function ActivityFeedItem({
 }) {
   const displayName = getSwarmSessionDisplayName(session)
   const task =
-    session.task ?? session.initialMessage ?? session.label ?? 'Working...'
+    session.task ?? session.initialMessage ?? session.label ?? t('swarmActivity.workingDefault')
 
   return (
     <motion.div
@@ -144,7 +145,7 @@ function ActivityFeedItem({
         </span>
         <span className="text-[11px] text-slate-500"> — </span>
         <span className={cn('text-[11px]', statusColor[session.swarmStatus])}>
-          {session.swarmStatus === 'running' ? 'working' : session.swarmStatus}
+          {session.swarmStatus === 'running' ? t('swarmActivity.working') : session.swarmStatus}
         </span>
         <p className="truncate text-[10px] text-slate-500 mt-0.5">{task}</p>
       </div>
@@ -191,32 +192,32 @@ export function ActivityPanel({ sessions, className }: ActivityPanelProps) {
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-center">
           <div className="text-lg font-bold text-blue-400">{active.length}</div>
-          <div className="text-[10px] text-blue-300/70">Active</div>
+          <div className="text-[10px] text-blue-300/70">{t('swarmActivity.active')}</div>
         </div>
         <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-center">
           <div className="text-lg font-bold text-emerald-400">
             {completed.length}
           </div>
-          <div className="text-[10px] text-emerald-300/70">Done</div>
+          <div className="text-[10px] text-emerald-300/70">{t('swarmActivity.done')}</div>
         </div>
         <div className="rounded-lg border border-accent-500/20 bg-accent-500/10 px-3 py-2 text-center">
           <div className="text-lg font-bold text-accent-400">
             {formatTokens(totalTokens)}
           </div>
-          <div className="text-[10px] text-accent-300/70">Tokens</div>
+          <div className="text-[10px] text-accent-300/70">{t('swarmActivity.tokens')}</div>
         </div>
         <div className="rounded-lg border border-slate-500/20 bg-slate-500/10 px-3 py-2 text-center">
           <div className="text-lg font-bold text-slate-300">
             {formatCost(totalCost)}
           </div>
-          <div className="text-[10px] text-slate-400">Cost</div>
+          <div className="text-[10px] text-slate-400">{t('swarmActivity.cost')}</div>
         </div>
       </div>
 
       {/* Agent Roster */}
       <div>
         <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-          <span>👥</span> Agent Roster
+          <span>👥</span> {t('swarmActivity.agentRoster')}
           <span className="ml-auto rounded-full bg-slate-700/50 px-1.5 text-[10px] text-slate-400">
             {sessions.length}
           </span>
@@ -232,7 +233,7 @@ export function ActivityPanel({ sessions, className }: ActivityPanelProps) {
           </AnimatePresence>
           {sessions.length === 0 && (
             <div className="rounded-lg border border-dashed border-slate-700 py-4 text-center text-[11px] text-slate-500">
-              No agents spawned yet
+              {t('swarmActivity.noAgents')}
             </div>
           )}
         </div>
@@ -242,7 +243,7 @@ export function ActivityPanel({ sessions, className }: ActivityPanelProps) {
       {recentActivity.length > 0 && (
         <div>
           <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-            <span>📡</span> Live Activity
+            <span>📡</span> {t('swarmActivity.liveActivity')}
           </h3>
           <div className="space-y-0.5 divide-y divide-slate-800/50">
             {recentActivity.map((session, i) => (
@@ -260,7 +261,7 @@ export function ActivityPanel({ sessions, className }: ActivityPanelProps) {
       {failed.length > 0 && (
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-red-400">
-            ⚠️ {failed.length} Failed
+            ⚠️ {t('swarmActivity.failed', { count: failed.length })}
           </div>
           {failed.map((s) => {
             const displayName = getSwarmSessionDisplayName(s)
@@ -269,7 +270,7 @@ export function ActivityPanel({ sessions, className }: ActivityPanelProps) {
                 key={s.key ?? s.friendlyId}
                 className="mt-1 text-[10px] text-red-300/70"
               >
-                {displayName}: {s.task?.slice(0, 50) ?? 'Unknown task'}
+                {displayName}: {s.task?.slice(0, 50) ?? t('swarmActivity.unknownTask')}
               </div>
             )
           })}

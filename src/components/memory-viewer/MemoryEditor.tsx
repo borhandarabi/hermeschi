@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { FloppyDiskIcon, LockIcon } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { t } from '@/lib/i18n'
 
 type SaveState = 'saved' | 'saving' | 'unsaved' | 'error'
 
@@ -27,16 +28,16 @@ function getStatusLabel(
   saveState: SaveState,
   lastSavedAt: string | null,
 ): string {
-  if (saveState === 'saving') return 'Auto-saving...'
-  if (saveState === 'unsaved') return 'Unsaved changes'
-  if (saveState === 'error') return 'Save failed'
-  if (!lastSavedAt) return 'Saved'
+  if (saveState === 'saving') return t('memoryEditor.autoSaving')
+  if (saveState === 'unsaved') return t('memoryEditor.unsavedChanges')
+  if (saveState === 'error') return t('memoryEditor.saveFailed')
+  if (!lastSavedAt) return t('memoryEditor.saved')
   const formatted = new Intl.DateTimeFormat(undefined, {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
   }).format(new Date(lastSavedAt))
-  return `Saved at ${formatted}`
+  return t('memoryEditor.savedAt', { time: formatted })
 }
 
 function MemoryEditor({
@@ -62,7 +63,7 @@ function MemoryEditor({
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-primary-200 px-3 py-2.5">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-medium text-balance text-primary-900">
-            {path || 'No file selected'}
+            {path || t('memoryEditor.noFileSelected')}
           </h2>
           <p className="text-xs text-primary-600 text-pretty tabular-nums">
             {getStatusLabel(saveState, lastSavedAt)}
@@ -71,7 +72,7 @@ function MemoryEditor({
         <div className="flex items-center gap-3">
           <label className="inline-flex items-center gap-1.5 text-xs text-primary-700 tabular-nums">
             <HugeiconsIcon icon={LockIcon} size={20} strokeWidth={1.5} />
-            Read-only
+            {t('memoryEditor.readOnly')}
             <Switch
               checked={readOnly}
               onCheckedChange={function onCheckedChange(next) {
@@ -87,14 +88,14 @@ function MemoryEditor({
             className="tabular-nums"
           >
             <HugeiconsIcon icon={FloppyDiskIcon} size={20} strokeWidth={1.5} />
-            Save
+            {t('memoryEditor.save')}
           </Button>
         </div>
       </header>
       <div className="min-h-0 flex-1">
         {loading ? (
           <div className="flex h-full items-center justify-center text-sm text-primary-600 text-pretty">
-            Loading file content...
+            {t('memoryEditor.loadingContent')}
           </div>
         ) : error ? (
           <div className="flex h-full items-center justify-center px-5 text-sm text-red-700 text-pretty">

@@ -12,6 +12,7 @@ import type { Ref } from 'react'
 import { useAutocompleteFilter } from '@/components/ui/autocomplete'
 import { Command, CommandItem, CommandList } from '@/components/ui/command'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type SlashCommandDefinition = {
   command: string
@@ -32,49 +33,49 @@ export type SlashCommandMenuHandle = {
 
 export const DEFAULT_SLASH_COMMANDS: Array<SlashCommandDefinition> = [
   // Session control
-  { command: '/new', description: 'Start new session' },
-  { command: '/clear', description: 'Clear screen and start fresh' },
-  { command: '/retry', description: 'Resend the last message' },
-  { command: '/undo', description: 'Remove the last exchange' },
-  { command: '/title', description: 'Name the current session' },
-  { command: '/compress', description: 'Manually compress context' },
+  { command: '/new', description: t('slashCommand.desc.new') },
+  { command: '/clear', description: t('slashCommand.desc.clear') },
+  { command: '/retry', description: t('slashCommand.desc.retry') },
+  { command: '/undo', description: t('slashCommand.desc.undo') },
+  { command: '/title', description: t('slashCommand.desc.title') },
+  { command: '/compress', description: t('slashCommand.desc.compress') },
 
   // Persistent goals (Ralph loop)
-  { command: '/goal <text>', description: 'Set standing goal across turns' },
-  { command: '/goal status', description: 'Check active goal status' },
-  { command: '/goal pause', description: 'Pause active goal' },
-  { command: '/goal resume', description: 'Resume paused goal' },
-  { command: '/goal clear', description: 'Clear active goal' },
-  { command: '/subgoal <text>', description: 'Add extra success criteria to active goal' },
+  { command: '/goal <text>', description: t('slashCommand.desc.goalSet') },
+  { command: '/goal status', description: t('slashCommand.desc.goalStatus') },
+  { command: '/goal pause', description: t('slashCommand.desc.goalPause') },
+  { command: '/goal resume', description: t('slashCommand.desc.goalResume') },
+  { command: '/goal clear', description: t('slashCommand.desc.goalClear') },
+  { command: '/subgoal <text>', description: t('slashCommand.desc.subgoal') },
 
   // Model & config
-  { command: '/model', description: 'Show or change the current model' },
-  { command: '/reasoning', description: 'Set reasoning level (none/minimal/low/medium/high/xhigh)' },
-  { command: '/skin', description: 'Change the display theme' },
-  { command: '/config', description: 'Show session config' },
-  { command: '/profile', description: 'Show active Hermes profile info' },
+  { command: '/model', description: t('slashCommand.desc.model') },
+  { command: '/reasoning', description: t('slashCommand.desc.reasoning') },
+  { command: '/skin', description: t('slashCommand.desc.skin') },
+  { command: '/config', description: t('slashCommand.desc.config') },
+  { command: '/profile', description: t('slashCommand.desc.profile') },
 
   // Tools & skills
-  { command: '/skills', description: 'Browse and manage skills' },
-  { command: '/skill <name>', description: 'Load a skill into session' },
-  { command: '/plugins', description: 'List installed plugins and their status' },
-  { command: '/mcp', description: 'Manage MCP servers' },
-  { command: '/cron', description: 'Manage cron jobs' },
-  { command: '/kanban', description: 'Kanban collaboration board' },
+  { command: '/skills', description: t('slashCommand.desc.skills') },
+  { command: '/skill <name>', description: t('slashCommand.desc.skill') },
+  { command: '/plugins', description: t('slashCommand.desc.plugins') },
+  { command: '/mcp', description: t('slashCommand.desc.mcp') },
+  { command: '/cron', description: t('slashCommand.desc.cron') },
+  { command: '/kanban', description: t('slashCommand.desc.kanban') },
 
   // Session management
-  { command: '/save', description: 'Save the current conversation' },
-  { command: '/history', description: 'Show conversation history' },
-  { command: '/agents', description: 'Show active agents and running tasks' },
-  { command: '/resume', description: 'Resume a named session' },
-  { command: '/branch', description: 'Branch the current session' },
-  { command: '/fork', description: 'Fork the current session' },
+  { command: '/save', description: t('slashCommand.desc.save') },
+  { command: '/history', description: t('slashCommand.desc.history') },
+  { command: '/agents', description: t('slashCommand.desc.agents') },
+  { command: '/resume', description: t('slashCommand.desc.resume') },
+  { command: '/branch', description: t('slashCommand.desc.branch') },
+  { command: '/fork', description: t('slashCommand.desc.fork') },
 
   // Info
-  { command: '/help', description: 'Show all available commands' },
-  { command: '/usage', description: 'View token usage' },
-  { command: '/status', description: 'Show session info' },
-  { command: '/debug', description: 'Upload debug report' },
+  { command: '/help', description: t('slashCommand.desc.help') },
+  { command: '/usage', description: t('slashCommand.desc.usage') },
+  { command: '/status', description: t('slashCommand.desc.status') },
+  { command: '/debug', description: t('slashCommand.desc.debug') },
 ]
 
 export function mergeSlashCommands(
@@ -90,7 +91,7 @@ export function mergeSlashCommands(
     seen.add(command)
     merged.push({
       command,
-      description: entry.description.trim() || 'Run command',
+      description: entry.description.trim() || t('slashCommand.runCommand'),
     })
   }
 
@@ -175,7 +176,7 @@ const SlashCommandMenu = forwardRef(function SlashCommandMenu(
         >
           {filteredCommands.length === 0 ? (
             <div className="px-3 py-2 text-sm text-primary-600">
-              No commands found
+              {t('slashCommand.noCommands')}
             </div>
           ) : (
             <CommandList className="max-h-60 min-h-0">

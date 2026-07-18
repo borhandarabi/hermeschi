@@ -5,6 +5,7 @@
 import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
 import type { AgentPersona } from '@/lib/agent-personas'
+import { t } from '@/lib/i18n'
 
 type AgentStatus =
   | 'running'
@@ -76,7 +77,7 @@ export function AgentCharacter({
           animate={{ opacity: [0.6, 1, 0.6], scale: [0.95, 1, 0.95] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          💭 thinking...
+          {t('agentCharacter.thinking')}
         </motion.div>
       )}
 

@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/toast'
 import { steerAgent } from '@/lib/gateway-api'
+import { t } from '@/lib/i18n'
 
 type SteerModalProps = {
   open: boolean
@@ -40,12 +41,12 @@ export function SteerModal({
     setPending(true)
     try {
       await steerAgent(normalizedSessionKey, trimmedMessage)
-      toast(`Directive sent to ${agentName}`, { type: 'success' })
+      toast(t('steer.sentToast', { name: agentName }), { type: 'success' })
       setMessage('')
       onOpenChange(false)
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Failed to send directive'
+        error instanceof Error ? error.message : t('steer.failedToast')
       toast(message, { type: 'error' })
     } finally {
       setPending(false)
@@ -57,16 +58,16 @@ export function SteerModal({
       <DialogContent className="w-[min(560px,92vw)]">
         <div className="space-y-4 p-5">
           <div className="space-y-1">
-            <DialogTitle className="text-base">Steer: {agentName}</DialogTitle>
+            <DialogTitle className="text-base">{t('steer.title', { name: agentName })}</DialogTitle>
             <DialogDescription>
-              Send a directive to influence this agent&apos;s next steps.
+              {t('steer.description')}
             </DialogDescription>
           </div>
 
           <textarea
             value={message}
             rows={5}
-            placeholder="Send a directive to this agent..."
+            placeholder={t('steer.placeholder')}
             disabled={pending}
             onChange={function onChangeMessage(event) {
               setMessage(event.target.value)
@@ -83,7 +84,7 @@ export function SteerModal({
                 onOpenChange(false)
               }}
             >
-              Cancel
+              {t('steer.cancel')}
             </Button>
             <Button
               size="sm"
@@ -93,7 +94,7 @@ export function SteerModal({
               }}
               className="bg-accent-500 text-white hover:bg-accent-600"
             >
-              {pending ? 'Sending...' : 'Send'}
+              {pending ? t('steer.sending') : t('steer.send')}
             </Button>
           </div>
         </div>

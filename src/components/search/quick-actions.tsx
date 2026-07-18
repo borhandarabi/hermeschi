@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type QuickAction = {
   id: string
@@ -24,7 +25,7 @@ export function QuickActions({
       {recentSearches.length > 0 ? (
         <div>
           <div className="mb-2 text-xs font-medium text-muted-foreground">
-            Recent Searches
+            {t('quickActions.recentSearches')}
           </div>
           <div className="flex flex-wrap gap-2">
             {recentSearches.map((entry) => (
@@ -46,7 +47,7 @@ export function QuickActions({
 
       <div>
         <div className="mb-2 text-xs font-medium text-muted-foreground">
-          Quick Actions
+          {t('quickActions.quickActions')}
         </div>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           {actions.map((action) => (

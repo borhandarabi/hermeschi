@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { AuthStatus } from '@/lib/claude-auth'
 import { writeTextToClipboard } from '@/lib/clipboard'
 import { fetchClaudeAuthStatus } from '@/lib/claude-auth'
+import { t } from '@/lib/i18n'
 
 const POLL_INTERVAL_MS = 2_000
 const FAILURE_REVEAL_MS = 5_000
@@ -24,25 +25,25 @@ function getSetupSteps(
 ): Array<{ title: string; command: string; note?: string }> {
   return [
     {
-      title: 'Use any OpenAI-compatible backend',
-      command: 'Set HERMES_API_URL to your backend base URL',
-      note: 'Portable chat works with any backend that exposes /v1/chat/completions (Ollama, LiteLLM, vLLM, etc.)',
+      title: t('connection.step.openaiCompatible.title'),
+      command: t('connection.step.openaiCompatible.command'),
+      note: t('connection.step.openaiCompatible.note'),
     },
     {
-      title: 'Optional: install Hermes Agent locally',
+      title: t('connection.step.installAgent.title'),
       command:
         'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash',
-      note: 'Vanilla hermes-agent unlocks sessions, skills, memory, jobs, and config automatically — no fork required',
+      note: t('connection.step.installAgent.note'),
     },
     {
-      title: 'Set up your agent',
+      title: t('connection.step.setup.title'),
       command: 'hermes setup',
-      note: 'Pick your providers once; Hermes Agent stores them under ~/.hermes',
+      note: t('connection.step.setup.note'),
     },
     {
-      title: 'Start the gateway',
+      title: t('connection.step.gateway.title'),
       command: 'hermes gateway run',
-      note: 'This starts the HTTP API on :8642 for the workspace',
+      note: t('connection.step.gateway.note'),
     },
   ]
 }
@@ -113,7 +114,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
           setServerLog([
             String(
               data.message ||
-                'Auto-started Hermes Agent gateway — reconnecting…',
+                t('connection.autoStarted'),
             ),
           ])
         }
@@ -169,7 +170,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
   const handleAutoStart = async () => {
     setServerStarting(true)
     setServerError(null)
-    setServerLog(['Looking for hermes-agent...'])
+    setServerLog([t('connection.lookingFor')])
     try {
       const res = await fetch('/api/start-claude', {
         method: 'POST',
@@ -177,7 +178,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
       })
       const contentType = res.headers.get('content-type') || ''
       if (!contentType.includes('application/json')) {
-        const msg = `Unexpected response (${res.status})`
+        const msg = t('connection.unexpectedResponse', { status: res.status })
         setServerLog([`Error: ${msg}`])
         setServerError(msg)
         setServerStarting(false)
@@ -187,13 +188,13 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
       const data = (await res.json()) as Record<string, unknown>
       if (res.ok && data.ok) {
         setServerLog([
-          String(data.message || 'Started — waiting for connection...'),
+          String(data.message || t('connection.startingMessage')),
         ])
         setServerStarting(false)
         return
       }
 
-      const msg = String(data.error || 'Could not find hermes-agent')
+      const msg = String(data.error || t('connection.couldNotFind'))
       const hint = data.hint ? String(data.hint) : ''
       setServerLog([`Error: ${msg}`])
       if (hint) setServerLog((prev) => [...prev, `Hint: ${hint}`])
@@ -221,12 +222,12 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
       <div className="flex w-full max-w-lg flex-col items-center text-center">
         <img
           src="/claude-avatar.webp"
-          alt="Hermes Agent"
+          alt={t('connection.alt')}
           className="mb-5 h-20 w-20 rounded-2xl object-cover shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
         />
 
         <h1 className="text-[2rem] font-semibold tracking-tight text-white">
-          Hermes Workspace
+          {t('connection.title')}
         </h1>
 
         {/* Connecting spinner */}
@@ -238,7 +239,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
           aria-hidden={showFailureState}
         >
           <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
-          <span>Connecting to your backend...</span>
+          <span>{t('connection.connecting')}</span>
         </div>
 
         {/* Failure state — setup guide */}
@@ -252,12 +253,10 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
         >
           <div className="w-full rounded-3xl border border-white/10 bg-white/5 p-5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm">
             <p className="text-base font-medium text-white">
-              Welcome! Let&apos;s connect your backend
+              {t('connection.welcomeTitle')}
             </p>
             <p className="mt-2 text-sm leading-6 text-white/60">
-              Hermes Workspace works with any OpenAI-compatible backend. Hermes Agent
-              gateway APIs unlock enhanced features automatically when they are
-              available.
+              {t('connection.welcomeBody')}
             </p>
 
             {/* Auto-start section */}
@@ -276,10 +275,10 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
                 {serverStarting ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white/90" />
-                    Detecting...
+                    {t('connection.detecting')}
                   </span>
                 ) : (
-                  'Auto-Start Hermes Agent Gateway'
+                  t('connection.autoStartButton')
                 )}
               </button>
 
@@ -308,7 +307,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
                 onClick={() => setShowManual(!showManual)}
                 className="text-xs font-medium text-white/50 transition hover:text-white/70"
               >
-                {showManual ? 'Hide' : 'Show'} manual setup
+                {showManual ? t('connection.hideManual') : t('connection.showManual')}
               </button>
               <div className="h-px flex-1 bg-white/10" />
             </div>
@@ -340,7 +339,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
                         onClick={() => handleCopy(step.command, idx)}
                         className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-white/60 transition hover:bg-white/10 hover:text-white/80"
                       >
-                        {copiedIdx === idx ? '✓ Copied' : 'Copy'}
+                        {copiedIdx === idx ? t('connection.copied') : t('connection.copy')}
                       </button>
                     </div>
                     <pre className="mt-2 overflow-x-auto rounded-lg bg-black/40 p-3 font-mono text-xs leading-5 text-white/80">
@@ -356,11 +355,10 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
               {/* Env var hint */}
               <div className="mt-4 rounded-xl border border-white/6 bg-white/3 p-3">
                 <p className="text-xs font-medium text-white/50">
-                  Point{' '}
+                  {t('connection.pointEnv')}{' '}
                   <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/70">
                     HERMES_API_URL
-                  </code>{' '}
-                  at any OpenAI-compatible backend:
+                  </code>
                 </p>
                 <pre className="mt-2 overflow-x-auto font-mono text-xs text-white/60">
                   HERMES_API_URL=http://your-server:8642 pnpm dev
@@ -372,7 +370,7 @@ export function ConnectionStartupScreen({ onConnected }: Props) {
 
         {!showFailureState ? (
           <p className="mt-6 text-xs text-white/45">
-            This page auto-refreshes when a compatible backend is detected
+            {t('connection.autoRefresh')}
           </p>
         ) : null}
       </div>

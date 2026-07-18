@@ -24,6 +24,7 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { t } from '@/lib/i18n'
 
 export function ChatPanel() {
   const isOpen = useWorkspaceStore((s) => s.chatPanelOpen)
@@ -70,12 +71,12 @@ export function ChatPanel() {
     ? activeSession.label ||
       activeSession.title ||
       activeSession.derivedTitle ||
-      'Chat'
+      t('chatPanel.chat')
     : activeFriendlyId === 'main'
-      ? 'Main Session'
+      ? t('chatPanel.mainSession')
       : isNewChat
-        ? 'New Chat'
-        : 'Chat'
+        ? t('chatPanel.newChat')
+        : t('chatPanel.chat')
 
   const handleSessionResolved = useCallback(
     (payload: { friendlyId: string; sessionKey: string }) => {
@@ -170,7 +171,7 @@ export function ChatPanel() {
                           size="icon-sm"
                           variant="ghost"
                           className="text-primary-600 hover:text-primary-900"
-                          aria-label="New chat"
+                          aria-label={t('chatPanel.newChatAria')}
                         >
                           <HugeiconsIcon
                             icon={PencilEdit02Icon}
@@ -180,7 +181,7 @@ export function ChatPanel() {
                         </Button>
                       }
                     />
-                    <TooltipContent side="bottom">New chat</TooltipContent>
+                    <TooltipContent side="bottom">{t('chatPanel.newChatTooltip')}</TooltipContent>
                   </TooltipRoot>
                   <TooltipRoot>
                     <TooltipTrigger
@@ -190,7 +191,7 @@ export function ChatPanel() {
                           size="icon-sm"
                           variant="ghost"
                           className="text-primary-600 hover:text-primary-900"
-                          aria-label="Expand to full chat"
+                          aria-label={t('chatPanel.expandAria')}
                         >
                           <HugeiconsIcon
                             icon={ArrowExpand01Icon}
@@ -200,7 +201,7 @@ export function ChatPanel() {
                         </Button>
                       }
                     />
-                    <TooltipContent side="bottom">Full view</TooltipContent>
+                    <TooltipContent side="bottom">{t('chatPanel.expandTooltip')}</TooltipContent>
                   </TooltipRoot>
                 </TooltipProvider>
                 <Button
@@ -208,7 +209,7 @@ export function ChatPanel() {
                   variant="ghost"
                   onClick={handleClose}
                   className="text-primary-600 hover:text-primary-900"
-                  aria-label="Close chat panel"
+                  aria-label={t('chatPanel.closeAria')}
                 >
                   <HugeiconsIcon
                     icon={Cancel01Icon}

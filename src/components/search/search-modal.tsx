@@ -25,14 +25,15 @@ import {
 } from '@/hooks/use-search-modal'
 import { filterResults, useSearchData } from '@/hooks/use-search-data'
 import { cn } from '@/lib/utils'
+import { t, type TranslationKey } from '@/lib/i18n'
 
-const SCOPE_TABS: Array<{ value: SearchScope; label: string }> = [
-  { value: 'all', label: 'All' },
-  { value: 'chats', label: '💬 Chats' },
-  { value: 'files', label: '📁 Files' },
-  { value: 'agents', label: '🤖 Agents' },
-  { value: 'skills', label: '🛠️ Skills' },
-  { value: 'actions', label: '⚡ Actions' },
+const SCOPE_TABS: Array<{ value: SearchScope; labelKey: TranslationKey }> = [
+  { value: 'all', labelKey: 'search.scope.all' },
+  { value: 'chats', labelKey: 'search.scope.chats' },
+  { value: 'files', labelKey: 'search.scope.files' },
+  { value: 'agents', labelKey: 'search.scope.agents' },
+  { value: 'skills', labelKey: 'search.scope.skills' },
+  { value: 'actions', labelKey: 'search.scope.actions' },
 ]
 
 const RESULT_LIMITS = {
@@ -86,8 +87,8 @@ export function SearchModal() {
       {
         id: 'qa-new-chat',
         emoji: '💬',
-        label: 'New Chat',
-        description: 'Start a new conversation session',
+        label: t('search.quickAction.newChat.label'),
+        description: t('search.quickAction.newChat.desc'),
         onSelect: () => {
           closeModal()
           // /chat redirects to last session — force the new sentinel. See #300.
@@ -97,8 +98,8 @@ export function SearchModal() {
       {
         id: 'qa-skills',
         emoji: '🛠️',
-        label: 'Skills',
-        description: 'Manage installed and available skills',
+        label: t('search.quickAction.skills.label'),
+        description: t('search.quickAction.skills.desc'),
         onSelect: () => {
           closeModal()
           navigate({ to: '/skills' })
@@ -107,8 +108,8 @@ export function SearchModal() {
       {
         id: 'qa-mcp',
         emoji: '🔌',
-        label: 'MCP',
-        description: 'Manage MCP servers and presets',
+        label: t('search.quickAction.mcp.label'),
+        description: t('search.quickAction.mcp.desc'),
         onSelect: () => {
           closeModal()
           navigate({ to: '/mcp' })
@@ -117,8 +118,8 @@ export function SearchModal() {
       {
         id: 'qa-memory',
         emoji: '🧠',
-        label: 'Memory',
-        description: 'Browse durable memory entries',
+        label: t('search.quickAction.memory.label'),
+        description: t('search.quickAction.memory.desc'),
         onSelect: () => {
           closeModal()
           navigate({ to: '/memory' })
@@ -127,8 +128,8 @@ export function SearchModal() {
       {
         id: 'qa-files',
         emoji: '📁',
-        label: 'Files',
-        description: 'Toggle the file explorer sidebar',
+        label: t('search.quickAction.files.label'),
+        description: t('search.quickAction.files.desc'),
         onSelect: () => {
           closeModal()
           emitSearchModalEvent(SEARCH_MODAL_EVENTS.TOGGLE_FILE_EXPLORER)
@@ -137,8 +138,8 @@ export function SearchModal() {
       {
         id: 'qa-settings',
         emoji: '⚙️',
-        label: 'Settings',
-        description: 'Open the settings workspace',
+        label: t('search.quickAction.settings.label'),
+        description: t('search.quickAction.settings.desc'),
         onSelect: () => {
           closeModal()
           navigate({ to: '/settings', search: {} })
@@ -147,8 +148,8 @@ export function SearchModal() {
       {
         id: 'qa-usage',
         emoji: '📊',
-        label: 'Usage',
-        description: 'Open usage meter details',
+        label: t('search.quickAction.usage.label'),
+        description: t('search.quickAction.usage.desc'),
         onSelect: () => {
           closeModal()
           emitSearchModalEvent(SEARCH_MODAL_EVENTS.OPEN_USAGE)
@@ -200,7 +201,7 @@ export function SearchModal() {
       scope: 'chats',
       icon: <HugeiconsIcon icon={Chat01Icon} size={20} strokeWidth={1.5} />,
       title: entry.title || entry.friendlyId,
-      snippet: entry.preview || `Session: ${entry.key}`,
+      snippet: entry.preview || t('search.sessionSnippet', { key: entry.key }),
       meta: entry.updatedAt
         ? new Date(entry.updatedAt).toLocaleTimeString()
         : '',
@@ -250,8 +251,8 @@ export function SearchModal() {
       ),
       title: entry.name,
       snippet: entry.description,
-      meta: entry.installed ? 'Installed' : 'Available',
-      badge: entry.installed ? 'Installed' : 'Not Installed',
+      meta: entry.installed ? t('search.installed') : t('search.available'),
+      badge: entry.installed ? t('search.installed') : t('search.notInstalled'),
       onSelect: () => {
         closeModal()
         navigate({ to: '/skills' })
@@ -274,7 +275,7 @@ export function SearchModal() {
         ),
         title: entry.label,
         snippet: entry.description,
-        meta: 'Action',
+        meta: t('search.action'),
         onSelect: entry.onSelect,
       })
       if (actions.length >= RESULT_LIMITS.actions) break
@@ -450,7 +451,7 @@ export function SearchModal() {
                         : 'border-primary-200 bg-primary-100/60 text-primary-500 hover:bg-primary-100',
                     )}
                   >
-                    <span>{tab.label}</span>
+                    <span>{t(tab.labelKey)}</span>
                   </button>
                 ))}
               </div>
@@ -487,13 +488,13 @@ export function SearchModal() {
             <div className="flex items-center justify-between border-t border-primary-200 bg-primary-50/80 px-3 py-2 text-[11px] text-primary-500">
               <div className="flex items-center gap-1.5">
                 <HugeiconsIcon icon={CommandIcon} size={20} strokeWidth={1.5} />
-                <span>Arrow keys to navigate</span>
+                <span>{t('search.shortcut.navigate')}</span>
               </div>
               <div className="flex items-center gap-2 tabular-nums">
-                <span>Tab scope</span>
-                <span>1-9 jump</span>
-                <span>↵ open</span>
-                <span>Esc close</span>
+                <span>{t('search.shortcut.tabScope')}</span>
+                <span>{t('search.shortcut.jump')}</span>
+                <span>{t('search.shortcut.open')}</span>
+                <span>{t('search.shortcut.close')}</span>
               </div>
             </div>
           </motion.div>

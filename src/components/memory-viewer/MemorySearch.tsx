@@ -2,6 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon } from '@hugeicons/core-free-icons'
 import type { MemorySearchResult } from './memory-types'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type MemorySearchProps = {
   query: string
@@ -32,7 +33,7 @@ function MemorySearch({
           onChange={function onChangeQuery(event) {
             onQueryChange(event.target.value)
           }}
-          placeholder="Search across MEMORY.md and memory/*.md"
+          placeholder={t('memorySearch.placeholder')}
           className="h-9 w-full rounded-lg border border-primary-200 bg-primary-50 pr-3 pl-9 text-sm text-primary-900 outline-none focus:border-accent-500/40"
         />
       </label>
@@ -40,11 +41,11 @@ function MemorySearch({
         <div className="mt-2 rounded-lg border border-primary-200 bg-primary-50 px-2 py-1.5">
           {searching ? (
             <p className="text-xs text-primary-600 text-pretty">
-              Searching memory files...
+              {t('memorySearch.searching')}
             </p>
           ) : results.length === 0 ? (
             <p className="text-xs text-primary-600 text-pretty">
-              No matches found.
+              {t('memorySearch.noMatches')}
             </p>
           ) : (
             <div className="max-h-44 space-y-1 overflow-y-auto">

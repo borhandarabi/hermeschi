@@ -5,6 +5,7 @@
 import type { ReactNode } from 'react'
 import { openHamburgerMenu } from '@/components/mobile-hamburger-menu'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 type MobilePageHeaderProps = {
   title: string
@@ -31,7 +32,7 @@ export function MobilePageHeader({
     >
       <button
         type="button"
-        aria-label="Open navigation menu"
+        aria-label={t('mobilePageHeader.openNav')}
         onClick={openHamburgerMenu}
         className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl active:bg-white/10 transition-colors touch-manipulation z-10"
       >

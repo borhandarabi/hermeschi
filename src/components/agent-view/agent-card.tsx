@@ -38,6 +38,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 export type AgentNodeStatus = AgentProgressStatus
 
@@ -111,11 +112,11 @@ function getStatusTextClassName(status: AgentNodeStatus): string {
 }
 
 function getStatusLabel(status: AgentNodeStatus): string {
-  if (status === 'failed') return 'failed'
-  if (status === 'thinking') return 'thinking'
-  if (status === 'complete') return 'complete'
-  if (status === 'queued') return 'queued'
-  return 'running'
+  if (status === 'failed') return t('agentView.failed')
+  if (status === 'thinking') return t('agentView.thinking')
+  if (status === 'complete') return t('agentView.complete')
+  if (status === 'queued') return t('agentView.queue')
+  return t('agentView.running')
 }
 
 function shouldPulse(status: AgentNodeStatus): boolean {
@@ -218,14 +219,14 @@ export function AgentCard({
       const paused =
         typeof payload.paused === 'boolean' ? payload.paused : nextPaused
       setPausedOverride(paused)
-      toast(`${node.name} ${paused ? 'paused' : 'resumed'}`, {
+      toast(paused ? t('agentCard.pausedToast', { name: node.name }) : t('agentCard.resumedToast', { name: node.name }), {
         type: 'success',
       })
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : `Failed to ${nextPaused ? 'pause' : 'resume'} agent`
+          : t(nextPaused ? 'agentCard.pauseFailed' : 'agentCard.resumeFailed')
       toast(message, { type: 'error' })
     } finally {
       setIsPausePending(false)
@@ -244,8 +245,8 @@ export function AgentCard({
             'aria-expanded:bg-primary-200',
             triggerClassName,
           )}
-          aria-label={`${node.name} controls`}
-          title="Agent controls"
+          aria-label={t('agentCard.controlsAria', { name: node.name })}
+          title={t('agentCard.agentControls')}
         >
           <HugeiconsIcon icon={MoreVerticalIcon} size={16} strokeWidth={1.5} />
         </MenuTrigger>
@@ -258,7 +259,7 @@ export function AgentCard({
             className="data-disabled:pointer-events-none data-disabled:opacity-50"
           >
             <HugeiconsIcon icon={AiChat01Icon} size={16} strokeWidth={1.5} />
-            Steer
+            {t('agentCard.steer')}
           </MenuItem>
           <MenuItem
             onClick={function onClickPauseToggle() {
@@ -274,11 +275,11 @@ export function AgentCard({
             />
             {isPausePending
               ? isPaused
-                ? 'Resuming...'
-                : 'Pausing...'
+                ? t('agentCard.resuming')
+                : t('agentCard.pausing')
               : isPaused
-                ? 'Resume'
-                : 'Pause'}
+                ? t('agentCard.resume')
+                : t('agentCard.pause')}
           </MenuItem>
           <MenuItem
             onClick={function onClickKill() {
@@ -287,7 +288,7 @@ export function AgentCard({
             className="text-red-700 hover:bg-red-50/80 data-highlighted:bg-red-50/80"
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.5} />
-            Kill
+            {t('agentCard.kill')}
           </MenuItem>
         </MenuContent>
       </MenuRoot>
@@ -339,7 +340,7 @@ export function AgentCard({
             onClick={() => setShowDetail(false)}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={14} strokeWidth={1.5} />
-            Back
+            {t('agentCard.back')}
           </Button>
           <div className="min-w-0 flex-1">
             <h4 className="truncate text-sm font-medium text-primary-900" title={node.name}>
@@ -375,7 +376,7 @@ export function AgentCard({
 
         {/* Last output / task preview */}
         <div className="mb-3 rounded-xl border border-primary-300/30 bg-primary-200/24 p-2.5">
-          <p className="mb-1 text-[10px] font-medium text-primary-600">Last message</p>
+          <p className="mb-1 text-[10px] font-medium text-primary-600">{t('agentView.lastMessage')}</p>
           <p className="text-[11px] leading-relaxed text-primary-800">
             {node.task.length > 80 ? `${node.task.slice(0, 80)}…` : node.task}
           </p>
@@ -385,7 +386,7 @@ export function AgentCard({
         <div className="mb-3 flex items-center gap-3 rounded-lg border border-primary-300/30 bg-primary-200/24 px-2.5 py-2 text-[10px] tabular-nums text-primary-600">
           <span>{formatRuntime(node.runtimeSeconds)}</span>
           <span className="text-primary-300">·</span>
-          <span>{node.tokenCount.toLocaleString()} tok</span>
+          <span>{t('agentCard.tokenCount', { count: node.tokenCount.toLocaleString() })}</span>
           <span className="text-primary-300">·</span>
           <span>${node.cost.toFixed(2)}</span>
         </div>
@@ -401,7 +402,7 @@ export function AgentCard({
                 onClick={() => onChat(node.id)}
               >
                 <HugeiconsIcon icon={EyeIcon} size={16} strokeWidth={1.5} />
-                View Output
+                {t('agentCard.viewOutput')}
               </Button>
             ) : null}
             {(node.status === 'running' || node.status === 'thinking') && onKill ? (
@@ -412,7 +413,7 @@ export function AgentCard({
                 onClick={() => setKillConfirmOpen(true)}
               >
                 <HugeiconsIcon icon={Delete02Icon} size={14} strokeWidth={1.5} />
-                Kill
+                {t('agentCard.kill')}
               </Button>
             ) : null}
             {node.status === 'queued' ? (
@@ -423,7 +424,7 @@ export function AgentCard({
                 onClick={() => onCancel?.(node.id)}
               >
                 <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={1.5} />
-                Cancel
+                {t('agentCard.cancel')}
               </Button>
             ) : null}
           </div>
@@ -517,7 +518,7 @@ export function AgentCard({
 
               <p className="mt-1 truncate text-[11px] text-primary-700">{node.task}</p>
               <p className="mt-0.5 truncate text-[10px] tabular-nums text-primary-600">
-                {formatRuntime(node.runtimeSeconds)} · {node.tokenCount.toLocaleString()} tokens · ${node.cost.toFixed(2)}
+                {formatRuntime(node.runtimeSeconds)} · {node.tokenCount.toLocaleString()} {t('common.tokens')} · ${node.cost.toFixed(2)}
               </p>
 
               {showActions ? (
@@ -532,7 +533,7 @@ export function AgentCard({
                       }}
                     >
                       <HugeiconsIcon icon={AiChat01Icon} size={13} strokeWidth={1.5} />
-                      Chat
+                      {t('agentCard.chat')}
                     </Button>
                   ) : null}
                   {onView || useInlineDetail ? (
@@ -543,7 +544,7 @@ export function AgentCard({
                       onClick={handleViewClick}
                     >
                       <HugeiconsIcon icon={EyeIcon} size={13} strokeWidth={1.5} />
-                      View
+                      {t('agentCard.view')}
                     </Button>
                   ) : null}
                 </div>
@@ -610,7 +611,7 @@ export function AgentCard({
             </TooltipTrigger>
             <TooltipContent side="right" className="text-xs">
               <span className="font-medium tabular-nums">{node.progress}%</span>{' '}
-              complete
+              {t('agentCard.completePct')}
             </TooltipContent>
           </TooltipRoot>
 
@@ -660,7 +661,7 @@ export function AgentCard({
         <div className="mt-2 max-h-0 overflow-hidden text-primary-700 tabular-nums opacity-0 transition-all duration-200 group-hover:max-h-48 group-hover:opacity-100">
           <p className="line-clamp-2 text-pretty text-[11px] text-primary-700">{node.task}</p>
           <p className="mt-0.5 truncate text-[10px] tabular-nums text-primary-600">
-            {formatRuntime(node.runtimeSeconds)} · {node.tokenCount.toLocaleString()} tokens · {formatCost(node.cost)}
+            {formatRuntime(node.runtimeSeconds)} · {node.tokenCount.toLocaleString()} {t('common.tokens')} · {formatCost(node.cost)}
           </p>
 
           {showActions ? (
@@ -676,7 +677,7 @@ export function AgentCard({
                     }}
                   >
                     <HugeiconsIcon icon={AiChat01Icon} size={14} strokeWidth={1.5} />
-                    Chat
+                    {t('agentCard.chat')}
                   </Button>
                 ) : null}
                 {onView || useInlineDetail ? (
@@ -687,7 +688,7 @@ export function AgentCard({
                     onClick={handleViewClick}
                   >
                     <HugeiconsIcon icon={EyeIcon} size={14} strokeWidth={1.5} />
-                    View
+                    {t('agentCard.view')}
                   </Button>
                 ) : null}
                 {node.status === 'queued' ? (
@@ -698,7 +699,7 @@ export function AgentCard({
                     onClick={function handleCancelClick() {
                       onCancel?.(node.id)
                     }}
-                    title="Cancel"
+                    title={t('agentCard.cancel')}
                   >
                     <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={1.5} />
                   </Button>

@@ -15,6 +15,7 @@ import { assignPersona } from '@/lib/agent-personas'
 import type { SwarmSession } from '@/stores/agent-swarm-store'
 import { cn } from '@/lib/utils'
 import { getSwarmSessionDisplayName } from './session-display-name'
+import { t } from '@/lib/i18n'
 
 type IsometricOfficeProps = {
   sessions: Array<SwarmSession>
@@ -101,7 +102,7 @@ function MeetingTable() {
           )
         })}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[8px] text-slate-500/60">Meeting</span>
+          <span className="text-[8px] text-slate-500/60">{t('office.meeting')}</span>
         </div>
       </div>
     </div>
@@ -155,7 +156,7 @@ function LunchArea() {
         <div className="size-2 rounded-full bg-green-400/30" />
         <div className="size-2 rounded-full bg-yellow-400/30" />
       </div>
-      <span className="mt-0.5 text-[7px] text-slate-500">🍕 Lunch</span>
+      <span className="mt-0.5 text-[7px] text-slate-500">{t('office.lunch')}</span>
     </div>
   )
 }
@@ -323,9 +324,9 @@ function EmptyOffice() {
         >
           🏢
         </motion.span>
-        <p className="mt-2 text-sm text-slate-400">Virtual office is empty</p>
+        <p className="mt-2 text-sm text-slate-400">{t('office.emptyTitle')}</p>
         <p className="text-xs text-slate-500">
-          Spawn agents to see them work here
+          {t('office.emptyDesc')}
         </p>
       </div>
     </div>
@@ -478,32 +479,25 @@ export function IsometricOffice({ sessions, className }: IsometricOfficeProps) {
       {/* Office info */}
       <div className="absolute bottom-3 left-3 rounded bg-slate-900/80 px-2 py-1 backdrop-blur">
         <span className="text-[9px] font-mono text-accent-400/60">
-          🦞 ClawSuite Office
+          {t('office.clawSuite')}
         </span>
       </div>
 
       <div className="absolute bottom-3 right-3 rounded bg-slate-900/80 px-2 py-1 backdrop-blur">
         <span className="text-[9px] text-slate-500">
-          {behaviors.size} agents · {sessions.length} sessions
+          {t('office.agentsSessions', { agents: behaviors.size, sessions: sessions.length })}
         </span>
       </div>
 
       {/* Whiteboard with live stats */}
       <div className="absolute left-[8%] top-[10%] rounded border border-slate-600/30 bg-slate-800/70 px-2 py-1">
         <div className="text-[8px] text-slate-400 font-mono">
-          <div>📋 Tasks: {sessions.length}</div>
+          <div>{t('office.tasks', { count: sessions.length })}</div>
           <div>
-            🏃 Active:{' '}
-            {
-              sessions.filter(
-                (s) =>
-                  s.swarmStatus === 'running' || s.swarmStatus === 'thinking',
-              ).length
-            }
+            {t('office.active', { count: sessions.filter((s) => s.swarmStatus === 'running' || s.swarmStatus === 'thinking').length })}
           </div>
           <div>
-            ✅ Done:{' '}
-            {sessions.filter((s) => s.swarmStatus === 'complete').length}
+            {t('office.done', { count: sessions.filter((s) => s.swarmStatus === 'complete').length })}
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { MobileSetupModal } from './MobileSetupModal'
+import { t } from '@/lib/i18n'
 
 export function MobilePromptTrigger() {
   const [showPrompt, setShowPrompt] = useState(false)
@@ -102,7 +103,7 @@ export function MobilePromptTrigger() {
                 <div className="flex shrink-0 items-center gap-1.5">
                   <img
                     src="/claude-avatar.webp"
-                    alt="Hermes Agent"
+                    alt={t('mobilePrompt.alt')}
                     className="size-8 rounded-lg"
                   />
                   <span className="text-xs text-primary-600">+</span>
@@ -174,14 +175,13 @@ export function MobilePromptTrigger() {
                     className="text-sm font-semibold"
                     style={{ color: 'var(--theme-text)' }}
                   >
-                    Set up mobile access
+                    {t('mobilePrompt.title')}
                   </p>
                   <p
                     className="text-xs"
                     style={{ color: 'var(--theme-muted)' }}
                   >
-                    Connect your phone to this Hermes Workspace instance in a
-                    few steps.
+                    {t('mobilePrompt.body')}
                   </p>
                 </div>
 
@@ -192,14 +192,14 @@ export function MobilePromptTrigger() {
                     className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
                     style={{ background: 'var(--theme-accent)' }}
                   >
-                    Set up
+                    {t('mobilePrompt.setUp')}
                   </button>
                   <button
                     type="button"
                     onClick={dismissPrompt}
                     className="rounded-lg p-1.5 transition-colors hover:opacity-80"
                     style={{ color: 'var(--theme-muted)' }}
-                    aria-label="Dismiss mobile setup prompt"
+                    aria-label={t('mobilePrompt.dismiss')}
                   >
                     <HugeiconsIcon
                       icon={Cancel01Icon}
@@ -224,7 +224,7 @@ export function MobilePromptTrigger() {
                     background: 'var(--theme-card2)',
                   }}
                 />
-                <span>Don&apos;t show this again</span>
+                <span>{t('mobilePrompt.dontShow')}</span>
               </label>
             </div>
           </motion.div>

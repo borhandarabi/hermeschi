@@ -6,6 +6,7 @@ import {
   MIN_PANEL_HEIGHT,
   useTerminalPanelStore,
 } from '@/stores/terminal-panel-store'
+import { t } from '@/lib/i18n'
 
 const TerminalWorkspace = lazy(() =>
   import('@/components/terminal/terminal-workspace').then((m) => ({
@@ -114,13 +115,13 @@ export function TerminalPanel() {
             className="absolute inset-x-0 top-0 h-1 cursor-row-resize bg-primary-300/50 transition-colors hover:bg-[#ea580c]/80"
             onMouseDown={handleResizeStart}
             role="separator"
-            aria-label="Resize terminal panel"
+            aria-label={t('terminalPanel.resize')}
           />
           <div className="h-full pt-1">
             <Suspense
               fallback={
                 <div className="flex h-full items-center justify-center text-xs text-primary-500">
-                  Loading terminal…
+                  {t('terminalPanel.loading')}
                 </div>
               }
             >

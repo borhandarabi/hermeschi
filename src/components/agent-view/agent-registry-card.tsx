@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { KillConfirmDialog } from './kill-confirm-dialog'
 import { SteerModal } from './steer-modal'
+import { t } from '@/lib/i18n'
 
 export type AgentRegistryStatus = 'active' | 'idle' | 'available' | 'paused'
 
@@ -31,10 +32,10 @@ type AgentRegistryCardProps = {
 }
 
 const STATUS_LABELS: Record<AgentRegistryStatus, string> = {
-  active: 'Active',
-  idle: 'Idle',
-  available: 'Available',
-  paused: 'Paused',
+  active: t('agentRegistry.statusActive'),
+  idle: t('agentRegistry.statusIdle'),
+  available: t('agentRegistry.statusAvailable'),
+  paused: t('agentRegistry.statusPaused'),
 }
 
 const STATUS_DOT_CLASS: Record<AgentRegistryStatus, string> = {
@@ -93,7 +94,7 @@ export function AgentRegistryCard({
   const isPaused = agent.status === 'paused'
 
   function showSpawnFirstNotice() {
-    setNotice('Spawn agent first')
+    setNotice(t('agentRegistry.spawnFirst'))
   }
 
   function handleSteerIntent() {
@@ -164,7 +165,7 @@ export function AgentRegistryCard({
               type="button"
               onClick={() => setMenuOpen((open) => !open)}
               className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/60 text-neutral-700 shadow-sm border border-white/30 dark:bg-neutral-900/30 dark:text-neutral-100 dark:border-white/10"
-              aria-label={`${agent.name} controls`}
+              aria-label={t('agentRegistry.controlsAria', { name: agent.name })}
               aria-expanded={menuOpen}
             >
               ⋯
@@ -174,7 +175,7 @@ export function AgentRegistryCard({
               <>
                 <button
                   type="button"
-                  aria-label="Close controls"
+                  aria-label={t('agentRegistry.closeControls')}
                   className="fixed inset-0 z-40"
                   onClick={() => setMenuOpen(false)}
                 />
@@ -187,7 +188,7 @@ export function AgentRegistryCard({
                     }}
                     className="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
                   >
-                    Steer
+                    {t('agentRegistry.steer')}
                   </button>
                   <button
                     type="button"
@@ -199,11 +200,11 @@ export function AgentRegistryCard({
                   >
                     {pausePending
                       ? isPaused
-                        ? 'Resuming...'
-                        : 'Pausing...'
+                        ? t('agentRegistry.resuming')
+                        : t('agentRegistry.pausing')
                       : isPaused
-                        ? 'Resume'
-                        : 'Pause'}
+                        ? t('agentRegistry.resume')
+                        : t('agentRegistry.pause')}
                   </button>
                   <button
                     type="button"
@@ -213,7 +214,7 @@ export function AgentRegistryCard({
                     }}
                     className="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/40"
                   >
-                    Kill
+                    {t('agentRegistry.kill')}
                   </button>
                 </div>
               </>
@@ -235,21 +236,21 @@ export function AgentRegistryCard({
             }}
             className="rounded-xl bg-white/60 dark:bg-neutral-900/30 backdrop-blur px-2 py-2 text-[11px] font-medium text-neutral-800 dark:text-neutral-100 shadow-sm border border-white/30 dark:border-white/10 active:scale-[0.97] transition"
           >
-            Chat
+            {t('agentRegistry.chat')}
           </button>
           <button
             type="button"
             onClick={handleSteerIntent}
             className="rounded-xl bg-white/60 dark:bg-neutral-900/30 backdrop-blur px-2 py-2 text-[11px] font-medium text-neutral-800 dark:text-neutral-100 shadow-sm border border-white/30 dark:border-white/10 active:scale-[0.97] transition"
           >
-            Steer
+            {t('agentRegistry.steer')}
           </button>
           <button
             type="button"
             onClick={() => onHistory(agent)}
             className="rounded-xl bg-white/60 dark:bg-neutral-900/30 backdrop-blur px-2 py-2 text-[11px] font-medium text-neutral-800 dark:text-neutral-100 shadow-sm border border-white/30 dark:border-white/10 active:scale-[0.97] transition"
           >
-            History
+            {t('agentRegistry.history')}
           </button>
           <button
             type="button"
@@ -259,7 +260,7 @@ export function AgentRegistryCard({
             disabled={isSpawning}
             className="rounded-xl bg-white/60 dark:bg-neutral-900/30 backdrop-blur px-2 py-2 text-[11px] font-medium text-neutral-800 dark:text-neutral-100 shadow-sm border border-white/30 dark:border-white/10 active:scale-[0.97] transition disabled:opacity-60"
           >
-            {isSpawning ? '...' : 'Spawn'}
+            {isSpawning ? '...' : t('agentRegistry.spawn')}
           </button>
         </div>
       </div>

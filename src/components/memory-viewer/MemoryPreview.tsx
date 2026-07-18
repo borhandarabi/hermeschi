@@ -8,6 +8,7 @@ import {
   ScrollAreaThumb,
   ScrollAreaViewport,
 } from '@/components/ui/scroll-area'
+import { t } from '@/lib/i18n'
 
 type MemoryPreviewProps = {
   path: string | null
@@ -21,17 +22,17 @@ function MemoryPreview({ path, content }: MemoryPreviewProps) {
         <div className="flex items-center gap-2">
           <HugeiconsIcon icon={EyeIcon} size={20} strokeWidth={1.5} />
           <h2 className="text-sm font-medium text-balance text-primary-900">
-            Preview
+            {t('memoryPreview.preview')}
           </h2>
         </div>
         <p className="text-xs text-primary-600 text-pretty tabular-nums">
-          {path || 'Select a memory file to preview markdown.'}
+          {path || t('memoryPreview.selectPrompt')}
         </p>
       </header>
       <ScrollAreaRoot className="min-h-0 flex-1">
         <ScrollAreaViewport className="h-full">
           <div className="p-4">
-            <Markdown className="text-sm">{content || '_No content_'}</Markdown>
+            <Markdown className="text-sm">{content || t('memoryPreview.noContent')}</Markdown>
           </div>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar orientation="vertical">
