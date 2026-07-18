@@ -375,7 +375,7 @@ function SettingsRoute() {
           {activeSection === 'appearance' && (
             <>
               <SettingsSection
-                title="Appearance"
+                title={t('settings.appearance')}
                 description="Choose a workspace theme and accent color."
                 icon={PaintBoardIcon}
               >
@@ -547,7 +547,7 @@ function SettingsRoute() {
           {activeSection === 'notifications' && (
             <>
               <SettingsSection
-                title="Notifications"
+                title={t('settings.notifications')}
                 description="Control alert delivery and usage warning threshold."
                 icon={Notification03Icon}
               >
@@ -757,7 +757,7 @@ function _ProfileSection() {
 
   return (
     <SettingsSection
-      title="Profile"
+      title={t('settings.profile')}
       description="Your display name and avatar for chat."
       icon={UserIcon}
     >
@@ -1824,7 +1824,7 @@ function ClaudeConfigSection({
       </SettingsSection>
 
       <SettingsSection
-        title="Memory"
+        title={t('nav.memory')}
         description="Configure Hermes Agent memory and user profiles."
         icon={UserIcon}
       >
@@ -2354,7 +2354,7 @@ function ClaudeConfigSection({
       </SettingsSection>
 
       <SettingsSection
-        title="About"
+        title={t('settings.about')}
         description="Hermes Agent runtime information."
         icon={Notification03Icon}
       >
