@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { usePageTitle } from '@/hooks/use-page-title'
+import { t } from '@/lib/i18n'
 import { AgoraScreen } from '@/screens/agora/agora-screen'
 
 export const Route = createFileRoute('/agora')({
@@ -8,6 +9,6 @@ export const Route = createFileRoute('/agora')({
 })
 
 function AgoraRoute() {
-  usePageTitle('Agora')
+  usePageTitle(t('agora.title'))
   return <AgoraScreen />
 }

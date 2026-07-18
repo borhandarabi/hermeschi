@@ -6,6 +6,7 @@ import {
   reconcileSessionDraft,
 } from '../../screens/chat/chat-queries'
 import { ErrorBoundary } from '@/components/error-boundary'
+import { t } from '@/lib/i18n'
 
 const ChatScreen = lazy(async () => {
   const module = await import('../../screens/chat/chat-screen')
@@ -22,19 +23,19 @@ export const Route = createFileRoute('/chat/$sessionKey')({
         <div className="max-w-md">
           <div className="mb-4 text-5xl">💬</div>
           <h2 className="text-xl font-semibold text-primary-900 mb-3">
-            Chat Error
+            {t('chat.errorTitle')}
           </h2>
           <p className="text-sm text-primary-600 mb-6">
             {error instanceof Error
               ? error.message
-              : 'Failed to load chat session'}
+              : t('chat.loadFailed')}
           </p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={reset}
               className="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors"
             >
-              Try Again
+              {t('chat.tryAgain')}
             </button>
             <button
               onClick={() => {
@@ -43,7 +44,7 @@ export const Route = createFileRoute('/chat/$sessionKey')({
               }}
               className="px-4 py-2 border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors"
             >
-              Return to Main
+              {t('chat.returnToMain')}
             </button>
           </div>
         </div>
@@ -123,7 +124,7 @@ function ChatRoute() {
   if (!mounted) {
     return (
       <div className="flex h-full items-center justify-center text-primary-400">
-        Loading chat…
+        {t('chat.loadingChat')}
       </div>
     )
   }
@@ -133,7 +134,7 @@ function ChatRoute() {
       <Suspense
         fallback={
           <div className="flex h-full items-center justify-center text-primary-400">
-            Loading chat…
+            {t('chat.loadingChat')}
           </div>
         }
       >

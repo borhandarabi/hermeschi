@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { usePageTitle } from '@/hooks/use-page-title'
+import { t } from '@/lib/i18n'
 
 const HERMES_REPO_URL = 'https://github.com/outsourc-e/hermes-workspace'
 const HERMES_DISCORD_URL = 'https://discord.com/invite/agentd'
@@ -10,7 +11,7 @@ export const Route = createFileRoute('/early-access')({
 })
 
 function EarlyAccessRoute() {
-  usePageTitle('HermesWorld — Early Access')
+  usePageTitle(t('earlyAccess.title'))
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#03060a] px-4 text-[#f8f3e7] selection:bg-[#d9b35f] selection:text-[#07080d]">
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -27,7 +28,7 @@ function EarlyAccessRoute() {
               Hermes<span className="text-cyan-200">World</span>
             </div>
             <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#bfb49a]/52">
-              Persistent agent RPG
+              {t('earlyAccess.persistentAgentRpg')}
             </div>
           </div>
         </div>
@@ -35,16 +36,13 @@ function EarlyAccessRoute() {
         <div className="mt-8">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#d9b35f]/30 bg-[#d9b35f]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-[#f8e4ac]">
             <span className="h-1.5 w-1.5 rounded-full bg-cyan-200 shadow-[0_0_18px_rgba(34,211,238,.95)]" />
-            Early access — keys rolling out
+            {t('earlyAccess.earlyAccessBadge')}
           </span>
           <h1 className="mt-5 font-serif text-4xl font-bold leading-[0.92] tracking-[-0.045em] text-[#fff6df] sm:text-6xl">
-            HermesWorld is opening soon.
+            {t('earlyAccess.heading')}
           </h1>
           <p className="mt-5 max-w-[560px] text-base leading-7 text-[#d7d0bd]/68 sm:text-lg">
-            We are polishing characters, the Agora plaza, and the launch trailer
-            before opening multiplayer to the public. Join Discord for early-access
-            keys and gameplay clips, or pull the open-source workspace and play
-            locally today.
+            {t('earlyAccess.body')}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -54,7 +52,7 @@ function EarlyAccessRoute() {
               rel="noreferrer"
               className="group inline-flex items-center justify-center rounded-xl border border-[#ffe7a3]/55 bg-[linear-gradient(180deg,#ffe7a3,#d9a63f)] px-7 py-4 text-sm font-black uppercase tracking-[0.16em] text-[#11100b] shadow-[0_30px_90px_rgba(217,179,95,.32),inset_0_1px_0_rgba(255,255,255,.32)] transition hover:-translate-y-0.5 hover:brightness-110"
             >
-              Join Discord for keys
+              {t('earlyAccess.joinDiscord')}
               <span className="ml-2 transition group-hover:translate-x-1">→</span>
             </a>
             <a
@@ -63,32 +61,35 @@ function EarlyAccessRoute() {
               rel="noreferrer"
               className="inline-flex items-center justify-center rounded-xl border border-[#d9b35f]/24 bg-[#0b1118]/82 px-6 py-4 text-sm font-black uppercase tracking-[0.16em] text-[#f8e4ac]/85 shadow-[inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-xl transition hover:border-[#d9b35f]/55 hover:bg-[#121823]"
             >
-              Play locally on GitHub
+              {t('earlyAccess.playLocally')}
             </a>
           </div>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             {[
-              ['1', 'Star the repo', 'Star Hermes Workspace on GitHub for updates.'],
-              ['2', 'Hop in Discord', 'Get notified the moment public play is live.'],
-              ['3', 'Watch the trailer', 'The launch trailer drops with the public world.'],
-            ].map(([i, title, copy]) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-white/10 bg-black/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.05)]"
-              >
-                <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#d9b35f]/72">
-                  Step {i}
+              [t('earlyAccess.step1Title'), t('earlyAccess.step1Copy')],
+              [t('earlyAccess.step2Title'), t('earlyAccess.step2Copy')],
+              [t('earlyAccess.step3Title'), t('earlyAccess.step3Copy')],
+            ].map(([title, copy], idx) => {
+              const i = String(idx + 1)
+              return (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-white/10 bg-black/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.05)]"
+                >
+                  <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#d9b35f]/72">
+                    {t('earlyAccess.stepLabel', { i })}
+                  </div>
+                  <div className="mt-2 text-sm font-bold text-[#fff6df]">{title}</div>
+                  <div className="mt-1 text-xs leading-5 text-[#d7d0bd]/55">{copy}</div>
                 </div>
-                <div className="mt-2 text-sm font-bold text-[#fff6df]">{title}</div>
-                <div className="mt-1 text-xs leading-5 text-[#d7d0bd]/55">{copy}</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="mt-8 text-[11px] uppercase tracking-[0.2em] text-[#bfb49a]/50">
             <a href="/hermes-world" className="hover:text-[#f8e4ac]">
-              ← Back to landing
+              {t('earlyAccess.backToLanding')}
             </a>
           </div>
         </div>
