@@ -1,20 +1,20 @@
 <div align="center">
 
 <img src="./public/claude-avatar.webp" alt="HermesChi" width="80" style="border-radius: 16px" />
-<!-- avatar filename retained for cache stability — do not rename without coordinated cache-bust -->
+<!-- نام فایل آواتار برای پایداری کش حفظ شده است — بدون هماهنگی cache-bust تغییر نام ندهید -->
 
 # HermesChi
 
-**Your AI agent's command center — chat, files, memory, skills, and terminal in one place.**
+**مرکز فرمان عامل هوش مصنوعی شما — گفت‌وگو، فایل‌ها، حافظه، مهارت‌ها و ترمینال در یک جا.**
 
 [![Version](https://img.shields.io/badge/version-2.3.0-2557b7.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-6366F1.svg)](CONTRIBUTING.md)
 
-> Not a chat wrapper. A complete workspace — orchestrate agents, browse memory, manage skills, and control everything from one interface.
+> فقط یک پوسته برای چت نیست. یک فضای کاری کامل — عامل‌ها را هماهنگ کنید، در حافظه مرور کنید، مهارت‌ها را مدیریت کنید و همه‌چیز را از یک رابط کنترل کنید.
 
-> **v2 — zero-fork.** Clone, don't fork. Runs on vanilla [`NousResearch/hermes-agent`](https://github.com/NousResearch/hermes-agent) installed via Nous's own installer. Chat, sessions, memory, skills, jobs, MCP, terminal, dashboard, Agent View, and Operations are all in vanilla parity. **Conductor** uses the dashboard mission API when available and falls back to Workspace-native Swarm dispatch (`mode: native-swarm`) when the dashboard endpoint is absent, preserving zero-fork behavior ([#262](https://github.com/outsourc-e/hermeschi/issues/262)).
+> **نسخه ۲ — بدون فورک.** کلون کنید، فورک نکنید. روی [`NousResearch/hermes-agent`](https://github.com/NousResearch/hermes-agent) نسخه خام، از طریق نصب‌کننده رسمی Nous اجرا می‌شود. چت، نشست‌ها، حافظه، مهارت‌ها، کارها، MCP، ترمینال، داشبورد، نمای عامل و عملیات همگی در هماهنگی کامل با نسخه خام هستند. **Conductor** در صورت موجود بودن از API مأموریت داشبورد استفاده می‌کند و در نبود endpoint داشبورد، به ارسال Swarm بومی فضای کاری (`mode: native-swarm`) برمی‌گردد تا رفتار بدون فورک حفظ شود ([#262](https://github.com/outsourc-e/hermeschi/issues/262)).
 
 ![HermesChi](./docs/screenshots/splash.png)
 
@@ -22,93 +22,93 @@
 
 ---
 
-## Swarm Mode
+## حالت Swarm
 
-Hermes Agent Swarm turns the workspace into a live control plane: unlimited Hermes Agents, 1 orchestrator, 0 humans manually dispatching.
-Persistent tmux workers keep context across tasks, rotate safely, and report proof-bearing checkpoints.
-Role-based dispatch routes builders, reviewers, docs, research, ops, triage, QA, and lab lanes without turning Eric into the task router.
-A byte-verified review gate protects release branches before PRs ship.
-Autonomous PR/issue lanes, lab experiments, and the repair playbook keep the machine moving while humans handle judgment.
+Hermes Agent Swarm فضای کاری را به یک صفحه کنترل زنده تبدیل می‌کند: تعداد نامحدودی Hermes Agent، ۱ هماهنگ‌کننده، ۰ انسانی که دستی ارسال کند.
+کارگرهای پایدار tmux زمینه را میان وظایف حفظ می‌کنند، با ایمنی چرخش می‌یابند و ایست‌های بازرسی همراه با مدرک گزارش می‌دهند.
+ارسال مبتنی بر نقش، مسیر سازنده‌ها، بازبین‌ها، مستندات، پژوهش، عملیات، دسته‌بندی، QA و خط آزمایشگاه را هدایت می‌کند بدون اینکه اریک را به مسیریاب وظایف تبدیل کند.
+یک دروازه بازبینی تأییدشده با بایت، شاخه‌های انتشار را پیش از رفتن PR محافظت می‌کند.
+مسیرهای خودکار PR/issue، آزمایش‌های آزمایشگاهی و راهنمای تعمیر، ماشین را در حال حرکت نگه می‌دارند در حالی که انسان‌ها قضاوت را بر عهده دارند.
 
-Start here: [docs/swarm/](./docs/swarm/)
+شروع از اینجا: [docs/swarm/](./docs/swarm/)
 
-- **Orchestrator Chat** — ask the control plane for one task, a decomposed mission, or a full broadcast.
-- **Multi-Agent Control Plane** — see persistent Hermes Agents, roles, state, runtime, and routing wires in one surface.
-- **Kanban TaskBoard** — plan backlog, ready, running, review, blocked, and done lanes without leaving the workspace.
-- **Reports + Inbox** — review checkpoints, blockers, handoffs, and ready-for-human decisions.
-- **TUI View built in** — attach to tmux-backed workers or fall back to a live shell/log stream.
-
----
-
-## ✨ What's inside
-
-- 💬 **Chat** — Real-time SSE streaming, tool call rendering, multi-session, markdown + syntax highlighting
-- 🧠 **Memory** — Browse, search, and edit agent memory; markdown live editor
-- 🧩 **Skills** — Browse 2,000+ skills with origin badges, filters, source paths, marketplace
-- 🔌 **MCP** — Full /mcp page (catalog + marketplace + sources), or fallback to local config CRUD
-- 📁 **Files + Terminal** — Full workspace file browser with Monaco; cross-platform PTY terminal
-- 🎮 **Operations** — Multi-agent dashboard with profile presets (Sage/Trader/Builder/Scribe/Ops) and 'Needs setup' detection
-- 📡 **Conductor** — Mission dispatch + decomposition with dashboard-backed missions when available and Workspace-native Swarm fallback otherwise
-- 👥 **Agent View** — Live agent panel in chat with avatar, queue, history, usage meter
-- 🐝 **Swarm Mode** — Persistent tmux-backed Hermes Agent workers with role-based dispatch
-- 🗄️ **Dashboard** — Aggregated overview: sessions, model mix, cost ledger, attention card, ops strip
-- 🎨 **Themes** — Hermes, Nous, Bronze, Slate, Mono (light + dark)
-- 🔒 **Security** — Auth middleware on every route, CSP, path-traversal guard, fail-closed remote bind
-- 📱 **PWA + Tailscale** — Install as a native-feeling app; access from any device on your tailnet
-- ⚙️ **Capability gates** — Features that need upstream endpoints (Conductor) show a clean placeholder instead of failing mid-action
+- **چت هماهنگ‌کننده** — از صفحه کنترل برای یک وظیفه، یک مأموریت تجزیه‌شده یا یک پخش کامل بخواهید.
+- **صفحه کنترل چندعاملی** — عامل‌های پایدار Hermes، نقش‌ها، وضعیت، زمان اجرا و سیم‌کشی مسیریابی را در یک سطح ببینید.
+- **تابلو وظایف Kanban** — بدون خروج از فضای کاری، خط‌های backlog، آماده، در حال اجرا، بازبینی، مسدود و انجام‌شده را برنامه‌ریزی کنید.
+- **گزارش‌ها + صندوق ورودی** — ایست‌های بازبینی، مسدودکننده‌ها، تحویل‌ها و تصمیمات آماده برای انسان را مرور کنید.
+- **نمای TUI داخلی** — به کارگرهای پشتیبان tmux متصل شوید یا به جریان زنده پوسته/لاگ برگردید.
 
 ---
 
-## 📸 Screenshots
+## ✨ چه چیزهایی درون است
 
-|                 Chat                 |                  Conductor                   |
+- 💬 **چت** — استریم زنده SSE، نمایش فراخوانی ابزار، چندنشست، markdown + برجسته‌سازی نحو
+- 🧠 **حافظه** — مرور، جست‌وجو و ویرایش حافظه عامل؛ ویرایشگر زنده markdown
+- 🧩 **مهارت‌ها** — مرور بیش از ۲٬۰۰۰ مهارت با نشان منبع، فیلترها، مسیرهای منبع، بازارچه
+- 🔌 **MCP** — صفحه کامل /mcp (کاتالوگ + بازارچه + منابع)، یا برگشت به CRUD پیکربندی محلی
+- 📁 **فایل‌ها + ترمینال** — مرورگر کامل فایل فضای کاری با Monaco؛ ترمینال PTY چندسکویی
+- 🎮 **عملیات** — داشبورد چندعاملی با presetهای پروفایل (Sage/Trader/Builder/Scribe/Ops) و تشخیص «نیازمند راه‌اندازی»
+- 📡 **Conductor** — ارسال مأموریت + تجزیه با مأموریت‌های پشتیبان داشبورد در صورت موجود بودن و در غیر این صورت برگشت به Swarm بومی فضای کاری
+- 👥 **نمای عامل** — پنل زنده عامل در چت با آواتار، صف، تاریخچه، نشانگر مصرف
+- 🐝 **حالت Swarm** — کارگرهای پشتیبان tmux عامل Hermes با ارسال مبتنی بر نقش
+- 🗄️ **داشبورد** — نمای کلی تجمیعی: نشست‌ها، ترکیب مدل، دفتر هزینه، کارت توجه، نوار عملیات
+- 🎨 **پوسته‌ها** — Hermes، Nous، Bronze، Slate، Mono (روشن + تاریک)
+- 🔒 **امنیت** — middleware احراز هویت روی هر مسیر، CSP، محافظ از پیمایش مسیر، اتصال از راه دور fail-closed
+- 📱 **PWA + Tailscale** — به‌عنوان اپلیکیشنی با حس بومی نصب کنید؛ از هر دستگاهی روی tailnet خود به آن دسترسی پیدا کنید
+- ⚙️ **دروازه‌های قابلیت** — قابلیت‌هایی که به endpoint بالادستی نیاز دارند (Conductor) به‌جای شکستن در میانه کار، یک جایگزین تمیز نمایش می‌دهند
+
+---
+
+## 📸 اسکرین‌شات‌ها
+
+|                 چت                 |                  Conductor                   |
 | :----------------------------------: | :------------------------------------------: |
 | ![Chat](./docs/screenshots/chat.png) | ![Conductor](./docs/screenshots/conductor.png) |
 
-|                   Dashboard                  |                  Memory                  |
+|                   داشبورد                  |                  حافظه                  |
 | :------------------------------------------: | :--------------------------------------: |
 | ![Dashboard](./docs/screenshots/dashboard.png) | ![Memory](./docs/screenshots/memory.png) |
 
-|                   Terminal                   |                   Settings                   |
+|                   ترمینال                   |                   تنظیمات                   |
 | :------------------------------------------: | :------------------------------------------: |
 | ![Terminal](./docs/screenshots/terminal.png) | ![Settings](./docs/screenshots/settings.png) |
 
-|                  Tasks                  |                 Jobs                 |
+|                  وظایف                  |                 کارها                 |
 | :--------------------------------------: | :----------------------------------: |
 | ![Tasks](./docs/screenshots/tasks.png) | ![Jobs](./docs/screenshots/jobs.png) |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 شروع سریع
 
-Three paths — pick the one that matches you:
+سه مسیر — آن یکی را انتخاب کنید که با شما سازگار است:
 
-| Path | Best for | Time |
+| مسیر | بهترین برای | زمان |
 |---|---|---|
-| **🐳 [Docker Compose](#-docker-quickstart)** | Self-hosters, home labs, "give me a compose gig" | ~2 min |
-| **🌐 One-line install** | Local dev on macOS/Linux | ~3 min |
-| **🔌 Attach to existing `hermes-agent`** | You already run Hermes Agent | ~1 min |
+| **🐳 [Docker Compose](#-شروع-سریع-docker)** | خودمیزبان‌ها، آزمایشگاه‌های خانگی، «یک compose بده و برو» | ~۲ دقیقه |
+| **🌐 نصب یک‌خطی** | توسعه محلی روی macOS/Linux | ~۳ دقیقه |
+| **🔌 اتصال به `hermes-agent` موجود** | اگر Hermes Agent را از قبل اجرا می‌کنید | ~۱ دقیقه |
 
-### One-line install
+### نصب یک‌خطی
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/outsourc-e/hermeschi/main/install.sh | bash
 ```
 
-This installs `hermes-agent` via Nous's official installer, clones this repo, sets up `.env`, and installs dependencies. Then:
+این دستور `hermes-agent` را از طریق نصب‌کننده رسمی Nous نصب می‌کند، این مخزن را کلون می‌کند، `.env` را راه‌اندازی می‌کند و وابستگی‌ها را نصب می‌کند. سپس:
 
 ```bash
-hermes gateway run                  # terminal 1
-cd ~/hermeschi && pnpm dev   # terminal 2
+hermes gateway run                  # ترمینال ۱
+cd ~/hermeschi && pnpm dev   # ترمینال ۲
 ```
 
-Open http://localhost:3000. That's it.
+http://localhost:3000 را باز کنید. همین.
 
 ---
 
-### Already running `hermes-agent`? Attach the workspace to it
+### `hermes-agent` را از قبل اجرا می‌کنید؟ فضای کاری را به آن متصل کنید
 
-If you already have `hermes-agent` installed (via Nous's official installer, a source checkout, systemd, Docker, or another existing setup) and it's serving the gateway at `http://<host>:8642`, you don't need to reinstall anything — just point the workspace at it.
+اگر `hermes-agent` را از قبل نصب کرده‌اید (از طریق نصب‌کننده رسمی Nous، یک checkout از روی سورس، systemd، Docker یا هر راه‌اندازی موجود دیگر) و gateway را در `http://<host>:8642` سرو می‌کند، نیازی به نصب مجدد چیزی نیست — فقط فضای کاری را به آن نشانه بگیرید.
 
 ```bash
 git clone https://github.com/outsourc-e/hermeschi.git
@@ -116,168 +116,168 @@ cd hermeschi
 pnpm install
 cp .env.example .env
 
-# Point at your existing Hermes Agent services.
+# به سرویس‌های Hermes Agent موجود خود نشانه بگیرید.
 echo 'HERMES_API_URL=http://127.0.0.1:8642' >> .env
-# Zero-fork installs also need the separate dashboard API for config/sessions/skills/jobs.
+# نصب‌های بدون فورک همچنین به API داشبورد جداگانه برای پیکربندی/نشست‌ها/مهارت‌ها/کارها نیاز دارند.
 echo 'HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119' >> .env
 
-# If your gateway was started with API_SERVER_KEY (auth enabled), set the same value:
+# اگر gateway شما با API_SERVER_KEY (احراز هویت فعال) آغاز شده، همان مقدار را تنظیم کنید:
 # echo 'HERMES_API_TOKEN=***' >> .env
 
-pnpm dev                            # http://localhost:3000 (override with PORT=4000 pnpm dev)
+pnpm dev                            # http://localhost:3000 (با PORT=4000 pnpm dev بازنویسی کنید)
 ```
 
-Requirements on the agent side:
+نیازمندی‌ها در سمت عامل:
 
-- Gateway bound to an address the workspace can reach (typically `API_SERVER_HOST=0.0.0.0` + the port exposed).
-- `API_SERVER_ENABLED=true` in `~/.hermes/.env` (or the agent's env) so the gateway serves core APIs on `:8642`.
-- `hermes dashboard` running (default `http://127.0.0.1:9119`) for zero-fork installs. The dashboard provides config, sessions, skills, and jobs APIs.
-- If `API_SERVER_KEY` is set, the workspace must pass the same value via `HERMES_API_TOKEN` — otherwise leave both unset.
+- gateway به آدرسی متصل باشد که فضای کاری بتواند به آن برسد (معمولاً `API_SERVER_HOST=0.0.0.0` + پورت در معرض نمایش).
+- `API_SERVER_ENABLED=true` در `~/.hermes/.env` (یا env عامل) تا gateway APIهای اصلی را روی `:8642` سرو کند.
+- `hermes dashboard` در حال اجرا (پیش‌فرض `http://127.0.0.1:9119`) برای نصب‌های بدون فورک. داشبورد APIهای پیکربندی، نشست‌ها، مهارت‌ها و کارها را فراهم می‌کند.
+- اگر `API_SERVER_KEY` تنظیم شده، فضای کاری باید همان مقدار را از طریق `HERMES_API_TOKEN` ارسال کند — در غیر این صورت هر دو را تنظیم‌نشده بگذارید.
 
-Verify both services before opening the workspace:
+پیش از باز کردن فضای کاری، هر دو سرویس را راستی‌آزمایی کنید:
 
-- `curl http://127.0.0.1:8642/health` should return ok.
-- `curl http://127.0.0.1:9119/api/status` should return dashboard metadata.
-- `curl http://127.0.0.1:3000/api/sessions` (after the workspace boots) should return a sessions payload or an empty list.
+- `curl http://127.0.0.1:8642/health` باید ok برگرداند.
+- `curl http://127.0.0.1:9119/api/status` باید متادیتای داشبورد برگرداند.
+- `curl http://127.0.0.1:3000/api/sessions` (پس از بوت شدن فضای کاری) باید یک payload نشست‌ها یا یک لیست خالی برگرداند.
 
-If `/api/sessions` is already returning data, **do not start another gateway just because the UI still says Offline** — refresh or reprobe the Workspace UI first.
+اگر `/api/sessions` از قبل داده برمی‌گرداند، **فقط به این دلیل که UI هنوز آفلاین می‌گوید، یک gateway دیگر راه‌اندازی نکنید** — ابتدا UI فضای کاری را بازخوانی یا دوباره بررسی کنید.
 
-If your default model is `gpt-5.4` / `openai-codex`, make sure Codex CLI auth is live before testing chat:
+اگر مدل پیش‌فرض شما `gpt-5.4` / `openai-codex` است، پیش از آزمایش چت مطمئن شوید احراز هویت Codex CLI فعال است:
 
 ```bash
 codex login
 ```
 
-Then start the workspace and complete onboarding — it should detect the gateway + dashboard pair and unlock the enhanced panes automatically.
+سپس فضای کاری را آغاز کنید و onboarding را تکمیل کنید — باید جفت gateway + داشبورد را تشخیص دهد و قابلیت‌های پیشرفته را به‌طور خودکار باز کند.
 
-#### Running on a remote host (Tailscale / VPN / LAN)
+#### اجرا روی یک میزبان از راه دور (Tailscale / VPN / LAN)
 
-If the workspace and its browser live on different machines — e.g. the workspace runs on a Pi/Mac/home server and you access it from your phone over Tailscale — point `HERMES_API_URL` at the **reachable** backend address, not `127.0.0.1`:
+اگر فضای کاری و مرورگر آن روی ماشین‌های متفاوتی هستند — مثلاً فضای کاری روی یک Pi/Mac/سرور خانگی اجرا می‌شود و شما از روی تلفن از طریق Tailscale به آن دسترسی دارید — `HERMES_API_URL` را به آدرس backend **قابل دسترس** نشانه بگیرید، نه `127.0.0.1`:
 
 ```bash
-# On the server running the workspace + gateway:
+# روی سروری که فضای کاری + gateway را اجرا می‌کند:
 echo 'HERMES_API_URL=http://100.x.y.z:8642' >> .env
 echo 'HERMESCHI_DASHBOARD_URL=http://100.x.y.z:9119' >> .env
 
-# Also tell the gateway to listen on all interfaces so Tailscale peers can reach it.
-# In ~/.hermes/.env (or wherever the gateway reads config):
+# همچنین به gateway بگویید روی همه رابط‌ها گوش دهد تا همتایان Tailscale بتوانند به آن برسند.
+# در ~/.hermes/.env (یا هر جایی که gateway پیکربندی را می‌خواند):
 echo 'API_SERVER_HOST=0.0.0.0' >> ~/.hermes/.env
 ```
 
-Then restart the gateway, dashboard, and workspace. Hit the workspace from the remote device and the connection probe will use the Tailscale IP instead of localhost. Both `HERMES_API_URL` and `HERMESCHI_DASHBOARD_URL` must be set to Tailscale/LAN-reachable URLs — setting only one will leave the other probing `127.0.0.1` and failing.
+سپس gateway، داشبورد و فضای کاری را راه‌اندازی مجدد کنید. از دستگاه از راه دور به فضای کاری درخواست بزنید و بررسی اتصال به‌جای localhost از IP تیل‌اسکیل استفاده خواهد کرد. هم `HERMES_API_URL` و هم `HERMESCHI_DASHBOARD_URL` باید روی URLهای قابل دسترس از Tailscale/LAN تنظیم شوند — تنظیم فقط یکی باعث می‌شود دیگری همچنان `127.0.0.1` را بررسی کند و شکست بخورد.
 
-**If you've already started the workspace**, you can update both URLs from `Settings → Connection` without restarting. The values are persisted to `~/.hermes/workspace-overrides.json` and take effect immediately (gateway capabilities are reprobed on save). Editing `.env` still works for pre-start config and for CI/containers.
+**اگر فضای کاری را از قبل آغاز کرده‌اید**، می‌توانید بدون راه‌اندازی مجدد، هر دو URL را از `Settings → Connection` به‌روزرسانی کنید. مقادیر در `~/.hermes/workspace-overrides.json` ذخیره می‌شوند و بلافاصله اعمال می‌شوند (قابلیت‌های gateway هنگام ذخیره دوباره بررسی می‌شوند). ویرایش `.env` همچنان برای پیکربندی پیش از آغاز و برای CI/کانتینرها کار می‌کند.
 
 ---
 
-### Manual install
+### نصب دستی
 
-HermesChi works with any OpenAI-compatible backend. If your backend also exposes Hermes Agent gateway APIs, enhanced features like sessions, memory, skills, and jobs unlock automatically.
+HermesChi با هر backend سازگار با OpenAI کار می‌کند. اگر backend شما همچنین APIهای gateway عامل Hermes را ارائه می‌دهد، قابلیت‌های پیشرفته‌ای مانند نشست‌ها، حافظه، مهالت‌ها و کارها به‌طور خودکار باز می‌شوند.
 
-#### Prerequisites
+#### پیش‌نیازها
 
 - **Node.js 22+** — [nodejs.org](https://nodejs.org/)
-- **An OpenAI-compatible backend** — local, self-hosted, or remote
-- **Optional:** Python 3.11+ if you want to run a Hermes Agent gateway locally
+- **یک backend سازگار با OpenAI** — محلی، خودمیزبان یا از راه دور
+- **اختیاری:** Python 3.11+ اگر می‌خواهید یک gateway عامل Hermes را به‌صورت محلی اجرا کنید
 
-#### Step 1: Start your backend
+#### گام ۱: backend خود را آغاز کنید
 
-Point HermesChi at any backend that supports:
+HermesChi را به هر backendی نشانه بگیرید که از این‌ها پشتیبانی می‌کند:
 
 - `POST /v1/chat/completions`
-- `GET /v1/models` recommended
+- `GET /v1/models` توصیه می‌شود
 
-Example Hermes Agent gateway setup (from scratch):
+نمونه راه‌اندازی gateway عامل Hermes (از صفر):
 
 ```bash
-# Install hermes-agent via Nous's official installer
+# نصب hermes-agent از طریق نصب‌کننده رسمی Nous
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 
-# Configure a provider + start the gateway
+# پیکربندی یک provider + آغاز gateway
 hermes setup
 hermes gateway run
 ```
 
-Our one-liner installer (below) does both steps automatically. If you're using another OpenAI-compatible server, just note its base URL.
+نصب‌کننده یک‌خطی ما (در ادامه) هر دو گام را به‌طور خودکار انجام می‌دهد. اگر از یک سرور سازگار با OpenAI دیگر استفاده می‌کنید، فقط URL پایه آن را یادداشت کنید.
 
-### Step 2: Install & Run HermesChi
+### گام ۲: نصب و اجرای HermesChi
 
 ```bash
-# In a new terminal
+# در یک ترمینال جدید
 git clone https://github.com/outsourc-e/hermeschi.git
 cd hermeschi
 pnpm install
 cp .env.example .env
 printf '\nHERMES_API_URL=http://127.0.0.1:8642\n' >> .env
-pnpm dev                   # Starts on http://localhost:3000
+pnpm dev                   # روی http://localhost:3000 آغاز می‌شود
 ```
 
-> **Verify:** Open `http://localhost:3000` and complete the onboarding flow. First connect the backend, then verify chat works. If your gateway exposes Hermes Agent APIs, advanced features appear automatically.
+> **راستی‌آزمایی:** `http://localhost:3000` را باز کنید و جریان onboarding را تکمیل کنید. ابتدا backend را متصل کنید، سپس راستی‌آزمایی کنید که چت کار می‌کند. اگر gateway شما APIهای عامل Hermes را ارائه می‌دهد، قابلیت‌های پیشرفته به‌طور خودکار ظاهر می‌شوند.
 
-#### Run without an open terminal
+#### اجرا بدون یک ترمینال باز
 
-After `pnpm build`, install Workspace as a user-level launchd/systemd service:
+پس از `pnpm build`، Workspace را به‌عنوان یک سرویس launchd/systemd سطح کاربر نصب کنید:
 
 ```bash
 chmod +x scripts/install-dashboard-service.sh
 scripts/install-dashboard-service.sh
 ```
 
-See [`docs/dashboard-service.md`](docs/dashboard-service.md) for macOS launchd, Linux systemd, logs, overrides, and uninstall steps.
+برای launchd مک، systemd لینوکس، لاگ‌ها، بازنویسی‌ها و مراحل حذف به [`docs/dashboard-service.md`](docs/dashboard-service.md) مراجعه کنید.
 
-#### Environment Variables
+#### متغیرهای محیطی
 
 ```env
-# OpenAI-compatible backend URL
+# URL backend سازگار با OpenAI
 HERMES_API_URL=http://127.0.0.1:8642
 
-# Optional: provider keys the Hermes Agent gateway can read at runtime.
-# You only need the key(s) for whichever provider(s) you actually use.
-# OPENAI_API_KEY=sk-...                # GPT / o-series / OpenAI-compatible
-# OPENROUTER_API_KEY=sk-or-v1-...      # OpenRouter (incl. free models)
+# اختیاری: کلیدهای provider که gateway عامل Hermes می‌تواند در زمان اجرا بخواند.
+# فقط به کلید(های) آن provider(هایی) نیاز دارید که واقعاً استفاده می‌کنید.
+# OPENAI_API_KEY=sk-...                # GPT / o-series / سازگار با OpenAI
+# OPENROUTER_API_KEY=sk-or-v1-...      # OpenRouter (شامل مدل‌های رایگان)
 # GOOGLE_API_KEY=AIza...               # Gemini
-# (Ollama / LM Studio / local servers don't need a key)
+# (Ollama / LM Studio / سرورهای محلی به کلید نیاز ندارند)
 
-# Optional: password-protect the web UI
+# اختیاری: محافظت با رمز عبور از رابط وب
 # HERMESCHI_PASSWORD=your_password
 ```
 
 ---
 
-## 🧠 Local Models (Ollama, Atomic Chat, LM Studio, vLLM)
+## 🧠 مدل‌های محلی (Ollama، Atomic Chat، LM Studio، vLLM)
 
-HermesChi supports two modes with local models:
+HermesChi با مدل‌های محلی از دو حالت پشتیبانی می‌کند:
 
-### Portable Mode (Easiest)
+### حالت قابل‌حمل (آسان‌ترین)
 
-Point the workspace directly at your local server — no Hermes Agent gateway needed.
+فضای کاری را مستقیماً به سرور محلی خود نشانه بگیرید — نیازی به gateway عامل Hermes نیست.
 
 ### Atomic Chat
 
 ```bash
-# Start workspace pointed at Atomic Chat
+# آغاز فضای کاری نشانه‌داده به Atomic Chat
 HERMES_API_URL=http://127.0.0.1:1337/v1 pnpm dev
 ```
 
-Download [Atomic Chat](https://atomic.chat/), launch the desktop app, and make sure a model is loaded before starting HermesChi.
+[Atomic Chat](https://atomic.chat/) را دانلود کنید، اپلیکیشن دسکتاپ را اجرا کنید و مطمئن شوید پیش از آغاز HermesChi یک مدل بارگذاری شده است.
 
 ### Ollama
 
 ```bash
-# Start Ollama
+# آغاز Ollama
 OLLAMA_ORIGINS=* ollama serve
 
-# Start workspace pointed at Ollama
+# آغاز فضای کاری نشانه‌داده به Ollama
 HERMES_API_URL=http://127.0.0.1:11434 pnpm dev
 ```
 
-Chat works immediately. Sessions, memory, and skills show "Not Available" — that's expected in portable mode.
+چت بلافاصله کار می‌کند. نشست‌ها، حافظه و مهارت‌ها «در دسترس نیست» نشان می‌دهند — این در حالت قابل‌حمل طبیعی است.
 
-### Enhanced Mode (Full Features)
+### حالت پیشرفته (امکانات کامل)
 
-Route through the Hermes Agent gateway for sessions, memory, skills, jobs, and tools.
+از طریق gateway عامل Hermes برای نشست‌ها، حافظه، مهارت‌ها، کارها و ابزارها عبور کنید.
 
-Here are two explicit `~/.hermes/config.yaml` examples for the local providers we support directly in the workspace:
+در اینجا دو نمونه صریح `~/.hermes/config.yaml` برای providerهای محلی که به‌طور مستقیم در فضای کاری پشتیبانی می‌شوند آورده شده است:
 
 **Atomic Chat**
 
@@ -303,35 +303,35 @@ custom_providers:
     api_mode: chat_completions
 ```
 
-You can adapt the same shape for other OpenAI-compatible local runners, but `Atomic Chat` and `Ollama` are the two built-in local paths documented in the workspace UI.
+می‌توانید همین ساختار را برای سایر runnerهای محلی سازگار با OpenAI تطبیق دهید، اما `Atomic Chat` و `Ollama` دو مسیر محلی داخلی هستند که در رابط فضای کاری مستندسازی شده‌اند.
 
-**2. Enable the API server in `~/.hermes/.env`:**
+**۲. فعال کردن API server در `~/.hermes/.env`:**
 
 ```env
 API_SERVER_ENABLED=true
 ```
 
-**3. Start the gateway, dashboard, and workspace:**
+**۳. آغاز gateway، داشبورد و فضای کاری:**
 
 ```bash
-hermes gateway run          # Starts core APIs on :8642
-hermes dashboard            # Starts dashboard APIs on :9119
+hermes gateway run          # آغاز APIهای اصلی روی :8642
+hermes dashboard            # آغاز APIهای داشبورد روی :9119
 HERMES_API_URL=http://127.0.0.1:8642 \
 HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119 \
 pnpm dev
 ```
 
-For authenticated gateways, also set `HERMES_API_TOKEN` in the workspace environment to the same value as `API_SERVER_KEY`.
+برای gatewayهای دارای احراز هویت، همچنین `HERMES_API_TOKEN` را در محیط فضای کاری به همان مقدار `API_SERVER_KEY` تنظیم کنید.
 
-All workspace features unlock automatically once both services are reachable — sessions persist, memory saves across chats, skills are available, and the dashboard shows real usage data.
+تمام قابلیت‌های فضای کاری به‌محض اینکه هر دو سرویس قابل دسترس شوند به‌طور خودکار باز می‌شوند — نشست‌ها ماندگار می‌شوند، حافظه میان چت‌ها ذخیره می‌شود، مهارت‌ها در دسترس هستند و داشبورد داده‌های مصرف واقعی را نمایش می‌دهد.
 
-> **Works with any OpenAI-compatible server** — Atomic Chat, Ollama, LM Studio, vLLM, llama.cpp, LocalAI, etc. Just change the `base_url` and `model` in the config above.
+> **با هر سرور سازگار با OpenAI کار می‌کند** — Atomic Chat، Ollama، LM Studio، vLLM، llama.cpp، LocalAI و غیره. فقط `base_url` و `model` را در پیکربندی بالا تغییر دهید.
 
 ---
 
-## 🤝 Pair an Agent with the Workspace
+## 🤝 جفت‌کردن یک عامل با فضای کاری
 
-Workspace is the UI. **Hermes Agent** is the brain. They talk over two HTTP services on localhost (or any reachable network).
+فضای کاری رابط کاربری است. **Hermes Agent** مغز است. آن‌ها روی localhost (یا هر شبکه قابل دسترسی) از طریق دو سرویس HTTP با هم صحبت می‌کنند.
 
 ```
 ┌───────────────┐         :8642 gateway          ┌────────────────┐
@@ -340,98 +340,98 @@ Workspace is the UI. **Hermes Agent** is the brain. They talk over two HTTP serv
 └───────────────┘         :9119 dashboard        └────────────────┘
 ```
 
-### Two services, three commands
+### دو سرویس، سه دستور
 
 ```bash
-hermes gateway run     # terminal 1 · :8642 · chat, models, streaming, jobs
-hermes dashboard       # terminal 2 · :9119 · sessions, skills, config, MCP
-cd ~/hermeschi && pnpm dev   # terminal 3 · :3000 · the UI
+hermes gateway run     # ترمینال ۱ · :8642 · چت، مدل‌ها، استریم، کارها
+hermes dashboard       # ترمینال ۲ · :9119 · نشست‌ها، مهارت‌ها، پیکربندی، MCP
+cd ~/hermeschi && pnpm dev   # ترمینال ۳ · :3000 · رابط کاربری
 ```
 
-> **Tip:** `pnpm start:all` starts gateway + dashboard + workspace in one shot if you've installed via the one-liner.
+> **نکته:** `pnpm start:all` در صورت نصب از طریق نصب‌کننده یک‌خطی، gateway + داشبورد + فضای کاری را در یک گام آغاز می‌کند.
 
-### Windows (PowerShell + WSL) one-command startup
+### ویندوز (PowerShell + WSL) آغاز یک‌دستوری
 
-If you use HermesChi from Windows with the agent running in WSL, use the helper script in this repo:
+اگر HermesChi را از ویندوز با عامل در حال اجرا در WSL استفاده می‌کنید، از اسکریپت کمکی در این مخزن استفاده کنید:
 
 ```powershell
-# from the repo root
+# از ریشه مخزن
 .\scripts\start-hermeschi.ps1
 ```
 
-To force a clean relaunch of the tmux session:
+برای اعمال راه‌اندازی مجدد تمیز نشست tmux:
 
 ```powershell
 .\scripts\start-hermeschi.ps1 -Restart
 ```
 
-Optional parameters:
-- `-Distro <name>` to target a non-default WSL distro
-- `-WorkspacePath </path/in/wsl>` if your clone is not at `~/hermeschi`
-- `-SessionName <name>` to use a custom tmux session name
+پارامترهای اختیاری:
+- `-Distro <name>` برای هدف قرار دادن یک توزیع WSL غیرپیش‌فرض
+- `-WorkspacePath </path/in/wsl>` اگر کلون شما در `~/hermeschi` نیست
+- `-SessionName <name>` برای استفاده از یک نام نشست tmux سفارشی
 
-### Verify the pairing
+### راستی‌آزمایی جفت‌شدن
 
 ```bash
 curl http://127.0.0.1:8642/health        # → {"status":"ok","platform":"hermes-agent"}
 curl http://127.0.0.1:9119/api/status    # → {"status":"ok", ...}
 ```
 
-Both must return `200`. If either fails, the workspace will fall back to **portable mode** (chat works, sessions/skills/memory show "Not Available").
+هر دو باید `200` برگردانند. اگر هر کدام شکست بخورد، فضای کاری به **حالت قابل‌حمل** برمی‌گردد (چت کار می‌کند، نشست‌ها/مهارت‌ها/حافظه «در دسترس نیست» نشان می‌دهند).
 
-### `.env` settings the workspace cares about
+### تنظیمات `.env` که فضای کاری به آن اهمیت می‌دهد
 
 ```env
-# Required: where the gateway is
+# الزامی: gateway کجاست
 HERMES_API_URL=http://127.0.0.1:8642
 
-# Recommended: where the dashboard is (unlocks sessions/skills/config/MCP/jobs)
+# توصیه‌شده: داشبورد کجاست (نشست‌ها/مهارت‌ها/پیکربندی/MCP/کارها را باز می‌کند)
 HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119
 
-# Only if your gateway was started with API_SERVER_KEY=... — paste the same value:
+# فقط اگر gateway شما با API_SERVER_KEY=... آغاز شده — همان مقدار را جای‌گذاری کنید:
 # HERMES_API_TOKEN=***
 
-# Optional: password-protect the web UI itself
+# اختیاری: محافظت با رمز عبور از خود رابط وب
 # HERMESCHI_PASSWORD=***
 ```
 
-### Common pairing scenarios
+### سناریوهای رایج جفت‌شدن
 
-| Scenario | Set this |
+| سناریو | این را تنظیم کنید |
 |---|---|
-| Workspace + gateway on the same machine | `HERMES_API_URL=http://127.0.0.1:8642`, `HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119` |
-| Gateway on a remote server (Tailscale / VPN) | Set both URLs to the reachable IP (e.g. `http://100.x.y.z:8642`) and add `API_SERVER_HOST=0.0.0.0` to the gateway's `~/.hermes/.env` |
-| Already-running `hermes-agent` from upstream installer | Just set `HERMES_API_URL` + `HERMESCHI_DASHBOARD_URL` and skip the one-liner installer |
-| Multiple agent profiles | Profiles live under `~/.hermes/profiles/<name>` — the dashboard switches between them at runtime; workspace follows automatically |
+| فضای کاری + gateway روی همان ماشین | `HERMES_API_URL=http://127.0.0.1:8642`، `HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119` |
+| gateway روی یک سرور از راه دور (Tailscale / VPN) | هر دو URL را روی IP قابل دسترس تنظیم کنید (مثلاً `http://100.x.y.z:8642`) و `API_SERVER_HOST=0.0.0.0` را به `~/.hermes/.env` gateway اضافه کنید |
+| `hermes-agent` در حال اجرا از نصب‌کننده بالادستی | فقط `HERMES_API_URL` + `HERMESCHI_DASHBOARD_URL` را تنظیم کنید و از نصب‌کننده یک‌خطی صرف‌نظر کنید |
+| چندین پروفایل عامل | پروفایل‌ها در `~/.hermes/profiles/<name>` قرار دارند — داشبورد در زمان اجرا میان آن‌ها جابه‌جا می‌شود؛ فضای کاری به‌طور خودکار پیروی می‌کند |
 
-### Live re-pairing (no restart)
+### جفت‌شدن مجدد زنده (بدون راه‌اندازی مجدد)
 
-If you've already started the workspace, change either URL from **Settings → Connection** without restarting. Values persist to `~/.hermes/workspace-overrides.json` and gateway capabilities are reprobed on save.
+اگر فضای کاری را از قبل آغاز کرده‌اید، بدون راه‌اندازی مجدد، هر یک از URLها را از **Settings → Connection** تغییر دهید. مقادیر در `~/.hermes/workspace-overrides.json` ذخیره می‌شوند و قابلیت‌های gateway هنگام ذخیره دوباره بررسی می‌شوند.
 
-### Troubleshooting
+### عیب‌یابی
 
-- **`Could not reach Hermes gateway on 8645, 8642, or 8643`** — gateway isn't running, or `HERMES_API_URL` points somewhere unreachable. Run `hermes gateway run` and re-check.
-- **Workspace shows "portable mode" / extended APIs missing** — dashboard isn't running. Start `hermes dashboard` in another terminal and refresh.
-- **Sessions probe says unavailable / UI claims Offline but pairing should be live** — verify `curl http://localhost:3000/api/sessions` before starting another gateway. If it returns sessions (or an empty array), the backend pairing is alive and the UI needs a refresh/reprobe.
-- **Chat send fails on `gpt-5.4` / Codex** — Codex CLI auth is stale. Run `codex login`, then retry the chat without starting another gateway.
-- **`Unauthorized` on every API call** — gateway has `API_SERVER_KEY` set but workspace is missing `HERMES_API_TOKEN`. Match them.
-- **`Could not connect` from your phone over Tailscale** — gateway is bound to loopback. Set `API_SERVER_HOST=0.0.0.0` in `~/.hermes/.env` and restart it.
+- **`Could not reach Hermes gateway on 8645, 8642, or 8643`** — gateway در حال اجرا نیست، یا `HERMES_API_URL` به جایی غیرقابل دسترس اشاره می‌کند. `hermes gateway run` را اجرا کنید و دوباره بررسی کنید.
+- **فضای کاری «حالت قابل‌حمل» نشان می‌دهد / APIهای توسعه‌یافته غایب‌اند** — داشبورد در حال اجرا نیست. `hermes dashboard` را در یک ترمینال دیگر آغاز کنید و بازخوانی کنید.
+- **بررسی نشست‌ها «غیرقابل دسترس» می‌گوید / رابط ادعای آفلاین می‌کند در حالی که جفت‌شدن باید زنده باشد** — پیش از آغاز gateway دیگر، `curl http://localhost:3000/api/sessions` را راستی‌آزمایی کنید. اگر نشست‌ها (یا یک آرایه خالی) برگرداند، جفت‌شدن backend زنده است و رابط به بازخوانی/بررسی مجدد نیاز دارد.
+- **ارسال چت روی `gpt-5.4` / Codex شکست می‌خورد** — احراز هویت Codex CLI منقضی شده. `codex login` را اجرا کنید، سپس بدون آغاز gateway دیگر چت را دوباره امتحان کنید.
+- **`Unauthorized` روی هر فراخوانی API** — gateway `API_SERVER_KEY` تنظیم کرده اما فضای کاری `HERMES_API_TOKEN` ندارد. آن‌ها را مطابقت دهید.
+- **`Could not connect` از تلفن از طریق Tailscale** — gateway به loopback متصل است. `API_SERVER_HOST=0.0.0.0` را در `~/.hermes/.env` تنظیم کنید و آن را راه‌اندازی مجدد کنید.
 
 ---
 
-## 🐳 Docker Quickstart
+## 🐳 شروع سریع Docker
 
 [![Open in GitHub Codespaces](https://img.shields.io/badge/GitHub%20Codespaces-Open-181717?logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=outsourc-e/hermeschi)
 
-The Docker setup runs both the **Hermes Agent gateway** and **HermesChi** together.
+راه‌اندازی Docker هم **gateway عامل Hermes** و هم **HermesChi** را با هم اجرا می‌کند.
 
-### Prerequisites
+### پیش‌نیازها
 
 - **Docker**
 - **Docker Compose**
-- **A configured Hermes Agent model provider** — run `hermes setup` / `hermes model`, or provide a key for whichever provider you use. This workspace does not require Anthropic.
+- **یک provider مدل عامل Hermes پیکربندی‌شده** — `hermes setup` / `hermes model` را اجرا کنید، یا کلیدی برای هر provider که استفاده می‌کنید ارائه دهید. این فضای کاری به Anthropic نیاز ندارد.
 
-### Step 1: Configure Environment
+### گام ۱: پیکربندی محیط
 
 ```bash
 git clone https://github.com/outsourc-e/hermeschi.git
@@ -439,45 +439,44 @@ cd hermeschi
 cp .env.example .env
 ```
 
-Edit `.env` and add **at least one** LLM provider key — whichever provider you want hermes-agent to use:
+`.env` را ویرایش کنید و **حداقل یک** کلید provider مدل زبان اضافه کنید — هر provider که می‌خواهید hermes-agent استفاده کند:
 
 ```env
-# Pick one (or more). You do NOT need all of these.
-# OPENAI_API_KEY=sk-...                # GPT / o-series / OpenAI-compatible
-# OPENROUTER_API_KEY=sk-or-v1-...      # OpenRouter (free models available)
+# یکی (یا چندتا) را انتخاب کنید. به همه این‌ها نیاز ندارید.
+# OPENAI_API_KEY=sk-...                # GPT / o-series / سازگار با OpenAI
+# OPENROUTER_API_KEY=sk-or-v1-...      # OpenRouter (مدل‌های رایگان موجود)
 # GOOGLE_API_KEY=AIza...               # Gemini
 ```
 
-Using **Ollama, LM Studio, or another local server**? No key needed — just point hermes-agent at your local endpoint via the onboarding flow.
+از **Ollama، LM Studio یا یک سرور محلی دیگر** استفاده می‌کنید؟ کلید لازم نیست — فقط از طریق جریان onboarding، hermes-agent را به endpoint محلی خود نشانه بگیرید.
 
-> **Heads up:** `hermes-agent` needs to be able to reach _some_ model. If you don't configure any provider (API key or local server), chat will fail on first message.
+> **توجه:** `hermes-agent` باید بتواند به _یک_ مدل برسد. اگر هیچ providerای (کلید API یا سرور محلی) پیکربندی نکنید، چت در اولین پیام شکست می‌خورد.
 
-### Step 2: Start the Services
+### گام ۲: آغاز سرویس‌ها
 
 ```bash
 docker compose up
 ```
 
-This pulls two pre-built images and starts them:
+این دو ایمیج پیش‌ساخته‌شده را می‌کشد و آغاز می‌کند:
 
-- **hermes-agent** → `nousresearch/hermes-agent:latest` on port **8642**
-- **hermeschi** → `ghcr.io/outsourc-e/hermeschi:latest` on port **3000**
+- **hermes-agent** → `nousresearch/hermes-agent:latest` روی پورت **8642**
+- **hermeschi** → `ghcr.io/outsourc-e/hermeschi:latest` روی پورت **3000**
 
-No local build. First run takes a minute to pull; subsequent starts are instant.
-Agent state (config, sessions, skills, memory, credentials) persists in the
-legacy-named `claude-data` Docker volume, so containers can be recreated without data loss.
+بدون build محلی. اولین اجرا یک دقیقه برای کشیدن طول می‌کشد؛ آغازهای بعدی فوری هستند.
+وضعیت عامل (پیکربندی، نشست‌ها، مهارت‌ها، حافظه، اعتبارنامه‌ها) در volume داکر با نام قدیمی `claude-data` ماندگار است، بنابراین کانتینرها می‌توانند بدون از دست رفتن داده بازسازی شوند.
 
-### Step 3: Access the Workspace
+### گام ۳: دسترسی به فضای کاری
 
-Open `http://localhost:3000` and complete the onboarding.
+`http://localhost:3000` را باز کنید و onboarding را تکمیل کنید.
 
-> **Verify:** Check the Docker logs for `[gateway] Connected to Hermes Agent` — this confirms the workspace successfully connected to the agent.
+> **راستی‌آزمایی:** لاگ‌های Docker را برای `[gateway] Connected to Hermes Agent` بررسی کنید — این تأیید می‌کند که فضای کاری با موفقیت به عامل متصل شده است.
 
-### Remote Access (LAN / Tailscale / VPN)
+### دسترسی از راه دور (LAN / Tailscale / VPN)
 
-The default compose file binds ports to `127.0.0.1` (localhost only). To access the workspace from other devices on your network, you need to:
+فایل compose پیش‌فرض پورت‌ها را به `127.0.0.1` (فقط localhost) متصل می‌کند. برای دسترسی به فضای کاری از دستگاه‌های دیگر روی شبکه خود، باید:
 
-**1. Publish ports without the loopback restriction.** Create a `docker-compose.override.yml`:
+**۱. پورت‌ها را بدون محدودیت loopback منتشر کنید.** یک `docker-compose.override.yml` بسازید:
 
 ```yaml
 services:
@@ -489,387 +488,387 @@ services:
       - '3000:3000'
 ```
 
-**2. Add these env vars to `.env`:**
+**۲. این متغیرهای env را به `.env` اضافه کنید:**
 
 ```env
-# Required: workspace session password (the workspace refuses to start on 0.0.0.0 without it)
+# الزامی: رمز عبور نشست فضای کاری (فضای کاری روی 0.0.0.0 بدون آن از آغاز سر باز می‌زند)
 HERMESCHI_PASSWORD=your-strong-secret-here
 
-# Required for plain-HTTP LAN access (browsers drop Secure cookies over http://)
+# الزامی برای دسترسی LAN با HTTP ساده (مرورگرها کوکی‌های Secure را روی http:// رد می‌کنند)
 COOKIE_SECURE=0
 
-# Recommended: gateway auth token (prevents unauthenticated API access on your LAN)
+# توصیه‌شده: توکن احراز هویت gateway (جلوگیری از دسترسی API بدون احراز هویت روی LAN شما)
 API_SERVER_KEY=***
 
-# If the gateway refuses to start with "No user allowlists configured":
+# اگر gateway با "No user allowlists configured" از آغاز سر باز می‌زند:
 GATEWAY_ALLOW_ALL_USERS=true
 ```
 
-**3. Restart the stack:**
+**۳. استک را راه‌اندازی مجدد کنید:**
 
 ```bash
 docker compose down && docker compose up -d
 ```
 
-> **HTTPS behind a reverse proxy?** If you terminate TLS at a reverse proxy (Traefik, Nginx, Caddy, Tailscale Funnel), set `COOKIE_SECURE=1` instead and add `TRUST_PROXY=1` so IP classification works correctly.
+> **HTTPS پشت یک reverse proxy؟** اگر TLS را در یک reverse proxy (Traefik، Nginx، Caddy، Tailscale Funnel) خاتمه می‌دهید، به‌جای آن `COOKIE_SECURE=1` تنظیم کنید و `TRUST_PROXY=1` اضافه کنید تا طبقه‌بندی IP درست کار کند.
 
-### Troubleshooting Docker
+### عیب‌یابی Docker
 
-| Symptom | Fix |
+| علامت | راه‌حل |
 |---|---|
-| `[workspace] refusing to start — HERMESCHI_PASSWORD is unset` | Add `HERMESCHI_PASSWORD=<secret>` to `.env` |
-| Login silently fails (no error, page reloads) | Add `COOKIE_SECURE=0` for HTTP, or `COOKIE_SECURE=1` + HTTPS |
-| `[Api_Server] Refusing to start: binding to 0.0.0.0 requires API_SERVER_KEY` | Add `API_SERVER_KEY=*** to `.env` |
-| `No user allowlists configured. All unauthorized users will be denied.` | Add `GATEWAY_ALLOW_ALL_USERS=true` to `.env` |
-| `CLAUDE_DASHBOARD_TOKEN is not set` warning | Set `CLAUDE_DASHBOARD_TOKEN` to the same value as `API_SERVER_KEY` |
-| 500 Internal Server Error on login after setting all the above | Clear browser cookies for the workspace domain, then retry |
+| `[workspace] refusing to start — HERMESCHI_PASSWORD is unset` | `HERMESCHI_PASSWORD=<secret>` را به `.env` اضافه کنید |
+| ورود به‌طور خاموش شکست می‌خورد (بدون خطا، صفحه بازخوانی می‌شود) | برای HTTP `COOKIE_SECURE=0` اضافه کنید، یا `COOKIE_SECURE=1` + HTTPS |
+| `[Api_Server] Refusing to start: binding to 0.0.0.0 requires API_SERVER_KEY` | `API_SERVER_KEY=***` را به `.env` اضافه کنید |
+| `No user allowlists configured. All unauthorized users will be denied.` | `GATEWAY_ALLOW_ALL_USERS=true` را به `.env` اضافه کنید |
+| هشدار `CLAUDE_DASHBOARD_TOKEN is not set` | `CLAUDE_DASHBOARD_TOKEN` را به همان مقدار `API_SERVER_KEY` تنظیم کنید |
+| خطای 500 Internal Server Error هنگام ورود پس از تنظیم همه موارد بالا | کوکی‌های مرورگر را برای دامنه فضای کاری پاک کنید، سپس دوباره امتحان کنید |
 
-### Building from source
+### ساختن از سورس
 
-Want to hack on the workspace and have local changes hot-built into the
-container? Use the dev overlay:
+می‌خواهید روی فضای کاری کار کنید و تغییرات محلی را به‌صورت hot-built درون کانتینر داشته
+باشید؟ از overlay توسعه‌ای استفاده کنید:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-The base `docker-compose.yml` stays untouched — the overlay adds a `build:`
-block for the `hermeschi` service so the local repo is compiled
-instead of pulled. The Hermes Agent service still uses the canonical
-`nousresearch/hermes-agent:latest` image; if you need a custom agent
-build, tag it locally and override `image:` in your own
-`compose.override.yml`.
+`docker-compose.yml` پایه دست‌نخورده باقی می‌ماند — overlay یک بلوک `build:`
+برای سرویس `hermeschi` اضافه می‌کند تا مخزن محلی به‌جای کشیده شدن، کامپایل شود.
+سرویس Hermes Agent همچنان از ایمیج کانونیکال
+`nousresearch/hermes-agent:latest` استفاده می‌کند؛ اگر به یک build عامل سفارشی
+نیاز دارید، آن را به‌صورت محلی تگ کنید و `image:` را در
+`compose.override.yml` خود بازنویسی کنید.
 
-### Using a Pre-Built Image (Coolify / Easypanel / Dokploy / Unraid)
+### استفاده از یک ایمیج پیش‌ساخته‌شده (Coolify / Easypanel / Dokploy / Unraid)
 
-Deploying HermesChi to a PaaS or home-lab stack? Pull the image
-directly from GitHub Container Registry:
+HermesChi را به یک PaaS یا استک آزمایشگاه خانگی مستقر می‌کنید؟ ایمیج را
+مستقیماً از GitHub Container Registry بکشید:
 
 ```
 ghcr.io/outsourc-e/hermeschi:latest
 ```
 
-Available tags:
+تگ‌های موجود:
 
-| Tag | What it is |
+| تگ | چیست |
 |---|---|
-| `latest` | Latest `main` commit (stable; recommended) |
-| `v2.0.0` | Pinned semver tag |
-| `main-<sha>` | Specific commit |
+| `latest` | آخرین commit `main` (پایدار؛ توصیه‌شده) |
+| `v2.0.0` | تگ semver پین‌شده |
+| `main-<sha>` | commit خاص |
 
-Minimal Coolify / Easypanel config:
+پیکربندی حداقلی Coolify / Easypanel:
 
 ```yaml
 service: hermeschi
 image: ghcr.io/outsourc-e/hermeschi:latest
 port: 3000
 env:
-  HERMES_API_URL: http://hermes-agent:8642   # point at your gateway
-  HERMES_API_TOKEN: ${API_SERVER_KEY}        # if gateway auth is enabled
+  HERMES_API_URL: http://hermes-agent:8642   # به gateway خود نشانه کنید
+  HERMES_API_TOKEN: ${API_SERVER_KEY}        # اگر احراز هویت gateway فعال است
 ```
 
-The image is built for `linux/amd64` and `linux/arm64`. Pair it with either
-a `nousresearch/hermes-agent:latest` container (what our `docker-compose.yml`
-does by default) or an existing gateway on another host.
+ایمیج برای `linux/amd64` و `linux/arm64` ساخته می‌شود. آن را با یک کانتینر
+`nousresearch/hermes-agent:latest` (کاری که `docker-compose.yml` ما به‌طور
+پیش‌فرض انجام می‌دهد) یا با یک gateway موجود روی میزبان دیگر جفت کنید.
 
 ---
 
-## 📱 Install as App (Recommended)
+## 📱 نصب به‌عنوان اپلیکیشن (توصیه‌شده)
 
-HermesChi is a **Progressive Web App (PWA)** — install it for the full native app experience with no browser chrome, keyboard shortcuts, and offline support.
+HermesChi یک **Progressive Web App (PWA)** است — آن را برای تجربه کامل اپلیکیشن بومی بدون مرورگر chrome، میان‌برهای صفحه‌کلید و پشتیبانی آفلاین نصب کنید.
 
-### 🖥️ Desktop (macOS / Windows / Linux)
+### 🖥️ دسکتاپ (macOS / Windows / Linux)
 
-1. Open HermesChi in **Chrome** or **Edge** at `http://localhost:3000`
-2. Click the **install icon** (⊕) in the address bar
-3. Click **Install** — HermesChi opens as a standalone desktop app
-4. Pin to Dock / Taskbar for quick access
+1. HermesChi را در **Chrome** یا **Edge** روی `http://localhost:3000` باز کنید
+2. روی **آیکون نصب** (⊕) در نوار آدرس کلیک کنید
+3. روی **Install** کلیک کنید — HermesChi به‌عنوان یک اپلیکیشن دسکتاپ مستقل باز می‌شود
+4. برای دسترسی سریع به Dock / Taskbar سنجاق کنید
 
-> **macOS users:** After installing, you can also add it to your Launchpad.
+> **کاربران macOS:** پس از نصب، می‌توانید آن را به Launchpad خود نیز اضافه کنید.
 
 ### 📱 iPhone / iPad (iOS Safari)
 
-1. Open HermesChi in **Safari** on your iPhone
-2. Tap the **Share** button (□↑)
-3. Scroll down and tap **"Add to Home Screen"**
-4. Tap **Add** — the HermesChi icon appears on your home screen
-5. Launch from home screen for the full native app experience
+1. HermesChi را در **Safari** روی iPhone خود باز کنید
+2. روی دکمه **Share** (□↑) ضربه بزنید
+3. پایین بیایید و روی **«Add to Home Screen»** ضربه بزنید
+4. روی **Add** ضربه بزنید — آیکون HermesChi روی صفحه اصلی شما ظاهر می‌شود
+5. برای تجربه کامل اپلیکیشن بومی از صفحه اصلی اجرا کنید
 
-### 🤖 Android
+### 🤖 اندروید
 
-1. Open HermesChi in **Chrome** on your Android device
-2. Tap the **three-dot menu** (⋮) → **"Add to Home screen"**
-3. Tap **Add** — HermesChi is now a native-feeling app on your device
+1. HermesChi را در **Chrome** روی دستگاه اندروید خود باز کنید
+2. روی **منوی سه‌نقطه** (⋮) ضربه بزنید → **«Add to Home screen»**
+3. روی **Add** ضربه بزنید — HermesChi اکنون یک اپلیکیشن با حس بومی روی دستگاه شماست
 
 ---
 
-## 📡 Mobile Access via Tailscale
+## 📡 دسترسی موبایل از طریق Tailscale
 
-Access HermesChi from anywhere on your devices — no port forwarding, no VPN complexity.
+از هر جا روی دستگاه‌های خود به HermesChi دسترسی پیدا کنید — بدون port forwarding، بدون پیچیدگی VPN.
 
-### Setup
+### راه‌اندازی
 
-1. **Install Tailscale** on your Mac and mobile device:
+1. **Tailscale را نصب کنید** روی Mac و دستگاه موبایل خود:
    - Mac: [tailscale.com/download](https://tailscale.com/download)
-   - iPhone/Android: Search "Tailscale" in the App Store / Play Store
+   - iPhone/Android: «Tailscale» را در App Store / Play Store جست‌وجو کنید
 
-2. **Sign in** to the same Tailscale account on both devices
+2. **وارد شوید** به همان حساب Tailscale روی هر دو دستگاه
 
-3. **Find your Mac's Tailscale IP:**
+3. **IP تیل‌اسکیل Mac خود را پیدا کنید:**
 
    ```bash
    tailscale ip -4
-   # Example output: 100.x.x.x
+   # خروجی نمونه: 100.x.x.x
    ```
 
-4. **Open HermesChi on your phone:**
+4. **HermesChi را روی تلفن خود باز کنید:**
 
    ```
    http://100.x.x.x:3000
    ```
 
-5. **Add to Home Screen** using the steps above for the full app experience
+5. **به صفحه اصلی اضافه کنید** با استفاده از مراحل بالا برای تجربه کامل اپلیکیشن
 
-> 💡 Tailscale works over any network — home wifi, mobile data, even across countries. Your traffic stays end-to-end encrypted.
-
----
-
-## 🖥️ Native Desktop App
-
-> **Status: In Development** — A native Electron-based desktop app is in active development.
-
-The desktop app will offer:
-
-- Native window management and tray icon
-- System notifications for agent events and mission completions
-- Auto-launch on startup
-- Deep OS integration (macOS menu bar, Windows taskbar)
-
-**In the meantime:** Install HermesChi as a PWA (see above) for a near-native desktop experience — it works great.
+> 💡 Tailscale روی هر شبکه‌ای کار می‌کند — وای‌فای خانگی، داده موبایل، حتی میان کشورها. ترافیک شما سرتاسری رمزنگاری‌شده باقی می‌ماند.
 
 ---
 
-## ☁️ Cloud & Hosted Setup
+## 🖥️ اپلیکیشن دسکتاپ بومی
 
-> **Status: Coming Soon**
+> **وضعیت: در حال توسعه** — یک اپلیکیشن دسکتاپ بومی مبتنی بر Electron در حال توسعه فعال است.
 
-A fully managed cloud version of HermesChi is in development:
+اپلیکیشن دسکتاپ این امکانات را خواهد داشت:
 
-- **One-click deploy** — No self-hosting required
-- **Multi-device sync** — Access your agents from any device
-- **Team collaboration** — Shared mission control for your whole team
-- **Automatic updates** — Always on the latest version
+- مدیریت پنجره بومی و آیکون سینی
+- اعلان‌های سیستمی برای رویدادهای عامل و تکمیل مأموریت
+- راه‌اندازی خودکار هنگام شروع سیستم
+- یکپارچه‌سازی عمیق با OS (نوار منوی macOS، نوار وظیفه ویندوز)
 
-Features pending cloud infrastructure:
-
-- Cross-device session sync
-- Team shared memory and workspaces
-- Cloud-hosted backend with managed uptime
-- Webhook integrations and external triggers
+**در این فاصله:** HermesChi را به‌عنوان PWA نصب کنید (در بالا) برای یک تجربه دسکتاپ نزدیک به بومی — به‌خوبی کار می‌کند.
 
 ---
 
-## 🔒 Security & deployment env vars
+## ☁️ راه‌اندازی ابری و میزبانی‌شده
 
-Key safeguards — most are on by default, the env vars below are for remote / Docker deployments where you opt out of the loopback default.
+> **وضعیت: به‌زودی**
 
-### Built-in safeguards
+یک نسخه ابری کاملاً مدیریت‌شده از HermesChi در حال توسعه است:
 
-- Auth middleware on every API route
-- CSP headers via meta tags
-- Path-traversal prevention on file/memory routes (real-path boundary check, not string prefix)
-- Rate limiting on endpoints
-- Fail-closed startup guard: refuses to bind non-loopback without `HERMESCHI_PASSWORD`
-- Session cookies: `HttpOnly` + `SameSite=Strict` + `Secure` (in production)
-- Optional password protection for the web UI
+- **استقرار یک‌کلیکی** — نیازی به خودمیزبانی نیست
+- **همگام‌سازی چنددستگاهی** — از هر دستگاهی به عامل‌های خود دسترسی پیدا کنید
+- **همکاری تیمی** — کنترل مأموریت مشترک برای کل تیم شما
+- **به‌روزرسانی‌های خودکار** — همیشه روی آخرین نسخه
 
-### Env vars for remote / Docker deployments
+قابلیت‌های در انتظار زیرساخت ابری:
 
-- `HERMESCHI_PASSWORD` — required whenever `HOST ≠ 127.0.0.1` (legacy `CLAUDE_PASSWORD` still honored as a fallback)
-- `COOKIE_SECURE=1` — force the `Secure` cookie flag when terminating HTTPS at a proxy
-- `COOKIE_SECURE=0` — disable the `Secure` flag for plain-HTTP LAN deployments (`HOST=0.0.0.0` without HTTPS); without this, browsers silently drop session cookies and login fails (#149)
-- `TRUST_PROXY=1` — trust `x-forwarded-for` / `x-real-ip` (only set behind a sanitizing reverse proxy)
-- `HERMESCHI_DASHBOARD_TOKEN` — explicit bearer for dashboard API (preferred over the legacy HTML-scrape fallback)
-- `HERMES_API_TOKEN` — bearer for the Hermes Agent gateway when started with `API_SERVER_KEY` (legacy `CLAUDE_API_TOKEN` still honored)
-- `HERMES_ALLOW_INSECURE_REMOTE=1` — bypass the fail-closed guard (not recommended)
-
-See `.env.example` for the full list. Credits to [@kiosvantra](https://github.com/kiosvantra) for the security audit surfacing #121–#125.
+- همگام‌سازی نشست میان‌دستگاهی
+- حافظه و فضاهای کاری مشترک تیمی
+- backend میزبانی‌شده ابری با uptime مدیریت‌شده
+- یکپارچه‌سازی‌های webhook و triggerهای خارجی
 
 ---
 
-## 🔧 Troubleshooting
+## 🔒 امنیت و متغیرهای env استقرار
 
-### "Workspace loads but chat doesn't work"
+محافظت‌های کلیدی — بیشترشان به‌طور پیش‌فرض فعال هستند، env vars زیر برای استقرارهای از راه دور / Docker است که از پیش‌فرض loopback صرف‌نظر می‌کنید.
 
-The workspace auto-detects your gateway's capabilities on startup. Check your terminal for a line like:
+### محافظت‌های داخلی
+
+- middleware احراز هویت روی هر مسیر API
+- هدرهای CSP از طریق متا تگ‌ها
+- جلوگیری از پیمایش مسیر روی مسیرهای فایل/حافظه (بررسی مرز مسیر واقعی، نه پیشوند رشته‌ای)
+- محدودیت نرخ روی endpointها
+- محافظ آغاز fail-closed: بدون `HERMESCHI_PASSWORD` از اتصال به غیر loopback سر باز می‌زند
+- کوکی‌های نشست: `HttpOnly` + `SameSite=Strict` + `Secure` (در production)
+- محافظت اختیاری با رمز عبور برای رابط وب
+
+### متغیرهای env برای استقرارهای از راه دور / Docker
+
+- `HERMESCHI_PASSWORD` — هر زمان که `HOST ≠ 127.0.0.1` باشد الزامی است (`CLAUDE_PASSWORD` قدیمی همچنان به‌عنوان fallback پذیرفته می‌شود)
+- `COOKIE_SECURE=1` — پرچم کوکی `Secure` را هنگام خاتمه HTTPS در یک proxy اجباری کنید
+- `COOKIE_SECURE=0` — پرچم `Secure` را برای استقرارهای LAN با HTTP ساده غیرفعال کنید (`HOST=0.0.0.0` بدون HTTPS)؛ بدون این، مرورگرها به‌طور خاموش کوکی‌های نشست را رد می‌کنند و ورود شکست می‌خورد (#149)
+- `TRUST_PROXY=1` — به `x-forwarded-for` / `x-real-ip` اعتماد کنید (فقط پشت یک reverse proxy پاک‌سازی‌کننده تنظیم کنید)
+- `HERMESCHI_DASHBOARD_TOKEN` — bearer صریح برای API داشبورد (بر fallback scrape HTML قدیمی ترجیح داده می‌شود)
+- `HERMES_API_TOKEN` — bearer برای gateway عامل Hermes هنگام آغاز با `API_SERVER_KEY` (`CLAUDE_API_TOKEN` قدیمی همچنان پذیرفته می‌شود)
+- `HERMES_ALLOW_INSECURE_REMOTE=1` — دور زدن محافظ fail-closed (توصیه نمی‌شود)
+
+برای لیست کامل به `.env.example` مراجعه کنید. اعتبار به [@kiosvantra](https://github.com/kiosvantra) برای ممیزی امنیتی که #121–#125 را آشکار کرد.
+
+---
+
+## 🔧 عیب‌یابی
+
+### «فضای کاری بارگذاری می‌شود اما چت کار نمی‌کند»
+
+فضای کاری قابلیت‌های gateway شما را هنگام آغاز به‌طور خودکار تشخیص می‌دهد. ترمینال خود را برای خطی مانند این بررسی کنید:
 
 ```
 [gateway] http://127.0.0.1:8642 available: health, models; missing: sessions, skills, memory, config, jobs
 [gateway] Missing Hermes Agent APIs detected. Update hermes-agent to the latest version.
 ```
 
-**Fix:** Upgrade to the latest stock `hermes-agent`, which ships the extended endpoints:
+**راه‌حل:** به آخرین نسخه استاندارد `hermes-agent` ارتقا دهید، که endpointهای توسعه‌یافته را همراه دارد:
 
 ```bash
 cd ~/hermes-agent && git pull && uv pip install -e .
 hermes gateway run
 ```
 
-(If you installed via a different path, follow your Nous installer's upgrade instructions.) If you were on the old `outsourc-e/hermes-agent` fork, it's no longer needed as of v2 — uninstall it and use upstream instead.
+(اگر از مسیر متفاوتی نصب کرده‌اید، دستورات ارتقا نصب‌کننده Nous خود را دنبال کنید.) اگر روی فورک قدیمی `outsourc-e/hermes-agent` بودید، از نسخه ۲ به بعد دیگر نیازی به آن نیست — آن را حذف کنید و به‌جای آن از upstream استفاده کنید.
 
-### "Connection refused" or workspace hangs on load
+### «اتصال رد شد» یا فضای کاری هنگام بارگذاری می‌خوابد
 
-Your Hermes Agent gateway isn't running. Start it:
+gateway عامل Hermes شما در حال اجرا نیست. آن را آغاز کنید:
 
 ```bash
 hermes gateway run
 ```
 
-First-time run? Do `hermes setup` first to pick a provider and model.
+اولین اجرا؟ ابتدا `hermes setup` را انجام دهید تا یک provider و مدل انتخاب کنید.
 
-### Ollama: chat returns empty or model shows "Offline"
+### Ollama: چت خالی برمی‌گرداند یا مدل «آفلاین» نشان می‌دهد
 
-Make sure your `~/.hermes/config.yaml` has the `custom_providers` section and `API_SERVER_ENABLED=true` in `~/.hermes/.env`. See [Local Models](#-local-models-ollama-lm-studio-vllm) above.
+مطمئن شوید `~/.hermes/config.yaml` شما بخش `custom_providers` را دارد و `API_SERVER_ENABLED=true` در `~/.hermes/.env` است. به [مدل‌های محلی](#-مدل‌های-محلی-ollama-lm-studio-vllm) در بالا مراجعه کنید.
 
-Also ensure Ollama is running with CORS enabled:
+همچنین مطمئن شوید Ollama با CORS فعال در حال اجراست:
 
 ```bash
 OLLAMA_ORIGINS=* ollama serve
 ```
 
-Use `http://127.0.0.1:11434/v1` (not `localhost`) as the base URL.
+از `http://127.0.0.1:11434/v1` (نه `localhost`) به‌عنوان URL پایه استفاده کنید.
 
-Verify: `curl http://localhost:8642/health` should return `{"status": "ok"}`.
+راستی‌آزمایی: `curl http://localhost:8642/health` باید `{"status": "ok"}` برگرداند.
 
-### "Using upstream NousResearch/hermes-agent"
+### «استفاده از upstream NousResearch/hermes-agent»
 
-v2+ runs on vanilla `hermes-agent`. **No fork required.** The upstream ships every endpoint the workspace needs for chat, sessions, memory, skills, config, jobs, MCP, terminal, and Agent View.
+نسخه ۲+ روی `hermes-agent` خام اجرا می‌شود. **بدون نیاز به فورک.** upstream هر endpointی را که فضای کاری برای چت، نشست‌ها، حافظه، مهارت‌ها، پیکربندی، کارها، MCP، ترمینال و نمای عامل نیاز دارد همراه دارد.
 
-**Conductor note:** when the dashboard mission API is available, Workspace uses it directly. When that endpoint is absent, Workspace uses its native Swarm fallback and returns `mode: native-swarm`. The fallback dispatches through Workspace Swarm workers, keeps status available through `/api/conductor-spawn?missionId=...`, and cancels through `/api/conductor-stop`.
+**نکته Conductor:** وقتی API مأموریت داشبورد موجود است، فضای کاری مستقیماً از آن استفاده می‌کند. وقتی آن endpoint غایب است، فضای کاری از fallback Swarm بومی خود استفاده می‌کند و `mode: native-swarm` برمی‌گرداند. fallback از طریق کارگران Workspace Swarm ارسال می‌کند، وضعیت را از طریق `/api/conductor-spawn?missionId=...` در دسترس نگه می‌دارد و از طریق `/api/conductor-stop` لغو می‌کند.
 
-If you're pinned to an older `hermes-agent` version and missing core endpoints, the workspace will degrade gracefully to **portable mode** with basic chat — upgrade upstream to restore full features.
+اگر به یک نسخه قدیمی‌تر `hermes-agent` پین شده‌اید و endpointهای اصلی غایب‌اند، فضای کاری به‌خوبی به **حالت قابل‌حمل** با چت پایه تقلیل می‌یابد — برای بازگرداندن قابلیت‌های کامل، upstream را ارتقا دهید.
 
-### Docker: "Unauthorized" or "Connection refused" to hermes-agent
+### Docker: «Unauthorized» یا «Connection refused» به hermes-agent
 
-If using Docker Compose and getting auth errors:
+اگر از Docker Compose استفاده می‌کنید و خطاهای احراز هویت دریافت می‌کنید:
 
-1. **Check at least one provider key is set:**
+1. **بررسی کنید حداقل یک کلید provider تنظیم شده:**
 
    ```bash
    grep -E '_API_KEY' .env
-   # Should show one of: OPENAI_API_KEY, OPENROUTER_API_KEY, GOOGLE_API_KEY, or another provider key you intentionally use.
+   # باید یکی از این‌ها را نشان دهد: OPENAI_API_KEY، OPENROUTER_API_KEY، GOOGLE_API_KEY یا کلید provider دیگری که عمداً استفاده می‌کنید.
    ```
 
-   (hermes-agent reads whichever key matches the provider configured in `~/.hermes/config.yaml`.)
+   (hermes-agent هر کلیدی را که با provider پیکربندی‌شده در `~/.hermes/config.yaml` مطابقت داشته باشد می‌خواند.)
 
-2. **View the agent container logs:**
+2. **لاگ‌های کانتینر عامل را ببینید:**
 
    ```bash
    docker compose logs hermes-agent
    ```
 
-   Look for startup errors or missing API key warnings.
+   به دنبال خطاهای آغاز یا هشدارهای کلید API غایب بگردید.
 
-3. **Verify the agent health endpoint:**
+3. **endpoint سلامت عامل را راستی‌آزمایی کنید:**
 
    ```bash
    curl http://localhost:8642/health
-   # Should return: {"status": "ok"}
+   # باید برگرداند: {"status": "ok"}
    ```
 
-4. **Restart with fresh containers:**
+4. **با کانتینرهای تازه راه‌اندازی مجدد کنید:**
 
    ```bash
    docker compose down
    docker compose up --build
    ```
 
-5. **Check workspace logs for gateway status:**
+5. **لاگ‌های فضای کاری را برای وضعیت gateway بررسی کنید:**
    ```bash
    docker compose logs hermeschi
    ```
-   Look for: `[gateway] http://hermes-agent:8642 mode=...` — if it shows `mode=disconnected`, the agent isn't running correctly.
+   به دنبال: `[gateway] http://hermes-agent:8642 mode=...` — اگر `mode=disconnected` نشان داد، عامل درست اجرا نمی‌شود.
 
-### Docker: older `claude webapi` docs are wrong
+### Docker: مستندات قدیمی `claude webapi` اشتباه هستند
 
-The `claude webapi` command referenced in some pre-rename docs doesn't exist. The correct commands are:
+دستور `claude webapi` که در برخی مستندات پیش از تغییر نام ارجاع داده شده وجود ندارد. دستورات درست این‌ها هستند:
 
 ```bash
-hermes gateway run    # FastAPI gateway on :8642
-hermes dashboard      # dashboard plugin on :9119 (sessions/skills/jobs/config)
+hermes gateway run    # gateway FastAPI روی :8642
+hermes dashboard      # افزونه داشبورد روی :9119 (نشست‌ها/مهارت‌ها/کارها/پیکربندی)
 ```
 
-The Docker setup runs both automatically — no action needed if using `docker compose up`.
+راه‌اندازی Docker هر دو را به‌طور خودکار اجرا می‌کند — در صورت استفاده از `docker compose up` نیازی به اقدام نیست.
 
 ---
 
-## 🗺️ Roadmap
+## 🗺️ نقشه راه
 
-### Shipped ✅
+### تحویل‌شده ✅
 
-| Feature | What it does |
+| قابلیت | کاری که می‌کند |
 |---|---|
-| Chat + SSE streaming | Live agent output with tool call rendering |
-| Files + Terminal | Full workspace file browser + cross-platform PTY |
-| Memory + Skills browsers | Edit memory, browse 2,000+ skills with marketplace |
-| Dashboard | Sessions, model mix, cost ledger, attention card |
-| Operations | Multi-agent management with preset personas |
-| Agent View | Live agent panel in chat |
-| Swarm Mode | Persistent tmux-backed worker pool with role dispatch |
-| MCP page | Full catalog + marketplace + sources |
-| Mobile PWA + Tailscale | Install as native-feeling app on any device |
-| Themes | Hermes / Nous / Bronze / Slate / Mono (light + dark) |
-| Capability gates | Graceful 'upstream not ready' placeholders |
-| Multi-provider | OpenAI/OpenAI-compatible, OpenRouter, Google, Ollama, LM Studio, vLLM, Atomic Chat, and other Hermes-supported providers |
+| چت + استریم SSE | خروجی زنده عامل با نمایش فراخوانی ابزار |
+| فایل‌ها + ترمینال | مرورگر کامل فایل فضای کاری + PTY چندسکویی |
+| مرورگرهای حافظه + مهارت‌ها | ویرایش حافظه، مرور بیش از ۲٬۰۰۰ مهارت با بازارچه |
+| داشبورد | نشست‌ها، ترکیب مدل، دفتر هزینه، کارت توجه |
+| عملیات | مدیریت چندعاملی با شخصیت‌های preset |
+| نمای عامل | پنل زنده عامل در چت |
+| حالت Swarm | استخر کارگر پشتیبان tmux پایدار با ارسال نقش |
+| صفحه MCP | کاتالوگ کامل + بازارچه + منابع |
+| PWA موبایل + Tailscale | نصب به‌عنوان اپلیکیشن با حس بومی روی هر دستگاه |
+| پوسته‌ها | Hermes / Nous / Bronze / Slate / Mono (روشن + تاریک) |
+| دروازه‌های قابلیت | جایگزین‌های مؤدبانه «upstream آماده نیست» |
+| چند provider | OpenAI/سازگار با OpenAI، OpenRouter، Google، Ollama، LM Studio، vLLM، Atomic Chat و سایر providerهای پشتیبانی‌شده توسط Hermes |
 
-### In progress 🔨
+### در حال انجام 🔨
 
-| Feature | Status |
+| قابلیت | وضعیت |
 |---|---|
-| Conductor missions | Workspace UI is shipped; uses dashboard mission API when available and Workspace-native Swarm fallback otherwise (see [#262](https://github.com/outsourc-e/hermeschi/issues/262)) |
-| Native Desktop App (Electron) | Spec'd; PWA install path works today |
+| مأموریت‌های Conductor | رابط کاربری فضای کاری تحویل شده؛ در صورت موجود بودن از API مأموریت داشبورد و در غیر این صورت از fallback Swarm بومی فضای کاری استفاده می‌کند (به [#262](https://github.com/outsourc-e/hermeschi/issues/262) مراجعه کنید) |
+| اپلیکیشن دسکتاپ بومی (Electron) | مشخص‌شده؛ مسیر نصب PWA امروز کار می‌کند |
 
-### Coming 🔜
+### به‌زودی 🔜
 
-| Feature | Status |
+| قابلیت | وضعیت |
 |---|---|
-| Cloud / Hosted version | Pending infra |
-| Team collaboration | Pending cloud + multi-tenant work |
+| نسخه ابری / میزبانی‌شده | در انتظار زیرساخت |
+| همکاری تیمی | در انتظار کار ابری + چندمستاجره |
 
 ---
 
-## ⭐ Star History
+## ⭐ تاریخچه ستاره
 
 ## [![Star History Chart](https://api.star-history.com/svg?repos=outsourc-e/hermeschi&type=date&logscale&legend=top-left)](https://www.star-history.com/#outsourc-e/hermeschi&type=date&logscale&legend=top-left)
 
-## 💛 Support the Project
+## 💛 پشتیبانی از پروژه
 
-HermesChi is free and open source. If it's saving you time and powering your workflow, consider supporting development:
+HermesChi رایگان و متن‌باز است. اگر در حال ذخیره زمان شما و تأمین نیروی جریان کاری‌تان است، از پشتیبانی توسعه حمایت کنید:
 
 **ETH:** `0xB332D4C60f6FBd94913e3Fd40d77e3FE901FAe22`
 
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github)](https://github.com/sponsors/outsourc-e)
 
-Every contribution helps keep this project moving. Thank you 🙏
+هر کمک کمک می‌کند این پروژه را در حرکت نگه دارد. سپاسگزاریم 🙏
 
 ---
 
-## 🤝 Contributing
+## 🤝 مشارکت
 
-PRs are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+PRها مورد استقبال هستند! برای راهنمایی‌ها به [CONTRIBUTING.md](CONTRIBUTING.md) مراجعه کنید.
 
-- Bug fixes → open a PR directly
-- New features → open an issue first to discuss
-- Security issues → see [SECURITY.md](SECURITY.md) for responsible disclosure
+- رفع باگ → مستقیماً یک PR باز کنید
+- قابلیت‌های جدید → ابتدا یک issue برای بحث باز کنید
+- مسائل امنیتی → برای افشای مسئولانه به [SECURITY.md](SECURITY.md) مراجعه کنید
 
 ---
 
-## 📄 License
+## 📄 مجوز
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT — برای جزئیات به [LICENSE](LICENSE) مراجعه کنید.
 
 ---
 
 <div align="center">
-  <sub>Built with ⚡ by <a href="https://github.com/outsourc-e">@outsourc-e</a> and the HermesChi community</sub>
+  <sub>ساخته‌شده با ⚡ توسط <a href="https://github.com/outsourc-e">@outsourc-e</a> و جامعه HermesChi</sub>
 </div>

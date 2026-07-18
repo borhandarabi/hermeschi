@@ -1,78 +1,78 @@
-# HermesWorld mobile performance baseline
+# خط پایهٔ عملکرد موبایل HermesWorld
 
-Branch: `perf/mobile-bundle-split`
-Base: `origin/perf/playground-engine-pass-1`
-Viewport/FPS audit: 390x844 mobile emulation, 4x CPU throttle, throttled 4G network profile, `/play/?debug=perf`.
+شاخه: `perf/mobile-bundle-split`
+پایه: `origin/perf/playground-engine-pass-1`
+ممیزی viewport/FPS: شبیه‌سازی موبایل ۳۹۰x۸۴۴، ۴x CPU throttle، پروفایل شبکهٔ ۴G throttled، `/play/?debug=perf`.
 
-## Static standalone bundle
+## باندل standalone استاتیک
 
-| Metric | Baseline | After | Delta |
+| معیار | پایه | پس از | تفاضل |
 | --- | ---: | ---: | ---: |
-| Initial `assets/play-standalone.js` raw | 4,173,581 B | 3,963,737 B | -209,844 B |
-| Initial `assets/play-standalone.js` gzip | 764,547 B | 720,759 B | -43,788 B |
+| `assets/play-standalone.js` خام اولیه | ۴٬۱۷۳٬۵۸۱ B | ۳٬۹۶۳٬۷۳۷ B | ‎-۲۰۹٬۸۴۴ B |
+| `assets/play-standalone.js` gzip اولیه | ۷۶۴٬۵۴۷ B | ۷۲۰٬۷۵۹ B | ‎-۴۳٬۷۸۸ B |
 
-Deferred chunks created by the static standalone split:
+chunkهای معوق‌شدهٔ ایجادشده توسط split استاتیک standalone:
 
-| Chunk | Raw | Gzip |
+| Chunk | خام | Gzip |
 | --- | ---: | ---: |
-| `chunks/hls-ECT73IPQ.js` | 1,119,898 B | 234,433 B |
-| `chunks/playground-dialog-AWPW46TC.js` | 32,373 B | 9,635 B |
-| `chunks/playground-sidepanel-Q7LFEOWJ.js` | 28,358 B | 5,583 B |
-| `chunks/playground-admin-panel-I45KF4UA.js` | 15,988 B | 3,550 B |
-| `chunks/playground-customizer-QEQIP3P7.js` | 15,391 B | 3,220 B |
-| `chunks/settings-panel-AOKCYYPL.js` | 11,370 B | 2,636 B |
-| `chunks/playground-journal-V62SEGYZ.js` | 10,397 B | 2,419 B |
-| `chunks/playground-map-Y3TJTSWE.js` | 7,473 B | 2,223 B |
+| `chunks/hls-ECT73IPQ.js` | ۱٬۱۱۹٬۸۹۸ B | ۲۳۴٬۴۳۳ B |
+| `chunks/playground-dialog-AWPW46TC.js` | ۳۲٬۳۷۳ B | ۹٬۶۳۵ B |
+| `chunks/playground-sidepanel-Q7LFEOWJ.js` | ۲۸٬۳۵۸ B | ۵٬۵۸۳ B |
+| `chunks/playground-admin-panel-I45KF4UA.js` | ۱۵٬۹۸۸ B | ۳٬۵۵۰ B |
+| `chunks/playground-customizer-QEQIP3P7.js` | ۱۵٬۳۹۱ B | ۳٬۲۲۰ B |
+| `chunks/settings-panel-AOKCYYPL.js` | ۱۱٬۳۷۰ B | ۲٬۶۳۶ B |
+| `chunks/playground-journal-V62SEGYZ.js` | ۱۰٬۳۹۷ B | ۲٬۴۱۹ B |
+| `chunks/playground-map-Y3TJTSWE.js` | ۷٬۴۷۳ B | ۲٬۲۲۳ B |
 
-## Vite client bundle analyzer snapshot
+## اسنپ‌شات تحلیل‌گر باندل کلاینت Vite
 
-| Metric | Baseline | After | Delta |
+| معیار | پایه | پس از | تفاضل |
 | --- | ---: | ---: | ---: |
-| Total client JS raw | 14,003,142 B | 14,003,238 B | +96 B |
-| Total client JS gzip | 2,831,059 B | 2,831,118 B | +59 B |
-| Playground route chunk raw | ~37.6 KB | ~37.7 KB | effectively flat |
-| Playground route chunk gzip | ~7.1 KB | ~7.2 KB | effectively flat |
+| مجموع JS کلاینت خام | ۱۴٬۰۰۳٬۱۴۲ B | ۱۴٬۰۰۳٬۲۳۸ B | ‎+۹۶ B |
+| مجموع JS کلاینت gzip | ۲٬۸۳۱٬۰۵۹ B | ۲٬۸۳۱٬۱۱۸ B | ‎+۵۹ B |
+| chunk مسیر Playground خام | ~۳۷٫۶ KB | ~۳۷٫۷ KB | عملاً تخت |
+| chunk مسیر Playground gzip | ~۷٫۱ KB | ~۷٫۲ KB | عملاً تخت |
 
-The meaningful win is the HermesWorld static standalone path; the app route was already split by Vite.
+موفقیت معنادار، مسیر standalone استاتیک HermesWorld است؛ مسیر اپ هم‌اکنون توسط Vite split شده بود.
 
-## Lighthouse mobile, local static server
+## Lighthouse موبایل، سرور استاتیک محلی
 
-Command profile: Lighthouse default mobile throttling against Python static server.
+پروفایل دستور: throttle پیش‌فرض موبایل Lighthouse در برابر سرور استاتیک Python.
 
-| Metric | Baseline | After |
+| معیار | پایه | پس از |
 | --- | ---: | ---: |
-| Performance score | 54 | 45 |
-| Accessibility | 97 | 97 |
-| Best practices | 96 | 96 |
-| SEO | 100 | 100 |
-| FCP | 25.6s | 23.3s |
-| LCP | 25.7s | 24.0s |
-| TBT | 140ms | 430ms |
-| CLS | 0.005 | 0.005 |
-| Speed Index | 25.6s | 23.3s |
-| TTI | 25.8s | 24.2s |
+| امتیاز عملکرد | ۵۴ | ۴۵ |
+| دسترس‌پذیری | ۹۷ | ۹۷ |
+| بهترین روش‌ها | ۹۶ | ۹۶ |
+| SEO | ۱۰۰ | ۱۰۰ |
+| FCP | ۲۵٫۶s | ۲۳٫۳s |
+| LCP | ۲۵٫۷s | ۲۴٫۰s |
+| TBT | ۱۴۰ms | ۴۳۰ms |
+| CLS | ۰٫۰۰۵ | ۰٫۰۰۵ |
+| شاخص سرعت | ۲۵٫۶s | ۲۳٫۳s |
+| TTI | ۲۵٫۸s | ۲۴٫۲s |
 
-Note: the score dipped due to Lighthouse TBT variance on local headless Chrome; paint/interactive timings improved. Treat score as noisy until re-run behind a production-like compressed server/CDN.
+یادداشت: امتیاز به‌دلیل نوسان TBT در Lighthouse روی Chrome محلی headless افت کرد؛ زمان‌بندی‌های paint/interactive بهبود یافتند. امتیاز را تا اجرای مجدد پشت سرور/CDN فشرده‌شدهٔ شبیه تولید، به‌عنوان پر‌نویز در نظر بگیرید.
 
-## Mobile FPS audit
+## ممیزی FPS موبایل
 
-CDP script with 390px viewport, 4x CPU throttle, throttled 4G, 10s RAF sample after scene load.
+اسکریپت CDP با viewport ۳۹۰px، ۴x CPU throttle، ۴G throttled، نمونه‌گیری ۱۰s RAF پس از بارگذاری scene.
 
-| Metric | Baseline | After |
+| معیار | پایه | پس از |
 | --- | ---: | ---: |
-| Reported FPS | 120.1 | 120.2 |
-| Avg frame | 8.33ms | 8.34ms |
-| p95 frame | 9.5ms | 9.5ms |
-| Max frame | 10.0ms | 46.7ms |
-| Frames >33.34ms | 0 | 1 |
+| FPS گزارش‌شده | ۱۲۰٫۱ | ۱۲۰٫۲ |
+| فریم میانگین | ۸٫۳۳ms | ۸٫۳۴ms |
+| فریم p95 | ۹٫۵ms | ۹٫۵ms |
+| فریم حداکثر | ۱۰٫۰ms | ۴۶٫۷ms |
+| فریم‌های >۳۳٫۳۴ms | ۰ | ۱ |
 
-Headless Chrome reports 120Hz RAF, so this is useful for relative frame-time regression only, not actual physical phone smoothness. No sustained mobile FPS regression found.
+Chrome headless، RAF با ۱۲۰Hz را گزارش می‌دهد، بنابراین این فقط برای regression نسبی زمان فریم مفید است، نه برای روانی واقعی گوشی فیزیکی. هیچ regression پایدار FPS موبایل یافت نشد.
 
-## Image optimization
+## بهینه‌سازی تصویر
 
-| Asset | PNG | WebP | Delta |
+| Asset | PNG | WebP | تفاضل |
 | --- | ---: | ---: | ---: |
-| `hermesworld-logo-horizontal@2x` | 137,541 B | 59,088 B | -78,453 B |
-| `hermesworld-logo-horizontal@3x` | 258,461 B | 98,076 B | -160,385 B |
-| `hermesworld-logo-stacked@2x` | 335,190 B | 99,954 B | -235,236 B |
-| `hermesworld-logo-stacked@3x` | 640,821 B | 161,012 B | -479,809 B |
+| `hermesworld-logo-horizontal@2x` | ۱۳۷٬۵۴۱ B | ۵۹٬۰۸۸ B | ‎-۷۸٬۴۵۳ B |
+| `hermesworld-logo-horizontal@3x` | ۲۵۸٬۴۶۱ B | ۹۸٬۰۷۶ B | ‎-۱۶۰٬۳۸۵ B |
+| `hermesworld-logo-stacked@2x` | ۳۳۵٬۱۹۰ B | ۹۹٬۹۵۴ B | ‎-۲۳۵٬۲۳۶ B |
+| `hermesworld-logo-stacked@3x` | ۶۴۰٬۸۲۱ B | ۱۶۱٬۰۱۲ B | ‎-۴۷۹٬۸۰۹ B |

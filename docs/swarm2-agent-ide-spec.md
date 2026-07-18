@@ -1,282 +1,282 @@
-# Swarm2 Agent IDE Spec
+# مشخصات IDE عامل Swarm2
 
-Status: Draft v1
-Date: 2026-04-27
-Owner: Aurora / Eric
-Surface: `/swarm2`, plus shared agent surfaces in main workspace chat
+وضعیت: پیش‌نویس v1
+تاریخ: 2026-04-27
+مالک: Aurora / Eric
+سطح: `/swarm2`، به همراه سطوح مشترک عامل در چت ورک‌اسپیس اصلی
 
-## 1. Product Thesis
+## ۱. تز محصول
 
-Swarm2 is not a dashboard. Swarm2 is the control plane and IDE for **sub-Claude agents**.
+Swarm2 یک داشبورد نیست. Swarm2 صفحه کنترل و IDE برای **عامل‌های زیر-کلاید** است.
 
-A user should be able to clone their main Claude agent as many times as needed. Each clone has the same core access, context shape, skills, memory conventions, workspace tools, and project capabilities as the parent agent, but can run independently on a lane of work.
+یک کاربر باید بتواند عامل کلاید اصلی خود را به تعداد دلخواه همسان‌سازی کند. هر کلون همان دسترسی هسته، شکل زمینه، مهارت‌ها، قراردادهای حافظه، ابزارهای ورک‌اسپیس و قابلیت‌های پروژه را به عنوان عامل والد دارد، اما می‌تواند مستقلاً روی یک لاین کاری اجرا شود.
 
-This is materially different from spawning disposable subagents:
+این به‌طور بنیادی با ایجاد زیرعامل‌های مصرفی متفاوت است:
 
-- Subagents are ephemeral workers.
-- Sub-Claude agents are persistent cloned operators.
-- Subagents perform a task.
-- Sub-Claude agents own a lane/project and can run on autopilot.
-- Subagents lose continuity unless wrapped carefully.
-- Sub-Claude agents carry persistent profile state, runtime metadata, tasks, logs, sessions, skills, and project awareness.
+- زیرعامل‌ها کارگرهای موقتی هستند.
+- عامل‌های زیر-کلاید اپراتورهای همسان‌سازی‌شده پایدارند.
+- زیرعامل‌ها یک وظیفه انجام می‌دهند.
+- عامل‌های زیر-کلاید مالک یک لاین/پروژه هستند و می‌توانند روی خودران کار کنند.
+- زیرعامل‌ها پیوستگی را از دست می‌دهند مگر اینکه با دقت بسته‌بندی شوند.
+- عامل‌های زیر-کلاید حالت پروفایل پایدار، فراداده اجرایی، وظایف، لاگ‌ها، جلسات، مهارت‌ها و آگاهی از پروژه را حمل می‌کنند.
 
-The swarm product promise:
+تعهد محصول swarm:
 
-> Clone your agent into a team, give each clone a lane, watch the work happen live, intervene when needed, and inspect/edit/ship outputs without leaving the swarm IDE.
+> عامل خود را در یک تیم همسان‌سازی کنید، به هر کلون یک لاین بدهید، کار را زنده تماشا کنید، در صورت نیاز دخالت کنید و خروجی‌ها را بدون ترک IDE swarm بررسی/ویرایش/ارسال کنید.
 
-## 2. Core Concepts
+## ۲. مفاهیم هسته
 
-### 2.1 Main Agent / Hub
+### ۲.۱ عامل اصلی / هاب
 
-The main agent is the orchestrator.
+عامل اصلی هماهنگ‌کننده است.
 
-In `/swarm2`, the main agent should appear as a compact hub node/card, not as a giant chat panel. Its job is to:
+در `/swarm2`، عامل اصلی باید به‌عنوان یک گره/کارت هاب فشرده ظاهر شود، نه یک پنل چت غول‌پیکر. وظیفه آن:
 
-- route work
-- monitor agents
-- coordinate collaboration
-- surface decisions/blockers
-- maintain the swarm topology
+- مسیریابی کار
+- پایش عامل‌ها
+- هماهنگی همکاری
+- نمایش تصمیمات/مانع‌ها
+- حفظ توپولوژی swarm
 
-The hub card should show:
+کارت هاب باید نمایش دهد:
 
-- avatar / identity
-- active swarm count
-- room / collaboration count
-- blockers / auth errors
-- active project lanes
-- routing controls
+- آواتار / هویت
+- تعداد swarm فعال
+- تعداد اتاق / همکاری
+- مانع‌ها / خطاهای احراز هویت
+- لاین‌های پروژه فعال
+- کنترل‌های مسیریابی
 
-It should not consume the main content area with a full chat UI.
+این نباید ناحیه محتوای اصلی را با یک UI چت کامل اشغال کند.
 
-### 2.2 Sub-Hermes Agent
+### ۲.۲ عامل Sub-Hermes
 
-A swarm agent is a cloned Hermes profile with:
+یک عامل swarm یک پروفایل Hermes همسان‌سازی‌شده است با:
 
-- model/provider config
-- skills/tool access
-- memory/profile files
-- runtime metadata
-- sessions/history
-- tasks/cron/autopilot state
-- project cwd
-- logs/output
-- terminal/TUI session
-- optional dev server / preview URL
+- پیکربندی مدل/ارائه‌دهنده
+- دسترسی به مهارت/ابزار
+- فایل‌های حافظه/پروفایل
+- فراداده اجرایی
+- جلسات/تاریخچه
+- وضعیت وظیفه/cron/خودران
+- cwd پروژه
+- لاگ/خروجی
+- جلسه ترمینال/TUI
+- URL پیش‌نمایش/سرور توسعه اختیاری
 
-Each worker card should be a compact IDE tile for that clone.
+هر کارت کارگر باید یک تایل IDE فشرده برای آن کلون باشد.
 
-### 2.3 Agent Lane
+### ۲.۳ لاین عامل
 
-Each cloned agent can own a lane:
+هر عامل همسان‌سازی‌شده می‌تواند مالک یک لاین باشد:
 
-- project lane, e.g. BenchLoop
-- PR lane
-- research lane
-- review lane
-- issue queue lane
-- docs lane
-- ops lane
+- لاین پروژه، مثلاً BenchLoop
+- لاین PR
+- لاین تحقیق
+- لاین بازبینی
+- لاین صف issue
+- لاین مستندات
+- لاین ops
 
-A lane has:
+یک لاین دارد:
 
-- current objective
-- task queue
-- project context
-- live chat
-- terminal/TUI
-- preview/editor surfaces
-- handoff/checkpoint state
+- هدف جاری
+- صف وظایف
+- زمینه پروژه
+- چت زنده
+- ترمینال/TUI
+- سطوح پیش‌نمایش/ویرایشگر
+- وضعیت تحویل/چک‌پوینت
 
-### 2.4 Autopilot
+### ۲.۴ خودران (Autopilot)
 
-Autopilot is orchestration over persistent cloned agents.
+Autopilot هماهنگی روی عامل‌های همسان‌سازی‌شده پایدار است.
 
-Autopilot should:
+Autopilot باید:
 
-- assign tasks to the right cloned agent
-- keep agents moving with proof-based checkpoints
-- detect drift/staleness/blockers
-- re-prompt or reroute when needed
-- summarize meaningful results
-- avoid interrupting the user unless a decision, blocker, or landed result matters
+- وظایف را به عامل همسان‌سازی‌شده درست تخصیص دهد
+- عامل‌ها را با چک‌پوینت‌های مبتنی بر اثبت در حرکت نگه دارد
+- انحراف/قدمت/مانع‌ها را تشخیص دهد
+- در صورت نیاز دوباره پرامپت دهد یا مسیر را تغییر دهد
+- نتایج معنادار را خلاصه کند
+- از قطع کاربر خودداری کند مگر اینکه یک تصمیم، مانع یا نتیجه فرودآمده مهم باشد
 
-## 3. Required Surfaces
+## ۳. سطوح مورد نیاز
 
-### 3.1 Swarm Hub
+### ۳.۱ هاب Swarm
 
-A compact top-center hub card.
+یک کارت هاب فشرده در بالا-مرکز.
 
-Required:
+موارد مورد نیاز:
 
-- Main agent identity/avatar
-- Swarm status metrics
-- Routing / dispatch button
-- Active room/collaboration count
-- Blocker/auth health
-- Wire anchor to worker cards
+- هویت/آواتار عامل اصلی
+- معیارهای وضعیت swarm
+- دکمه مسیریابی / ارسال
+- تعداد اتاق/همکاری فعال
+- سلامت مانع/احراز هویت
+- لنگر سیم به کارت‌های کارگر
 
-Not required:
+غیرضروری:
 
-- Full embedded main chat panel
+- پنل چت اصلی تعبیه‌شده کامل
 
-### 3.2 Worker Cards
+### ۳.۲ کارت‌های کارگر
 
-Each worker card is the primary control unit.
+هر کارت کارگر واحد کنترل اصلی است.
 
-Required fields:
+فیلدهای مورد نیاز:
 
-- worker name/id
-- role/lane
-- status: idle, working, thinking, reviewing, blocked, waiting, offline
-- model/provider
-- current task
-- task queue preview
-- latest chat messages
-- latest runtime/log signal
-- project/cwd/branch
-- preview URL if available
-- terminal/TUI attach state
-- quick actions: chat, route, tasks, terminal, preview, editor
+- نام/شناسه کارگر
+- نقش/لاین
+- وضعیت: idle, working, thinking, reviewing, blocked, waiting, offline
+- مدل/ارائه‌دهنده
+- وظیفه جاری
+- پیش‌نمایش صف وظایف
+- آخرین پیام‌های چت
+- آخرین سیگنال اجرایی/لاگ
+- پروژه/cwd/شاخه
+- URL پیش‌نمایش در صورت وجود
+- وضعیت اتصال ترمینال/TUI
+- اقدامات سریع: چت، مسیریابی، وظایف، ترمینال، پیش‌نمایش، ویرایشگر
 
-### 3.3 Live Worker Chat
+### ۳.۳ چت زنده کارگر
 
-Worker chat must be real, not local-only card history.
+چت کارگر باید واقعی باشد، نه فقط تاریخچه کارت محلی.
 
-Required:
+موارد مورد نیاز:
 
-- Pull latest messages from the worker's actual session history/state.db/API
-- Poll or subscribe for updates
-- Show user/assistant/tool-ish messages compactly
-- Sending from the card dispatches to that worker's real profile/session
-- LocalStorage is allowed only as fallback/draft cache
+- آخرین پیام‌ها را از history/state.db/API جلسه واقعی کارگر بکشید
+- Poll یا subscribe برای به‌روزرسانی‌ها
+- پیام‌های user/assistant/tool-مانند را به‌صورت فشرده نمایش دهید
+- ارسال از کارت به پروفایل/جلسه واقعی آن کارگر دیسپچ می‌شود
+- LocalStorage فقط به‌عنوان کش fallback/پیش‌نویس مجاز است
 
-Acceptance:
+پذیرش:
 
-- If a worker was prompted by autopilot, the card reflects that conversation.
-- If the user sends a message to a worker, the reply appears in the same live feed.
+- اگر یک کارگر توسط autopilot پرامپت شده باشد، کارت آن گفتگو را منعکس می‌کند.
+- اگر کاربر پیامی به کارگر بفرستد، پاسخ در همان فید زنده ظاهر می‌شود.
 
-### 3.4 Task Queue
+### ۳.۴ صف وظایف
 
-Each worker card should show its task state.
+هر کارت کارگر باید وضعیت وظیفه خود را نمایش دهد.
 
-Required:
+موارد مورد نیاز:
 
-- current task
-- next 2-3 queued tasks
-- blocked/waiting indicators
-- done/recently completed count
-- click to open full task drawer or `/tasks?assignee=workerId`
+- وظیفه جاری
+- ۲-۳ وظیفه بعدی در صف
+- شاخص‌های blocked/waiting
+- تعداد انجام‌شده/اخیراً کامل‌شده
+- کلیک برای باز کردن drawer کامل وظایف یا `/tasks?assignee=workerId`
 
-Task sources:
+منابع وظیفه:
 
 - Hermes tasks API
 - worker runtime.json currentTask/state
-- optional project issue/PR metadata
+- فراداده اختیاری issue/PR پروژه
 
-### 3.5 Live Terminal / TUI
+### ۳.۵ ترمینال زنده / TUI
 
-Swarm2 should host the actual live worker terminal/TUI when available.
+Swarm2 باید ترمینال/TUI واقعی زنده کارگر را در صورت وجود میزبانی کند.
 
-Required:
+موارد مورد نیاز:
 
-- auto-detect active worker terminals
-- mount active terminals by default in runtime view
-- allow add/remove terminal panes
-- attach to real tmux/session when available
-- fallback to live log tail or shell when no attachable terminal exists
-- preserve exact TUI interaction where possible
+- تشخیص خودکار ترمینال‌های فعال کارگر
+- mount ترمینال‌های فعال به‌طور پیش‌فرض در نمای اجرایی
+- اجازه افزودن/حذف پنل‌های ترمینال
+- اتصال به tmux/session واقعی در صورت وجود
+- fallback به tail لاگ زنده یا shell وقتی ترمینال قابل اتصالی وجود ندارد
+- حفظ تعامل دقیق TUI در صورت امکان
 
-Acceptance:
+پذیرش:
 
-- User can use the agent's TUI directly from Swarm2.
-- Runtime view should not require manually knowing a tmux session name.
+- کاربر می‌تواند TUI عامل را مستقیماً از Swarm2 استفاده کند.
+- نمای اجرایی نباید دانستن دستی نام جلسه tmux را نیاز داشته باشد.
 
-### 3.6 Project Preview
+### ۳.۶ پیش‌نمایش پروژه
 
-If an agent is working on a local project/site, Swarm2 should expose it.
+اگر یک عامل روی یک پروژه/سایت محلی کار می‌کند، Swarm2 باید آن را نمایش دهد.
 
-Required:
+موارد مورد نیاز:
 
-- detect project cwd
-- detect package/dev server config where possible
-- surface known local URL(s), e.g. localhost ports
-- show embedded preview panel
-- show project label, branch, changed files
+- تشخیص cwd پروژه
+- تشخیص پیکربندی package/dev server در صورت امکان
+- نمایش URL(s) محلی شناخته‌شده، مثلاً پورت‌های localhost
+- نمایش پنل پیش‌نمایش تعبیه‌شده
+- نمایش برچسب پروژه، شاخه، فایل‌های تغییر یافته
 
-Acceptance:
+پذیرش:
 
-- If swarm4 is working on BenchLoop and a local preview is running, the user can view it inside Swarm2 without leaving the page.
+- اگر swarm4 روی BenchLoop کار می‌کند و یک پیش‌نمایش محلی در حال اجراست، کاربر می‌تواند آن را بدون ترک صفحه در داخل Swarm2 ببیند.
 
-### 3.7 Editor / Diff Surface
+### ۳.۷ سطح ویرایشگر / دیف
 
-Swarm2 should evolve into a Bolt-like agent IDE.
+Swarm2 باید به یک IDE عامل شبیه Bolt تکامل یابد.
 
-Phase 1:
+فاز ۱:
 
-- file browser for the worker's project cwd
-- open/read files
-- edit/save files
-- diff view
-- changed files list
+- مرورگر فایل برای cwd پروژه کارگر
+- باز/خواندن فایل‌ها
+- ویرایش/ذخیره فایل‌ها
+- نمای دیف
+- لیست فایل‌های تغییر یافته
 
-Phase 2:
+فاز ۲:
 
-- visual element picker from preview
-- selected element -> create fix task
-- agent-assisted edits
-- accept/reject patch workflow
+- انتخاب‌گر عنصر بصری از پیش‌نمایش
+- عنصر انتخاب‌شده -> ایجاد وظیفه اصلاح
+- ویرایش‌های کمکی توسط عامل
+- گردش کار پذیرش/رد patch
 
-Acceptance:
+پذیرش:
 
-- User can inspect and modify agent output from the swarm surface.
+- کاربر می‌تواند خروجی عامل را از سطح swarm بررسی و اصلاح کند.
 
-### 3.8 Collaboration / Office View
+### ۳.۸ همکاری / نمای دفتر
 
-Cards should communicate collaboration visually.
+کارت‌ها باید همکاری را به‌صورت بصری ارتباط برقرار کنند.
 
-Concept:
+مفهوم:
 
-- each worker has a small 2x2 office space in its card
-- tools/status light up areas of the office
-- when workers collaborate, their cards/offices connect into a larger shared office
-- wires show collaboration lanes and routing
+- هر کارگر یک فضای دفتر کوچک ۲×۲ در کارت خود دارد
+- ابزارها/وضعیت نواحی دفتر را روشن می‌کنند
+- وقتی کارگران همکاری می‌کنند، کارت‌ها/دفاترشان به یک دفتر مشترک بزرگتر متصل می‌شوند
+- سیم‌ها لاین‌های همکاری و مسیریابی را نمایش می‌دهند
 
-Required first pass:
+اولین پاس مورد نیاز:
 
-- visual grouping by project/lane
-- stronger connected state for workers in same room/project
-- collaboration wire emphasis
+- گروه‌بندی بصری بر اساس پروژه/لاین
+- وضعیت متصل قوی‌تر برای کارگران در همان اتاق/پروژه
+- تأکید سیم همکاری
 
-Later:
+بعداً:
 
-- mini office avatars/scenes
-- shared workspace expansion
-- tool/state animations
+- آواتار/صحنه‌های مینی دفتر
+- توسعه ورک‌اسپیس مشترک
+- انیمیشن‌های ابزار/وضعیت
 
-### 3.9 Main Chat Agent Sidebar
+### ۳.۹ سایدبار عامل چت اصلی
 
-Main workspace chat should get an agent sidebar inspired by Clawsuite.
+چت ورک‌اسپیس اصلی باید یک سایدبار عامل الهام‌گرفته از Clawsuite داشته باشد.
 
-Required:
+موارد مورد نیاز:
 
-- active cloned agents
-- CLI/ACP/sub-Claude sessions
-- status/current task
-- latest output
-- issues/PRs solved
-- quick open into Swarm2 card/session/terminal/preview
-- Claude-inspired avatars
+- عامل‌های همسان‌سازی‌شده فعال
+- جلسات CLI/ACP/sub-Claude
+- وضعیت/وظیفه جاری
+- آخرین خروجی
+- issue/PRهای حل‌شده
+- باز کردن سریع به کارت/جلسه/ترمینال/پیش‌نمایش Swarm2
+- آواتارهای الهام‌گرفته از Claude
 
-Acceptance:
+پذیرش:
 
-- User can monitor all agent work from the main chat surface without opening Swarm2.
+- کاربر می‌تواند تمام کار عامل را از سطح چت اصلی بدون باز کردن Swarm2 پایش کند.
 
-## 4. Data Contracts
+## ۴. قراردادهای داده
 
-### 4.1 `runtime.json`
+### ۴.۱ `runtime.json`
 
-Each worker should write/maintain:
+هر کارگر باید بنویسد/نگه دارد:
 
 ```json
 {
@@ -297,9 +297,9 @@ Each worker should write/maintain:
 }
 ```
 
-### 4.2 Worker Metadata
+### ۴.۲ فراداده کارگر
 
-Each worker should have `swarm.yaml` or equivalent:
+هر کارگر باید `swarm.yaml` یا معادل آن داشته باشد:
 
 ```yaml
 id: swarm4
@@ -320,13 +320,13 @@ projectHints:
   - bench-loop-app
 ```
 
-### 4.3 Chat History API
+### ۴.۳ API تاریخچه چت
 
-Add/standardize:
+افزودن/استانداردسازی:
 
 `GET /api/swarm-chat?workerId=swarm4&limit=30`
 
-Returns:
+برمی‌گرداند:
 
 ```json
 {
@@ -339,20 +339,20 @@ Returns:
 }
 ```
 
-### 4.4 Task API
+### ۴.۴ API وظایف
 
-Worker cards should consume:
+کارت‌های کارگر باید مصرف کنند:
 
 - `GET /api/claude-tasks?assignee=swarm4&include_done=false`
-- or existing task endpoint equivalent
+- یا معادل endpoint موجود
 
-### 4.5 Project Preview API
+### ۴.۵ API پیش‌نمایش پروژه
 
-Add:
+افزودن:
 
 `GET /api/swarm-project?workerId=swarm4`
 
-Returns:
+برمی‌گرداند:
 
 ```json
 {
@@ -366,102 +366,102 @@ Returns:
 }
 ```
 
-## 5. UX Layout
+## ۵. چیدمان UX
 
-### Default `/swarm2` Layout
+### چیدمان پیش‌فرض `/swarm2`
 
-1. Header/stat strip
-2. Compact hub node
-3. Worker card grid
-4. Recent activity feed
-5. Floating router/dispatch drawer
+۱. نوار هدر/آمار
+۲. گره هاب فشرده
+۳. گرید کارت کارگر
+۴. فید فعالیت اخیر
+۵. drawer شناور مسیریاب/ارسال
 
-### Worker Card Expanded Drawer
+### Drawer توسعه‌یافته کارت کارگر
 
-Tabs:
+تب‌ها:
 
-- Chat
-- Tasks
-- Terminal
-- Preview
-- Files/Diff
-- Logs
+- چت
+- وظایف
+- ترمینال
+- پیش‌نمایش
+- فایل‌ها/دیف
+- لاگ‌ها
 
-### Runtime View
+### نمای اجرایی
 
-- auto-populated terminal grid for active workers
-- add/remove terminal pane controls
-- fallback panes for logs if no terminal attach exists
+- گرید ترمینال خودکار برای کارگران فعال
+- کنترل‌های افزودن/حذف پنل ترمینال
+- پنل‌های fallback برای لاگ‌ها اگر اتصال ترمینالی وجود ندارد
 
-### Project View
+### نمای پروژه
 
-- preview iframe
-- file tree/editor
-- changed files/diff
-- worker chat sidecar
+- iframe پیش‌نمایش
+- درخت فایل/ویرایشگر
+- فایل‌های تغییر یافته/دیف
+- سایدبار چت کارگر
 
-## 6. Implementation Phases
+## ۶. مراحل پیاده‌سازی
 
-### Phase 1 — Make Swarm2 operationally useful
+### فاز ۱ — Swarm2 را از نظر عملیاتی مفید کنید
 
-- Remove giant main-agent chat from hub
-- Make hub compact
-- Replace fake worker chat with real session history
-- Add task queue panel to cards
-- Add runtime terminal auto-population
-- Add project/cwd/preview metadata badges
+- حذف چت عامل اصلی غول‌پیکر از هاب
+- هاب را فشرده کنید
+- جایگزینی چت جعلی کارگر با تاریخچه جلسه واقعی
+- افزودن پنل صف وظایف به کارت‌ها
+- افزودن خودکارشدن ترمینال اجرایی
+- افزودن badgeهای فراداده project/cwd/preview
 
-### Phase 2 — Agent IDE foundation
+### فاز ۲ — پایه IDE عامل
 
-- Worker drawer with tabs
-- File browser/read/edit
-- changed files + diff
-- project preview iframe
-- terminal/log fallback polish
+- drawer کارگر با تب‌ها
+- مرورگر فایل خواندن/ویرایش
+- فایل‌های تغییر یافته + دیف
+- iframe پیش‌نمایش پروژه
+- بهبود fallback ترمینال/لاگ
 
-### Phase 3 — Autopilot orchestration
+### فاز ۳ — هماهنگی خودران
 
-- profile metadata (`swarm.yaml`)
-- routing uses worker specialties
-- autopilot check-in reads real runtime/task/chat states
-- proof-based checkpoint prompts
-- drift/blocker detection
+- فراداده پروفایل (`swarm.yaml`)
+- مسیریابی از تخصص‌های کارگر استفاده می‌کند
+- check-in خودران وضعیت‌های واقعی runtime/task/chat را می‌خواند
+- پرامپت‌های چک‌پوینت مبتنی بر اثبات
+- تشخیص انحراف/مانع
 
-### Phase 4 — Collaboration visuals
+### فاز ۴ — بصری‌سازی همکاری
 
-- 2x2 office card visuals
-- shared office expansion for collaborating workers
-- project/lane clustering
-- stronger topology and collaboration wires
+- بصری‌سازی کارت دفتر ۲×۲
+- توسعه دفتر مشترک برای کارگران همکاری‌کننده
+- خوشه‌بندی پروژه/لاین
+- توپولوژی و سیم‌های همکاری قوی‌تر
 
-### Phase 5 — Main workspace integration
+### فاز ۵ — یکپارچه‌سازی ورک‌اسپیس اصلی
 
-- Agent sidebar in main chat
-- Active cloned agents/sub-Claude list
-- latest output/status
-- issues/PR solved summaries
-- jump into Swarm2 views
+- سایدبار عامل در چت اصلی
+- لیست عامل‌های همسان‌سازی‌شده/sub-Claude فعال
+- آخرین خروجی/وضعیت
+- خلاصه‌های issue/PR حل‌شده
+- پرش به نمای‌های Swarm2
 
-## 7. Acceptance Criteria
+## ۷. معیارهای پذیرش
 
-Swarm2 is solid when:
+Swarm2 زمانی پایدار است که:
 
-- User can clone multiple full Claude agents and see them as persistent workers.
-- User can understand what every worker is doing without leaving `/swarm2`.
-- User can chat with any worker and see real recent messages.
-- User can see each worker's tasks and blockers.
-- User can attach to live terminals/TUIs or live log fallback.
-- User can view the local project/site each worker is modifying.
-- User can inspect/edit files or diffs from the same surface.
-- Autopilot can monitor workers and re-prompt based on real evidence.
-- Main chat can show the same agent state in a sidebar.
+- کاربر بتواند چندین عامل کلاید کامل همسان‌سازی کند و آن‌ها را به‌عنوان کارگران پایدار ببیند.
+- کاربر بتواند فهمید چه کاری هر کارگر در حال انجام آن است بدون ترک `/swarm2`.
+- کاربر بتواند با هر کارگر چت کند و پیام‌های اخیر واقعی را ببیند.
+- کاربر بتواند وظایف و مانع‌های هر کارگر را ببیند.
+- کاربر بتواند به ترمینال‌های/TUIهای زنده یا fallback لاگ زنده متصل شود.
+- کاربر بتواند پروژه/سایت محلی که هر کارگر در حال اصلاح آن است را ببیند.
+- کاربر بتواند فایل‌ها یا دیف‌ها را از همان سطح بررسی/ویرایش کند.
+- Autopilot بتواند کارگران را پایش کند و بر اساس شواهد واقعی دوباره پرامپت دهد.
+- چت اصلی بتواند همان وضعیت عامل را در یک سایدبار نمایش دهد.
 
-## 7.1 Promotion & Deprecation Path
+## ۷.۱ مسیر ارتقا و منسوخ‌سازی
 
-`/swarm` is v0 and got cluttered. `/swarm2` is the keeper. Lock-in:
+`/swarm` نسخه v0 است و شلوغ شد. `/swarm2` نگه‌دارنده است. تثبیت:
 
-1. Promote `/swarm2` to `/swarm`. Keep `/swarm2` as a redirect for one release.
-2. Delete legacy components and screen:
+۱. ارتقا `/swarm2` به `/swarm`. حفظ `/swarm2` به‌عنوان ریدایرکت برای یک انتشار.
+۲. حذف کامپوننت‌ها و صفحه legacy:
    - `screens/swarm/swarm-screen.tsx`
    - `components/swarm/topology-band.tsx`
    - `components/swarm/widget-rail.tsx`
@@ -471,28 +471,28 @@ Swarm2 is solid when:
    - `components/swarm/swarm-runtime-strip.tsx`
    - `components/swarm/swarm-health-strip.tsx`
    - `components/swarm/swarm-compose.tsx`
-3. Keep only what the new surface uses: `swarm-terminal.tsx`, `router-chat.tsx`, and `swarm-node-chat.tsx` until real-chat replaces it.
-4. Move `screens/swarm2/*` into `screens/swarm/*` after promotion.
-5. Sidebar nav label: "Swarm". Drop Swarm2 branding everywhere.
-6. Remove `SWARM2_SURFACE_CONTRACT.keepsLegacySwarmRoute = true`.
-7. Rename `swarm2-screen.test.ts` to `swarm-screen.test.ts` and audit stale imports.
+۳. فقط آنچه سطح جدید استفاده می‌کند نگه دارید: `swarm-terminal.tsx`، `router-chat.tsx` و `swarm-node-chat.tsx` تا زمانی که چت واقعی جایگزین آن کند.
+۴. انتقال `screens/swarm2/*` به `screens/swarm/*` پس از ارتقا.
+۵. برچسب nav سایدبار: "Swarm". حذف برندینگ Swarm2 در همه‌جا.
+۶. حذف `SWARM2_SURFACE_CONTRACT.keepsLegacySwarmRoute = true`.
+۷. تغییر نام `swarm2-screen.test.ts` به `swarm-screen.test.ts` و حسابرسی importهای قدیمی.
 
-Acceptance: one Swarm route, no duplicates, all swarm tests green, docs/README/nav updated, `/swarm2` redirects for one release then 404s.
+پذیرش: یک مسیر Swarm، بدون تکرار، تمام تست‌های swarm سبز، مستندات/README/nav به‌روز، `/swarm2` برای یک انتشار ریدایرکت می‌شود سپس ۴۰۴.
 
-## 8. Non-goals for immediate pass
+## ۸. غیراهداف برای پاس فوری
 
-- Full visual editor parity with Bolt in Phase 1
-- Perfect cross-machine terminal streaming before local attach works
-- Full PR/issue automation UI before worker/task runtime is reliable
-- Replacing `/swarm`; `/swarm2` remains the new product surface until stable
+- برابری کامل ویرایشگر بصری با Bolt در فاز ۱
+- استریم ترمینال کامل بین ماشین قبل از کار کردن اتصال محلی
+- UI خودکارسازی کامل PR/issue قبل از قابل اعتماد شدن runtime کارگر/وظیفه
+- جایگزینی `/swarm`؛ `/swarm2` تا زمان پایدار شدن سطح محصول جدید باقی می‌ماند
 
-## 9. Immediate Next Build Pass
+## ۹. پاس ساخت فوری بعدی
 
-Execution contract for this mission:
-- Context, memory, and handoffs come from `/Users/aurora/.openclaw/workspace`
-- Swarm2 code, git, build, and tests run in `/Users/aurora/hermeschi`
-- Do not use legacy workspace aliases
-- Before any build/test/git loop, run:
+قرارداد اجرا برای این ماموریت:
+- زمینه، حافظه و تحویل‌ها از `/Users/aurora/.openclaw/workspace` می‌آیند
+- کد، git، build و تست Swarm2 در `/Users/aurora/hermeschi` اجرا می‌شوند
+- از نام‌های مستعار ورک‌اسپیس legacy استفاده نکنید
+- قبل از هر حلقه build/test/git، اجرا کنید:
 
 ```bash
 cd /Users/aurora/hermeschi &&
@@ -501,13 +501,13 @@ test -f package.json &&
 jq -r .name package.json
 ```
 
-Start here:
+از اینجا شروع کنید:
 
-1. Shrink `Swarm2OrchestratorCard` to hub-only, no embedded main chat.
-2. Add `/api/swarm-chat` and wire worker cards to real history.
-3. Add per-card task queue preview.
-4. Add active project/cwd/preview badges from runtime/project API.
-5. Make runtime view auto-populate active workers and attach/fallback cleanly.
-6. After new route-module changes, prefer a full dev-server restart over trusting hot reload.
+۱. کوچک کردن `Swarm2OrchestratorCard` به هاب-فقط، بدون چت اصلی تعبیه‌شده.
+۲. افزودن `/api/swarm-chat` و اتصال کارت‌های کارگر به تاریخچه واقعی.
+۳. افزودن پیش‌نمایش صف وظایف به هر کارت.
+۴. افزودن badgeهای فعال project/cwd/preview از API runtime/project.
+۵. خودکار کردن نمای اجرایی برای پر کردن کارگران فعال و اتصال/fallback تمیز.
+۶. پس از تغییرات route-module جدید، یک restart کامل dev-server را به Hot reload ترجیح دهید.
 
-This turns `/swarm2` from a beautiful control surface into the first version of the actual sub-Claude IDE.
+این کار `/swarm2` را از یک سطح کنترل زیبا به اولین نسخه واقعی IDE زیر-کلاید تبدیل می‌کند.

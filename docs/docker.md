@@ -1,43 +1,43 @@
 # Docker
 
-HermesChi + Hermes Agent in containers.
+HermesChi + Hermes Agent در containerها.
 
-## TL;DR (single-host, localhost-only)
+## خلاصه (تک‌میزبانی، فقط localhost)
 
 ```bash
 git clone https://github.com/outsourc-e/hermeschi
 cd hermeschi
 cp .env.example .env
-# add at least one provider key (e.g. OPENROUTER_API_KEY=...)
+# حداقل یک کلید provider اضافه کنید (مثلاً OPENROUTER_API_KEY=...)
 docker compose up -d
 open http://localhost:3000
 ```
 
-That's it. The repo's `docker-compose.yml` runs:
+همین. `docker-compose.yml` مخزن اجرا می‌کند:
 
-- `hermes-agent` (port `8642`, internal only)
-- `hermeschi` (port `3000`, bound to `127.0.0.1`)
+- `hermes-agent` (پورت `8642`، فقط داخلی)
+- `hermeschi` (پورت `3000`، متصل به `127.0.0.1`)
 
-The workspace waits for the agent's `/health` to return `200` before starting (via `depends_on: condition: service_healthy`). On a fresh laptop this takes about 15 seconds.
+workspace پیش از شروع، منتظر می‌ماند تا `/health` عامل `200` برگرداند (از طریق `depends_on: condition: service_healthy`). روی یک لپ‌تاپ تازه این حدود ۱۵ ثانیه طول می‌کشد.
 
-## Multi-host / NAS / VPS
+## چندمیزبانی / NAS / VPS
 
-If the workspace and agent run on **different machines**, or you want LAN/Tailscale access to the workspace, three things change:
+اگر workspace و عامل روی **ماشین‌های متفاوتی** اجرا می‌شوند، یا می‌خواهید دسترسی LAN/Tailscale به workspace داشته باشید، سه چیز تغییر می‌کند:
 
-### 1. Agent binds publicly
+### ۱. عامل به‌صورت عمومی bind می‌شود
 
-In `.env`:
+در `.env`:
 
 ```bash
 API_SERVER_HOST=0.0.0.0
 API_SERVER_KEY=<a long random string>
 ```
 
-This makes the agent listen on all interfaces, not just the Docker loopback. **`API_SERVER_KEY` is mandatory** when `API_SERVER_HOST` is non-loopback — the agent will refuse to start otherwise.
+این کار باعث می‌شود عامل روی همهٔ interfaceها گوش دهد، نه فقط loopback داکر. **`API_SERVER_KEY` الزامی است** زمانی که `API_SERVER_HOST` غیر loopback است — در غیر این صورت عامل از راه‌اندازی امتناع می‌کند.
 
-### 2. Workspace knows where the agent is
+### ۲. workspace می‌داند عامل کجاست
 
-In `.env`:
+در `.env`:
 
 ```bash
 HERMES_API_URL=http://<agent-host-or-service>:8642
@@ -46,87 +46,87 @@ HERMESCHI_DASHBOARD_URL=http://<agent-host-or-service>:9119
 HERMESCHI_DASHBOARD_TOKEN=<same key, or set CLAUDE_DASHBOARD_TOKEN>
 ```
 
-Inside docker compose on the same host, `<agent-host-or-service>` is the service name from your compose file (e.g. `hermes-agent`). On a Synology NAS with a separate workspace stack, it's the LAN IP (e.g. `192.168.1.78`).
+در داخل docker compose روی همان میزبان، `<agent-host-or-service>` نام سرویس از فایل compose شماست (مثلاً `hermes-agent`). روی یک NAS سینولوژی با یک stack جداگانهٔ workspace، این IP LAN است (مثلاً `192.168.1.78`).
 
-### 3. Workspace gets a password
+### ۳. workspace یک رمز عبور می‌گیرد
 
-The workspace bind is non-loopback in Docker (`0.0.0.0:3000`). It refuses to start in production mode without a password to prevent accidental open exposure:
+اتصال workspace در Docker غیر loopback است (`0.0.0.0:3000`). این در حالت تولید بدون رمز عبور از راه‌اندازی امتناع می‌کند تا از در معرض قرار گرفتن تصادفی باز جلوگیری شود:
 
 ```bash
 HERMESCHI_PASSWORD=<a long random string different from API_SERVER_KEY>
 ```
 
-If you publish the workspace behind HTTPS (reverse proxy, Tailscale Funnel, Cloudflare Tunnel), also set `COOKIE_SECURE=1` so session cookies get the `Secure` flag.
+اگر workspace را پشت HTTPS منتشر می‌کنید (reverse proxy، Tailscale Funnel، Cloudflare Tunnel)، همچنین `COOKIE_SECURE=1` را تنظیم کنید تا cookieهای سشن فلگ `Secure` را دریافت کنند.
 
-## Connection failures — diagnostic playbook
+## شکست‌های اتصال — راهنمای تشخیص
 
-If the workspace shows "**Disconnected**" or "**Missing Hermes APIs detected**" but the agent appears to be running:
+اگر workspace "**Disconnected**" یا "**Missing Hermes APIs detected**" را نشان می‌دهد اما عامل به‌نظر می‌رسد در حال اجراست:
 
-### Step 1 — Verify the agent is reachable from inside the workspace container
+### گام ۱ — راستی‌آزمایی کنید که عامل از داخل container workspace قابل‌دسترس است
 
 ```bash
 docker compose exec hermeschi sh
-# inside the workspace container:
+# داخل container workspace:
 curl -fsS http://hermes-agent:8642/health
 curl -fsS -H "Authorization: Bearer $HERMES_API_TOKEN" http://hermes-agent:8642/v1/models | head -c 200
 exit
 ```
 
-If `/health` returns a JSON `{"status": "ok"}`, the agent is alive on the docker network.
+اگر `/health` یک JSON `{"status": "ok"}` برگرداند، عامل روی شبکهٔ docker زنده است.
 
-### Step 2 — Confirm the workspace's environment
+### گام ۲ — محیط workspace را تأیید کنید
 
 ```bash
 docker compose exec hermeschi env | grep -E "HERMES_API|API_SERVER"
 ```
 
-You should see:
+باید ببینید:
 
-- `HERMES_API_URL=http://hermes-agent:8642` (or whichever service name)
+- `HERMES_API_URL=http://hermes-agent:8642` (یا هر نام سرویس دیگر)
 - `HERMES_API_TOKEN=<same value as agent's API_SERVER_KEY>`
 
-### Step 3 — Force a reprobe
+### گام ۳ — reprobe اجباری
 
-The workspace caches the gateway capability map for 2 minutes (15 seconds when in disconnected state, since v2.2.1). If the agent came up after the workspace started probing, that cache is stale.
+workspace نقشهٔ قابلیت دروازه را به‌مدت ۲ دقیقه کش می‌کند (۱۵ ثانیه در حالت disconnected، از نسخهٔ v2.2.1). اگر عامل پس از شروع probe کردن workspace راه‌اندازی شده باشد، آن کش stale است.
 
 ```bash
 curl -X POST http://localhost:3000/api/gateway-reprobe
 ```
 
-This re-runs the probe and returns the fresh capability map. If it now reads `mode=zero-fork` you're connected.
+این کار probe را دوباره اجرا کرده و نقشهٔ قابلیت تازه را برمی‌گرداند. اگر اکنون `mode=zero-fork` را نشان داد، متصل شده‌اید.
 
-### Step 4 — Read the workspace's capability log
+### گام ۴ — لاگ قابلیت workspace را بخوانید
 
-The workspace logs the full capability summary on every probe. Look for the `[gateway]` line:
+workspace خلاصهٔ کامل قابلیت را در هر probe لاگ می‌کند. به خط `[gateway]` نگاه کنید:
 
 ```bash
 docker compose logs hermeschi 2>&1 | grep '\[gateway\]' | tail -3
 ```
 
-A healthy log looks like:
+یک لاگ سالم به‌این شکل است:
 
 ```
 [gateway] gateway=http://hermes-agent:8642 dashboard=http://hermes-agent:9119 mode=zero-fork core=[health,chatCompletions,models,streaming] enhanced=[sessions,skills,memory,config,jobs,enhancedChat,conductor,kanban] missing=[mcp]
 ```
 
-A failing log usually shows `core=[]` and `missing=[health,...]` — that means every probe got a non-2xx response. Check the agent's logs (`docker compose logs hermes-agent`) for matching 401/404/timeout entries.
+یک لاگ ناموفق معمولاً `core=[]` و `missing=[health,...]` را نشان می‌دهد — یعنی هر probe یک پاسخ غیر-2xx دریافت کرده است. لاگ‌های عامل (`docker compose logs hermes-agent`) را برای ورودی‌های 401/404/timeout منطبق بررسی کنید.
 
-### Common causes
+### علل رایج
 
-| Symptom | Cause | Fix |
+| علامت | علت | رفع |
 |---|---|---|
-| `core=[]` and `missing=[health,...]` | Workspace probed before agent was ready | Wait 30s and reload, or `POST /api/gateway-reprobe`. Cache TTL drops to 15s in disconnected state. |
-| `core=[health,chatCompletions]` but no `models` | Older agent image (pre-`/v1/models`) | Update: `docker compose pull && docker compose up -d` |
-| All probes 401 | `HERMES_API_TOKEN` doesn't match agent's `API_SERVER_KEY` | Check both `.env` values are the same. They must match exactly. |
-| Workspace UI shows "Connection refused" | Workspace using `127.0.0.1` instead of the service name | Set `HERMES_API_URL=http://hermes-agent:8642` (or whichever service name). |
-| Agent restart loops with `API_SERVER_KEY required` | Agent bound to 0.0.0.0 without a key | Set `API_SERVER_KEY` in `.env` (mandatory for non-loopback bind). |
+| `core=[]` و `missing=[health,...]` | workspace پیش از آماده‌شدن عامل probe کرده است | ۳۰s صبر کنید و reload کنید، یا `POST /api/gateway-reprobe`. کش TTL در حالت disconnected به ۱۵s کاهش می‌یابد. |
+| `core=[health,chatCompletions]` اما بدون `models` | image عامل قدیمی‌تر (پیش از `/v1/models`) | به‌روزرسانی: `docker compose pull && docker compose up -d` |
+| همهٔ probeها 401 | `HERMES_API_TOKEN` با `API_SERVER_KEY` عامل همخوانی ندارد | بررسی کنید هر دو مقدار `.env` یکسان باشند. باید دقیقاً همخوانی داشته باشند. |
+| رابط کاربری workspace "Connection refused" را نشان می‌دهد | workspace از `127.0.0.1` به‌جای نام سرویس استفاده می‌کند | `HERMES_API_URL=http://hermes-agent:8642` را تنظیم کنید (یا هر نام سرویس دیگر). |
+| عامل با حلقهٔ restart `API_SERVER_KEY required` | عامل به 0.0.0.0 بدون کلید bind شده | `API_SERVER_KEY` را در `.env` تنظیم کنید (برای bind غیر loopback الزامی است). |
 
-## Synology NAS / external host setups
+## NAS سینولوژی / راه‌اندازی میزبان خارجی
 
-If your workspace and agent are on **different stacks** on the same NAS (or different hosts entirely), they don't share a docker network. You need:
+اگر workspace و عامل شما روی **stackهای متفاوتی** روی همان NAS هستند (یا کاملاً روی میزبان‌های متفاوت)، آن‌ها یک شبکهٔ docker مشترک ندارند. لازم است:
 
-1. Both to publish their ports (the agent on `8642`, the workspace on `3000`).
-2. The workspace to point at the agent's **host IP**, not service name. Example for Synology with NAS at `192.168.1.78`:
+۱. هر دو پورت‌های خود را منتشر کنند (عامل روی `8642`، workspace روی `3000`).
+۲. workspace به **host IP** عامل اشاره کند، نه نام سرویس. نمونه برای سینولوژی با NAS در `192.168.1.78`:
 
 ```bash
 HERMES_API_URL=http://192.168.1.78:8642
@@ -134,33 +134,33 @@ HERMES_API_TOKEN=<API_SERVER_KEY>
 HERMESCHI_DASHBOARD_URL=http://192.168.1.78:9119
 ```
 
-3. The agent to bind on `0.0.0.0`:
+۳. عامل روی `0.0.0.0` bind شود:
 
 ```bash
 API_SERVER_HOST=0.0.0.0
 API_SERVER_KEY=<long random>
 ```
 
-4. The dashboard plugin (multi-board kanban, conductor missions) needs the dashboard service running on the agent host too — see the agent's docker-compose for that service.
+۴. پلاگین داشبورد (kanban چندبوردی، ماموریت‌های conductor) نیز نیازمند اجرای سرویس داشبورد روی میزبان عامل است — به docker-compose عامل برای آن سرویس مراجعه کنید.
 
-If you bind the agent to `0.0.0.0` on a NAS without `API_SERVER_KEY`, the agent will refuse to start. This is intentional — open-internet exposure of the agent's chat endpoint without auth would be a footgun.
+اگر عامل را به `0.0.0.0` روی یک NAS بدون `API_SERVER_KEY` bind کنید، عامل از راه‌اندازی امتناع می‌کند. این عمدی است — در معرض قرار دادن endpoint گفتگوی عامل در اینترنت باز بدون auth، یک footgun است.
 
-## HermesChi + Hermes Agent: why two containers?
+## HermesChi + Hermes Agent: چرا دو container؟
 
-The workspace is the **UI**. The agent is the **engine**. Splitting them lets you:
+workspace **رابط کاربری** است. عامل **موتور** است. جدا کردن آن‌ها به شما اجازه می‌دهد:
 
-- Update either independently (`docker compose pull hermeschi` etc.)
-- Run multiple workspaces against one agent (different ports)
-- Run the workspace on a tablet/phone while the agent stays on a beefy machine
+- هر کدام را مستقل به‌روزرسانی کنید (`docker compose pull hermeschi` و غیره)
+- چندین workspace را در برابر یک عامل اجرا کنید (پورت‌های متفاوت)
+- workspace را روی تبلت/گوشی اجرا کنید در حالی که عامل روی یک ماشین قدرتمند باقی می‌ماند
 
-The default compose colocates them for simplicity. The split-host setup above is the explicit "you know what you're doing" path.
+compose پیش‌فرض برای سادگی آن‌ها را colocate می‌کند. راه‌اندازی split-host بالا، مسیر صریح «می‌دانید چه می‌کنید» است.
 
-## Filing bugs
+## ثبت باگ
 
-If your setup matches the playbook above and still breaks, file an issue at <https://github.com/outsourc-e/hermeschi/issues> with:
+اگر راه‌اندازی شما با راهنمای بالا همخوانی دارد اما همچنان می‌شکند، یک issue در <https://github.com/outsourc-e/hermeschi/issues> ثبت کنید با:
 
-1. Your `docker-compose.yml` (redact secrets)
-2. The output of `docker compose logs hermeschi 2>&1 | grep '\[gateway\]' | tail -5`
-3. The output of `curl -fsS http://<workspace-host>:3000/api/gateway-reprobe -X POST` (also redact)
+۱. `docker-compose.yml` شما (secretها را redact کنید)
+۲. خروجی `docker compose logs hermeschi 2>&1 | grep '\[gateway\]' | tail -5`
+۳. خروجی `curl -fsS http://<workspace-host>:3000/api/gateway-reprobe -X POST` (همچنین redact کنید)
 
-That gets us to the actual cause within a couple of comments instead of a long back-and-forth.
+این کار ما را در عرض چند نظر به علت واقعی می‌رساند، به‌جای یک رفت‌وبرگشت طولانی.

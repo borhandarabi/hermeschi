@@ -1,159 +1,159 @@
-# HermesChi OpenAI-Compat Architecture Spec
+# مشخصهٔ معماری HermesChi سازگار با OpenAI
 
-> **For Claude:** Use `writing-plans` if this turns into an implementation plan. This doc locks the product and backend compatibility direction.
+> **برای Claude:** اگر این به یک برنامهٔ پیاده‌سازی تبدیل شد، از `writing-plans` استفاده کنید. این سند جهت سازگاری محصول و بک‌اند را قفل می‌کند.
 
-**Goal:** Make HermesChi work out of the box against vanilla `hermes-agent` and any OpenAI-compatible backend, while unlocking richer workspace features automatically when Claude-specific APIs are available.
+**هدف:** هرمزچی را به‌گونه‌ای کار کند که به‌صورت پیش‌فرض در برابر `hermes-agent` ساده و هر بک‌اند سازگار با OpenAI کار کند، در حالی که ویژگی‌های غنی‌تر workspace را هنگامی که APIهای مختص Claude در دسترس هستند، به‌صورت خودکار فعال کند.
 
-**Status:** Approved architectural constraint for the next implementation pass.
-
----
-
-## 1. Problem
-
-HermesChi currently depends on a forked `hermes-agent` gateway for extended functionality:
-
-- session management
-- streaming chat
-- memory browser
-- skills browser / install flow
-- config editing
-- capability-aware dashboard behavior
-
-That fork dependency is the wrong shape for distribution.
-
-Current downside:
-
-- users cannot point the workspace at stock `hermes-agent` and expect it to work
-- README/setup flow forces a custom fork
-- chat reliability is coupled to `/api/sessions` instead of the more portable OpenAI-compatible chat interface
-- product adoption is constrained by backend politics instead of frontend usability
-
-We want to reverse that.
+**وضعیت:** محدودیت معماری تأییدشده برای pass پیاده‌سازی بعدی.
 
 ---
 
-## 2. Architectural Constraint
+## ۱. مسئله
 
-This is the decision to lock in:
+هرمزچی در حال حاضر برای قابلیت‌های توسعه‌یافته به یک دروازهٔ `hermes-agent` forkشده وابسته است:
 
-> **HermesChi must work standalone against any OpenAI-compatible backend.**
+- مدیریت سشن
+- گفتگوی استریم
+- مرورگر memory
+- مرورگر skills / جریان نصب
+- ویرایش پیکربندی
+- رفتار داشبورد آگاه از قابلیت
+
+آن وابستگی fork، شکل اشتباهی برای توزیع است.
+
+ضرر فعلی:
+
+- کاربران نمی‌توانند workspace را به `hermes-agent` ساده اشاره کنند و انتظار داشته باشند کار کند
+- جریان README/راه‌اندازی یک fork سفارشی را تحمیل می‌کند
+- قابلیت اطمینان گفتگو به `/api/sessions` گره خورده است به‌جای رابط گفتگوی سازگار با OpenAI قابل‌حمل‌تر
+- اتخاذ محصول به‌جای قابلیت‌استفادهٔ فرانت‌اند، توسط سیاست بک‌اند محدود می‌شود
+
+ما می‌خواهیم این را معکوس کنیم.
+
+---
+
+## ۲. محدودیت معماری
+
+این تصمیمی است که قفل می‌شود:
+
+> **هرمزچی باید به‌صورت مستقل در برابر هر بک‌اند سازگار با OpenAI کار کند.**
 >
-> Claude-specific workspace features may enhance the experience when the full Hermes Agent API is available, but the product must remain usable without those endpoints.
+> ویژگی‌های مختص workspace ممکن است هنگامی که API کامل Hermes Agent در دسترس باشد، تجربه را غنی کنند، اما محصول باید بدون آن endpointها قابل‌استفاده باقی بماند.
 
-Non-negotiable implication:
+نتیجهٔ غیرقابل‌مذاکره:
 
-- **The fork cannot remain a product requirement.**
-- Enhanced APIs are optional capability unlocks, not startup prerequisites.
-
----
-
-## 3. Two-Step Strategy
-
-### Step 1 — Make Workspace standalone now
-
-Rewrite the workspace so the core chat product works against:
-
-- vanilla `hermes-agent`
-- any backend exposing `/v1/chat/completions`
-- any backend exposing `/v1/models` optionally
-
-In this mode, advanced features degrade gracefully when Claude-specific APIs are absent.
-
-### Step 2 — Upstream the richer API later
-
-Submit the custom Claude endpoints into upstream `hermes-agent`, targeting `gateway/platforms/api_server.py`.
-
-If upstream accepts them:
-
-- full workspace functionality works with vanilla `hermes-agent`
-- no long-term fork dependency remains
-- the enhanced UX becomes a first-class upstream capability, not a private patchset
+- **fork نمی‌تواند یک الزام محصول باقی بماند.**
+- APIهای توسعه‌یافته، قابلیت‌های اختیاری هستند، نه پیش‌نیازهای شروع.
 
 ---
 
-## 4. Product Modes
+## ۳. استراتژی دو مرحله‌ای
 
-The workspace should operate in two runtime modes.
+### مرحلهٔ ۱ — Workspace را اکنون مستقل کنید
 
-### Mode A — Portable OpenAI-Compat Mode
+workspace را بازنویسی کنید تا محصول هستهٔ گفتگو در برابر موارد زیر کار کند:
 
-Minimum required backend surface:
+- `hermes-agent` ساده
+- هر بک‌اند که `/v1/chat/completions` را ارائه می‌دهد
+- هر بک‌اند که به‌صورت اختیاری `/v1/models` را ارائه می‌دهد
+
+در این حالت، ویژگی‌های پیشرفته هنگامی که APIهای مختص Claude غایب هستند، به‌خوبی کاهش می‌یابند.
+
+### مرحلهٔ ۲ — API غنی‌تر را بعداً upstream کنید
+
+endpointهای سفارشی Claude را به upstream `hermes-agent` ارسال کنید، با هدف `gateway/platforms/api_server.py`.
+
+اگر upstream آن‌ها را بپذیرد:
+
+- عملکرد کامل workspace با `hermes-agent` ساده کار می‌کند
+- هیچ وابستگی fork بلندمدت باقی نمی‌ماند
+- UX توسعه‌یافته به یک قابلیت upstream درجه‌یک تبدیل می‌شود، نه یک patchset خصوصی
+
+---
+
+## ۴. حالت‌های محصول
+
+workspace باید در دو حالت زمان‌اجرا عمل کند.
+
+### حالت A — حالت Portable سازگار با OpenAI
+
+حداقل سطح بک‌اند مورد نیاز:
 
 - `POST /v1/chat/completions`
-- optional `GET /v1/models`
+- `GET /v1/models` اختیاری
 
-User gets:
+کاربر دریافت می‌کند:
 
-- working chat
-- streaming assistant responses when backend supports streaming
-- model selection when `/v1/models` exists
-- basic attachments if backend/model supports them
-- clean onboarding and connection state
+- گفتگوی کارآمد
+- پاسخ‌های دستیار استریم‌شده هنگامی که بک‌اند از استریم پشتیبانی می‌کند
+- انتخاب مدل هنگامی که `/v1/models` وجود دارد
+- ضمائم پایه اگر بک‌اند/مدل از آن‌ها پشتیبانی می‌کند
+- onboarding تمیز و وضعیت اتصال
 
-User does **not** need:
+کاربر **نیاز ندارد**:
 
 - `/api/sessions`
 - `/api/skills`
 - `/api/memory`
 - `/api/config`
-- Claude-specific metadata endpoints
+- endpointهای metadata مختص Claude
 
-### Mode B — Enhanced Claude Mode
+### حالت B — حالت Enhanced Claude
 
-When Claude-specific endpoints are present, unlock:
+هنگامی که endpointهای مختص Claude حضور دارند، فعال کنید:
 
-- session history and named sessions
-- memory browser / search / editing
-- skills browser / install / management
-- config editor
-- jobs/cron visibility
-- richer capability and workspace introspection
+- تاریخچهٔ سشن و سشن‌های نام‌گذاری‌شده
+- مرورگر memory / جستجو / ویرایش
+- مرورگر skills / نصب / مدیریت
+- ویرایشگر پیکربندی
+- دیداری بودن jobs/cron
+- درون‌بینی غنی‌تر قابلیت و workspace
 
-The UI should detect these capabilities and progressively enhance.
-
----
-
-## 5. Core Product Principle
-
-**Chat is the base product. Everything else is optional enhancement.**
-
-If a user points HermesChi at a valid OpenAI-compatible backend, they should be able to send a message and receive a streamed response without caring whether the backend is Claude, OpenAI, OpenRouter, Ollama, vLLM, or something else.
-
-Anything beyond that should be treated as capability-based augmentation.
+رابط کاربری باید این قابلیت‌ها را شناسایی کرده و به‌تدریج غنی کند.
 
 ---
 
-## 6. Required Behavior Changes
+## ۵. اصل محصول هسته
 
-### 6.1 Chat transport
+**گفتگو محصول پایه است. هر چیز دیگر بهبود اختیاری است.**
 
-The workspace must stop treating `/api/sessions` as the prerequisite for sending a chat message.
+اگر یک کاربر هرمزچی را به یک بک‌اند سازگار با OpenAI معتبر اشاره کند، باید بتواند یک پیام ارسال کرده و یک پاسخ استریم‌شده دریافت کند بدون آنکه اهمیت دهد بک‌اند Claude، OpenAI، OpenRouter، Ollama، vLLM یا چیز دیگری است.
 
-Instead:
+هر چیز فراتر از آن باید به‌عنوان افزایش مبتنی بر قابلیت در نظر گرفته شود.
 
-1. Detect whether Claude session APIs exist.
-2. If yes, use the enhanced Claude session flow.
-3. If not, send chat through `POST /v1/chat/completions`.
-4. If streaming is supported, render streamed deltas.
-5. If streaming is not supported, render standard non-stream response cleanly.
+---
 
-Result:
+## ۶. تغییرات رفتار مورد نیاز
 
-- missing Claude sessions API must no longer cause the product to hang or hard-fail for basic chat
+### ۶.۱ انتقال گفتگو
 
-### 6.2 Capability detection
+workspace باید از رفتار `/api/sessions` به‌عنوان پیش‌نیاز ارسال یک پیام گفتگو دست بردارد.
 
-Capability probing should explicitly distinguish:
+در عوض:
 
-#### Core portable capabilities
+۱. شناسایی اینکه آیا APIهای سشن Claude وجود دارند.
+۲. اگر بله، از جریان سشن توسعه‌یافتهٔ Claude استفاده کنید.
+۳. اگر نه، گفتگو را از طریق `POST /v1/chat/completions` ارسال کنید.
+۴. اگر استریم پشتیبانی می‌شود، deltaهای استریم‌شده را رندر کنید.
+۵. اگر استریم پشتیبانی نمی‌شود، پاسخ غیراستریمی استاندارد را به‌خوبی رندر کنید.
 
-- health / reachability
+نتیجه:
+
+- فقدان API سشن‌های Claude نباید باعث شود محصول برای گفتگوی پایه hang یا hard-fail کند
+
+### ۶.۲ شناسایی قابلیت
+
+probe قابلیت باید به‌طور صریح تمایز قائل شود:
+
+#### قابلیت‌های قابل‌حمل هسته
+
+- سلامت / قابل‌دسترس بودن
 - `/v1/chat/completions`
 - `/v1/models`
-- streaming support if detectable
-- attachment / image support if inferable
+- پشتیبانی استریم اگر قابل‌شناسایی باشد
+- پشتیبانی ضمیمه / تصویر اگر قابل‌استنباط باشد
 
-#### Claude enhancement capabilities
+#### قابلیت‌های بهبود Claude
 
 - `/api/sessions`
 - `/api/skills`
@@ -161,213 +161,213 @@ Capability probing should explicitly distinguish:
 - `/api/config`
 - `/api/jobs`
 
-The app should expose these as two layers:
+اپ باید این‌ها را به‌عنوان دو لایه نمایش دهد:
 
 - `coreCapabilities`
 - `enhancedCapabilities`
 
-### 6.3 Graceful degradation
+### ۶.۳ کاهش ایمن
 
-When Claude-specific APIs are missing, the UI must not show broken loaders, dead tabs, or cryptic errors.
+هنگامی که APIهای مختص Claude غایب هستند، رابط کاربری نباید loaderهای شکسته، تب‌های مرده یا خطاهای رمزی نشان دهد.
 
-Instead, each advanced surface should do one of the following:
+در عوض، هر سطح پیشرفته باید یکی از موارد زیر را انجام دهد:
 
-- hide itself when not relevant
-- show a clear “Not available on this backend” state
-- explain what capability would unlock it
-- continue to preserve the rest of the app as fully usable
+- هنگامی که مرتبط نیست، خود را پنهان کند
+- یک وضعیت روشن «Not available on this backend» نشان دهد
+- توضیح دهد چه قابلیتی آن را فعال می‌کند
+- بقیهٔ اپ را به‌عنوان کاملاً قابل‌استفاده حفظ کند
 
-Required degraded states:
+وضعیت‌های کاهش‌یافتهٔ مورد نیاز:
 
-- **Sessions:** fallback to ephemeral/local chat thread state
-- **Memory:** read-only unavailable state with explanation
-- **Skills:** unavailable state with explanation
-- **Config:** unavailable state with explanation
-- **Jobs:** unavailable state with explanation
+- **سشن‌ها:** fallback به وضعیت thread گفتگوی ephemeral/محلی
+- **memory:** وضعیت فقط‌خواندنی غیرقابل‌دسترس با توضیح
+- **skills:** وضعیت غیرقابل‌دسترس با توضیح
+- **پیکربندی:** وضعیت غیرقابل‌دسترس با توضیح
+- **jobs:** وضعیت غیرقابل‌دسترس با توضیح
 
-### 6.4 Onboarding and setup
+### ۶.۴ onboarding و راه‌اندازی
 
-The setup flow must stop instructing users that a fork is required.
+جریان راه‌اندازی باید از دستور دادن به کاربران که یک fork لازم است، دست بردارد.
 
-New setup principle:
+اصل جدید راه‌اندازی:
 
-- connect any OpenAI-compatible backend first
-- verify chat works
-- then advertise extra Claude-native features if supported
+- ابتدا به هر بک‌اند سازگار با OpenAI متصل شوید
+- راستی‌آزمایی کنید گفتگو کار می‌کند
+- سپس ویژگی‌های اضافی Claude-native را اگر پشتیبانی می‌شود، تبلیغ کنید
 
-Onboarding copy should communicate:
+کپی onboarding باید منتقل کند:
 
-- “Works with any OpenAI-compatible backend”
-- “Enhanced features unlock automatically with Hermes Agent gateway APIs”
+- «Works with any OpenAI-compatible backend»
+- «Enhanced features unlock automatically with Hermes Agent gateway APIs»
 
-### 6.5 Documentation
+### ۶.۵ مستندات
 
-README and setup docs must reflect the architecture honestly.
+README و مستندات راه‌اندازی باید به‌صورت صادقانه معماری را منعکس کنند.
 
-Required messaging:
+پیام‌رسانی مورد نیاز:
 
-- workspace works standalone with OpenAI-compatible backends
-- vanilla `hermes-agent` is a supported target
-- the richer Hermes Agent API is optional for advanced workspace features
-- upstreaming those APIs is the long-term path
-
----
-
-## 7. UX Requirements
-
-### 7.1 Connection status language
-
-Do not frame missing advanced APIs as a fatal error when core chat works.
-
-Use status language like:
-
-- **Connected** — chat available
-- **Enhanced** — Claude workspace APIs detected
-- **Partial** — chat available, some advanced features unavailable
-- **Disconnected** — no usable chat backend detected
-
-### 7.2 Feature gating
-
-Feature gating should feel intentional, not broken.
-
-Good examples:
-
-- “Memory browser requires Claude memory API.”
-- “Session history isn’t available on this backend yet.”
-- “Connected in portable mode. Chat works; advanced workspace tools are unavailable.”
-
-Bad examples:
-
-- raw 404 text
-- spinner forever
-- generic 500 banners with no next step
-- startup screen claiming setup is incomplete when chat is actually usable
-
-### 7.3 Session behavior in portable mode
-
-When no Claude sessions API exists, the app still needs a sane chat UX.
-
-Portable-mode minimum:
-
-- maintain current thread in client state
-- preserve visible message history for the active page/app session
-- clearly label it as local / temporary if persistence is unavailable
-- avoid fake server session IDs when the backend does not provide them
+- workspace به‌صورت مستقل با بک‌اندهای سازگار با OpenAI کار می‌کند
+- `hermes-agent` ساده یک هدف پشتیبانی‌شده است
+- API غنی‌تر Hermes Agent برای ویژگی‌های پیشرفتهٔ workspace اختیاری است
+- upstream کردن آن APIها مسیر بلندمدت است
 
 ---
 
-## 8. API Design Direction
+## ۷. الزامات UX
 
-### 8.1 Portable path
+### ۷.۱ زبان وضعیت اتصال
 
-Primary portable request target:
+هنگامی که گفتگو هسته کار می‌کند، فقدان APIهای پیشرفته را به‌عنوان یک خطای مهلک قاب‌بندی نکنید.
+
+از زبان وضعیتی مانند زیر استفاده کنید:
+
+- **Connected** — گفتگو در دسترس
+- **Enhanced** — APIهای workspace Claude شناسایی شدند
+- **Partial** — گفتگو در دسترس، برخی ویژگی‌های پیشرفته غیرقابل‌دسترس
+- **Disconnected** — هیچ بک‌اند گفتگوی قابل‌استفاده شناسایی نشد
+
+### ۷.۲ gating ویژگی
+
+gating ویژگی باید عمدی به‌نظر برسد، نه شکسته.
+
+نمونه‌های خوب:
+
+- «Memory browser requires Claude memory API.»
+- «Session history isn't available on this backend yet.»
+- «Connected in portable mode. Chat works; advanced workspace tools are unavailable.»
+
+نمونه‌های بد:
+
+- متن 404 خاموش
+- spinner برای همیشه
+- bannerهای 500 عمومی بدون گام بعدی
+- صفحهٔ شروع که ادعا می‌کند راه‌اندازی ناقص است در حالی که گفتگو در واقع قابل‌استفاده است
+
+### ۷.۳ رفتار سشن در حالت portable
+
+هنگامی که هیچ API سشن Claude وجود ندارد، اپ همچنان به یک UX گفتگوی معقول نیاز دارد.
+
+حداقل حالت portable:
+
+- حفظ thread فعلی در وضعیت کلاینت
+- حفظ تاریخچهٔ پیام قابل‌مشاهده برای صفحهٔ فعلی/سشن اپ
+- در صورت عدم در دسترس بودن persisting، به‌وضوح به‌عنوان محلی/موقتی برچسب‌گذاری کنید
+- از ID سشن سرور جعلی هنگامی که بک‌اند آن‌ها را ارائه نمی‌دهد، پرهیز کنید
+
+---
+
+## ۸. جهت طراحی API
+
+### ۸.۱ مسیر قابل‌حمل
+
+هدف اصلی درخواست قابل‌حمل:
 
 - `POST /v1/chat/completions`
 
-Expected request compatibility:
+سازگاری درخواست مورد انتظار:
 
 - `model`
 - `messages`
 - `stream`
-- `temperature` if supported
-- attachments / image content where backend accepts multimodal OpenAI-style messages
+- `temperature` اگر پشتیبانی می‌شود
+- ضمیمه‌ها / محتوای تصویر جایی که بک‌اند پیام‌های چندوجهی به‌سبک OpenAI را می‌پذیرد
 
-Expected response handling:
+مدیریت پاسخ مورد انتظار:
 
-- SSE stream chunks for streaming mode
-- standard OpenAI chat completion JSON for non-stream mode
+- chunkهای SSE stream برای حالت استریم
+- JSON تکمیل گفتگوی استاندارد OpenAI برای حالت غیراستریمی
 
-### 8.2 Enhanced Claude path
+### ۸.۲ مسیر Enhanced Claude
 
-Enhanced path remains Claude-native where available, because it provides:
+مسیر توسعه‌یافته در صورت وجود، Claude-native باقی می‌ماند، زیرا فراهم می‌کند:
 
-- persistent sessions
-- message history
-- memory/skills/config surfaces
-- richer workspace affordances
+- سشن‌های پایدار
+- تاریخچهٔ پیام
+- سطوح memory/skills/config
+- affordanceهای غنی‌تر workspace
 
-That is fine, but it must sit behind capability detection instead of being assumed.
+این خوب است، اما باید پشت شناسایی قابلیت باشد، نه فرض شده.
 
-### 8.3 Upstream target
+### ۸.۳ هدف upstream
 
-For Step 2, the custom API endpoints should be proposed upstream in:
+برای مرحلهٔ ۲، endpointهای API سفارشی باید در upstream پیشنهاد شوند در:
 
 - `gateway/platforms/api_server.py`
 
-Intent:
+نیت:
 
-- make enhanced workspace APIs part of upstream `hermes-agent`
-- remove ongoing maintenance burden of a permanent fork
-- let HermesChi treat stock Claude as the best backend, without requiring it
-
----
-
-## 9. Non-Goals
-
-This spec does **not** require:
-
-- universal parity across every OpenAI-compatible provider
-- guaranteed session persistence on non-Hermes backends
-- memory/skills/config support outside Claude
-- building a backend abstraction for every vendor-specific extension
-
-The goal is simpler:
-
-- portable chat first
-- enhanced Claude features second
-- no fork requirement
+- APIهای workspace توسعه‌یافته را به‌بخشی از upstream `hermes-agent` تبدیل کنید
+- بار نگهداری مستمر یک fork دائمی را حذف کنید
+- اجازه دهید هرمزچی Claude ساده را به‌عنوان بهترین بک‌اند در نظر بگیرد، بدون الزام به آن
 
 ---
 
-## 10. Acceptance Criteria
+## ۹. اهداف غیر
 
-This initiative is complete when all of the following are true:
+این مشخصه **نیاز ندارد**:
 
-### Product acceptance
+- برابری جهانی در طول همهٔ providerهای سازگار با OpenAI
+- تضمین persisting سشن روی بک‌اندهای غیر-Hermes
+- پشتیبانی memory/skills/config خارج از Claude
+- ساخت یک abstraction بک‌اند برای هر توسعهٔ مختص vendor
 
-- A user can launch HermesChi against a stock OpenAI-compatible backend and successfully chat without patching backend code.
-- A user can launch HermesChi against vanilla `hermes-agent` and get a working core experience.
-- Advanced features do not hard-fail the app when Claude-specific APIs are absent.
-- The UI clearly communicates portable mode vs enhanced Claude mode.
+هدف ساده‌تر است:
 
-### Technical acceptance
-
-- Chat send path no longer hard-depends on `/api/sessions`.
-- Capability probing includes `/v1/chat/completions` readiness, not just Claude-specific APIs.
-- Missing `/api/sessions`, `/api/skills`, `/api/memory`, or `/api/config` does not block app boot or core chat.
-- Portable-mode chat streaming works against OpenAI-compatible SSE responses.
-
-### Documentation acceptance
-
-- README no longer says the fork is required.
-- Setup docs describe OpenAI-compatible standalone mode first.
-- Enhanced Hermes Agent API support is documented as progressive enhancement.
-- Step 2 upstreaming target is documented clearly.
+- ابتدا گفتگوی قابل‌حمل
+- ثانیاً ویژگی‌های توسعه‌یافتهٔ Claude
+- بدون الزام fork
 
 ---
 
-## 11. Implementation Guidance
+## ۱۰. معیارهای پذیرش
 
-This is not the detailed task plan, but the engineering direction should be:
+این ابتکار زمانی کامل است که همهٔ موارد زیر درست باشند:
 
-1. Separate **core chat client** from **Claude enhanced client**.
-2. Refactor capability probing into portable vs enhanced layers.
-3. Add OpenAI-compatible streaming parser path.
-4. Add local-thread fallback for non-session backends.
-5. Gate advanced screens cleanly behind capability checks.
-6. Rewrite onboarding and docs around portable-first positioning.
-7. After Step 1 is stable, prepare the upstream PR for Claude-native endpoints.
+### پذیرش محصول
+
+- یک کاربر می‌تواند هرمزچی را در برابر یک بک‌اند سازگار با OpenAI ساده راه‌اندازی کرده و با موفقیت گفتگو کند بدون اینکه کد بک‌اند را patch کند.
+- یک کاربر می‌تواند هرمزچی را در برابر `hermes-agent` ساده راه‌اندازی کرده و یک تجربهٔ هستهٔ کارآمد دریافت کند.
+- ویژگی‌های پیشرفته هنگامی که APIهای مختص Claude غایب هستند، اپ را hard-fail نمی‌کنند.
+- رابط کاربری به‌وضوح حالت portable را در مقابل حالت Enhanced Claude منتقل می‌کند.
+
+### پذیرش فنی
+
+- مسیر ارسال گفتگو دیگر به‌شدت به `/api/sessions` وابسته نیست.
+- probe قابلیت شامل آمادگی `/v1/chat/completions` است، نه فقط APIهای مختص Claude.
+- فقدان `/api/sessions`، `/api/skills`، `/api/memory` یا `/api/config`، boot اپ یا گفتگوی هسته را مسدود نمی‌کند.
+- استریم گفتگوی حالت portable در برابر پاسخ‌های SSE سازگار با OpenAI کار می‌کند.
+
+### پذیرش مستندات
+
+- README دیگر نمی‌گوید fork الزامی است.
+- مستندات راه‌اندازی حالت مستقل سازگار با OpenAI را اول توصیف می‌کنند.
+- پشتیبانی API Hermes Agent توسعه‌یافته به‌عنوان بهبود تدریجی مستند شده است.
+- هدف upstreaming مرحلهٔ ۲ به‌وضوح مستند شده است.
 
 ---
 
-## 12. Final Decision Statement
+## ۱۱. راهنمایی پیاده‌سازی
 
-Lock this in:
+این برنامهٔ وظیفهٔ دقیق نیست، اما جهت مهندسی باید این باشد:
 
-> HermesChi is a standalone frontend for OpenAI-compatible chat backends.
+۱. جداسازی **کلاینت گفتگوی هسته** از **کلاینت توسعه‌یافتهٔ Claude**.
+۲. refactor probe قابلیت به لایه‌های portable در مقابل توسعه‌یافته.
+۳. افزودن مسیر parser استریم سازگار با OpenAI.
+۴. افزودن fallback thread-محلی برای بک‌اندهای بدون سشن.
+۵. gating تمیز صفحه‌های پیشرفته پشت بررسی‌های قابلیت.
+۶. بازنویسی onboarding و مستندات حول موقعیت‌دهی portable-first.
+۷. پس از پایدار شدن مرحلهٔ ۱، آماده‌سازی PR upstream برای endpointهای Claude-native.
+
+---
+
+## ۱۲. بیان تصمیم نهایی
+
+این را قفل کنید:
+
+> هرمزچی یک فرانت‌اند مستقل برای بک‌اندهای گفتگوی سازگار با OpenAI است.
 >
-> Claude-native APIs are an enhancement layer, not a requirement.
+> APIهای Claude-native یک لایه بهبود هستند، نه یک الزام.
 >
-> Step 1 is portable compatibility now.
+> مرحلهٔ ۱، اکنون سازگاری قابل‌حمل است.
 >
-> Step 2 is upstreaming the enhanced Hermes Agent APIs so no fork is needed ever again.
+> مرحلهٔ ۲، upstream کردن APIهای توسعه‌یافتهٔ Hermes Agent است تا هیچ fork دیگری لازم نباشد.

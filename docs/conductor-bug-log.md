@@ -1,13 +1,13 @@
-# Conductor Bug Log
+# گزارش خطای Conductor
 
-## 1. Portable Conductor jobs never executed
+## ۱. وظایف portable Conductor هرگز اجرا نمی‌شدند
 
-- Symptom: portable-mode missions were being created as scheduled Hermes jobs, but the jobs stayed in `scheduled` state and never ran.
-- Fix: portable Conductor now uses the existing `/api/send-stream` session-streaming path instead of the dead jobs path.
-- Validation: portable API smoke test returned `started`, `chunk`, and `done` SSE events, and the build passed.
+- علامت: ماموریت‌های حالت portable به‌عنوان وظایف زمان‌بندی‌شدهٔ Hermes ایجاد می‌شدند، اما وظایف در حالت `scheduled` باقی می‌ماندند و هرگز اجرا نمی‌شدند.
+- رفع: portable Conductor اکنون به‌جای مسیر وظایف مرده، از مسیر موجود `/api/send-stream` برای استریم سشن استفاده می‌کند.
+- اعتبارسنجی: آزمون دودویی API حالت portable رویدادهای SSE با نام‌های `started`، `chunk` و `done` را بازگرداند و build با موفقیت گذر کرد.
 
-## 2. Dashboard-backed mission was running but the UI showed `0 active`
+## ۲. ماموریت مبتنی بر داشبورد در حال اجرا بود اما رابط کاربری `0 active` را نشان می‌داد
 
-- Symptom: the conductor page launched a dashboard-backed mission, but the activity panel stayed at `0 active` even while the dashboard showed live mission sessions.
-- Fix: the conductor session filter now matches recent mission-related sessions by exact key and by mission text/summary, not just `worker-*` / `conductor-*` labels.
-- Validation: after reloading the conductor page, the mission showed `1 active` and the worker card appeared.
+- علامت: صفحهٔ conductor یک ماموریت مبتنی بر داشبورد را راه‌اندازی کرد، اما پنل فعالیت حتی زمانی که داشبورد سشن‌های زندهٔ ماموریت را نشان می‌داد، در `0 active` باقی می‌ماند.
+- رفع: فیلتر سشن conductor اکنون سشن‌های اخیر مرتبط با ماموریت را بر اساس کلید دقیق و همچنین متن/خلاصهٔ ماموریت تطبیق می‌دهد، نه فقط برچسب‌های `worker-*` / `conductor-*`.
+- اعتبارسنجی: پس از بارگذاری مجدد صفحهٔ conductor، ماموریت `1 active` را نشان داد و کارت worker ظاهر شد.

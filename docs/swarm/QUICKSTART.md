@@ -1,55 +1,55 @@
-# Swarm Mode Quickstart
+# Quickstart حالت Swarm
 
-This quickstart gets a local HermesChi checkout running, confirms profile auto-detection, starts a tmux-backed Hermes Agent, dispatches a first task, and shows where to review the result.
+این quickstart یک checkout محلی هرمزچی را اجرا می‌کند، تشخیص خودکار profile را تأیید می‌کند، یک Hermes Agent با tmux-backed شروع می‌کند، اولین task را dispatch می‌کند و نشان می‌دهد کجا نتیجه را بازبینی کنید.
 
-## 0. Prerequisites
+## ۰. پیش‌نیازها
 
-You need:
+نیاز دارید به:
 
 - Node.js 22+
 - pnpm
 - git
-- tmux for persistent TUI-backed workers
-- a configured Hermes Agent profile under `~/.hermes/profiles/`
+- tmux برای کارگرهای پایدار TUI-backed
+- یک profile پیکربندی‌شدهٔ Hermes Agent در `~/.hermes/profiles/`
 
-The workspace can still render without tmux, but tmux is what makes the worker sessions feel alive instead of one-shot and disposable.
+workspace همچنان می‌تواند بدون tmux render شود، اما tmux است که sessionهای کارگر را به‌جای یک‌بارمصرف و دورریختنی، زنده نشان می‌دهد.
 
-## 1. Clone the workspace
+## ۱. کلون کردن workspace
 
 ```bash
 git clone https://github.com/outsourc-e/hermeschi.git
 cd hermeschi
 ```
 
-## 2. Install dependencies
+## ۲. نصب وابستگی‌ها
 
 ```bash
 pnpm install
 ```
 
-## 3. Start the workspace
+## ۳. شروع workspace
 
 ```bash
 pnpm dev
 ```
 
-Open the local URL printed by Vite/TanStack Start. In most local setups that is:
+URL محلی چاپ‌شده توسط Vite/TanStack Start را باز کنید. در اکثر راه‌اندازی‌های محلی این است:
 
 ```text
 http://localhost:3000
 ```
 
-Some release lanes run on `:3002`; trust the terminal output if it differs.
+برخی از laneهای release روی `:3002` اجرا می‌شوند؛ به خروجی terminal اعتماد کنید اگر متفاوت بود.
 
-## 4. First-run profile detection
+## ۴. تشخیص profile در اولین اجرا
 
-On first run, the workspace looks for Hermes Agent profiles in:
+در اولین اجرا، workspace به دنبال profileهای Hermes Agent در این مسیر می‌گردد:
 
 ```text
 ~/.hermes/profiles/
 ```
 
-Each worker profile can include:
+هر profile کارگر می‌تواند شامل موارد زیر باشد:
 
 ```text
 ~/.hermes/profiles/<workerId>/
@@ -61,34 +61,34 @@ Each worker profile can include:
   skills/
 ```
 
-The roster and runtime APIs use that profile shape to populate worker cards, runtime state, model labels, tmux session names, checkpoint status, and recent summaries.
+APIهای roster و runtime از آن شکل profile برای پر کردن کارت‌های کارگر، state زمان‌اجرایی، برچسب‌های مدل، نام‌های session tmux، وضعیت checkpoint و خلاصه‌های اخیر استفاده می‌کنند.
 
-If a worker exists in the roster but has no local profile, it can still appear as roster-only. Create or import the profile before expecting persistent memory, skill loading, or tmux launch to work.
+اگر یک کارگر در roster وجود دارد اما profile محلی ندارد، همچنان می‌تواند به‌صورت roster-only ظاهر شود. قبل از انتظار به حافظهٔ پایدار، بارگذاری skill یا راه‌اندازی tmux، profile را بسازید یا import کنید.
 
-## 5. Spawn a tmux-backed worker
+## ۵. spawn کردن یک کارگر tmux-backed
 
-### Add Swarm dialog
+### dialog افزودن Swarm
 
-In the workspace:
+در workspace:
 
-1. Open Swarm Mode.
-2. Choose Add Swarm.
-3. Pick a role preset.
-4. Set worker ID, display name, model, specialty, mission, and skills.
-5. Save.
-6. Start the worker session from the card or Runtime view.
+1. حالت Swarm را باز کنید.
+2. Add Swarm را انتخاب کنید.
+3. یک preset نقش انتخاب کنید.
+4. worker ID، display name، model، specialty، mission و skillها را تنظیم کنید.
+5. ذخیره کنید.
+6. session کارگر را از کارت یا نمای Runtime شروع کنید.
 
-The role presets fill the important defaults: role, specialty, mission, system prompt, skills, and default model. You can edit them before saving.
+presetهای نقش defaultهای مهم را پر می‌کنند: role، specialty، mission، system prompt، skillها و default model. می‌توانید قبل از ذخیره آن‌ها را ویرایش کنید.
 
-## 6. Dispatch the first task
+## ۶. dispatch اولین task
 
-The dispatch API is:
+API dispatch این است:
 
 ```text
 POST /api/swarm-dispatch
 ```
 
-Minimal single-worker example:
+نمونهٔ مینیمال تک‌کارگری:
 
 ```bash
 curl -X POST http://localhost:3000/api/swarm-dispatch   -H 'Content-Type: application/json'   -d '{
@@ -99,7 +99,7 @@ curl -X POST http://localhost:3000/api/swarm-dispatch   -H 'Content-Type: applic
   }'
 ```
 
-Assignment-form example:
+نمونهٔ فرم assignment:
 
 ```bash
 curl -X POST http://localhost:3000/api/swarm-dispatch   -H 'Content-Type: application/json'   -d '{
@@ -116,7 +116,7 @@ curl -X POST http://localhost:3000/api/swarm-dispatch   -H 'Content-Type: applic
   }'
 ```
 
-Expected response shape:
+شکل پاسخ مورد انتظار:
 
 ```json
 {
@@ -135,42 +135,42 @@ Expected response shape:
 }
 ```
 
-If `waitForCheckpoint` is true, the API waits for a fresh checkpoint from runtime state or worker chat. If it times out, the worker may still be running; inspect Runtime view before assuming failure.
+اگر `waitForCheckpoint` درست باشد، API برای یک checkpoint تازه از state زمان‌اجرایی یا chat کارگر منتظر می‌ماند. اگر timeout شود، کارگر ممکن است همچنان در حال اجرا باشد؛ قبل از فرض fail بودن، نمای Runtime را بررسی کنید.
 
-## 7. View Reports + Inbox
+## ۷. مشاهدهٔ Reports + Inbox
 
-Open Swarm Mode, then switch the view to Reports.
+حالت Swarm را باز کنید، سپس view را به Reports تغییر دهید.
 
-Reports gives you:
+Reports به شما می‌دهد:
 
-- mission history
-- assignment state
-- worker checkpoints
-- blockers
-- `NEEDS_REVIEW` items
-- ready-for-human Inbox cards
-- route-to-reviewer actions
+- تاریخچهٔ mission
+- state assignment
+- checkpointهای کارگر
+- blockerها
+- موارد `NEEDS_REVIEW`
+- کارت‌های Inbox آماده برای انسان
+- اقدامات route-to-reviewer
 
-The Inbox is where the swarm asks for judgment instead of trying to be brave in public. Good.
+Inbox جایی است که swarm به‌جای شجاع‌بودن در انظار، درخواست قضاوت می‌کند. خوب است.
 
-## 8. Use the Kanban TaskBoard
+## ۸. استفاده از Kanban TaskBoard
 
-Switch to Kanban view for planning. The board is useful when you want a visual queue but still want dispatch to happen through the orchestrator.
+برای برنامه‌ریزی به view Kanban تغییر دهید. board زمانی مفید است که یک صف بصری می‌خواهید اما همچنان می‌خواهید dispatch از طریق ارکستریتور انجام شود.
 
-Recommended lane meanings:
+معانی پیشنهادی laneها:
 
-| Lane | Meaning |
+| Lane | معنی |
 | --- | --- |
-| Backlog | Useful but not ready. |
-| Ready | Clear enough to dispatch. |
-| Running | Worker owns it now. |
-| Review | Needs reviewer or Eric. |
-| Blocked | Needs repair, input, auth, or scope cut. |
-| Done | Verified checkpoint landed. |
+| Backlog | مفید اما آماده نیست. |
+| Ready | به‌اندازهٔ کافی واضح برای dispatch. |
+| Running | کارگر آن را در اختیار دارد. |
+| Review | نیاز به reviewer یا اریک دارد. |
+| Blocked | نیاز به repair، input، auth یا کاهش scope. |
+| Done | checkpoint تأییدشده رسیده. |
 
-## 9. Add a worker with role presets
+## ۹. افزودن کارگر با presetهای نقش
 
-The Add Swarm dialog includes these presets:
+dialog افزودن Swarm شامل این presetهاست:
 
 - Orchestrator
 - Builder
@@ -184,55 +184,55 @@ The Add Swarm dialog includes these presets:
 - Mirror Integrations
 - Custom
 
-Pick the closest role first, then tune. Avoid starting from Custom unless you are intentionally creating a new lane. Presets encode the operating contract so the worker knows whether it is allowed to build, review, triage, research, or just report.
+ابتدا نزدیک‌ترین role را انتخاب کنید، سپس تنظیم کنید. از شروع با Custom پرهیز کنید مگر اینکه عمداً در حال ساخت یک lane جدید باشید. presetها قرارداد عملیاتی را رمزگذاری می‌کنند تا کارگر بداند آیا مجاز است build کند، بازبینی کند، triage کند، research کند یا فقط گزارش دهد.
 
-## 10. First-task checklist
+## ۱۰. چک‌لیست اولین task
 
-Before trusting a new worker:
+قبل از اعتماد به یک کارگر جدید:
 
-- It appears in the roster.
-- Its profile exists under `~/.hermes/profiles/<workerId>/`.
-- Runtime view can attach to tmux or open a shell/log stream.
-- `/api/swarm-dispatch` can deliver a task.
-- The worker returns the canonical checkpoint format.
-- Reports shows the checkpoint.
-- The orchestrator can route the next action.
+- در roster ظاهر می‌شود.
+- profile آن در `~/.hermes/profiles/<workerId>/` وجود دارد.
+- نمای runtime می‌تواند به tmux متصل شود یا یک shell/log stream باز کند.
+- `/api/swarm-dispatch` می‌تواند یک task تحویل دهد.
+- کارگر فرمت canonical checkpoint را برمی‌گرداند.
+- Reports checkpoint را نشان می‌دهد.
+- ارکستریتور می‌تواند اقدام بعدی را route کند.
 
-## 11. Common fixes
+## ۱۱. رفع‌های رایج
 
-### Worker card exists but TUI does not attach
+### کارت کارگر وجود دارد اما TUI متصل نمی‌شود
 
-Check tmux:
+tmux را بررسی کنید:
 
 ```bash
 tmux ls
 ```
 
-Expected session name:
+نام session مورد انتظار:
 
 ```text
 swarm-<workerId>
 ```
 
-Start or rotate the worker if the session is missing.
+اگر session گمشده است، کارگر را شروع یا rotate کنید.
 
-### Dispatch returns timeout
+### dispatch برمی‌گرداند timeout
 
-A timeout means the API did not see a fresh checkpoint in time. It does not always mean the worker failed.
+یک timeout به این معنی است که API در زمان مشخص checkpoint تازه‌ای ندید. همیشه به این معنی نیست که کارگر fail کرده.
 
-Check:
+بررسی کنید:
 
-- Runtime view
-- worker `runtime.json`
-- worker chat transcript
-- Reports tab after refresh
+- نمای Runtime
+- `runtime.json` کارگر
+- transcript chat کارگر
+- tab Reports پس از refresh
 
-### Worker has wrong role/model/skills
+### کارگر role/model/skill اشتباه دارد
 
-Open Add Swarm or edit the roster config, then restart the worker session. Role, model, and skills are part of the worker identity; changing them mid-task creates weird ghosts. Weird ghosts are expensive.
+Add Swarm را باز کنید یا config roster را ویرایش کنید، سپس session کارگر را restart کنید. role، model و skillها بخشی از هویت کارگرند؛ تغییر آن‌ها در میانهٔ task ghostهای عجیب می‌سازد. ghostهای عجیب گران هستند.
 
-## 12. Safe operating boundary
+## ۱۲. مرز عملیاتی امن
 
-The swarm can prepare commits, branches, PR bodies, review verdicts, issues, and release notes. It should not merge, force-push, publish, announce publicly, close issues, or perform destructive file operations without explicit human approval.
+swarm می‌تواند commit، branch، PR body، review verdict، issue و release note را آماده کند. نباید بدون تأیید صریح انسانی merge کند، force-push کند، publish کند، به‌صورت عمومی announce کند، issue را close کند یا عملیات مخرب فایل انجام دهد.
 
-That boundary is the Greenlight Gate. Keep it boring.
+آن مرز Greenlight Gate است. خسته‌کننده نگهش دارید.

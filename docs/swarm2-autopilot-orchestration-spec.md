@@ -1,49 +1,49 @@
-# Swarm2 Autopilot Orchestration Spec
+# مشخصات هماهنگی خودران Swarm2
 
-Date: 2026-04-28
-Status: implementation spec, staged rollout
-Canonical repo: `/Users/aurora/hermeschi`
+تاریخ: 2026-04-28
+وضعیت: مشخصات پیاده‌سازی، rollout مرحله‌بندی‌شده
+مخزن کانونیک: `/Users/aurora/hermeschi`
 
-## Goal
+## هدف
 
-Swarm2 should behave like a persistent autopilot team, not a prettier multi-chat UI.
+Swarm2 باید مانند یک تیم خودران پایدار رفتار کند، نه یک UI چند-چت زیباتر.
 
-A user should be able to tell the orchestrator:
+یک کاربر باید بتواند به هماهنگ‌کننده بگوید:
 
-> Set up four agents: one handles PRs, one does research, one builds features, one reviews. Run this mission.
+> چهار عامل راه‌اندازی کنید: یکی PRها را مدیریت می‌کند، یکی تحقیق می‌کند، یکی فیچر می‌سازد، یکی بازبینی می‌کند. این ماموریت را اجرا کن.
 
-Swarm2 should then:
+سپس Swarm2 باید:
 
-1. create or update the swarm roster,
-2. assign roles, skills, and missions,
-3. route work to the right persistent Hermes worker sessions,
-4. keep each worker running in its own profile/tmux session,
-5. collect checkpoints as workers complete subtasks,
-6. automatically prompt workers to continue when more work remains,
-7. review outputs before calling the workflow complete,
-8. surface the whole loop in `/swarm2` without requiring manual babysitting.
+۱. فهرست swarm را ایجاد یا به‌روزرسانی کند،
+۲. نقش‌ها، مهارت‌ها و ماموریت‌ها را تخصیص دهد،
+۳. کار را به جلسات کارگر Hermes پایدار درست مسیریابی کند،
+۴. هر کارگر را در پروفایل/جلسه tmux خود اجرا کند،
+۵. چک‌پوینت‌ها را وقتی کارگران زیروظایف را کامل می‌کنند جمع‌آوری کند،
+۶. وقتی کار بیشتری باقی است به‌طور خودکار کارگران را برای ادامه پرامپت کند،
+۷. خروجی‌ها را قبل از کامل اعلام گردش کار بازبینی کند،
+۸. کل حلقه را در `/swarm2` بدون نیاز به babysitting دستی نمایش دهد.
 
-## Product principles
+## اصول محصول
 
-- **Persistent agents, not disposable helpers.** Each worker has identity, profile memory, runtime state, and a live session.
-- **Roster is source of truth.** Worker number heuristics are fallback only. Routing reads `swarm.yaml`.
-- **Proof beats vibes.** Workers checkpoint files changed, commands run, results, blockers, next action.
-- **Orchestrator drives the loop.** Workers execute. Orchestrator decomposes, sequences, monitors, re-prompts, reviews, and escalates.
-- **Autopilot is staged.** The system should work in manual, semi-auto, then full-auto modes.
-- **tmux/Claude native.** Worker sessions are Hermes profiles in `swarm-<workerId>` tmux sessions.
+- **عامل‌های پایدار، نه کمک‌کننده‌های مصرفی.** هر کارگر هویت، حافظه پروفایل، وضعیت runtime و یک جلسه زنده دارد.
+- **فهرست منبع حقیقت است.** اکتشاف‌های عدد کارگر فقط fallback هستند. مسیریابی `swarm.yaml` را می‌خواند.
+- **اثبات براحساس.** کارگران چک‌پوینت می‌کنند: فایل‌های تغییر یافته، دستورات اجرا شده، نتایج، مانع‌ها، اقدام بعدی.
+- **هماهنگ‌کننده حلقه را هدایت می‌کند.** کارگران اجرا می‌کنند. هماهنگ‌کننده تجزیه، توالی، پایش، دوباره‌پرامپت، بازبینی و تشدید را انجام می‌دهد.
+- **خودران مرحله‌بندی‌شده است.** سیستم باید در حالت‌های دستی، نیمه‌خودکار، سپس تمام‌خودکار کار کند.
+- **بومی tmux/Claude.** جلسات کارگر پروفایل‌های Hermes در جلسات tmux `swarm-<workerId>` هستند.
 
-## Current foundation
+## زیربنای فعلی
 
-Already present:
+قبلاً موجود:
 
-- `swarm.yaml`, canonical roster config.
-- `/api/swarm-roster`, reads/writes roster entries.
-- `/api/swarm-decompose`, routes a mission into assignments.
-- `/api/swarm-dispatch`, sends prompts to live tmux/Claude sessions and falls back to one-shot Claude.
-- `/api/swarm-runtime`, reads worker `runtime.json`, tmux state, tasks, artifacts, previews.
-- `/api/swarm-chat`, reads worker chat history from profile `state.db`.
-- `/api/swarm-tmux-start/stop/scroll`, controls persistent sessions.
-- Swarm skills:
+- `swarm.yaml`، پیکربندی فهرست کانونیک.
+- `/api/swarm-roster`، خواندن/نوشتن ورودی‌های فهرست.
+- `/api/swarm-decompose`، مسیریابی ماموریت به تخصیص‌ها.
+- `/api/swarm-dispatch`، ارسال پرامپت به جلسات زنده tmux/Claude و fallback به Claude یک‌بار.
+- `/api/swarm-runtime`، خواندن `runtime.json` کارگر، وضعیت tmux، وظایف، artifacts، پیش‌نمایش‌ها.
+- `/api/swarm-chat`، خواندن تاریخچه چت کارگر از `state.db` پروفایل.
+- `/api/swarm-tmux-start/stop/scroll`، کنترل جلسات پایدار.
+- skillهای swarm:
   - `swarm-worker-core`
   - `swarm-orchestrator`
   - `swarm-dev-runtime`
@@ -51,7 +51,7 @@ Already present:
   - `swarm-pr-worker`
   - `swarm-bench-worker`
 
-## Target architecture
+## معماری هدف
 
 ```text
 User mission
@@ -75,9 +75,9 @@ Orchestrator loop
 continue / reroute / review / complete / escalate
 ```
 
-## Roster contract
+## قرارداد فهرست
 
-`swarm.yaml` remains human-readable and portable. Each worker entry should support:
+`swarm.yaml` قابل خواندن توسط انسان و قابل حمل باقی می‌ماند. هر ورودی کارگر باید پشتیبانی کند:
 
 ```yaml
 workers:
@@ -99,7 +99,7 @@ workers:
     reviewRequired: true
 ```
 
-### Required fields now
+### فیلدهای الزامی فعلی
 
 - `id`
 - `name`
@@ -109,7 +109,7 @@ workers:
 - `mission`
 - `skills`
 
-### Next fields to add
+### فیلدهای بعدی برای افزودن
 
 - `capabilities`
 - `defaultCwd`
@@ -118,11 +118,11 @@ workers:
 - `acceptsBroadcast`
 - `reviewRequired`
 
-## Runtime contract
+## قرارداد runtime
 
-Each worker profile may expose `~/.hermes/profiles/<workerId>/runtime.json`.
+هر پروفایل کارگر ممکن است `~/.hermes/profiles/<workerId>/runtime.json` را نمایش دهد.
 
-The orchestrator and worker should keep these fields current:
+هماهنگ‌کننده و کارگر باید این فیلدها را به‌روز نگه دارند:
 
 - `workerId`
 - `role`
@@ -145,9 +145,9 @@ The orchestrator and worker should keep these fields current:
 - `artifacts[]`
 - `previews[]`
 
-## Assignment contract
+## قرارداد تخصیص
 
-`/api/swarm-decompose` should return assignments shaped like:
+`/api/swarm-decompose` باید تخصیص‌هایی به این شکل برگرداند:
 
 ```json
 {
@@ -165,17 +165,17 @@ The orchestrator and worker should keep these fields current:
 }
 ```
 
-Stage 1 only requires `workerId`, `task`, `rationale`.
+مرحله ۱ فقط به `workerId`، `task`، `rationale` نیاز دارد.
 
-## Dispatch contract
+## قرارداد dispatch
 
-`/api/swarm-dispatch` should accept either legacy broadcast shape:
+`/api/swarm-dispatch` باید یا شکل legacy broadcast را بپذیرد:
 
 ```json
 { "workerIds": ["swarm1"], "prompt": "..." }
 ```
 
-or assignment shape:
+یا شکل تخصیص:
 
 ```json
 {
@@ -186,20 +186,20 @@ or assignment shape:
 }
 ```
 
-Assignment dispatch must send each worker only its own task, plus compact orchestration context.
+dispatch تخصیص باید به هر کارگر فقط وظیفه خودش را، به همراه زمینه فشرده هماهنگی، ارسال کند.
 
-## Worker prompt envelope
+## پاکت پرامپت کارگر
 
-Every dispatched task should be wrapped with:
+هر وظیفه dispatch شده باید با این‌ها بسته‌بندی شود:
 
-1. orchestrator context,
-2. worker identity from `swarm.yaml`,
-3. skill stack names,
-4. current task,
-5. checkpoint/reporting contract,
-6. continuation instruction.
+۱. زمینه هماهنگ‌کننده،
+۲. هویت کارگر از `swarm.yaml`،
+۳. نام‌های skill stack،
+۴. وظیفه جاری،
+۵. قرارداد چک‌پوینت/گزارش‌دهی،
+۶. دستور ادامه.
 
-Example:
+مثال:
 
 ```text
 ## Swarm Orchestrator Dispatch
@@ -222,91 +222,91 @@ NEXT_ACTION: ...
 If this is one task in a larger workflow, stop after the checkpoint and wait for orchestrator continuation.
 ```
 
-## Orchestrator loop
+## حلقه هماهنگ‌کننده
 
-The orchestrator loop runs over runtime state:
+حلقه هماهنگ‌کننده روی وضعیت runtime اجرا می‌شود:
 
-1. collect worker states from `/api/swarm-runtime`,
-2. inspect recent chat from `/api/swarm-chat`,
-3. mark workers stale if `lastCheckIn` is too old,
-4. detect blockers,
-5. detect completion checkpoints,
-6. assign next task if more work remains,
-7. route review tasks to reviewer lanes,
-8. escalate only when human input is needed.
+۱. جمع‌آوری وضعیت‌های کارگر از `/api/swarm-runtime`،
+۲. بررسی چت اخیر از `/api/swarm-chat`،
+۳. علامت‌گذاری کارگران stale اگر `lastCheckIn` خیلی قدیمی است،
+۴. تشخیص مانع‌ها،
+۵. تشخیص چک‌پوینت‌های تکمیل،
+۶. تخصیص وظیفه بعدی اگر کار بیشتری باقی است،
+۷. مسیریابی وظایف بازبینی به لاین‌های بازبین،
+۸. تشدید فقط وقتی ورودی انسانی نیاز است.
 
-### Loop states
+### وضعیت‌های حلقه
 
-- `planning`: mission decomposition is being built.
-- `dispatching`: initial assignments are going out.
-- `executing`: workers are active.
-- `checkpointing`: workers are returning proof.
-- `reviewing`: reviewer/orchestrator validates outputs.
-- `continuing`: next tasks are sent.
-- `blocked`: human or environment intervention required.
-- `complete`: final handoff is ready.
+- `planning`: تجزیه ماموریت در حال ساخت است.
+- `dispatching`: تخصیص‌های اولیه در حال ارسال هستند.
+- `executing`: کارگران فعال هستند.
+- `checkpointing`: کارگران در حال بازگرداندن اثبات هستند.
+- `reviewing`: بازبین/هماهنگ‌کننده خروجی‌ها را اعتبارسنجی می‌کند.
+- `continuing`: وظایف بعدی ارسال می‌شوند.
+- `blocked`: مداخله انسانی یا محیطی الزامی است.
+- `complete`: تحویل نهایی آماده است.
 
-## Autopilot stages
+## مراحل خودران
 
-### Stage 1, landing now
+### مرحله ۱، در حال فرود
 
-- Router uses real roster metadata instead of hardcoded worker-number roles.
-- Decomposer receives full roster context.
-- Dispatch accepts per-worker assignments.
-- Dispatch writes initial runtime checkpoint.
-- Worker prompts include skill/checkpoint contract.
+- مسیریاب از فراداده واقعی فهرست به‌جای نقش‌های hardcoded worker-number استفاده می‌کند.
+- تجزیه‌کننده زمینه کامل فهرست را دریافت می‌کند.
+- dispatch تخصیص‌های per-worker را می‌پذیرد.
+- dispatch چک‌پوینت اولیه runtime را می‌نویسد.
+- پرامپت‌های کارگر شامل قرارداد skill/checkpoint هستند.
 
-### Stage 2
+### مرحله ۲
 
-- Add `/api/swarm-checkpoint` to safely write structured worker checkpoints.
-- Parse worker checkpoint messages from chat and update runtime state.
-- Add assignment IDs and parent mission IDs.
+- افزودن `/api/swarm-checkpoint` برای نوشتن امن چک‌پوینت‌های ساختاریافته کارگر.
+- parse پیام‌های چک‌پوینت کارگر از چت و به‌روزرسانی وضعیت runtime.
+- افزودن IDهای تخصیص و IDهای ماموریت والد.
 
-### Stage 3
+### مرحله ۳
 
-- Add `/api/swarm-orchestrator-loop`.
-- Loop watches runtime/chat and auto-continues workers.
-- Add stale/drift detection.
-- Add reviewer lane routing.
+- افزودن `/api/swarm-orchestrator-loop`.
+- حلقه runtime/chat را تماشا می‌کند و کارگران را auto-continue می‌کند.
+- افزودن تشخیص stale/drift.
+- افزودن مسیریابی لاین بازبین.
 
-### Stage 4
+### مرحله ۴
 
-- Add user-facing mission history.
-- Add saved workflows/templates.
-- Add multi-user bootstrapping so fresh installs can create agents and roles seamlessly.
+- افزودن تاریخچه ماموریت کاربر-پسند.
+- افزودن گردش‌کار/قالب‌های ذخیره‌شده.
+- افزودن bootstrapping چندکاربره تا نصب‌های تازه بتوانند به‌طور یکپارچه عامل و نقش ایجاد کنند.
 
-## Stage 1 smoke test
+## تست smoke مرحله ۱
 
-Mission:
+ماموریت:
 
 > Test Swarm2 autopilot. Research one improvement, implement one tiny safe artifact, review the result.
 
-Expected route:
+مسیر مورد انتظار:
 
-- Research worker receives research/checkpoint task.
-- Builder receives implementation/checkpoint task.
-- Reviewer receives review/checkpoint task.
+- کارگر تحقیق وظیفه research/checkpoint دریافت می‌کند.
+- Builder وظیفه implementation/checkpoint دریافت می‌کند.
+- بازبین وظیفه review/checkpoint دریافت می‌کند.
 
-Pass criteria:
+معیارهای قبولی:
 
-- `/api/swarm-decompose` returns assignment JSON using roster roles.
-- `/api/swarm-dispatch` returns `delivery: tmux` for live workers.
-- `runtime.json` for each target shows `state: executing`, current task, `checkpointStatus: in_progress`.
-- Worker card chat eventually shows the dispatched message.
-- At least one worker replies with proof-bearing state.
+- `/api/swarm-decompose` JSON تخصیص با استفاده از نقش‌های فهرست برمی‌گرداند.
+- `/api/swarm-dispatch` برای کارگران زنده `delivery: tmux` برمی‌گرداند.
+- `runtime.json` برای هر هدف `state: executing`، وظیفه جاری، `checkpointStatus: in_progress` را نشان می‌دهد.
+- چت کارت کارگر در نهایت پیام dispatch شده را نشان می‌دهد.
+- حداقل یک کارگر با وضعیت حامل اثبات پاسخ می‌دهد.
 
-## Open questions
+## سؤالات باز
 
-- Should new roster-only agents auto-create Hermes profiles and wrappers, or should Add Swarm remain config-only until first start?
-- Should orchestrator loop run in the browser session, server interval, cron job, or persistent Claude orchestrator worker?
-- How aggressive should auto-continue be before asking Eric?
-- Should reviews be mandatory for code-changing tasks only, or all workflows?
+- آیا عامل‌های فقط-فهرست جدید باید پروفایل‌ها و wrapperهای Hermes را خودکار ایجاد کنند، یا Add Swarm تا اولین شروع فقط پیکربندی بماند؟
+- آیا حلقه هماهنگ‌کننده باید در جلسه مرورگر، interval سرور، cron job یا کارگر هماهنگ‌کننده Claude پایدار اجرا شود؟
+- auto-continue قبل از پرسیدن از Eric چقدر تهاجمی باشد؟
+- آیا بازبینی‌ها فقط برای وظایف تغییر-کد الزامی باشند، یا برای همه گردش‌کارها؟
 
-## Recommended next implementation order
+## ترتیب پیاده‌سازی بعدی توصیه‌شده
 
-1. Stage 1 routing/dispatch/checkpoint patch.
-2. Smoke test via direct API and UI.
-3. Add `/api/swarm-checkpoint`.
-4. Add mission IDs and assignment IDs.
-5. Add orchestrator loop endpoint.
-6. Add bootstrapping for user-created swarms.
+۱. patch مسیریابی/dispatch/checkpoint مرحله ۱.
+۲. تست smoke از طریق API مستقیم و UI.
+۳. افزودن `/api/swarm-checkpoint`.
+۴. افزودن IDهای ماموریت و IDهای تخصیص.
+۵. افزودن endpoint حلقه هماهنگ‌کننده.
+۶. افزودن bootstrapping برای swarmهای ایجادشده توسط کاربر.

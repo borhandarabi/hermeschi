@@ -1,15 +1,15 @@
-# API key registry and rotation checklist
+# ثبت کلید API و چک‌لیست چرخش
 
-This registry groups supported environment keys so deployments can audit what is configured and rotate keys before a phase graduates.
+این ثبت‌نامه، کلیدهای محیطی پشتیبانی‌شده را گروه‌بندی می‌کند تا استقرارها بتوانند آن‌چه پیکربندی شده را ممیزی کنند و کلیدها را پیش از فارغ‌التحصیلی یک فاز بچرخانند.
 
-## Rotation policy
+## سیاست چرخش
 
-- Treat all prototype keys as temporary.
-- Rotate a group when a feature moves from prototype to production, when access is shared with a new operator, or after any suspected leak.
-- Prefer provider dashboards or Infisical for storage. Do not commit real values to this repo.
-- Keep `.env` values scoped to the minimum deployment that needs them.
+- تمام کلیدهای نمونهٔ اولیه را به‌عنوان موقتی در نظر بگیرید.
+- یک گروه را زمانی بچرخانید که یک ویژگی از نمونهٔ اولیه به تولید منتقل می‌شود، دسترسی با یک اپراتور جدید به اشتراک گذاشته می‌شود، یا پس از هر نشت مشکوک.
+- برای ذخیره‌سازی، داشبوردهای provider یا Infisical را ترجیح دهید. مقادیر واقعی را در این مخزن commit نکنید.
+- مقادیر `.env` را در حداقل استقراری که به آن‌ها نیاز دارد، محدود نگه دارید.
 
-## LLM inference
+## استنتاج LLM
 
 - `ANTHROPIC_API_KEY`
 - `NOUS_API_KEY`
@@ -17,7 +17,7 @@ This registry groups supported environment keys so deployments can audit what is
 - `MINIMAX_API_KEY`
 - `OPENROUTER_API_KEY`
 
-## Image generation
+## تولید تصویر
 
 - `LEONARDO_API_KEY`
 - `LEONARDO_SEED_BLOG`
@@ -28,7 +28,7 @@ This registry groups supported environment keys so deployments can audit what is
 - `KREA_API_TOKEN`
 - `FAL_KEY`
 
-## Web3 and on-chain
+## Web3 و on-chain
 
 - `LENS_PRIVATE_KEY`
 - `LENS_WALLET_ADDRESS`
@@ -41,14 +41,14 @@ This registry groups supported environment keys so deployments can audit what is
 - `POAP_AUTH_TOKEN`
 - `POAP_EMAIL`
 
-## Storage and infrastructure
+## ذخیره‌سازی و زیرساخت
 
 - `R2_ACCESS_KEY_ID`
 - `R2_SECRET_ACCESS_KEY`
 - `R2_ENDPOINT`
 - `R2_BACKUP_BUCKET`
 
-## Communication
+## ارتباطات
 
 - `TELEGRAM_BOT_TOKEN`
 - `SLACK_BOT_TOKEN`
@@ -57,7 +57,7 @@ This registry groups supported environment keys so deployments can audit what is
 - `EMAIL_PASSWORD`
 - `HERMES_API_TOKEN`
 
-## Integrations and tools
+## یکپارچه‌سازی‌ها و ابزارها
 
 - `OPENCODE_ZEN_API_KEY`
 - `SHOPIFY_ACCESS_TOKEN`
@@ -67,20 +67,20 @@ This registry groups supported environment keys so deployments can audit what is
 - `API_SERVER_KEY`
 - `HERMESCHI_PASSWORD`
 
-## Platforms and auth
+## پلتفرم‌ها و auth
 
 - `INFISICAL_CLIENT_ID`
 - `INFISICAL_CLIENT_SECRET`
 - `GOOGLE_API_KEY`
 - `GOOGLE_AI_STUDIO_API_KEY`
 
-## Operator handoff
+## تحویل به اپراتور
 
-When handing off a phase:
+هنگام تحویل یک فاز:
 
-1. Export the active key list from the deployment secret store.
-2. Compare it against this registry.
-3. Rotate keys in the provider dashboard.
-4. Update the deployment secret store.
-5. Restart Hermes Agent / Workspace services.
-6. Re-run provider/model checks in Workspace settings.
+۱. فهرست کلیدهای فعال را از مخزن secret استقرار export کنید.
+۲. آن را با این ثبت‌نامه مقایسه کنید.
+۳. کلیدها را در داشبورد provider بچرخانید.
+۴. مخزن secret استقرار را به‌روزرسانی کنید.
+۵. سرویس‌های Hermes Agent / Workspace را راه‌اندازی مجدد کنید.
+۶. بررسی‌های provider/model را در تنظیمات Workspace دوباره اجرا کنید.

@@ -1,16 +1,16 @@
-# Run HermesChi as a user service
+# اجرای HermesChi به‌عنوان سرویس کاربر
 
-HermesChi can run without keeping a terminal open. The helper below installs a **user-level** service, not a system-wide root service.
+HermesChi می‌تواند بدون باز نگه‌داشتن ترمینال اجرا شود. راهنمای زیر یک سرویس **در سطح کاربر** نصب می‌کند، نه یک سرویس root سراسری-سیستم.
 
-## Prerequisites
+## پیش‌نیازها
 
 ```bash
 pnpm install
 pnpm build
-cp .env.example .env # if you have not configured it yet
+cp .env.example .env # اگر هنوز پیکربندی نکرده‌اید
 ```
 
-Set at least the same environment you use for `pnpm start`, for example:
+حداقل همان محیطی را که برای `pnpm start` استفاده می‌کنید، تنظیم کنید، مثلاً:
 
 ```bash
 export HERMES_API_URL=http://127.0.0.1:8642
@@ -18,21 +18,21 @@ export HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119
 export HERMES_API_TOKEN=...
 ```
 
-## Install
+## نصب
 
 ```bash
 chmod +x scripts/install-dashboard-service.sh
 scripts/install-dashboard-service.sh
 ```
 
-Defaults:
+پیش‌فرض‌ها:
 
 - `HOST=127.0.0.1`
 - `PORT=3000`
 - `NODE_ENV=production`
-- command: `pnpm start`
+- دستور: `pnpm start`
 
-Override them inline if needed:
+در صورت نیاز، آن‌ها را به‌صورت inline override کنید:
 
 ```bash
 PORT=3123 HOST=127.0.0.1 scripts/install-dashboard-service.sh
@@ -40,13 +40,13 @@ PORT=3123 HOST=127.0.0.1 scripts/install-dashboard-service.sh
 
 ## macOS launchd
 
-The installer writes:
+نصب‌کننده می‌نویسد:
 
 ```text
 ~/Library/LaunchAgents/com.hermeschi.workspace.plist
 ```
 
-Useful commands:
+دستورات مفید:
 
 ```bash
 launchctl print gui/$(id -u)/com.hermeschi.workspace
@@ -54,15 +54,15 @@ launchctl kickstart -k gui/$(id -u)/com.hermeschi.workspace
 tail -f logs/hermeschi.out.log logs/hermeschi.err.log
 ```
 
-## Linux systemd user service
+## سرویس کاربر systemd لینوکس
 
-The installer writes:
+نصب‌کننده می‌نویسد:
 
 ```text
 ~/.config/systemd/user/hermeschi.service
 ```
 
-Useful commands:
+دستورات مفید:
 
 ```bash
 systemctl --user status hermeschi
@@ -70,18 +70,18 @@ journalctl --user -u hermeschi -f
 systemctl --user restart hermeschi
 ```
 
-If you need the service after logout on Linux, enable lingering once:
+اگر پس از خروج در لینوکس به سرویس نیاز دارید، یک‌بار lingering را فعال کنید:
 
 ```bash
 loginctl enable-linger "$USER"
 ```
 
-## Uninstall
+## حذف نصب
 
 ```bash
 scripts/install-dashboard-service.sh uninstall
 ```
 
-## Security note
+## یادداشت امنیتی
 
-Do not bind to `0.0.0.0` unless `HERMESCHI_PASSWORD` and your reverse-proxy/auth setup are configured. Workspace exposes files, terminals, and agent controls, so loopback is the safe default.
+به `0.0.0.0` متصل نشوید مگر آنکه `HERMESCHI_PASSWORD` و راه‌اندازی reverse-proxy/auth شما پیکربندی شده باشد. Workspace فایل‌ها، ترمینال‌ها و کنترل‌های عامل را در معرض قرار می‌دهد، بنابراین loopback پیش‌فرض امن است.

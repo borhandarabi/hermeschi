@@ -1,111 +1,111 @@
-# Swarm2 Memory Framework Spec
+# مشخصات چارچوب حافظه Swarm2
 
-Date: 2026-04-28
-Status: Stage 1 implementation spec
-Canonical repo: `/Users/aurora/hermeschi`
+تاریخ: 2026-04-28
+وضعیت: مشخصات پیاده‌سازی مرحله ۱
+مخزن کانونیک: `/Users/aurora/hermeschi`
 
-## Goal
+## هدف
 
-Swarm2 workers need continuity across tasks, compaction, restarts, and multi-session missions.
+کارگران Swarm2 به پیوستگی بین وظایف، فشرده‌سازی، ری‌استارت و ماموریت‌های چندجلسه‌ای نیاز دارند.
 
-Today each worker has a Hermes profile, a `state.db`, a `runtime.json`, and a tmux session. That gives process identity, but not a structured memory layer. The memory framework adds deterministic file-backed memory that can later be augmented with Claude-native semantic memory providers.
+امروز هر کارگر یک پروفایل Hermes، یک `state.db`، یک `runtime.json` و یک جلسه tmux دارد. این هویت فرآیند را فراهم می‌کند، اما نه یک لایه حافظه ساختاریافته. چارچوب حافظه، حافظه مبتنی بر فایل قطعی را اضافه می‌کند که بعداً می‌تواند با ارائه‌دهندگان حافظه معنایی بومی Claude تقویت شود.
 
-The first version must be simple, inspectable, and durable:
+نسخه اول باید ساده، قابل بررسی و پایدار باشد:
 
-- markdown files for human-readable memory,
-- JSON metadata where structure matters,
-- atomic writes from server hooks,
-- grep-style recall first,
-- vector/provider recall later.
+- فایل‌های markdown برای حافظه قابل خواندن توسط انسان،
+- فراداده JSON جایی که ساختار مهم است،
+- نوشتن‌های اتمیک از hookهای سرور،
+- یادآوری به سبک grep در ابتدا،
+- یادآوری برداری/ارائه‌دهنده بعداً.
 
-## Canonical paths
+## مسیرهای کانونیک
 
-These paths are locked. Do not substitute Claude/OpenClaw profile paths for worker-local memory.
+این مسیرها قفل شده‌اند. مسیرهای پروفایل Claude/OpenClaw را برای حافظه محلی کارگر جایگزین نکنید.
 
-| Layer | Canonical path |
+| لایه | مسیر کانونیک |
 | --- | --- |
-| Worker profile root | `~/.hermes/profiles/<workerId>/` |
-| Worker chat DB | `~/.hermes/profiles/<workerId>/state.db` |
-| Worker runtime state | `~/.hermes/profiles/<workerId>/runtime.json` |
-| Worker memory root | `~/.hermes/profiles/<workerId>/memory/` |
-| Worker curated memory | `~/.hermes/profiles/<workerId>/memory/MEMORY.md` |
-| Worker identity file | `~/.hermes/profiles/<workerId>/memory/IDENTITY.md` |
-| Worker role/persona file | `~/.hermes/profiles/<workerId>/memory/SOUL.md` |
-| Worker mission memory | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/` |
-| Worker mission summary | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/SUMMARY.md` |
-| Worker mission event log | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/events.jsonl` |
-| Worker episodic logs | `~/.hermes/profiles/<workerId>/memory/episodes/YYYY-MM-DD.md` |
-| Worker handoffs | `~/.hermes/profiles/<workerId>/memory/handoffs/<missionId>.md` |
-| Swarm control-plane runtime | `/Users/aurora/hermeschi/.runtime/` |
-| Swarm mission ledger | `/Users/aurora/hermeschi/.runtime/swarm-missions.json` |
-| Swarm roster/source of truth | `/Users/aurora/hermeschi/swarm.yaml` |
-| Shared swarm handoffs | `/Users/aurora/.openclaw/workspace/memory/handoffs/swarm/` |
-| Shared swarm archive/memory | `/Users/aurora/.openclaw/workspace/memory/swarm/` |
-| Completed mission archive | `/Users/aurora/.openclaw/workspace/memory/swarm/missions/<missionId>/` |
+| ریشه پروفایل کارگر | `~/.hermes/profiles/<workerId>/` |
+| DB چت کارگر | `~/.hermes/profiles/<workerId>/state.db` |
+| وضعیت اجرایی کارگر | `~/.hermes/profiles/<workerId>/runtime.json` |
+| ریشه حافظه کارگر | `~/.hermes/profiles/<workerId>/memory/` |
+| حافظه تازه‌سازی‌شده کارگر | `~/.hermes/profiles/<workerId>/memory/MEMORY.md` |
+| فایل هویت کارگر | `~/.hermes/profiles/<workerId>/memory/IDENTITY.md` |
+| فایل نقش/پرسونا کارگر | `~/.hermes/profiles/<workerId>/memory/SOUL.md` |
+| حافظه ماموریت کارگر | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/` |
+| خلاصه ماموریت کارگر | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/SUMMARY.md` |
+| لاگ رویداد ماموریت کارگر | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/events.jsonl` |
+| لاگ‌های اپیزودیک کارگر | `~/.hermes/profiles/<workerId>/memory/episodes/YYYY-MM-DD.md` |
+| تحویل‌های کارگر | `~/.hermes/profiles/<workerId>/memory/handoffs/<missionId>.md` |
+| runtime صفحه کنترل swarm | `/Users/aurora/hermeschi/.runtime/` |
+| دفتر ماموریت swarm | `/Users/aurora/hermeschi/.runtime/swarm-missions.json` |
+| فهرست swarm / منبع حقیقت | `/Users/aurora/hermeschi/swarm.yaml` |
+| تحویل‌های مشترک swarm | `/Users/aurora/.openclaw/workspace/memory/handoffs/swarm/` |
+| آرشیو/حافظه مشترک swarm | `/Users/aurora/.openclaw/workspace/memory/swarm/` |
+| آرشیو ماموریت کامل‌شده | `/Users/aurora/.openclaw/workspace/memory/swarm/missions/<missionId>/` |
 
-Explicitly wrong paths:
+مسیرهای صریحاً اشتباه:
 
 - `~/.hermes/profiles/...`
 - `~/.openclaw/profiles/...`
 - `/Users/aurora/hermeschi/.runtime/...`
-- `/Users/aurora/.ocplatform/workspace/...` for new canonical writes
+- `/Users/aurora/.ocplatform/workspace/...` برای نوشتن‌های کانونیک جدید
 
-## Ownership model
+## مدل مالکیت
 
-### Worker-local memory
+### حافظه محلی کارگر
 
-Stored under `~/.hermes/profiles/<workerId>/memory/`.
+ذخیره‌شده در `~/.hermes/profiles/<workerId>/memory/`.
 
-Owned by the worker. Used for:
+متعلق به کارگر. استفاده برای:
 
-- durable worker identity,
-- role-specific conventions,
-- mission-local decisions,
-- episodic task history,
-- compaction/restart handoffs.
+- هویت پایدار کارگر،
+- قراردادهای خاص نقش،
+- تصمیمات محلی ماموریت،
+- تاریخچه اپیزودیک وظایف،
+- تحویل‌های فشرده‌سازی/ری‌استارت.
 
-### Swarm control-plane state
+### وضعیت صفحه کنترل swarm
 
-Stored under `/Users/aurora/hermeschi/.runtime/`.
+ذخیره‌شده در `/Users/aurora/hermeschi/.runtime/`.
 
-Owned by Swarm2 server code. Used for:
+متعلق به کد سرور Swarm2. استفاده برای:
 
-- mission ledger,
-- assignment states,
-- runtime-generated coordination state,
-- transient server artifacts.
+- دفتر ماموریت،
+- وضعیت‌های تخصیص،
+- وضعیت هماهنگی تولیدشده توسط runtime،
+- artifacts گذرای سرور.
 
-### Shared swarm memory
+### حافظه مشترک swarm
 
-Stored under `/Users/aurora/.openclaw/workspace/memory/swarm/` and `/Users/aurora/.openclaw/workspace/memory/handoffs/swarm/`.
+ذخیره‌شده در `/Users/aurora/.openclaw/workspace/memory/swarm/` و `/Users/aurora/.openclaw/workspace/memory/handoffs/swarm/`.
 
-Owned by the orchestrator/main session. Used for:
+متعلق به هماهنگ‌کننده/جلسه اصلی. استفاده برای:
 
-- cross-worker handoffs,
-- mission archives,
-- swarm-wide lessons,
-- coordination context that should outlive a worker profile.
+- تحویل‌های بین‌کارگری،
+- آرشیو ماموریت،
+- درس‌های swarm-wide،
+- زمینه هماهنگی که باید طولانی‌تر از یک پروفایل کارگر عمر کند.
 
-## File contracts
+## قراردادهای فایل
 
 ### `MEMORY.md`
 
-Curated long-term memory for a worker.
+حافظه بلندمدت تازه‌سازی‌شده برای یک کارگر.
 
-Purpose:
+هدف:
 
-- facts and preferences that should survive missions,
-- stable role constraints,
-- durable lessons,
-- recurring gotchas.
+- حقایق و ترجیحات که باید از ماموریت‌ها جان سالم به در ببرند،
+- محدودیت‌های نقش پایدار،
+- درس‌های پایدار،
+- gotchaهای تکرارشونده.
 
-Rules:
+قوانین:
 
-- concise, curated, not a raw log,
-- promoted from mission/episodic memory only when broadly useful,
-- loaded at worker startup by the future `swarm-memory` skill.
+- مختصر، تازه‌سازی‌شده، نه یک لاگ خام،
+- ترفیع از حافظه ماموریت/اپیزودیک فقط وقتی به‌طور گسترده مفید باشد،
+- بارگذاری در startup کارگر توسط skill آینده `swarm-memory`.
 
-Initial template:
+قالب اولیه:
 
 ```markdown
 # Memory — <workerId>
@@ -129,7 +129,7 @@ Initial template:
 
 ### `IDENTITY.md`
 
-Stable identity metadata.
+فراداده هویت پایدار.
 
 ```markdown
 # IDENTITY.md — <workerId>
@@ -143,28 +143,28 @@ Stable identity metadata.
 
 ### `SOUL.md`
 
-Role/persona instructions for the worker.
+دستورالعمل‌های نقش/پرسونا برای کارگر.
 
-Purpose:
+هدف:
 
-- role-specific behavior,
-- tone and decision style,
-- escalation rules,
-- quality bar.
+- رفتار خاص نقش،
+- لحن و سبک تصمیم،
+- قوانین تشدید،
+- میزان کیفیت.
 
-### Mission memory
+### حافظه ماموریت
 
-Path:
+مسیر:
 
 `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/`
 
-Files:
+فایل‌ها:
 
-- `SUMMARY.md` — human-readable mission context and current state
-- `events.jsonl` — append-only structured event stream
-- `handoff.md` — latest mission-specific handoff, if any
+- `SUMMARY.md` — زمینه ماموریت قابل خواندن توسط انسان و وضعیت جاری
+- `events.jsonl` — جریان رویداد ساختاریافته append-only
+- `handoff.md` — آخرین تحویل خاص ماموریت، در صورت وجود
 
-`SUMMARY.md` template:
+قالب `SUMMARY.md`:
 
 ```markdown
 # Mission <missionId> — <title>
@@ -200,13 +200,13 @@ Files:
 ...
 ```
 
-`events.jsonl` event shape:
+شکل رویداد `events.jsonl`:
 
 ```json
 {"at":"2026-04-28T00:00:00.000Z","type":"dispatch","workerId":"swarm5","missionId":"mission-...","assignmentId":"assign-...","summary":"Dispatched builder task"}
 ```
 
-Event types:
+انواع رویداد:
 
 - `mission-start`
 - `dispatch`
@@ -218,19 +218,19 @@ Event types:
 - `complete`
 - `note`
 
-### Episodic logs
+### لاگ‌های اپیزودیک
 
-Path:
+مسیر:
 
 `~/.hermes/profiles/<workerId>/memory/episodes/YYYY-MM-DD.md`
 
-Purpose:
+هدف:
 
-- chronological worker activity,
-- easy grep,
-- raw-ish but still readable.
+- فعالیت زمان‌مند کارگر،
+- grep آسان،
+- خام-مانند اما همچنان قابل خواندن.
 
-Template:
+قالب:
 
 ```markdown
 # Episodes — <workerId> — YYYY-MM-DD
@@ -244,17 +244,17 @@ Template:
 - Next action: ...
 ```
 
-### Handoffs
+### تحویل‌ها
 
-Worker-local handoff:
+تحویل محلی کارگر:
 
 `~/.hermes/profiles/<workerId>/memory/handoffs/<missionId>.md`
 
-Shared latest handoff:
+آخرین تحویل مشترک:
 
 `/Users/aurora/.openclaw/workspace/memory/handoffs/swarm/<workerId>-latest.md`
 
-Template:
+قالب:
 
 ```markdown
 # Handoff — <workerId> — <missionId>
@@ -298,18 +298,18 @@ Generated: <ISO timestamp>
 When this worker restarts, load this handoff, inspect runtime.json, then continue from "Next exact action".
 ```
 
-## API contracts
+## قراردادهای API
 
 ### `GET /api/swarm-memory`
 
-Query params:
+پارامترهای query:
 
-- `workerId` required unless reading shared memory
+- `workerId` الزامی مگر اینکه حافظه مشترک خوانده شود
 - `kind`: `profile | mission | episodic | handoff | shared`
-- `missionId` optional/required for mission memory
-- `date` optional for episodic logs
+- `missionId` اختیاری/الزامی برای حافظه ماموریت
+- `date` اختیاری برای لاگ‌های اپیزودیک
 
-Returns:
+برمی‌گرداند:
 
 ```json
 {
@@ -325,7 +325,7 @@ Returns:
 
 ### `POST /api/swarm-memory`
 
-Body:
+بدنه:
 
 ```json
 {
@@ -338,90 +338,90 @@ Body:
 }
 ```
 
-Rules:
+قوانین:
 
-- validate `workerId`, `missionId`, and path traversal,
-- create directories on demand,
-- write markdown atomically,
-- append JSONL events atomically,
-- optionally mirror handoffs to shared handoff path.
+- اعتبارسنجی `workerId`، `missionId` و path traversal،
+- ایجاد دایرکتوری‌ها در صورت تقاضا،
+- نوشتن اتمیک markdown،
+- append اتمیک رویدادهای JSONL،
+- آینه‌سازی اختیاری تحویل‌ها به مسیر تحویل مشترک.
 
 ### `GET /api/swarm-memory/search`
 
-Query params:
+پارامترهای query:
 
-- `workerId` optional,
-- `query` required,
-- `scope`: `worker | shared | all`, default `worker`,
-- `limit`, default 10.
+- `workerId` اختیاری،
+- `query` الزامی،
+- `scope`: `worker | shared | all`، پیش‌فرض `worker`،
+- `limit`، پیش‌فرض ۱۰.
 
-Stage 1 implementation:
+پیاده‌سازی مرحله ۱:
 
-- grep-like text search over markdown/jsonl files,
-- simple ranking: exact phrase > token overlap > recency,
-- return snippets with paths and line numbers.
+- جستجوی متنی شبیه grep روی فایل‌های markdown/jsonl،
+- رتبه‌بندی ساده: عبارت دقیق > همپوشانی توکن > قدمت،
+- بازگرداندن snippetها با مسیرها و شماره خطوط.
 
-Later:
+بعداً:
 
-- use Claude native memory provider or external provider for semantic recall.
+- استفاده از ارائه‌دهنده حافظه بومی Claude یا ارائه‌دهنده خارجی برای یادآوری معنایی.
 
-## Integration with existing skills
+## یکپارچه‌سازی با skillهای موجود
 
 ### `swarm-worker-core`
 
-Already defines checkpoint discipline and runtime reporting.
+قبلاً انضباط چک‌پوینت و گزارش‌دهی runtime را تعریف کرده است.
 
-Memory framework adds:
+چارچوب حافظه اضافه می‌کند:
 
-- every checkpoint can become a mission event,
-- every checkpoint can append to episodic memory,
-- durable lessons can promote to `MEMORY.md`.
+- هر چک‌پوینت می‌تواند به یک رویداد ماموریت تبدیل شود،
+- هر چک‌پوینت می‌تواند به حافظه اپیزودیک append شود،
+- درس‌های پایدار می‌توانند به `MEMORY.md` ترفیع یابند.
 
 ### `swarm-dev-runtime`
 
-Already defines Claude-native profile/tmux invariants.
+قبلاً ناوراری‌های پروفایل/tmux بومی Claude را تعریف کرده است.
 
-Memory framework must respect:
+چارچوب حافظه باید رعایت کند:
 
-- `~/.hermes/profiles/<workerId>` profile root,
-- `HERMES_HOME` per worker,
-- tmux sessions named `swarm-<workerId>`,
-- wrappers in `~/.local/bin/swarmN`.
+- ریشه پروفایل `~/.hermes/profiles/<workerId>`،
+- `HERMES_HOME` برای هر کارگر،
+- جلسات tmux با نام `swarm-<workerId>`،
+- wrapperها در `~/.local/bin/swarmN`.
 
 ### `swarm-orchestrator`
 
-Uses memory to:
+از حافظه استفاده می‌کند برای:
 
-- search worker history before assignment,
-- attach relevant mission context to prompts,
-- find prior handoffs,
-- archive completed missions.
+- جستجوی تاریخچه کارگر قبل از تخصیص،
+- پیوست زمینه ماموریت مرتبط به پرامپت‌ها،
+- یافتن تحویل‌های قبلی،
+- آرشیو ماموریت‌های کامل‌شده.
 
-### Role skills
+### skillهای نقش
 
-`swarm-pr-worker`, `swarm-ui-worker`, `swarm-bench-worker`, and future role skills use `swarm-memory` for role-specific recall.
+`swarm-pr-worker`، `swarm-ui-worker`، `swarm-bench-worker` و skillهای نقش آینده از `swarm-memory` برای یادآوری خاص نقش استفاده می‌کنند.
 
 ### `self-improving-agent`
 
-Provides learning/promotion conventions.
+قراردادهای یادگیری/ترفیع را فراهم می‌کند.
 
-Memory framework adopts:
+چارچوب حافظه اتخاذ می‌کند:
 
-- daily log pattern,
-- `MEMORY.md` as curated long-term memory,
-- promotion of broadly useful learnings.
+- الگوی لاگ روزانه،
+- `MEMORY.md` به‌عنوان حافظه بلندمدت تازه‌سازی‌شده،
+- ترفیع یادگیری‌های به‌طور گسترده مفید.
 
-## Startup/resume behavior
+## رفتار startup/resume
 
-Future `swarm-memory` skill should instruct workers to load:
+skill آینده `swarm-memory` باید به کارگران دستور دهد بارگذاری کنند:
 
-1. `IDENTITY.md`, `SOUL.md`, and `MEMORY.md`,
-2. `runtime.json` to detect `currentMissionId`,
-3. active mission `SUMMARY.md`, if present,
-4. latest local/shared handoff for current mission, if present,
-5. recent episodic entries relevant to the active mission.
+۱. `IDENTITY.md`، `SOUL.md` و `MEMORY.md`،
+۲. `runtime.json` برای تشخیص `currentMissionId`،
+۳. `SUMMARY.md` ماموریت فعال، در صورت وجود،
+۴. آخرین تحویل محلی/مشترک برای ماموریت جاری، در صورت وجود،
+۵. ورودی‌های اپیزودیک اخیر مرتبط با ماموریت فعال.
 
-Resume prompt should be compact:
+پرامپت resume باید فشرده باشد:
 
 ```text
 Load your worker memory from ~/.hermes/profiles/<workerId>/memory/.
@@ -429,40 +429,40 @@ If runtime.json has currentMissionId, read that mission SUMMARY.md and latest ha
 Continue from the handoff's Next exact action.
 ```
 
-## Auto-write hooks
+## hookهای نوشتن خودکار
 
-Stage 1 hooks:
+hookهای مرحله ۱:
 
-- dispatch start → mission event + episodic entry,
-- checkpoint parsed → mission event + episodic entry + update SUMMARY.md,
-- lifecycle handoff requested → handoff-requested event,
-- handoff written → local handoff + shared latest handoff.
+- شروع dispatch → رویداد ماموریت + ورودی اپیزودیک،
+- parse چک‌پوینت → رویداد ماموریت + ورودی اپیزودیک + به‌روزرسانی SUMMARY.md،
+- تحویل lifecycle درخواست شد → رویداد handoff-requested،
+- نوشته شدن تحویل → تحویل محلی + آخرین تحویل مشترک.
 
-## Safety and privacy
+## امنیت و حریم خصوصی
 
-- Do not copy private main-session `MEMORY.md` into worker profiles.
-- Workers receive only their own profile memory plus mission/shared swarm memory.
-- Shared swarm memory should contain project/process knowledge, not Eric-private context unless explicitly intended.
-- All writes must remain inside canonical roots.
+- `MEMORY.md` جلسه اصلی خصوصی را در پروفایل‌های کارگر کپی نکنید.
+- کارگران فقط حافظه پروفایل خود به همراه حافظه ماموریت/swarm مشترک را دریافت می‌کنند.
+- حافظه مشترک swarm باید شامل دانش پروژه/فرآیند باشد، نه زمینه Eric-خصوصی مگر اینکه صریحاً در نظر گرفته شده باشد.
+- تمام نوشتن‌ها باید داخل ریشه‌های کانونیک باقی بمانند.
 
-## Stage 1 deliverables
+## تحویل‌دادنی‌های مرحله ۱
 
-1. `src/server/swarm-memory.ts`
-2. `src/routes/api/swarm-memory.ts`
-3. `src/routes/api/swarm-memory/search.ts` or equivalent route
-4. auto-write hooks in dispatch/checkpoint/lifecycle
-5. `skills/swarm-memory/SKILL.md`
-6. minimal tests for path resolution, writes, and search
+۱. `src/server/swarm-memory.ts`
+۲. `src/routes/api/swarm-memory.ts`
+۳. `src/routes/api/swarm-memory/search.ts` یا مسیر معادل
+۴. hookهای نوشتن خودکار در dispatch/checkpoint/lifecycle
+۵. `skills/swarm-memory/SKILL.md`
+۶. تست‌های حداقلی برای resolution مسیر، نوشتن‌ها و جستجو
 
-## Stage 2 deliverables
+## تحویل‌دادنی‌های مرحله ۲
 
-1. lifecycle auto-renew integration,
-2. worker startup/resume loader prompt integration,
-3. mission archive export,
-4. worker card memory panel.
+۱. یکپارچه‌سازی auto-renew در lifecycle،
+۲. یکپارچه‌سازی پرامپت loader startup/resume کارگر،
+۳. export آرشیو ماموریت،
+۴. پنل حافظه کارت کارگر.
 
-## Stage 3 deliverables
+## تحویل‌دادنی‌های مرحله ۳
 
-1. optional Claude memory provider bridge,
-2. vector/semantic recall,
-3. cross-worker memory recommendation in decompose/routing.
+۱. bridge اختیاری ارائه‌دهنده حافظه Claude،
+۲. یادآوری برداری/معنایی،
+۳. توصیه حافظه بین‌کارگری در decompose/routing.

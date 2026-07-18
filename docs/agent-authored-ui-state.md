@@ -1,27 +1,27 @@
-# Agent-authored UI state
+# وضعیت رابط کاربریِ تولیدشده توسط عامل
 
-HermesChi can render optional structured UI state emitted by the agent instead of relying only on heuristic panel derivation from plain chat text.
+هرمزچی می‌تواند وضعیت رابط کاربریِ ساختاریافتهٔ اختیاری را که توسط عامل منتشر می‌شود، نمایش دهد، به‌جای تکیهٔ صرف بر استنتاج اِuristic پنل از متن سادهٔ گفتگو.
 
-## Why
+## چرا
 
-Some side surfaces are more trustworthy when the agent explicitly says what should be surfaced.
+برخی از سطوح جانبی زمانی که عامل صریحاً می‌گوید چه چیزی باید نمایش داده شود، قابل‌اعتمادترند.
 
-This keeps the shell thin:
+این کار پوسته را نازک نگه می‌دارد:
 
-- the agent decides what deserves screen space
-- the client renders it
-- heuristic fallback stays only as backup
+- عامل تصمیم می‌گیرد چه چیزی شایستهٔ فضای نمایش است
+- کلاینت آن را رندر می‌کند
+- fallback اِuristic فقط به‌عنوان پشتیبان باقی می‌ماند
 
-## Current scope
+## دامنهٔ فعلی
 
-This first slice supports agent-authored state for:
+این برش نخست از وضعیت تولیدشده توسط عامل برای موارد زیر پشتیبانی می‌کند:
 
-- chat-side artifact events in the Inspector
+- رویدادهای artifact در سمت گفتگو در Inspector
 
-If no agent-authored artifact is present, existing UI behavior remains unchanged.
+اگر هیچ artifact تولیدشده توسط عامل موجود نباشد، رفتار فعلی رابط کاربری بدون تغییر باقی می‌ماند.
 
-## Notes
+## یادداشت‌ها
 
-- This is intentionally optional and backward-compatible.
-- The exact protocol shape can evolve later.
-- The shell should prefer agent-authored state when present and fall back conservatively otherwise.
+- این قابلیت به‌طور عمدی اختیاری و سازگار با نسخه‌های پیشین است.
+- شکل دقیق پروتکل می‌تواند بعداً تکامل یابد.
+- پوسته باید در صورت وجود، وضعیت تولیدشده توسط عامل را ترجیح دهد و در غیر این صورت محافظه‌کارانه fallback کند.
