@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (!n || n <= 0) return '0'
@@ -244,12 +245,12 @@ export function HeroMetrics({
     ? analytics!.totalApiCalls
     : fallback.toolCalls
 
-  const window = useAnalytics ? `${analytics!.windowDays}d` : 'all time'
+  const window = useAnalytics ? `${analytics!.windowDays}d` : t('dashboard.hero.allTime')
 
   const tiles: Array<HeroTileProps> = useMemo(
     () => [
       {
-        label: 'Sessions',
+        label: t('dashboard.hero.sessions'),
         value: formatCount(sessionsTotal),
         sub: window,
         delta: useAnalytics ? deltaPct(sessCurr, sessPrev) : null,
@@ -258,20 +259,20 @@ export function HeroMetrics({
         icon: '💬',
       },
       {
-        label: 'Tokens',
+        label: t('dashboard.hero.tokens'),
         value: formatTokens(tokensTotal),
         sub: useAnalytics
-          ? `${formatTokens(analytics!.cacheReadTokens)} cached`
-          : 'Hermes ledger',
+          ? t('dashboard.hero.cached', { count: formatTokens(analytics!.cacheReadTokens) })
+          : t('dashboard.hero.hermesLedger'),
         delta: useAnalytics ? deltaPct(tokCurr, tokPrev) : null,
         spark: useAnalytics ? dailyTokens : undefined,
         tone: 'var(--theme-accent-secondary)',
         icon: '⚡',
       },
       {
-        label: 'API Calls',
+        label: t('dashboard.hero.apiCalls'),
         value: formatCount(apiCalls),
-        sub: useAnalytics ? `${window} window` : 'tool calls',
+        sub: useAnalytics ? t('dashboard.hero.window', { window }) : t('dashboard.hero.toolCalls'),
         delta: null,
         spark: useAnalytics ? dailyCalls : undefined,
         tone: 'var(--theme-success)',

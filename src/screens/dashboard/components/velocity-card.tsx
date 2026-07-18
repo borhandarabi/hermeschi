@@ -1,4 +1,5 @@
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
@@ -12,11 +13,11 @@ function deltaText(curr: number, prev: number): {
 } {
   if (prev === 0) {
     return curr > 0
-      ? { text: 'new', tone: 'var(--theme-success)' }
-      : { text: 'flat', tone: 'var(--theme-muted)' }
+      ? { text: t('dashboard.velocity.new'), tone: 'var(--theme-success)' }
+      : { text: t('dashboard.velocity.flat'), tone: 'var(--theme-muted)' }
   }
   const pct = ((curr - prev) / prev) * 100
-  if (Math.abs(pct) < 1) return { text: 'flat', tone: 'var(--theme-muted)' }
+  if (Math.abs(pct) < 1) return { text: t('dashboard.velocity.flat'), tone: 'var(--theme-muted)' }
   return {
     text: `${pct > 0 ? '+' : ''}${pct.toFixed(0)}%`,
     tone:
@@ -87,13 +88,13 @@ export function VelocityCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Velocity
+          {t('dashboard.card.velocity')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {analytics.windowDays}d avg
+          {t('dashboard.velocity.daysAvg', { days: analytics.windowDays })}
         </span>
       </div>
 
@@ -109,7 +110,7 @@ export function VelocityCard({
             className="font-mono text-[10px] uppercase tracking-[0.1em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            sess/day
+            {t('dashboard.velocity.sessionsPerDay')}
           </span>
         </div>
         <span
@@ -128,7 +129,7 @@ export function VelocityCard({
           className="font-mono uppercase tracking-[0.1em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {formatNumber(callsPerDay)} calls/day
+          {t('dashboard.velocity.callsPerDay', { count: formatNumber(callsPerDay) })}
         </span>
         <div
           className="flex items-end gap-[2px]"
@@ -146,7 +147,7 @@ export function VelocityCard({
                     ? 'color-mix(in srgb, var(--theme-border) 35%, transparent)'
                     : `color-mix(in srgb, var(--theme-accent) ${Math.max(40, (c / max) * 100)}%, transparent)`,
               }}
-              title={`day ${idx + 1}: ${c} session${c === 1 ? '' : 's'}`}
+              title={t('dashboard.velocity.dayTooltip', { n: idx + 1, count: c, s: c === 1 ? '' : 's' })}
             />
           ))}
         </div>

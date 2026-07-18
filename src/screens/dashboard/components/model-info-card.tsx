@@ -72,16 +72,16 @@ export function ModelInfoCard({
       )
       if (match) {
         const pct = Math.round((match.calls / analytics.totalApiCalls) * 100)
-        return `${pct}% of calls · ${match.sessions.toLocaleString()} sessions · ${analytics.windowDays}d`
+        return t('dashboard.modelInfo.opsLineMatch', { pct, sessions: match.sessions.toLocaleString(), days: analytics.windowDays })
       }
     }
     const flags: Array<string> = []
-    if (supportsTools) flags.push('tools')
-    if (supportsReasoning) flags.push('reasoning')
-    if (supportsVision) flags.push('vision')
+    if (supportsTools) flags.push(t('dashboard.modelInfo.flagTools'))
+    if (supportsReasoning) flags.push(t('dashboard.modelInfo.flagReasoning'))
+    if (supportsVision) flags.push(t('dashboard.modelInfo.flagVision'))
     return flags.length > 0
-      ? `default routing · ${flags.join(' + ')}`
-      : 'default routing target'
+      ? t('dashboard.modelInfo.defaultRoutingFlags', { flags: flags.join(' + ') })
+      : t('dashboard.modelInfo.defaultRouting')
   }, [analytics, modelInfo, supportsReasoning, supportsTools, supportsVision])
 
   return (
@@ -107,7 +107,7 @@ export function ModelInfoCard({
             className="text-[10px] font-semibold uppercase tracking-[0.18em]"
             style={{ color: palette.muted }}
           >
-            Active Model
+            {t('dashboard.modelInfo.activeModel')}
           </h3>
           <span
             className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold"
@@ -124,7 +124,7 @@ export function ModelInfoCard({
                 background: connected ? palette.success : palette.danger,
               }}
             />
-            {connected ? 'Online' : 'Offline'}
+            {connected ? t('common.online') : t('common.offline')}
           </span>
         </div>
         <div className="flex flex-1 flex-col gap-2 px-4 pb-3 pt-2">
@@ -154,30 +154,30 @@ export function ModelInfoCard({
 
           <div className="flex flex-wrap items-center gap-1">
             <CapabilityChip
-              label="ctx"
+              label={t('dashboard.modelInfo.capCtx')}
               value={formatContext(contextLength)}
               tone={palette.accent}
             />
             {family ? (
               <CapabilityChip
-                label="family"
+                label={t('dashboard.modelInfo.capFamily')}
                 value={family}
                 tone={palette.muted}
               />
             ) : null}
             {supportsTools ? (
-              <CapabilityChip label="tools" value="✓" tone={palette.success} />
+              <CapabilityChip label={t('dashboard.modelInfo.capTools')} value="✓" tone={palette.success} />
             ) : null}
             {supportsVision ? (
               <CapabilityChip
-                label="vision"
+                label={t('dashboard.modelInfo.capVision')}
                 value="✓"
                 tone={palette.success}
               />
             ) : null}
             {supportsReasoning ? (
               <CapabilityChip
-                label="reason"
+                label={t('dashboard.modelInfo.capReason')}
                 value="✓"
                 tone={palette.success}
               />
@@ -193,7 +193,7 @@ export function ModelInfoCard({
               color: palette.muted,
             }}
           >
-            Inventory →
+            {t('dashboard.modelInfo.inventory')}
           </button>
         </div>
       </div>
@@ -271,7 +271,7 @@ function ModelInventoryModal({
         )
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'failed to load')
+          setError(err instanceof Error ? err.message : t('dashboard.common.loadFailed'))
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -321,13 +321,13 @@ function ModelInventoryModal({
               className="text-sm font-semibold uppercase tracking-[0.18em]"
               style={{ color: 'var(--theme-text)' }}
             >
-              Model inventory
+              {t('dashboard.modelInfo.inventoryTitle')}
             </h2>
             <p
               className="font-mono text-[10px] uppercase tracking-[0.1em]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              {models.length} models from {grouped.length || '—'} providers
+              {t('dashboard.modelInfo.inventorySummary', { count: models.length, providers: grouped.length || '—' })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ function ModelInventoryModal({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t('common.close')}
               className="rounded p-1 hover:bg-[var(--theme-card)]/80"
             >
               <HugeiconsIcon
@@ -364,7 +364,7 @@ function ModelInventoryModal({
               className="py-8 text-center text-[11px]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              Loading models…
+              {t('dashboard.modelInfo.loadingModels')}
             </div>
           ) : error ? (
             <div
@@ -378,7 +378,7 @@ function ModelInventoryModal({
               className="py-8 text-center text-[11px]"
               style={{ color: 'var(--theme-muted)' }}
             >
-              No matching models.
+              {t('dashboard.modelInfo.noMatching')}
             </div>
           ) : (
             grouped.map(([provider, list]) => (
@@ -387,7 +387,7 @@ function ModelInventoryModal({
                   className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em]"
                   style={{ color: 'var(--theme-muted)' }}
                 >
-                  {provider} · {list.length}
+                  {t('dashboard.modelInfo.providerGroup', { provider, count: list.length })}
                 </h3>
                 <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                   {list.map((m) => {
@@ -422,7 +422,7 @@ function ModelInventoryModal({
                                 color: 'var(--theme-success)',
                               }}
                             >
-                              active
+                              {t('dashboard.modelInfo.active')}
                             </span>
                           ) : null}
                         </div>

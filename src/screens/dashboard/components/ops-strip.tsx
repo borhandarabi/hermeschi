@@ -1,17 +1,18 @@
 import { useNavigate } from '@tanstack/react-router'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
 import { cn } from '@/lib/utils'
+import { t } from '@/lib/i18n'
 
 function formatPulse(iso: string | null): string {
   if (!iso) return '—'
   const ms = Date.parse(iso)
   if (!Number.isFinite(ms)) return '—'
   const diff = Date.now() - ms
-  if (diff < 0) return 'just now'
-  if (diff < 60_000) return '<1m ago'
-  if (diff < 3_600_000) return `${Math.round(diff / 60_000)}m ago`
-  if (diff < 86_400_000) return `${Math.round(diff / 3_600_000)}h ago`
-  return `${Math.round(diff / 86_400_000)}d ago`
+  if (diff < 0) return t('dashboard.common.justNow')
+  if (diff < 60_000) return t('dashboard.common.underMinAgo')
+  if (diff < 3_600_000) return t('dashboard.common.minutesAgo', { n: Math.round(diff / 60_000) })
+  if (diff < 86_400_000) return t('dashboard.common.hoursAgo', { n: Math.round(diff / 3_600_000) })
+  return t('dashboard.common.daysAgo', { n: Math.round(diff / 86_400_000) })
 }
 
 const PLATFORM_GLYPH: Record<string, string> = {
@@ -54,15 +55,15 @@ function formatNextRun(iso: string | null): {
   text: string
   tone: string
 } {
-  if (!iso) return { text: 'no schedule', tone: 'var(--theme-muted)' }
+  if (!iso) return { text: t('dashboard.ops.noSchedule'), tone: 'var(--theme-muted)' }
   const ms = Date.parse(iso)
-  if (!Number.isFinite(ms)) return { text: 'no schedule', tone: 'var(--theme-muted)' }
+  if (!Number.isFinite(ms)) return { text: t('dashboard.ops.noSchedule'), tone: 'var(--theme-muted)' }
   const diff = ms - Date.now()
   if (diff < -7 * 86_400_000) {
-    return { text: 'stale', tone: 'var(--theme-muted)' }
+    return { text: t('dashboard.ops.stale'), tone: 'var(--theme-muted)' }
   }
-  if (diff < 0) return { text: 'overdue', tone: 'var(--theme-warning)' }
-  if (diff < 60_000) return { text: '<1m', tone: 'var(--theme-text)' }
+  if (diff < 0) return { text: t('dashboard.ops.overdue'), tone: 'var(--theme-warning)' }
+  if (diff < 60_000) return { text: t('dashboard.ops.underMin'), tone: 'var(--theme-text)' }
   if (diff < 3_600_000)
     return { text: `${Math.round(diff / 60_000)}m`, tone: 'var(--theme-text)' }
   if (diff < 86_400_000)
@@ -132,7 +133,7 @@ export function OpsStrip({
             className="font-mono uppercase tracking-[0.15em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            {ok ? 'gateway' : `gateway ${status.gatewayState}`}
+            {ok ? t('dashboard.ops.gateway') : t('dashboard.ops.gatewayState', { state: status.gatewayState })}
           </span>
         </span>
         {status.version ? (
@@ -147,16 +148,15 @@ export function OpsStrip({
           className="font-mono uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          · {status.activeAgents} active{' '}
-          {status.activeAgents === 1 ? 'run' : 'runs'}
+          {t('dashboard.ops.activeRuns', { count: status.activeAgents, runPlural: status.activeAgents === 1 ? t('dashboard.ops.runSingular') : t('dashboard.ops.runPlural') })}
         </span>
         {status.lastHeartbeatAt ? (
           <span
             className="font-mono text-[9px] uppercase tracking-[0.15em]"
             style={{ color: 'var(--theme-muted)' }}
-            title={`Last gateway heartbeat: ${status.lastHeartbeatAt}`}
+            title={t('dashboard.ops.pulseTitle', { ts: status.lastHeartbeatAt })}
           >
-            · pulse {formatPulse(status.lastHeartbeatAt)}
+            {t('dashboard.ops.pulse', { time: formatPulse(status.lastHeartbeatAt) })}
           </span>
         ) : null}
         {status.restartRequested ? (
@@ -170,7 +170,7 @@ export function OpsStrip({
                 '1px solid color-mix(in srgb, var(--theme-warning) 35%, transparent)',
             }}
           >
-            restart pending
+            {t('dashboard.ops.restartPending')}
           </span>
         ) : null}
         {drift > 0 ? (
@@ -185,9 +185,9 @@ export function OpsStrip({
               border:
                 '1px solid color-mix(in srgb, var(--theme-warning) 30%, transparent)',
             }}
-            title={`Local config v${status.configVersion} · latest v${status.latestConfigVersion}`}
+            title={t('dashboard.ops.configDiffTitle', { local: status.configVersion ?? '', latest: status.latestConfigVersion ?? '' })}
           >
-            {drift} config diff{drift === 1 ? '' : 's'}
+            {t('dashboard.ops.configDiff', { count: drift, plural: drift === 1 ? '' : 's' })}
           </button>
         ) : null}
       </div>
@@ -206,8 +206,8 @@ export function OpsStrip({
                 }}
                 title={
                   platform.errorMessage
-                    ? `${platform.name}: ${platform.errorMessage}`
-                    : `${platform.name} · ${platform.state}`
+                    ? t('dashboard.ops.platformErrorTitle', { name: platform.name, message: platform.errorMessage })
+                    : t('dashboard.ops.platformTitle', { name: platform.name, state: platform.state })
                 }
               >
                 <span aria-hidden>
@@ -235,29 +235,29 @@ export function OpsStrip({
                   : 'transparent',
               color: 'var(--theme-muted)',
             }}
-            title="Open Kanban board"
+            title={t('dashboard.ops.openKanbanTitle')}
           >
-            <span>board</span>
+            <span>{t('dashboard.ops.board')}</span>
             <span style={{ color: 'var(--theme-text)' }}>{kanban.total}</span>
             {kanban.ready > 0 ? (
-              <span style={{ color: 'var(--theme-text)' }}>· {kanban.ready} ready</span>
+              <span style={{ color: 'var(--theme-text)' }}>{t('dashboard.ops.ready', { count: kanban.ready })}</span>
             ) : null}
             {kanban.running > 0 ? (
               <span style={{ color: 'var(--theme-success)' }}>
-                · {kanban.running} running
+                {t('dashboard.ops.running', { count: kanban.running })}
               </span>
             ) : null}
             {kanban.blocked > 0 ? (
               <span style={{ color: 'var(--theme-warning)' }}>
-                · {kanban.blocked} blocked
+                {t('dashboard.ops.blocked', { count: kanban.blocked })}
               </span>
             ) : null}
           </button>
         ) : null}
 
         {cron ? (() => {
-          const isStale = next?.text === 'stale'
-          const isWarn = next?.text === 'overdue' || isStale
+          const isStale = next?.text === t('dashboard.ops.stale')
+          const isWarn = next?.text === t('dashboard.ops.overdue') || isStale
           return (
             <button
               type="button"
@@ -274,24 +274,24 @@ export function OpsStrip({
               }}
               title={
                 isStale
-                  ? 'Cron next-run is more than 7 days overdue'
-                  : 'Open cron jobs'
+                  ? t('dashboard.ops.cronStaleTitle')
+                  : t('dashboard.ops.cronOpenTitle')
               }
             >
-              <span>cron</span>
+              <span>{t('dashboard.ops.cron')}</span>
               <span style={{ color: 'var(--theme-text)' }}>{cron.total}</span>
               {cron.paused > 0 ? (
                 <span style={{ color: 'var(--theme-warning)' }}>
-                  · {cron.paused} paused
+                  {t('dashboard.ops.paused', { count: cron.paused })}
                 </span>
               ) : null}
               {cron.running > 0 ? (
                 <span style={{ color: 'var(--theme-success)' }}>
-                  · {cron.running} running
+                  {t('dashboard.ops.running', { count: cron.running })}
                 </span>
               ) : null}
               {next ? (
-                <span style={{ color: next.tone }}>· {next.text}</span>
+                <span style={{ color: next.tone }}>{next.text}</span>
               ) : null}
             </button>
           )

@@ -1,5 +1,6 @@
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatCount(n: number): string {
   if (!n || n <= 0) return '0'
@@ -75,7 +76,7 @@ export function ActiveModelKpi({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          Active Model
+          {t('dashboard.activeModelKpi.activeModel')}
         </span>
         <span
           className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold"
@@ -87,7 +88,7 @@ export function ActiveModelKpi({
           }}
         >
           <span className="size-1.5 rounded-full" style={{ background: tone }} />
-          {connected ? 'Online' : 'Offline'}
+          {connected ? t('common.online') : t('common.offline')}
         </span>
       </div>
 
@@ -106,9 +107,9 @@ export function ActiveModelKpi({
               background: 'color-mix(in srgb, var(--theme-accent) 12%, transparent)',
               color: 'var(--theme-accent)',
             }}
-            title="Share of API calls in the analytics window."
+            title={t('dashboard.activeModelKpi.callsTitle')}
           >
-            {share}% calls
+            {t('dashboard.activeModelKpi.callsShare', { share })}
           </span>
         ) : null}
       </div>
@@ -120,7 +121,7 @@ export function ActiveModelKpi({
         >
           {provider}
           {sessionsForModel !== null
-            ? ` · ${formatCount(sessionsForModel)} sessions`
+            ? t('dashboard.activeModelKpi.sessions', { count: formatCount(sessionsForModel) })
             : ''}
         </span>
         {modelInfo?.effectiveContextLength ? (
@@ -128,7 +129,7 @@ export function ActiveModelKpi({
             className="font-mono uppercase tracking-[0.12em]"
             style={{ color: 'var(--theme-muted)' }}
           >
-            ctx {formatCount(modelInfo.effectiveContextLength)}
+            {t('dashboard.activeModelKpi.ctx', { count: formatCount(modelInfo.effectiveContextLength) })}
           </span>
         ) : null}
       </div>

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { t } from '@/lib/i18n'
 
 /**
  * Hour-of-day activity heatmap.
@@ -56,13 +57,13 @@ export function HourOfDayCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Hour of day
+          {t('dashboard.hourOfDay.title')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          peak {formatHour(peakHour)} · {total} sessions
+          {t('dashboard.hourOfDay.peak', { hour: formatHour(peakHour), count: total })}
         </span>
       </div>
 
@@ -84,7 +85,7 @@ export function HourOfDayCard({
                 height: count === 0 ? 4 : `${Math.max(8, heightPct)}%`,
                 minHeight: 4,
               }}
-              title={`${formatHour(hour)} · ${count} session${count === 1 ? '' : 's'}`}
+              title={t('dashboard.hourOfDay.cellTitle', { hour: formatHour(hour), count, s: count === 1 ? '' : 's' })}
             />
           )
         })}
@@ -94,11 +95,11 @@ export function HourOfDayCard({
         className="flex justify-between font-mono text-[8px] uppercase tracking-[0.1em]"
         style={{ color: 'var(--theme-muted)' }}
       >
-        <span>12a</span>
-        <span>6a</span>
-        <span>12p</span>
-        <span>6p</span>
-        <span>12a</span>
+        <span>{t('dashboard.hourOfDay.12a')}</span>
+        <span>{t('dashboard.hourOfDay.6a')}</span>
+        <span>{t('dashboard.hourOfDay.12p')}</span>
+        <span>{t('dashboard.hourOfDay.6p')}</span>
+        <span>{t('dashboard.hourOfDay.12a')}</span>
       </div>
     </div>
   )

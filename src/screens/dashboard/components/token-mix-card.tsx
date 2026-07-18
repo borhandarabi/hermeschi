@@ -1,4 +1,5 @@
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (!n || n <= 0) return '0'
@@ -42,28 +43,28 @@ export function TokenMixCard({
 
   const slices: Array<Slice> = [
     {
-      label: 'cache',
+      label: t('dashboard.legend.cache'),
       value: analytics.cacheReadTokens,
       tone: 'var(--theme-accent-secondary)',
-      hint: 'Cache read tokens. Free vs first-pass input on most providers.',
+      hint: t('dashboard.tokenMix.hintCache'),
     },
     {
-      label: 'input',
+      label: t('dashboard.legend.input'),
       value: analytics.inputTokens,
       tone: 'var(--theme-accent)',
-      hint: 'Prompt tokens sent to the model.',
+      hint: t('dashboard.tokenMix.hintInput'),
     },
     {
-      label: 'output',
+      label: t('dashboard.legend.output'),
       value: analytics.outputTokens,
       tone: 'var(--theme-success)',
-      hint: 'Completion tokens emitted by the model.',
+      hint: t('dashboard.tokenMix.hintOutput'),
     },
     {
-      label: 'reasoning',
+      label: t('dashboard.legend.reasoning'),
       value: analytics.reasoningTokens,
       tone: 'var(--theme-warning)',
-      hint: 'Thinking/reasoning tokens (when supported).',
+      hint: t('dashboard.tokenMix.hintReasoning'),
     },
   ]
 
@@ -86,14 +87,14 @@ export function TokenMixCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Token mix · {analytics.windowDays}d
+          {t('dashboard.tokenMix.title', { days: analytics.windowDays })}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
-          title="Output as % of input — proxy for how chatty the model is."
+          title={t('dashboard.tokenMix.outInTitle')}
         >
-          out/in {ratio.toFixed(1)}%
+          {t('dashboard.tokenMix.outIn', { ratio: ratio.toFixed(1) })}
         </span>
       </div>
 
@@ -115,7 +116,7 @@ export function TokenMixCard({
                 width: `${widthPct}%`,
                 background: s.tone,
               }}
-              title={`${s.label}: ${formatTokens(s.value)} (${widthPct.toFixed(1)}%)`}
+              title={t('dashboard.tokenMix.cellTitle', { label: s.label, tokens: formatTokens(s.value), pct: widthPct.toFixed(1) })}
             />
           )
         })}

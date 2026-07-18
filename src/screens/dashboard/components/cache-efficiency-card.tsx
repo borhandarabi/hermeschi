@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (!n || n <= 0) return '0'
@@ -77,13 +78,13 @@ export function CacheEfficiencyCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Cache efficiency
+          {t('dashboard.card.cacheEfficiency')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {analytics.windowDays}d
+          {t('dashboard.cacheEfficiency.days', { days: analytics.windowDays })}
         </span>
       </div>
 
@@ -97,9 +98,9 @@ export function CacheEfficiencyCard({
         <span
           className="font-mono text-[10px] uppercase tracking-[0.1em]"
           style={{ color: 'var(--theme-muted)' }}
-          title="Cache reads divided by (cache reads + first-pass input)."
+          title={t('dashboard.cacheEfficiency.hitRateTitle')}
         >
-          hit rate
+          {t('dashboard.cacheEfficiency.hitRate')}
         </span>
       </div>
 
@@ -108,20 +109,16 @@ export function CacheEfficiencyCard({
           className="font-mono text-[10px] leading-snug"
           style={{ color: 'var(--theme-muted)' }}
         >
-          <span style={{ color: 'var(--theme-text)' }}>
-            {formatTokens(cache)}
-          </span>{' '}
-          cache /{' '}
-          <span style={{ color: 'var(--theme-text)' }}>
-            {formatTokens(input)}
-          </span>{' '}
-          input
+          {t('dashboard.cacheEfficiency.cacheOverInput', {
+            cache: formatTokens(cache),
+            input: formatTokens(input),
+          })}
           <br />
           <span
             className="font-mono"
-            title="How many cache tokens per fresh input token."
+            title={t('dashboard.cacheEfficiency.ratioTitle')}
           >
-            {ratio.toFixed(1)}× ratio
+            {t('dashboard.cacheEfficiency.ratio', { ratio: ratio.toFixed(1) })}
           </span>
         </div>
 

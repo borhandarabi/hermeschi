@@ -11,6 +11,7 @@ import type {
   DashboardIncident,
   DashboardOverview,
 } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 const SOURCE_ICON: Record<DashboardIncident['source'], typeof AlertCircleIcon> = {
   cron: Time04Icon,
@@ -67,7 +68,7 @@ export function AttentionCard({
             className="text-[10px] font-semibold uppercase tracking-[0.18em]"
             style={{ color: 'var(--theme-text)' }}
           >
-            Attention
+            {t('dashboard.card.attention')}
           </h3>
         </div>
         <span
@@ -79,7 +80,7 @@ export function AttentionCard({
             color: empty ? 'var(--theme-success)' : 'var(--theme-warning)',
           }}
         >
-          {empty ? 'all clear' : `${items.length}`}
+          {empty ? t('dashboard.attention.allClear') : `${items.length}`}
         </span>
       </div>
 
@@ -88,7 +89,7 @@ export function AttentionCard({
           className="py-1 text-[11px]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          Nothing to triage. Gateway healthy, no stale jobs, logs quiet.
+          {t('dashboard.attention.emptyMsg')}
         </p>
       ) : (
         <ul className="flex flex-col gap-1">

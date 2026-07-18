@@ -2,6 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ChartBarLineIcon } from '@hugeicons/core-free-icons'
 import { formatModelName } from '@/screens/dashboard/lib/formatters'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
+import { t } from '@/lib/i18n'
 
 function formatTokens(n: number): string {
   if (!n || n <= 0) return '0'
@@ -55,14 +56,14 @@ export function TopModelsCard({
             className="text-[10px] font-semibold uppercase tracking-[0.18em]"
             style={{ color: 'var(--theme-text)' }}
           >
-            Top models · {analytics.windowDays}d
+            {t('dashboard.topModels.title', { days: analytics.windowDays })}
           </h3>
         </div>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em]"
           style={{ color: 'var(--theme-muted)' }}
         >
-          {analytics.topModels.length} ranked
+          {t('dashboard.topModels.ranked', { count: analytics.topModels.length })}
         </span>
       </div>
 
@@ -120,7 +121,7 @@ export function TopModelsCard({
                 style={{ color: 'var(--theme-muted)' }}
               >
                 <span>
-                  {sharePct}% of calls · {m.sessions.toLocaleString()} sessions
+                  {t('dashboard.topModels.shareSessions', { pct: sharePct, sessions: m.sessions.toLocaleString() })}
                 </span>
                 <span>{formatCost(m.cost)}</span>
               </div>

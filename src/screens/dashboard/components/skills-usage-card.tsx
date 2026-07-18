@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import type { DashboardOverview } from '@/server/dashboard-aggregator'
 import { formatSkillName } from '@/screens/dashboard/lib/formatters'
+import { t } from '@/lib/i18n'
 
 /**
  * Skills usage card. Replaces the lonely "60" tile that the Hermes
@@ -54,16 +55,16 @@ export function SkillsUsageCard({
           className="text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: 'var(--theme-text)' }}
         >
-          Skills usage
+          {t('dashboard.card.skillsUsage')}
         </h3>
         <span
           className="font-mono text-[9px] uppercase tracking-[0.15em] transition-colors group-hover:text-[var(--theme-accent)]"
           style={{ color: 'var(--theme-muted)' }}
         >
           {hasUsage
-            ? `${usage!.distinctSkills} of ${installedCount} used`
-            : `${installedCount} installed`}
-          {' · manage →'}
+            ? t('dashboard.skillsUsage.xOfY', { used: usage!.distinctSkills, total: installedCount })
+            : t('dashboard.skillsUsage.installed', { count: installedCount })}
+          {t('dashboard.skillsUsage.manage')}
         </span>
       </div>
 
@@ -116,8 +117,8 @@ export function SkillsUsageCard({
           style={{ color: 'var(--theme-muted)' }}
         >
           {installedCount === 0
-            ? 'no skills installed'
-            : 'no usage in this window yet'}
+            ? t('dashboard.skillsUsage.noSkills')
+            : t('dashboard.skillsUsage.noUsage')}
         </div>
       )}
     </button>
