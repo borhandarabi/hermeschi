@@ -16,7 +16,7 @@ type ErrorBoundaryState = {
   recovering: boolean
 }
 
-const REACT_DOM_RECOVERY_KEY = 'hermes-react-dom-recovery-at'
+const REACT_DOM_RECOVERY_KEY = 'hermeschi-react-dom-recovery-at'
 const REACT_DOM_RECOVERY_TTL_MS = 30_000
 
 function isReactDomReconciliationError(error: Error): boolean {

@@ -1,7 +1,7 @@
 module.exports = {
-  appId: 'com.hermesworkspace.app',
-  productName: 'hermes-workspace',
-  copyright: 'Copyright © 2026 hermes-workspace',
+  appId: 'com.hermeschi.app',
+  productName: 'hermeschi',
+  copyright: 'Copyright © 2026 hermeschi',
   icon: 'assets/icon.png',
   directories: {
     output: 'release',
@@ -30,7 +30,7 @@ module.exports = {
     gatekeeperAssess: false,
   },
   dmg: {
-    title: 'Hermes Workspace',
+    title: 'HermesChi',
     iconSize: 80,
     contents: [
       { x: 130, y: 220 },
@@ -39,7 +39,7 @@ module.exports = {
   },
   win: {
     target: ['portable', 'nsis'],
-    executableName: 'hermes-workspace',
+    executableName: 'hermeschi',
   },
   nsis: {
     oneClick: true,
@@ -50,10 +50,10 @@ module.exports = {
   publish: {
     provider: 'github',
     owner: 'outsourc-e',
-    repo: 'hermes-workspace',
+    repo: 'hermeschi',
     releaseType: 'release',
   },
   asar: false,
   compression: 'maximum',
-  artifactName: 'hermes-workspace-setup-${version}.${ext}',
+  artifactName: 'hermeschi-setup-${version}.${ext}',
 }

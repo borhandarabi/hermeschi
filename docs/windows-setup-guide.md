@@ -1,4 +1,4 @@
-# Windows Setup Guide — Hermes Workspace
+# Windows Setup Guide — HermesChi
 
 Last updated: 2026-05-28
 
@@ -10,7 +10,7 @@ Three services, three config files:
 |---|---|---|
 | Hermes Agent Gateway | 8642 | `C:\Users\<you>\AppData\Local\hermes\.env` |
 | Hermes CLI tools | — | `C:\Users\<you>\.hermes\.env` |
-| Workspace Dashboard | 3000 | `C:\Users\<you>\hermes-workspace\.env` |
+| Workspace Dashboard | 3000 | `C:\Users\<you>\hermeschi\.env` |
 
 ## Required .env contents
 
@@ -27,11 +27,11 @@ API_SERVER_KEY=<generate-a-random-hex-string>
 ### `~/.hermes\.env` (CLI tools)
 Same as above — same keys, same API_SERVER_KEY.
 
-### `hermes-workspace\.env` (dashboard)
+### `hermeschi\.env` (dashboard)
 ```
 OPENROUTER_API_KEY=<your-key>
 HERMES_API_URL=http://127.0.0.1:8642
-HERMES_DASHBOARD_URL=http://127.0.0.1:9119
+HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119
 HERMES_API_TOKEN=<must-match-API_SERVER_KEY-above>
 PORT=3000
 HOST=127.0.0.1
@@ -64,7 +64,7 @@ hermes gateway run
 # Wait for: "Uvicorn running on http://127.0.0.1:8642"
 
 # Terminal 2 — Dashboard
-cd C:\Users\<you>\hermes-workspace
+cd C:\Users\<you>\hermeschi
 pnpm dev
 
 # Open http://127.0.0.1:3000
@@ -106,9 +106,9 @@ Stop-Process -Id <PID> -Force
 |---|---|
 | Gateway env | `C:\Users\<you>\AppData\Local\hermes\.env` |
 | CLI env | `C:\Users\<you>\.hermes\.env` |
-| Workspace env | `C:\Users\<you>\hermes-workspace\.env` |
+| Workspace env | `C:\Users\<you>\hermeschi\.env` |
 | Kanban DB | `C:\Users\<you>\AppData\Local\hermes\kanban.db` |
 | Gateway code | `C:\Users\<you>\AppData\Local\hermes\hermes-agent\` |
-| Workspace code | `C:\Users\<you>\hermes-workspace\` |
+| Workspace code | `C:\Users\<you>\hermeschi\` |
 | Custom skills | `C:\Users\<you>\AppData\Local\hermes\skills\` |
 | Hermes config | `C:\Users\<you>\.hermes\config.yaml` |

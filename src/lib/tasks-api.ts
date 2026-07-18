@@ -2,7 +2,7 @@
  * Tasks API client with automatic backend detection.
  *
  * Two backend routes exist for task storage:
- *   /api/hermes-tasks  — flat-file store at ~/.hermes/tasks.json (used by agents/cron)
+ *   /api/hermeschi-tasks  — flat-file store at ~/.hermes/tasks.json (used by agents/cron)
  *   /api/claude-tasks  — kanban-backend abstraction (local JSON, or Hermes Dashboard proxy)
  *
  * On first fetch this module probes both in parallel and selects the backend that has
@@ -13,7 +13,7 @@
  * backend so reads and writes are always consistent.
  */
 
-const HERMES_BASE = '/api/hermes-tasks'
+const HERMES_BASE = '/api/hermeschi-tasks'
 const CLAUDE_BASE = '/api/claude-tasks'
 
 export type TasksBackend = 'hermes' | 'claude'
@@ -60,7 +60,7 @@ async function resolveBackend(): Promise<BackendResolution> {
     const useHermes = hermesCount > 0 && hermesCount >= claudeCount
     _resolved = {
       base: useHermes ? HERMES_BASE : CLAUDE_BASE,
-      assigneesBase: useHermes ? '/api/hermes-tasks-assignees' : '/api/claude-tasks-assignees',
+      assigneesBase: useHermes ? '/api/hermeschi-tasks-assignees' : '/api/claude-tasks-assignees',
       backend: useHermes ? 'hermes' : 'claude',
     }
     return _resolved

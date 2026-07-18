@@ -544,7 +544,7 @@ const dashboardProxyBackend: KanbanBackend = {
       body: (input.spec ?? '').trim() || undefined,
       assignee: input.assignedWorker?.trim() || undefined,
       status: mapLaneToDashboardStatus(input.status ?? 'backlog'),
-      created_by: input.createdBy?.trim() || 'hermes-workspace',
+      created_by: input.createdBy?.trim() || 'hermeschi',
     })
     return dashboardTaskToCard(task)
   },

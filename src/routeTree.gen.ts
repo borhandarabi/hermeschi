@@ -88,8 +88,8 @@ import { Route as ApiMcpRouteImport } from './routes/api/mcp'
 import { Route as ApiLocalProvidersRouteImport } from './routes/api/local-providers'
 import { Route as ApiIntegrationsRouteImport } from './routes/api/integrations'
 import { Route as ApiHistoryRouteImport } from './routes/api/history'
-import { Route as ApiHermesTasksRouteImport } from './routes/api/hermes-tasks'
-import { Route as ApiHermesConfigRouteImport } from './routes/api/hermes-config'
+import { Route as ApiHermesTasksRouteImport } from './routes/api/hermeschi-tasks'
+import { Route as ApiHermesConfigRouteImport } from './routes/api/hermeschi-config'
 import { Route as ApiGatewayStatusRouteImport } from './routes/api/gateway-status'
 import { Route as ApiGatewayReprobeRouteImport } from './routes/api/gateway-reprobe'
 import { Route as ApiFilesRouteImport } from './routes/api/files'
@@ -153,8 +153,8 @@ import { Route as ApiKnowledgeReadRouteImport } from './routes/api/knowledge/rea
 import { Route as ApiKnowledgeListRouteImport } from './routes/api/knowledge/list'
 import { Route as ApiKnowledgeGraphRouteImport } from './routes/api/knowledge/graph'
 import { Route as ApiKnowledgeConfigRouteImport } from './routes/api/knowledge/config'
-import { Route as ApiHermesworldReservationsRouteImport } from './routes/api/hermesworld/reservations'
-import { Route as ApiHermesTasksTaskIdRouteImport } from './routes/api/hermes-tasks.$taskId'
+import { Route as ApiHermesworldReservationsRouteImport } from './routes/api/hermeschiworld/reservations'
+import { Route as ApiHermesTasksTaskIdRouteImport } from './routes/api/hermeschi-tasks.$taskId'
 import { Route as ApiExternalMemorySearchRouteImport } from './routes/api/external-memory/search'
 import { Route as ApiExternalMemoryProvidersRouteImport } from './routes/api/external-memory/providers'
 import { Route as ApiExternalMemoryCandidatesRouteImport } from './routes/api/external-memory/candidates'
@@ -167,7 +167,7 @@ import { Route as ApiSessionsSessionKeyStatusRouteImport } from './routes/api/se
 import { Route as ApiSessionsSessionKeyActiveRunRouteImport } from './routes/api/sessions/$sessionKey.active-run'
 import { Route as ApiMcpHubSourcesIdRouteImport } from './routes/api/mcp/hub-sources.$id'
 import { Route as ApiMcpNameLogsRouteImport } from './routes/api/mcp/$name.logs'
-import { Route as ApiHermesworldReservationsConfirmRouteImport } from './routes/api/hermesworld/reservations/confirm'
+import { Route as ApiHermesworldReservationsConfirmRouteImport } from './routes/api/hermeschiworld/reservations/confirm'
 import { Route as ApiRunsSessionKeyRunIdAbandonRouteImport } from './routes/api/runs/$sessionKey.$runId.abandon'
 
 const WorldRoute = WorldRouteImport.update({
@@ -567,13 +567,13 @@ const ApiHistoryRoute = ApiHistoryRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHermesTasksRoute = ApiHermesTasksRouteImport.update({
-  id: '/api/hermes-tasks',
-  path: '/api/hermes-tasks',
+  id: '/api/hermeschi-tasks',
+  path: '/api/hermeschi-tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHermesConfigRoute = ApiHermesConfigRouteImport.update({
-  id: '/api/hermes-config',
-  path: '/api/hermes-config',
+  id: '/api/hermeschi-config',
+  path: '/api/hermeschi-config',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiGatewayStatusRoute = ApiGatewayStatusRouteImport.update({
@@ -893,8 +893,8 @@ const ApiKnowledgeConfigRoute = ApiKnowledgeConfigRouteImport.update({
 } as any)
 const ApiHermesworldReservationsRoute =
   ApiHermesworldReservationsRouteImport.update({
-    id: '/api/hermesworld/reservations',
-    path: '/api/hermesworld/reservations',
+    id: '/api/hermeschiworld/reservations',
+    path: '/api/hermeschiworld/reservations',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiHermesTasksTaskIdRoute = ApiHermesTasksTaskIdRouteImport.update({
@@ -1026,8 +1026,8 @@ export interface FileRoutesByFullPath {
   '/api/files': typeof ApiFilesRoute
   '/api/gateway-reprobe': typeof ApiGatewayReprobeRoute
   '/api/gateway-status': typeof ApiGatewayStatusRoute
-  '/api/hermes-config': typeof ApiHermesConfigRoute
-  '/api/hermes-tasks': typeof ApiHermesTasksRouteWithChildren
+  '/api/hermeschi-config': typeof ApiHermesConfigRoute
+  '/api/hermeschi-tasks': typeof ApiHermesTasksRouteWithChildren
   '/api/history': typeof ApiHistoryRoute
   '/api/integrations': typeof ApiIntegrationsRoute
   '/api/local-providers': typeof ApiLocalProvidersRoute
@@ -1091,8 +1091,8 @@ export interface FileRoutesByFullPath {
   '/api/external-memory/candidates': typeof ApiExternalMemoryCandidatesRoute
   '/api/external-memory/providers': typeof ApiExternalMemoryProvidersRoute
   '/api/external-memory/search': typeof ApiExternalMemorySearchRoute
-  '/api/hermes-tasks/$taskId': typeof ApiHermesTasksTaskIdRoute
-  '/api/hermesworld/reservations': typeof ApiHermesworldReservationsRouteWithChildren
+  '/api/hermeschi-tasks/$taskId': typeof ApiHermesTasksTaskIdRoute
+  '/api/hermeschiworld/reservations': typeof ApiHermesworldReservationsRouteWithChildren
   '/api/knowledge/config': typeof ApiKnowledgeConfigRoute
   '/api/knowledge/graph': typeof ApiKnowledgeGraphRoute
   '/api/knowledge/list': typeof ApiKnowledgeListRoute
@@ -1134,7 +1134,7 @@ export interface FileRoutesByFullPath {
   '/api/update/agent': typeof ApiUpdateAgentRoute
   '/api/update/status': typeof ApiUpdateStatusRoute
   '/api/update/workspace': typeof ApiUpdateWorkspaceRoute
-  '/api/hermesworld/reservations/confirm': typeof ApiHermesworldReservationsConfirmRoute
+  '/api/hermeschiworld/reservations/confirm': typeof ApiHermesworldReservationsConfirmRoute
   '/api/mcp/$name/logs': typeof ApiMcpNameLogsRoute
   '/api/mcp/hub-sources/$id': typeof ApiMcpHubSourcesIdRoute
   '/api/sessions/$sessionKey/active-run': typeof ApiSessionsSessionKeyActiveRunRoute
@@ -1187,8 +1187,8 @@ export interface FileRoutesByTo {
   '/api/files': typeof ApiFilesRoute
   '/api/gateway-reprobe': typeof ApiGatewayReprobeRoute
   '/api/gateway-status': typeof ApiGatewayStatusRoute
-  '/api/hermes-config': typeof ApiHermesConfigRoute
-  '/api/hermes-tasks': typeof ApiHermesTasksRouteWithChildren
+  '/api/hermeschi-config': typeof ApiHermesConfigRoute
+  '/api/hermeschi-tasks': typeof ApiHermesTasksRouteWithChildren
   '/api/history': typeof ApiHistoryRoute
   '/api/integrations': typeof ApiIntegrationsRoute
   '/api/local-providers': typeof ApiLocalProvidersRoute
@@ -1252,8 +1252,8 @@ export interface FileRoutesByTo {
   '/api/external-memory/candidates': typeof ApiExternalMemoryCandidatesRoute
   '/api/external-memory/providers': typeof ApiExternalMemoryProvidersRoute
   '/api/external-memory/search': typeof ApiExternalMemorySearchRoute
-  '/api/hermes-tasks/$taskId': typeof ApiHermesTasksTaskIdRoute
-  '/api/hermesworld/reservations': typeof ApiHermesworldReservationsRouteWithChildren
+  '/api/hermeschi-tasks/$taskId': typeof ApiHermesTasksTaskIdRoute
+  '/api/hermeschiworld/reservations': typeof ApiHermesworldReservationsRouteWithChildren
   '/api/knowledge/config': typeof ApiKnowledgeConfigRoute
   '/api/knowledge/graph': typeof ApiKnowledgeGraphRoute
   '/api/knowledge/list': typeof ApiKnowledgeListRoute
@@ -1295,7 +1295,7 @@ export interface FileRoutesByTo {
   '/api/update/agent': typeof ApiUpdateAgentRoute
   '/api/update/status': typeof ApiUpdateStatusRoute
   '/api/update/workspace': typeof ApiUpdateWorkspaceRoute
-  '/api/hermesworld/reservations/confirm': typeof ApiHermesworldReservationsConfirmRoute
+  '/api/hermeschiworld/reservations/confirm': typeof ApiHermesworldReservationsConfirmRoute
   '/api/mcp/$name/logs': typeof ApiMcpNameLogsRoute
   '/api/mcp/hub-sources/$id': typeof ApiMcpHubSourcesIdRoute
   '/api/sessions/$sessionKey/active-run': typeof ApiSessionsSessionKeyActiveRunRoute
@@ -1350,8 +1350,8 @@ export interface FileRoutesById {
   '/api/files': typeof ApiFilesRoute
   '/api/gateway-reprobe': typeof ApiGatewayReprobeRoute
   '/api/gateway-status': typeof ApiGatewayStatusRoute
-  '/api/hermes-config': typeof ApiHermesConfigRoute
-  '/api/hermes-tasks': typeof ApiHermesTasksRouteWithChildren
+  '/api/hermeschi-config': typeof ApiHermesConfigRoute
+  '/api/hermeschi-tasks': typeof ApiHermesTasksRouteWithChildren
   '/api/history': typeof ApiHistoryRoute
   '/api/integrations': typeof ApiIntegrationsRoute
   '/api/local-providers': typeof ApiLocalProvidersRoute
@@ -1415,8 +1415,8 @@ export interface FileRoutesById {
   '/api/external-memory/candidates': typeof ApiExternalMemoryCandidatesRoute
   '/api/external-memory/providers': typeof ApiExternalMemoryProvidersRoute
   '/api/external-memory/search': typeof ApiExternalMemorySearchRoute
-  '/api/hermes-tasks/$taskId': typeof ApiHermesTasksTaskIdRoute
-  '/api/hermesworld/reservations': typeof ApiHermesworldReservationsRouteWithChildren
+  '/api/hermeschi-tasks/$taskId': typeof ApiHermesTasksTaskIdRoute
+  '/api/hermeschiworld/reservations': typeof ApiHermesworldReservationsRouteWithChildren
   '/api/knowledge/config': typeof ApiKnowledgeConfigRoute
   '/api/knowledge/graph': typeof ApiKnowledgeGraphRoute
   '/api/knowledge/list': typeof ApiKnowledgeListRoute
@@ -1458,7 +1458,7 @@ export interface FileRoutesById {
   '/api/update/agent': typeof ApiUpdateAgentRoute
   '/api/update/status': typeof ApiUpdateStatusRoute
   '/api/update/workspace': typeof ApiUpdateWorkspaceRoute
-  '/api/hermesworld/reservations/confirm': typeof ApiHermesworldReservationsConfirmRoute
+  '/api/hermeschiworld/reservations/confirm': typeof ApiHermesworldReservationsConfirmRoute
   '/api/mcp/$name/logs': typeof ApiMcpNameLogsRoute
   '/api/mcp/hub-sources/$id': typeof ApiMcpHubSourcesIdRoute
   '/api/sessions/$sessionKey/active-run': typeof ApiSessionsSessionKeyActiveRunRoute
@@ -1514,8 +1514,8 @@ export interface FileRouteTypes {
     | '/api/files'
     | '/api/gateway-reprobe'
     | '/api/gateway-status'
-    | '/api/hermes-config'
-    | '/api/hermes-tasks'
+    | '/api/hermeschi-config'
+    | '/api/hermeschi-tasks'
     | '/api/history'
     | '/api/integrations'
     | '/api/local-providers'
@@ -1579,8 +1579,8 @@ export interface FileRouteTypes {
     | '/api/external-memory/candidates'
     | '/api/external-memory/providers'
     | '/api/external-memory/search'
-    | '/api/hermes-tasks/$taskId'
-    | '/api/hermesworld/reservations'
+    | '/api/hermeschi-tasks/$taskId'
+    | '/api/hermeschiworld/reservations'
     | '/api/knowledge/config'
     | '/api/knowledge/graph'
     | '/api/knowledge/list'
@@ -1622,7 +1622,7 @@ export interface FileRouteTypes {
     | '/api/update/agent'
     | '/api/update/status'
     | '/api/update/workspace'
-    | '/api/hermesworld/reservations/confirm'
+    | '/api/hermeschiworld/reservations/confirm'
     | '/api/mcp/$name/logs'
     | '/api/mcp/hub-sources/$id'
     | '/api/sessions/$sessionKey/active-run'
@@ -1675,8 +1675,8 @@ export interface FileRouteTypes {
     | '/api/files'
     | '/api/gateway-reprobe'
     | '/api/gateway-status'
-    | '/api/hermes-config'
-    | '/api/hermes-tasks'
+    | '/api/hermeschi-config'
+    | '/api/hermeschi-tasks'
     | '/api/history'
     | '/api/integrations'
     | '/api/local-providers'
@@ -1740,8 +1740,8 @@ export interface FileRouteTypes {
     | '/api/external-memory/candidates'
     | '/api/external-memory/providers'
     | '/api/external-memory/search'
-    | '/api/hermes-tasks/$taskId'
-    | '/api/hermesworld/reservations'
+    | '/api/hermeschi-tasks/$taskId'
+    | '/api/hermeschiworld/reservations'
     | '/api/knowledge/config'
     | '/api/knowledge/graph'
     | '/api/knowledge/list'
@@ -1783,7 +1783,7 @@ export interface FileRouteTypes {
     | '/api/update/agent'
     | '/api/update/status'
     | '/api/update/workspace'
-    | '/api/hermesworld/reservations/confirm'
+    | '/api/hermeschiworld/reservations/confirm'
     | '/api/mcp/$name/logs'
     | '/api/mcp/hub-sources/$id'
     | '/api/sessions/$sessionKey/active-run'
@@ -1837,8 +1837,8 @@ export interface FileRouteTypes {
     | '/api/files'
     | '/api/gateway-reprobe'
     | '/api/gateway-status'
-    | '/api/hermes-config'
-    | '/api/hermes-tasks'
+    | '/api/hermeschi-config'
+    | '/api/hermeschi-tasks'
     | '/api/history'
     | '/api/integrations'
     | '/api/local-providers'
@@ -1902,8 +1902,8 @@ export interface FileRouteTypes {
     | '/api/external-memory/candidates'
     | '/api/external-memory/providers'
     | '/api/external-memory/search'
-    | '/api/hermes-tasks/$taskId'
-    | '/api/hermesworld/reservations'
+    | '/api/hermeschi-tasks/$taskId'
+    | '/api/hermeschiworld/reservations'
     | '/api/knowledge/config'
     | '/api/knowledge/graph'
     | '/api/knowledge/list'
@@ -1945,7 +1945,7 @@ export interface FileRouteTypes {
     | '/api/update/agent'
     | '/api/update/status'
     | '/api/update/workspace'
-    | '/api/hermesworld/reservations/confirm'
+    | '/api/hermeschiworld/reservations/confirm'
     | '/api/mcp/$name/logs'
     | '/api/mcp/hub-sources/$id'
     | '/api/sessions/$sessionKey/active-run'
@@ -2640,17 +2640,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/hermes-tasks': {
-      id: '/api/hermes-tasks'
-      path: '/api/hermes-tasks'
-      fullPath: '/api/hermes-tasks'
+    '/api/hermeschi-tasks': {
+      id: '/api/hermeschi-tasks'
+      path: '/api/hermeschi-tasks'
+      fullPath: '/api/hermeschi-tasks'
       preLoaderRoute: typeof ApiHermesTasksRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/hermes-config': {
-      id: '/api/hermes-config'
-      path: '/api/hermes-config'
-      fullPath: '/api/hermes-config'
+    '/api/hermeschi-config': {
+      id: '/api/hermeschi-config'
+      path: '/api/hermeschi-config'
+      fullPath: '/api/hermeschi-config'
       preLoaderRoute: typeof ApiHermesConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -3095,17 +3095,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiKnowledgeConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/hermesworld/reservations': {
-      id: '/api/hermesworld/reservations'
-      path: '/api/hermesworld/reservations'
-      fullPath: '/api/hermesworld/reservations'
+    '/api/hermeschiworld/reservations': {
+      id: '/api/hermeschiworld/reservations'
+      path: '/api/hermeschiworld/reservations'
+      fullPath: '/api/hermeschiworld/reservations'
       preLoaderRoute: typeof ApiHermesworldReservationsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/hermes-tasks/$taskId': {
-      id: '/api/hermes-tasks/$taskId'
+    '/api/hermeschi-tasks/$taskId': {
+      id: '/api/hermeschi-tasks/$taskId'
       path: '/$taskId'
-      fullPath: '/api/hermes-tasks/$taskId'
+      fullPath: '/api/hermeschi-tasks/$taskId'
       preLoaderRoute: typeof ApiHermesTasksTaskIdRouteImport
       parentRoute: typeof ApiHermesTasksRoute
     }
@@ -3193,10 +3193,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMcpNameLogsRouteImport
       parentRoute: typeof ApiMcpNameRoute
     }
-    '/api/hermesworld/reservations/confirm': {
-      id: '/api/hermesworld/reservations/confirm'
+    '/api/hermeschiworld/reservations/confirm': {
+      id: '/api/hermeschiworld/reservations/confirm'
       path: '/confirm'
-      fullPath: '/api/hermesworld/reservations/confirm'
+      fullPath: '/api/hermeschiworld/reservations/confirm'
       preLoaderRoute: typeof ApiHermesworldReservationsConfirmRouteImport
       parentRoute: typeof ApiHermesworldReservationsRoute
     }

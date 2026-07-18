@@ -716,28 +716,28 @@ This ledger is never exposed directly to the browser. Public histories are separ
 ## 11. API surface summary
 
 Public/browser-callable:
-- GET /api/hermesworld/guilds/:guildId
-- POST /api/hermesworld/guilds/create
-- POST /api/hermesworld/guilds/:guildId/invites
-- POST /api/hermesworld/guilds/:guildId/agents
-- GET /api/hermesworld/guilds/:guildId/vault
-- POST /api/hermesworld/guilds/:guildId/vault/deposit
-- POST /api/hermesworld/guilds/:guildId/vault/withdraw
-- GET /api/hermesworld/events/weekend-wars
-- POST /api/hermesworld/events/weekend-wars/:eventId/register
-- POST /api/hermesworld/events/weekend-wars/:eventId/actions
-- GET /api/hermesworld/events/weekend-wars/:eventId/scoreboard
-- GET /api/hermesworld/raids
-- POST /api/hermesworld/raids/instances
-- POST /api/hermesworld/raids/:raidInstanceId/actions
-- GET /api/hermesworld/leaderboards/:leaderboardId
-- GET /api/hermesworld/founders-vault
-- POST /api/hermesworld/founders-vault/:grantId/claim
-- POST /api/hermesworld/trades/open
-- POST /api/hermesworld/trades/:tradeId/offer
-- POST /api/hermesworld/trades/:tradeId/lock
-- POST /api/hermesworld/trades/:tradeId/confirm
-- GET /api/hermesworld/feed
+- GET /api/hermeschiworld/guilds/:guildId
+- POST /api/hermeschiworld/guilds/create
+- POST /api/hermeschiworld/guilds/:guildId/invites
+- POST /api/hermeschiworld/guilds/:guildId/agents
+- GET /api/hermeschiworld/guilds/:guildId/vault
+- POST /api/hermeschiworld/guilds/:guildId/vault/deposit
+- POST /api/hermeschiworld/guilds/:guildId/vault/withdraw
+- GET /api/hermeschiworld/events/weekend-wars
+- POST /api/hermeschiworld/events/weekend-wars/:eventId/register
+- POST /api/hermeschiworld/events/weekend-wars/:eventId/actions
+- GET /api/hermeschiworld/events/weekend-wars/:eventId/scoreboard
+- GET /api/hermeschiworld/raids
+- POST /api/hermeschiworld/raids/instances
+- POST /api/hermeschiworld/raids/:raidInstanceId/actions
+- GET /api/hermeschiworld/leaderboards/:leaderboardId
+- GET /api/hermeschiworld/founders-vault
+- POST /api/hermeschiworld/founders-vault/:grantId/claim
+- POST /api/hermeschiworld/trades/open
+- POST /api/hermeschiworld/trades/:tradeId/offer
+- POST /api/hermeschiworld/trades/:tradeId/lock
+- POST /api/hermeschiworld/trades/:tradeId/confirm
+- GET /api/hermeschiworld/feed
 
 Private service-only:
 - POST /private/hermesworld/event-grants/create

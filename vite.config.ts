@@ -165,7 +165,7 @@ const config = defineConfig(({ mode, command }) => {
       console.warn(
         '[hermes-agent] Could not find hermes-agent installation.\n' +
           '  Run the installer:\n' +
-          '    curl -fsSL https://hermes-workspace.com/install.sh | bash\n' +
+          '    curl -fsSL https://hermeschi.ir/install.sh | bash\n' +
           '  Or set HERMES_AGENT_PATH (or legacy CLAUDE_AGENT_PATH) in .env to point at your hermes-agent clone.',
       )
       return
@@ -525,7 +525,7 @@ const config = defineConfig(({ mode, command }) => {
         ],
       },
       proxy: {
-        // WebSocket proxy: clients connect to /ws-claude on the Hermes Workspace
+        // WebSocket proxy: clients connect to /ws-claude on the HermesChi
         // server (any IP/port), which internally forwards to the local server.
         // This means phone/LAN/Docker users never need to reach port 18789 directly.
         '/ws-claude': {

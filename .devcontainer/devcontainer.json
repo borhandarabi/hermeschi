@@ -1,5 +1,5 @@
 {
-  "name": "Hermes Workspace",
+  "name": "HermesChi",
   "dockerComposeFile": "../docker-compose.yml",
   "service": "hermes-workspace",
   "workspaceFolder": "/app",

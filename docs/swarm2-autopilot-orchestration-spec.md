@@ -2,7 +2,7 @@
 
 Date: 2026-04-28
 Status: implementation spec, staged rollout
-Canonical repo: `/Users/aurora/hermes-workspace`
+Canonical repo: `/Users/aurora/hermeschi`
 
 ## Goal
 
@@ -86,13 +86,13 @@ workers:
     role: Builder
     specialty: full-stack implementation and UI/system integration
     model: GPT-5.5
-    mission: Ship focused product slices in Hermes Workspace with tests.
+    mission: Ship focused product slices in HermesChi with tests.
     skills: [swarm-ui-worker, swarm-worker-core]
     capabilities:
       - code-editing
       - ui-implementation
       - build-verification
-    defaultCwd: /Users/aurora/hermes-workspace
+    defaultCwd: /Users/aurora/hermeschi
     preferredTaskTypes: [implementation, refactor, ui]
     maxConcurrentTasks: 1
     acceptsBroadcast: true
@@ -204,7 +204,7 @@ Example:
 ```text
 ## Swarm Orchestrator Dispatch
 Worker: swarm5 — Builder
-Mission: Ship focused product slices in Hermes Workspace with tests.
+Mission: Ship focused product slices in HermesChi with tests.
 Skills: swarm-ui-worker, swarm-worker-core
 
 ## Assigned Task

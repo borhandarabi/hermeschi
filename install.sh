@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Hermes Workspace — one-liner installer
+# HermesChi — one-liner installer
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/outsourc-e/hermes-workspace/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/outsourc-e/hermeschi/main/install.sh | bash
 #
 # What it does:
 #   1. Verifies Node 22+, git, pnpm
@@ -15,7 +15,7 @@
 
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/outsourc-e/hermes-workspace.git}"
+REPO_URL="${REPO_URL:-https://github.com/outsourc-e/hermeschi.git}"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/hermes-workspace}"
 GATEWAY_PORT="${GATEWAY_PORT:-8642}"
 NOUS_INSTALLER_URL="${NOUS_INSTALLER_URL:-https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh}"
@@ -35,7 +35,7 @@ banner() {
 
    ╭────────────────────────────────────────────╮
    │  HERMES WORKSPACE — zero-fork installer   │
-   │  outsourc-e/hermes-workspace               │
+   │  outsourc-e/hermeschi               │
    ╰────────────────────────────────────────────╯
 
 EOF
@@ -154,7 +154,7 @@ else
   if ! command -v hermes &>/dev/null; then
     red "  hermes-agent installed, but 'hermes' is not on PATH in this shell."
     yellow "  Open a new shell (or: source ~/.bashrc / ~/.zshrc) and re-run:"
-    yellow "    curl -fsSL https://hermes-workspace.com/install.sh | bash"
+    yellow "    curl -fsSL https://hermeschi.ir/install.sh | bash"
     exit 1
   fi
   green "  hermes-agent installed ✓ ($(command -v hermes))"
@@ -239,10 +239,10 @@ fi
 # wrapper), not dist/server/server.js directly.
 
 if [[ "$(uname -s)" == "Darwin" ]]; then
-  cyan "→ Installing macOS LaunchAgent (com.hermes.workspace)…"
+  cyan "→ Installing macOS LaunchAgent (com.hermeschi.workspace)…"
 
-  PLIST_TEMPLATE="$INSTALL_DIR/macos/com.hermes.workspace.plist.template"
-  PLIST_DEST="$HOME/Library/LaunchAgents/com.hermes.workspace.plist"
+  PLIST_TEMPLATE="$INSTALL_DIR/macos/com.hermeschi.workspace.plist.template"
+  PLIST_DEST="$HOME/Library/LaunchAgents/com.hermeschi.workspace.plist"
   mkdir -p "$HOME/Library/LaunchAgents"
 
   NODE_BIN="$(command -v node)"
@@ -267,7 +267,7 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 
   launchctl unload "$PLIST_DEST" 2>/dev/null || true
   if launchctl load -w "$PLIST_DEST" 2>/dev/null; then
-    green "  LaunchAgent loaded ✓ (com.hermes.workspace)"
+    green "  LaunchAgent loaded ✓ (com.hermeschi.workspace)"
   else
     yellow "  Could not load LaunchAgent now — it will still be available for next login."
   fi

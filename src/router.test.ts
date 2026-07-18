@@ -3,13 +3,13 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { resolveRouterBasepath } from './router'
 
 function setBasepathGlobal(value: unknown) {
-  ;(window as unknown as Record<string, unknown>).__HERMES_WORKSPACE_BASEPATH__ =
+  ;(window as unknown as Record<string, unknown>).__HERMESCHI_BASEPATH__ =
     value
 }
 
 function clearBasepathGlobal() {
   delete (window as unknown as Record<string, unknown>)
-    .__HERMES_WORKSPACE_BASEPATH__
+    .__HERMESCHI_BASEPATH__
 }
 
 afterEach(() => {

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Hermes Workspace supports a portable chat path through OpenAI-compatible `/v1/chat/completions`. In this mode, the browser route alone is not enough to preserve conversational context: Workspace must forward a stable server-side session identifier to the Hermes Agent gateway.
+HermesChi supports a portable chat path through OpenAI-compatible `/v1/chat/completions`. In this mode, the browser route alone is not enough to preserve conversational context: Workspace must forward a stable server-side session identifier to the Hermes Agent gateway.
 
 This document records the routing contract and the failure mode that caused related turns and attachments to be stored as separate `api-*` sessions.
 
@@ -83,8 +83,8 @@ if (options.sessionId) {
 3. Restart Workspace where deployed:
 
    ```bash
-   systemctl --user restart hermes-workspace.service
-   systemctl --user is-active hermes-workspace.service
+   systemctl --user restart hermeschi.service
+   systemctl --user is-active hermeschi.service
    ```
 
 4. Send two `/api/send-stream` turns with the same `sessionKey` and a unique token in the first prompt.

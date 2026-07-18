@@ -1,4 +1,4 @@
-# Hermes Workspace Desktop Update System
+# HermesChi Desktop Update System
 
 This branch introduces the update contract that the DMG/EXE packaging should use.
 
@@ -6,7 +6,7 @@ This branch introduces the update contract that the DMG/EXE packaging should use
 
 Hermes ships two separately updateable products:
 
-1. **Hermes Workspace**: the UI/server shell.
+1. **HermesChi**: the UI/server shell.
 2. **Hermes Agent**: the local agent/gateway runtime.
 
 They must not be modeled as two remotes in the same git checkout. The Workspace updater updates Workspace. The Agent updater updates the installed/bundled Agent.
@@ -39,7 +39,7 @@ For git installs:
 
 ## Desktop behavior to wire next
 
-The packaged app should set `HERMES_WORKSPACE_DESKTOP=1` and provide a desktop updater bridge that:
+The packaged app should set `HERMESCHI_DESKTOP=1` and provide a desktop updater bridge that:
 
 1. Checks a signed update manifest or GitHub Release.
 2. Downloads the Workspace app update through Electron auto-updater or equivalent.

@@ -9,14 +9,14 @@ try {
   ;({ autoUpdater } = require('electron-updater'))
 } catch (error) {
   console.warn(
-    '[hermes-workspace] electron-updater unavailable, disabling built-in updater:',
+    '[hermeschi] electron-updater unavailable, disabling built-in updater:',
     error?.message || error,
   )
 }
 
 const APP_PORT = 3847
 const HERMES_GATEWAY_URL = 'http://127.0.0.1:8642/health'
-const HERMES_DASHBOARD_URL = 'http://127.0.0.1:9119/api/status'
+const HERMESCHI_DASHBOARD_URL = 'http://127.0.0.1:9119/api/status'
 const HERMES_INSTALL_SCRIPT =
   'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup'
 
@@ -79,7 +79,7 @@ function configureAutoUpdater() {
       defaultId: 0,
       cancelId: 1,
       title: 'Update available',
-      message: `A new hermes-workspace version (${info?.version || 'latest'}) is available.`,
+      message: `A new hermeschi version (${info?.version || 'latest'}) is available.`,
       detail: 'Download and install it from inside the app?',
     })
     if (result.response === 0) {
@@ -112,7 +112,7 @@ function configureAutoUpdater() {
       defaultId: 0,
       cancelId: 1,
       title: 'Update ready',
-      message: `hermes-workspace ${info?.version || ''} is ready to install.`,
+      message: `hermeschi ${info?.version || ''} is ready to install.`,
       detail: 'The app will restart to finish the update.',
     })
     if (result.response === 0) {
@@ -183,7 +183,7 @@ async function getBootstrapStatus() {
   return {
     hermesInstalled: isHermesInstalled(),
     gatewayReachable: await checkHttp(HERMES_GATEWAY_URL),
-    dashboardReachable: await checkHttp(HERMES_DASHBOARD_URL),
+    dashboardReachable: await checkHttp(HERMESCHI_DASHBOARD_URL),
     installerRunning: Boolean(installProcess && !installProcess.killed),
     localServerReady,
     localServerPort,
@@ -192,7 +192,7 @@ async function getBootstrapStatus() {
 
 function spawnDetached(command, label) {
   const logDir = getTempDir()
-  const logFile = join(logDir, `hermes-workspace-${label}.log`)
+  const logFile = join(logDir, `hermeschi-${label}.log`)
 
   let child
   if (process.platform === 'win32') {
@@ -202,7 +202,7 @@ function spawnDetached(command, label) {
       stdio: ['ignore', logFd, logFd],
       env: {
         ...process.env,
-        HERMES_WORKSPACE_DESKTOP: '1',
+        HERMESCHI_DESKTOP: '1',
         API_SERVER_ENABLED: process.env.API_SERVER_ENABLED || 'true',
       },
       windowsHide: true,
@@ -214,7 +214,7 @@ function spawnDetached(command, label) {
       stdio: 'ignore',
       env: {
         ...process.env,
-        HERMES_WORKSPACE_DESKTOP: '1',
+        HERMESCHI_DESKTOP: '1',
         API_SERVER_ENABLED: process.env.API_SERVER_ENABLED || 'true',
       },
     })
@@ -247,7 +247,7 @@ async function installHermesInBackground() {
 
 async function ensureHermesBackend() {
   const gatewayReachable = await checkHttp(HERMES_GATEWAY_URL)
-  const dashboardReachable = await checkHttp(HERMES_DASHBOARD_URL)
+  const dashboardReachable = await checkHttp(HERMESCHI_DASHBOARD_URL)
 
   if (!isHermesInstalled()) {
     await installHermesInBackground()
@@ -267,7 +267,7 @@ async function ensureHermesBackend() {
   return {
     installed: true,
     gatewayReachable: await checkHttp(HERMES_GATEWAY_URL, 4000),
-    dashboardReachable: await checkHttp(HERMES_DASHBOARD_URL, 4000),
+    dashboardReachable: await checkHttp(HERMESCHI_DASHBOARD_URL, 4000),
   }
 }
 
@@ -297,10 +297,10 @@ function startLocalServer() {
           ELECTRON_RUN_AS_NODE: '1',
           NODE_ENV: 'production',
           PORT: String(APP_PORT),
-          HERMES_WORKSPACE_DESKTOP: '1',
+          HERMESCHI_DESKTOP: '1',
           HERMES_API_URL: process.env.HERMES_API_URL || 'http://127.0.0.1:8642',
-          HERMES_DASHBOARD_URL:
-            process.env.HERMES_DASHBOARD_URL || 'http://127.0.0.1:9119',
+          HERMESCHI_DASHBOARD_URL:
+            process.env.HERMESCHI_DASHBOARD_URL || 'http://127.0.0.1:9119',
         },
         stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
       },
@@ -348,7 +348,7 @@ async function createWindow() {
     height: 940,
     minWidth: 980,
     minHeight: 680,
-    title: 'hermes-workspace',
+    title: 'hermeschi',
     icon: existsSync(join(__dirname, '..', 'assets', 'icon.png'))
       ? join(__dirname, '..', 'assets', 'icon.png')
       : undefined,
@@ -386,7 +386,7 @@ async function createWindow() {
 }
 
 ipcMain.handle('desktop:status', async () => getBootstrapStatus())
-ipcMain.handle('desktop:install-hermes', async () =>
+ipcMain.handle('desktop:install-hermeschichi', async () =>
   installHermesInBackground(),
 )
 ipcMain.handle('desktop:start-backend', async () => ensureHermesBackend())
@@ -413,4 +413,4 @@ app.on('before-quit', () => {
   localServer?.kill()
 })
 
-app.setName('hermes-workspace')
+app.setName('hermeschi')

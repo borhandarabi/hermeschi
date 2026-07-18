@@ -1,6 +1,6 @@
 # Agent Pairing Guide — Workspace ↔ Hermes Agent
 
-> **Audience:** AI agents helping users set up Hermes Workspace.
+> **Audience:** AI agents helping users set up HermesChi.
 > Run these steps in order. Each step has a verification command. Do not skip
 > ahead, and do not start a second gateway until the current one fails the
 > checks below.
@@ -9,7 +9,7 @@
 
 ```
 ┌─────────────────┐       HTTP :8642        ┌──────────────────┐
-│  Claude Gateway  │◄──────────────────────►│ Hermes Workspace │
+│  Claude Gateway  │◄──────────────────────►│ HermesChi │
 │  (Python, FastAPI)│  /health, /v1/chat,   │  (Node, Vite)     │
 │  hermes gateway   │  /api/sessions, etc.  │  pnpm dev         │
 │  run              │                       │  port 3000        │
@@ -175,7 +175,7 @@ hermes dashboard
 ## Step 5 — Is Workspace pointed at the gateway?
 
 ```bash
-# In the hermes-workspace directory
+# In the hermeschi directory
 cat .env | grep HERMES_API_URL
 ```
 
@@ -184,16 +184,16 @@ cat .env | grep HERMES_API_URL
 Also set the dashboard URL:
 
 ```bash
-grep HERMES_DASHBOARD_URL .env
+grep HERMESCHI_DASHBOARD_URL .env
 ```
 
-**Pass:** `HERMES_DASHBOARD_URL=http://127.0.0.1:9119`
+**Pass:** `HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119`
 
 **Fail or missing:**
 ```bash
-# In the hermes-workspace directory
+# In the hermeschi directory
 echo 'HERMES_API_URL=http://127.0.0.1:8642' >> .env
-echo 'HERMES_DASHBOARD_URL=http://127.0.0.1:9119' >> .env
+echo 'HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119' >> .env
 ```
 
 If `.env` doesn't exist:
@@ -207,7 +207,7 @@ cp .env.example .env
 ## Step 6 — Start Workspace and verify pairing
 
 ```bash
-cd ~/hermes-workspace   # or wherever it's installed
+cd ~/hermeschi   # or wherever it's installed
 pnpm dev
 ```
 
@@ -272,7 +272,7 @@ sleep 8
 curl -sf http://127.0.0.1:8642/health && echo "✅ Gateway API is up" || echo "❌ Gateway API not reachable"
 
 # 6. Set workspace env
-cd ~/hermes-workspace 2>/dev/null || cd "$(find ~ -maxdepth 2 -name hermes-workspace -type d | head -1)"
+cd ~/hermeschi 2>/dev/null || cd "$(find ~ -maxdepth 2 -name hermeschi -type d | head -1)"
 grep -q '^HERMES_API_URL=' .env 2>/dev/null && \
   sed -i.bak 's|^HERMES_API_URL=.*|HERMES_API_URL=http://127.0.0.1:8642|' .env || \
   echo 'HERMES_API_URL=http://127.0.0.1:8642' >> .env
@@ -321,7 +321,7 @@ echo "=== claude env (redacted) ===" && grep -E "^(API_SERVER|CLAUDE_)" "$(claud
 echo "=== gateway process ===" && pgrep -af "claude.*gateway" 2>&1 || echo "not running"
 echo "=== port 8642 ===" && (ss -tlnp 2>/dev/null || lsof -iTCP:8642 -sTCP:LISTEN 2>/dev/null) | grep 8642 || echo "not bound"
 echo "=== health check ===" && curl -sf http://127.0.0.1:8642/health 2>&1 || echo "not reachable"
-echo "=== workspace .env ===" && grep CLAUDE ~/hermes-workspace/.env 2>&1 || echo "no .env"
+echo "=== workspace .env ===" && grep CLAUDE ~/hermeschi/.env 2>&1 || echo "no .env"
 echo "=== OS ===" && uname -a
 echo "=== Node ===" && node --version
 echo "=== Python ===" && python3 --version 2>&1

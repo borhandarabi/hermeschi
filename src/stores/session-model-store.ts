@@ -51,7 +51,7 @@ export const useSessionModelStore = create<State & Actions>()(
       },
     }),
     {
-      name: 'hermes-session-model',
+      name: 'hermeschi-session-model',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ models: state.models }),
     },

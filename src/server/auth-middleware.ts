@@ -140,11 +140,11 @@ export function revokeSessionToken(token: string): void {
 /**
  * Resolve the configured workspace password.
  *
- * Honors HERMES_PASSWORD first (current name, post-rename) and falls back to
+ * Honors HERMESCHI_PASSWORD first (current name, post-rename) and falls back to
  * CLAUDE_PASSWORD for back-compat with deployments configured pre-rename.
  */
 function getConfiguredPassword(): string {
-  const fromHermes = process.env.HERMES_PASSWORD
+  const fromHermes = process.env.HERMESCHI_PASSWORD
   if (fromHermes && fromHermes.length > 0) return fromHermes
   const fromClaude = process.env.CLAUDE_PASSWORD
   if (fromClaude && fromClaude.length > 0) return fromClaude

@@ -271,7 +271,7 @@ function readCommits(
 
 function workspaceInstallKind(): InstallKind {
   if (
-    process.env.HERMES_WORKSPACE_DESKTOP === '1' ||
+    process.env.HERMESCHI_DESKTOP === '1' ||
     process.env.ELECTRON_RUN_AS_NODE
   )
     return 'desktop'
@@ -290,7 +290,7 @@ export function readWorkspaceUpdateStatus(
   if (installKind === 'desktop') {
     return {
       id: 'workspace',
-      label: 'Hermes Workspace',
+      label: 'HermesChi',
       installKind,
       version,
       path: repoPath,
@@ -310,7 +310,7 @@ export function readWorkspaceUpdateStatus(
   if (installKind === 'docker') {
     return {
       id: 'workspace',
-      label: 'Hermes Workspace',
+      label: 'HermesChi',
       installKind,
       version,
       path: repoPath,
@@ -330,7 +330,7 @@ export function readWorkspaceUpdateStatus(
   if (!gitRepo) {
     return {
       id: 'workspace',
-      label: 'Hermes Workspace',
+      label: 'HermesChi',
       installKind: 'unknown',
       version,
       path: repoPath,
@@ -348,8 +348,9 @@ export function readWorkspaceUpdateStatus(
 
   const remoteUrl = git(['remote', 'get-url', 'origin'], gitRepo)
   const repoMatches = remoteUrlMatches(remoteUrl, [
+    'hermeschi',
     'hermes-workspace',
-    'outsourc-e/hermes-workspace',
+    'outsourc-e/hermeschi',
   ])
   if (repoMatches) git(['fetch', 'origin', '--quiet'], gitRepo, 30_000)
   const currentHead = git(['rev-parse', 'HEAD'], gitRepo)
@@ -371,7 +372,7 @@ export function readWorkspaceUpdateStatus(
 
   return {
     id: 'workspace',
-    label: 'Hermes Workspace',
+    label: 'HermesChi',
     installKind: 'git',
     version,
     path: repoPath,
@@ -393,7 +394,7 @@ export function readWorkspaceUpdateStatus(
               : 'blocked'
             : 'current',
     reason: !repoMatches
-      ? 'Workspace origin remote does not look like hermes-workspace.'
+      ? 'Workspace origin remote does not look like HermesChi.'
       : !supportedBranch
         ? 'Workspace one-click updates are only enabled on main/master branches.'
         : dirty
@@ -596,7 +597,7 @@ export function applyWorkspaceUpdate(): ApplyUpdateResult {
   const releaseNotes = [
     {
       product: 'workspace' as const,
-      label: 'Hermes Workspace',
+      label: 'HermesChi',
       from: before.currentHead,
       to: after.currentHead,
       commits: readCommits(

@@ -1,12 +1,12 @@
-# Hermes Workspace Naming Contract
+# HermesChi Naming Contract
 
-This repo is for **Hermes Workspace** and **Hermes Agent** work.
+This repo is for **HermesChi** and **Hermes Agent** work.
 
 ## Canonical product names
 
 Use these names in all new UI, docs, skills, prompts, tests, review comments, and handoffs:
 
-- **Hermes Workspace**
+- **HermesChi**
 - **Hermes Agent**
 - **Swarm**
 - **Hermes Kanban**
@@ -17,7 +17,7 @@ Use these names in all new UI, docs, skills, prompts, tests, review comments, an
 
 Do **not** introduce these in new work unless quoting legacy history or compatibility behavior:
 
-- Hermes Workspace
+- HermesChi
 - Hermes Agent
 - Claude swarm
 - Claude-native paths
@@ -41,22 +41,22 @@ For Claude-native runtime work, prefer:
 - `claude`
 - Hermes worker sessions
 
-Do not suggest Claude-specific runtime wrappers or profile paths for live Hermes Workspace behavior.
+Do not suggest Claude-specific runtime wrappers or profile paths for live HermesChi behavior.
 
 ## Swarm/UI language rules
 
 Prefer:
 - **Ready** not person-specific hardcoded labels
 - **Board / Cards / List** for reports views
-- **Hermes Workspace** and **Hermes Agent** in update/config/status UI
+- **HermesChi** and **Hermes Agent** in update/config/status UI
 
 Avoid:
 - person-specific product labels baked into UI
-- Claude-branded wording in Hermes Workspace surfaces
+- Claude-branded wording in HermesChi surfaces
 
 ## Reviewer rule
 
-Any PR or patch that introduces new Claude-branded naming into Hermes Workspace should be treated as a regression unless it is:
+Any PR or patch that introduces new Claude-branded naming into HermesChi should be treated as a regression unless it is:
 - a legacy compatibility note
 - a migration guide
 - a quoted historical artifact

@@ -67,9 +67,9 @@ type Notes = {
 }
 
 const CHECK_INTERVAL_MS = 30 * 60 * 1000
-const DISMISS_PREFIX = 'hermes-update-v2-dismissed:'
-const NOTES_KEY = 'hermes-update-v2-release-notes'
-const NOTES_SEEN_KEY = 'hermes-update-v2-release-notes-seen'
+const DISMISS_PREFIX = 'hermeschi-update-v2-dismissed:'
+const NOTES_KEY = 'hermeschi-update-v2-release-notes'
+const NOTES_SEEN_KEY = 'hermeschi-update-v2-release-notes-seen'
 
 function shortSha(value: string | null | undefined): string {
   return value ? value.slice(0, 7) : t('updateCenter.unknownSha')

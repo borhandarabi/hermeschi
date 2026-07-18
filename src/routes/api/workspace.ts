@@ -258,9 +258,9 @@ async function configuredDefaultWorkspace(): Promise<{
       : ''
 
   return firstValidDirectory([
-    { path: process.env.HERMES_WORKSPACE_DIR ?? '', source: 'env' },
+    { path: process.env.HERMESCHI_WORKSPACE_DIR ?? '', source: 'env' },
     { path: process.env.CLAUDE_WORKSPACE_DIR ?? '', source: 'env' },
-    { path: process.env.HERMES_WEBUI_DEFAULT_WORKSPACE ?? '', source: 'env' },
+    { path: process.env.HERMESCHI_WEBUI_DEFAULT_WORKSPACE ?? '', source: 'env' },
     { path: readString(cfg.workspace), source: 'config.workspace' },
     {
       path: readString(cfg.default_workspace),
@@ -319,7 +319,7 @@ export async function loadWorkspaceCatalog(): Promise<WorkspaceDetectionResponse
 
   // Priority 2: Environment variable
   const envWorkspace =
-    process.env.HERMES_WORKSPACE_DIR?.trim() ||
+    process.env.HERMESCHI_WORKSPACE_DIR?.trim() ||
     process.env.CLAUDE_WORKSPACE_DIR?.trim()
   if (envWorkspace) {
     const isValid = await isValidDirectory(envWorkspace)

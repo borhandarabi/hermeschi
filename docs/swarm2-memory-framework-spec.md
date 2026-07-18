@@ -2,7 +2,7 @@
 
 Date: 2026-04-28
 Status: Stage 1 implementation spec
-Canonical repo: `/Users/aurora/hermes-workspace`
+Canonical repo: `/Users/aurora/hermeschi`
 
 ## Goal
 
@@ -36,9 +36,9 @@ These paths are locked. Do not substitute Claude/OpenClaw profile paths for work
 | Worker mission event log | `~/.hermes/profiles/<workerId>/memory/missions/<missionId>/events.jsonl` |
 | Worker episodic logs | `~/.hermes/profiles/<workerId>/memory/episodes/YYYY-MM-DD.md` |
 | Worker handoffs | `~/.hermes/profiles/<workerId>/memory/handoffs/<missionId>.md` |
-| Swarm control-plane runtime | `/Users/aurora/hermes-workspace/.runtime/` |
-| Swarm mission ledger | `/Users/aurora/hermes-workspace/.runtime/swarm-missions.json` |
-| Swarm roster/source of truth | `/Users/aurora/hermes-workspace/swarm.yaml` |
+| Swarm control-plane runtime | `/Users/aurora/hermeschi/.runtime/` |
+| Swarm mission ledger | `/Users/aurora/hermeschi/.runtime/swarm-missions.json` |
+| Swarm roster/source of truth | `/Users/aurora/hermeschi/swarm.yaml` |
 | Shared swarm handoffs | `/Users/aurora/.openclaw/workspace/memory/handoffs/swarm/` |
 | Shared swarm archive/memory | `/Users/aurora/.openclaw/workspace/memory/swarm/` |
 | Completed mission archive | `/Users/aurora/.openclaw/workspace/memory/swarm/missions/<missionId>/` |
@@ -47,7 +47,7 @@ Explicitly wrong paths:
 
 - `~/.hermes/profiles/...`
 - `~/.openclaw/profiles/...`
-- `/Users/aurora/hermes-workspace/.runtime/...`
+- `/Users/aurora/hermeschi/.runtime/...`
 - `/Users/aurora/.ocplatform/workspace/...` for new canonical writes
 
 ## Ownership model
@@ -66,7 +66,7 @@ Owned by the worker. Used for:
 
 ### Swarm control-plane state
 
-Stored under `/Users/aurora/hermes-workspace/.runtime/`.
+Stored under `/Users/aurora/hermeschi/.runtime/`.
 
 Owned by Swarm2 server code. Used for:
 

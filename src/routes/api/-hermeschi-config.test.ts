@@ -52,7 +52,7 @@ async function loadHandlers(modulePath: string) {
   return (mod as any).Route.server.handlers
 }
 
-describe('canonical /api/hermes-config route', () => {
+describe('canonical /api/hermeschi-config route', () => {
   it('GET returns normalized provider state with paths and active provider', async () => {
     fs.writeFileSync(
       path.join(tmpHome, 'config.yaml'),
@@ -67,7 +67,7 @@ describe('canonical /api/hermes-config route', () => {
 
     const handlers = await loadHandlers('./hermes-config')
     const res = await handlers.GET({
-      request: new Request('http://localhost/api/hermes-config'),
+      request: new Request('http://localhost/api/hermeschi-config'),
     })
     const body = await res.json()
 
@@ -83,7 +83,7 @@ describe('canonical /api/hermes-config route', () => {
   it('PATCH dispatches set-default-model and returns the action message', async () => {
     const handlers = await loadHandlers('./hermes-config')
     const res = await handlers.PATCH({
-      request: new Request('http://localhost/api/hermes-config', {
+      request: new Request('http://localhost/api/hermeschi-config', {
         method: 'PATCH',
         body: JSON.stringify({
           action: 'set-default-model',
@@ -109,7 +109,7 @@ describe('canonical /api/hermes-config route', () => {
 
     const handlers = await loadHandlers('./hermes-config')
     await handlers.PATCH({
-      request: new Request('http://localhost/api/hermes-config', {
+      request: new Request('http://localhost/api/hermeschi-config', {
         method: 'PATCH',
         body: JSON.stringify({ config: { memory: { memory_enabled: true } } }),
       }),
@@ -123,7 +123,7 @@ describe('canonical /api/hermes-config route', () => {
   it('PATCH rejects malformed action bodies with 400', async () => {
     const handlers = await loadHandlers('./hermes-config')
     const res = await handlers.PATCH({
-      request: new Request('http://localhost/api/hermes-config', {
+      request: new Request('http://localhost/api/hermeschi-config', {
         method: 'PATCH',
         body: JSON.stringify({ action: 'set-default-model' }),
       }),
@@ -138,7 +138,7 @@ describe('canonical /api/hermes-config route', () => {
     }))
     const handlers = await loadHandlers('./hermes-config')
     const res = await handlers.PATCH({
-      request: new Request('http://localhost/api/hermes-config', {
+      request: new Request('http://localhost/api/hermeschi-config', {
         method: 'PATCH',
         body: JSON.stringify({ action: 'set-api-key', envKey: 'X', value: 'y' }),
       }),

@@ -1,5 +1,5 @@
 {
-  description = "Hermes Workspace — desktop workspace for Hermes Agent";
+  description = "HermesChi — desktop workspace for Hermes Agent";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -17,13 +17,13 @@
       # NixOS module — available on all systems
       # -----------------------------------------------------------------------
       nixosModules.default = import ./nix/module.nix;
-      nixosModules.hermes-workspace = nixosModules.default;
+      nixosModules.hermeschi = nixosModules.default;
 
-      # Overlay that adds hermes-workspace into any nixpkgs instance
+      # Overlay that adds hermeschi into any nixpkgs instance
       overlays.default = final: _prev: {
-        hermes-workspace = final.callPackage ./nix/package.nix { };
+        hermeschi = final.callPackage ./nix/package.nix { };
       };
-      overlays.hermes-workspace = overlays.default;
+      overlays.hermeschi = overlays.default;
     in
     # -----------------------------------------------------------------------
     # Per-system outputs
@@ -41,30 +41,30 @@
         # Packages
         # -----------------------------------------------------------------
         packages = {
-          default = pkgs.hermes-workspace;
-          hermes-workspace = pkgs.hermes-workspace;
+          default = pkgs.hermeschi;
+          hermeschi = pkgs.hermeschi;
         };
 
         # -----------------------------------------------------------------
-        # Apps  (nix run .  or  nix run .#hermes-workspace)
+        # Apps  (nix run .  or  nix run .#hermeschi)
         # -----------------------------------------------------------------
         apps =
           let
             app = {
               type = "app";
-              program = "${pkgs.hermes-workspace}/bin/hermes-workspace";
+              program = "${pkgs.hermeschi}/bin/hermeschi";
             };
           in
           {
             default = app;
-            hermes-workspace = app;
+            hermeschi = app;
           };
 
         # -----------------------------------------------------------------
         # Dev shell  (nix develop)
         # -----------------------------------------------------------------
         devShells.default = pkgs.mkShell {
-          name = "hermes-workspace-dev";
+          name = "hermeschi-dev";
 
           packages = with pkgs; [
             # Node / JS toolchain
@@ -82,7 +82,7 @@
 
           shellHook = ''
             echo ""
-            echo "  🚀 hermes-workspace dev shell"
+            echo "  🚀 hermeschi dev shell"
             echo "     node  $(node --version)"
             echo "     pnpm  $(pnpm --version)"
             echo "     python $(python3 --version)"
@@ -106,8 +106,8 @@
         # -----------------------------------------------------------------
         checks = {
           # Verify the package evaluates without building it
-          package-eval = pkgs.runCommand "hermes-workspace-pkg-eval" { } ''
-            echo "Package evaluated: ${pkgs.hermes-workspace.name}" > $out
+          package-eval = pkgs.runCommand "hermeschi-pkg-eval" { } ''
+            echo "Package evaluated: ${pkgs.hermeschi.name}" > $out
           '';
         };
       }

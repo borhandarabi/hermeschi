@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="./public/claude-avatar.webp" alt="Hermes Workspace" width="80" style="border-radius: 16px" />
+<img src="./public/claude-avatar.webp" alt="HermesChi" width="80" style="border-radius: 16px" />
 <!-- avatar filename retained for cache stability — do not rename without coordinated cache-bust -->
 
-# Hermes Workspace
+# HermesChi
 
 **Your AI agent's command center — chat, files, memory, skills, and terminal in one place.**
 
@@ -14,9 +14,9 @@
 
 > Not a chat wrapper. A complete workspace — orchestrate agents, browse memory, manage skills, and control everything from one interface.
 
-> **v2 — zero-fork.** Clone, don't fork. Runs on vanilla [`NousResearch/hermes-agent`](https://github.com/NousResearch/hermes-agent) installed via Nous's own installer. Chat, sessions, memory, skills, jobs, MCP, terminal, dashboard, Agent View, and Operations are all in vanilla parity. **Conductor** uses the dashboard mission API when available and falls back to Workspace-native Swarm dispatch (`mode: native-swarm`) when the dashboard endpoint is absent, preserving zero-fork behavior ([#262](https://github.com/outsourc-e/hermes-workspace/issues/262)).
+> **v2 — zero-fork.** Clone, don't fork. Runs on vanilla [`NousResearch/hermes-agent`](https://github.com/NousResearch/hermes-agent) installed via Nous's own installer. Chat, sessions, memory, skills, jobs, MCP, terminal, dashboard, Agent View, and Operations are all in vanilla parity. **Conductor** uses the dashboard mission API when available and falls back to Workspace-native Swarm dispatch (`mode: native-swarm`) when the dashboard endpoint is absent, preserving zero-fork behavior ([#262](https://github.com/outsourc-e/hermeschi/issues/262)).
 
-![Hermes Workspace](./docs/screenshots/splash.png)
+![HermesChi](./docs/screenshots/splash.png)
 
 </div>
 
@@ -92,14 +92,14 @@ Three paths — pick the one that matches you:
 ### One-line install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/outsourc-e/hermes-workspace/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/outsourc-e/hermeschi/main/install.sh | bash
 ```
 
 This installs `hermes-agent` via Nous's official installer, clones this repo, sets up `.env`, and installs dependencies. Then:
 
 ```bash
 hermes gateway run                  # terminal 1
-cd ~/hermes-workspace && pnpm dev   # terminal 2
+cd ~/hermeschi && pnpm dev   # terminal 2
 ```
 
 Open http://localhost:3000. That's it.
@@ -111,15 +111,15 @@ Open http://localhost:3000. That's it.
 If you already have `hermes-agent` installed (via Nous's official installer, a source checkout, systemd, Docker, or another existing setup) and it's serving the gateway at `http://<host>:8642`, you don't need to reinstall anything — just point the workspace at it.
 
 ```bash
-git clone https://github.com/outsourc-e/hermes-workspace.git
-cd hermes-workspace
+git clone https://github.com/outsourc-e/hermeschi.git
+cd hermeschi
 pnpm install
 cp .env.example .env
 
 # Point at your existing Hermes Agent services.
 echo 'HERMES_API_URL=http://127.0.0.1:8642' >> .env
 # Zero-fork installs also need the separate dashboard API for config/sessions/skills/jobs.
-echo 'HERMES_DASHBOARD_URL=http://127.0.0.1:9119' >> .env
+echo 'HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119' >> .env
 
 # If your gateway was started with API_SERVER_KEY (auth enabled), set the same value:
 # echo 'HERMES_API_TOKEN=***' >> .env
@@ -157,14 +157,14 @@ If the workspace and its browser live on different machines — e.g. the workspa
 ```bash
 # On the server running the workspace + gateway:
 echo 'HERMES_API_URL=http://100.x.y.z:8642' >> .env
-echo 'HERMES_DASHBOARD_URL=http://100.x.y.z:9119' >> .env
+echo 'HERMESCHI_DASHBOARD_URL=http://100.x.y.z:9119' >> .env
 
 # Also tell the gateway to listen on all interfaces so Tailscale peers can reach it.
 # In ~/.hermes/.env (or wherever the gateway reads config):
 echo 'API_SERVER_HOST=0.0.0.0' >> ~/.hermes/.env
 ```
 
-Then restart the gateway, dashboard, and workspace. Hit the workspace from the remote device and the connection probe will use the Tailscale IP instead of localhost. Both `HERMES_API_URL` and `HERMES_DASHBOARD_URL` must be set to Tailscale/LAN-reachable URLs — setting only one will leave the other probing `127.0.0.1` and failing.
+Then restart the gateway, dashboard, and workspace. Hit the workspace from the remote device and the connection probe will use the Tailscale IP instead of localhost. Both `HERMES_API_URL` and `HERMESCHI_DASHBOARD_URL` must be set to Tailscale/LAN-reachable URLs — setting only one will leave the other probing `127.0.0.1` and failing.
 
 **If you've already started the workspace**, you can update both URLs from `Settings → Connection` without restarting. The values are persisted to `~/.hermes/workspace-overrides.json` and take effect immediately (gateway capabilities are reprobed on save). Editing `.env` still works for pre-start config and for CI/containers.
 
@@ -172,7 +172,7 @@ Then restart the gateway, dashboard, and workspace. Hit the workspace from the r
 
 ### Manual install
 
-Hermes Workspace works with any OpenAI-compatible backend. If your backend also exposes Hermes Agent gateway APIs, enhanced features like sessions, memory, skills, and jobs unlock automatically.
+HermesChi works with any OpenAI-compatible backend. If your backend also exposes Hermes Agent gateway APIs, enhanced features like sessions, memory, skills, and jobs unlock automatically.
 
 #### Prerequisites
 
@@ -182,7 +182,7 @@ Hermes Workspace works with any OpenAI-compatible backend. If your backend also 
 
 #### Step 1: Start your backend
 
-Point Hermes Workspace at any backend that supports:
+Point HermesChi at any backend that supports:
 
 - `POST /v1/chat/completions`
 - `GET /v1/models` recommended
@@ -200,12 +200,12 @@ hermes gateway run
 
 Our one-liner installer (below) does both steps automatically. If you're using another OpenAI-compatible server, just note its base URL.
 
-### Step 2: Install & Run Hermes Workspace
+### Step 2: Install & Run HermesChi
 
 ```bash
 # In a new terminal
-git clone https://github.com/outsourc-e/hermes-workspace.git
-cd hermes-workspace
+git clone https://github.com/outsourc-e/hermeschi.git
+cd hermeschi
 pnpm install
 cp .env.example .env
 printf '\nHERMES_API_URL=http://127.0.0.1:8642\n' >> .env
@@ -239,14 +239,14 @@ HERMES_API_URL=http://127.0.0.1:8642
 # (Ollama / LM Studio / local servers don't need a key)
 
 # Optional: password-protect the web UI
-# HERMES_PASSWORD=your_password
+# HERMESCHI_PASSWORD=your_password
 ```
 
 ---
 
 ## 🧠 Local Models (Ollama, Atomic Chat, LM Studio, vLLM)
 
-Hermes Workspace supports two modes with local models:
+HermesChi supports two modes with local models:
 
 ### Portable Mode (Easiest)
 
@@ -259,7 +259,7 @@ Point the workspace directly at your local server — no Hermes Agent gateway ne
 HERMES_API_URL=http://127.0.0.1:1337/v1 pnpm dev
 ```
 
-Download [Atomic Chat](https://atomic.chat/), launch the desktop app, and make sure a model is loaded before starting Hermes Workspace.
+Download [Atomic Chat](https://atomic.chat/), launch the desktop app, and make sure a model is loaded before starting HermesChi.
 
 ### Ollama
 
@@ -317,7 +317,7 @@ API_SERVER_ENABLED=true
 hermes gateway run          # Starts core APIs on :8642
 hermes dashboard            # Starts dashboard APIs on :9119
 HERMES_API_URL=http://127.0.0.1:8642 \
-HERMES_DASHBOARD_URL=http://127.0.0.1:9119 \
+HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119 \
 pnpm dev
 ```
 
@@ -345,29 +345,29 @@ Workspace is the UI. **Hermes Agent** is the brain. They talk over two HTTP serv
 ```bash
 hermes gateway run     # terminal 1 · :8642 · chat, models, streaming, jobs
 hermes dashboard       # terminal 2 · :9119 · sessions, skills, config, MCP
-cd ~/hermes-workspace && pnpm dev   # terminal 3 · :3000 · the UI
+cd ~/hermeschi && pnpm dev   # terminal 3 · :3000 · the UI
 ```
 
 > **Tip:** `pnpm start:all` starts gateway + dashboard + workspace in one shot if you've installed via the one-liner.
 
 ### Windows (PowerShell + WSL) one-command startup
 
-If you use Hermes Workspace from Windows with the agent running in WSL, use the helper script in this repo:
+If you use HermesChi from Windows with the agent running in WSL, use the helper script in this repo:
 
 ```powershell
 # from the repo root
-.\scripts\start-hermes-workspace.ps1
+.\scripts\start-hermeschi.ps1
 ```
 
 To force a clean relaunch of the tmux session:
 
 ```powershell
-.\scripts\start-hermes-workspace.ps1 -Restart
+.\scripts\start-hermeschi.ps1 -Restart
 ```
 
 Optional parameters:
 - `-Distro <name>` to target a non-default WSL distro
-- `-WorkspacePath </path/in/wsl>` if your clone is not at `~/hermes-workspace`
+- `-WorkspacePath </path/in/wsl>` if your clone is not at `~/hermeschi`
 - `-SessionName <name>` to use a custom tmux session name
 
 ### Verify the pairing
@@ -386,22 +386,22 @@ Both must return `200`. If either fails, the workspace will fall back to **porta
 HERMES_API_URL=http://127.0.0.1:8642
 
 # Recommended: where the dashboard is (unlocks sessions/skills/config/MCP/jobs)
-HERMES_DASHBOARD_URL=http://127.0.0.1:9119
+HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119
 
 # Only if your gateway was started with API_SERVER_KEY=... — paste the same value:
 # HERMES_API_TOKEN=***
 
 # Optional: password-protect the web UI itself
-# HERMES_PASSWORD=***
+# HERMESCHI_PASSWORD=***
 ```
 
 ### Common pairing scenarios
 
 | Scenario | Set this |
 |---|---|
-| Workspace + gateway on the same machine | `HERMES_API_URL=http://127.0.0.1:8642`, `HERMES_DASHBOARD_URL=http://127.0.0.1:9119` |
+| Workspace + gateway on the same machine | `HERMES_API_URL=http://127.0.0.1:8642`, `HERMESCHI_DASHBOARD_URL=http://127.0.0.1:9119` |
 | Gateway on a remote server (Tailscale / VPN) | Set both URLs to the reachable IP (e.g. `http://100.x.y.z:8642`) and add `API_SERVER_HOST=0.0.0.0` to the gateway's `~/.hermes/.env` |
-| Already-running `hermes-agent` from upstream installer | Just set `HERMES_API_URL` + `HERMES_DASHBOARD_URL` and skip the one-liner installer |
+| Already-running `hermes-agent` from upstream installer | Just set `HERMES_API_URL` + `HERMESCHI_DASHBOARD_URL` and skip the one-liner installer |
 | Multiple agent profiles | Profiles live under `~/.hermes/profiles/<name>` — the dashboard switches between them at runtime; workspace follows automatically |
 
 ### Live re-pairing (no restart)
@@ -421,9 +421,9 @@ If you've already started the workspace, change either URL from **Settings → C
 
 ## 🐳 Docker Quickstart
 
-[![Open in GitHub Codespaces](https://img.shields.io/badge/GitHub%20Codespaces-Open-181717?logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=outsourc-e/hermes-workspace)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/GitHub%20Codespaces-Open-181717?logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=outsourc-e/hermeschi)
 
-The Docker setup runs both the **Hermes Agent gateway** and **Hermes Workspace** together.
+The Docker setup runs both the **Hermes Agent gateway** and **HermesChi** together.
 
 ### Prerequisites
 
@@ -434,8 +434,8 @@ The Docker setup runs both the **Hermes Agent gateway** and **Hermes Workspace**
 ### Step 1: Configure Environment
 
 ```bash
-git clone https://github.com/outsourc-e/hermes-workspace.git
-cd hermes-workspace
+git clone https://github.com/outsourc-e/hermeschi.git
+cd hermeschi
 cp .env.example .env
 ```
 
@@ -461,7 +461,7 @@ docker compose up
 This pulls two pre-built images and starts them:
 
 - **hermes-agent** → `nousresearch/hermes-agent:latest` on port **8642**
-- **hermes-workspace** → `ghcr.io/outsourc-e/hermes-workspace:latest` on port **3000**
+- **hermeschi** → `ghcr.io/outsourc-e/hermeschi:latest` on port **3000**
 
 No local build. First run takes a minute to pull; subsequent starts are instant.
 Agent state (config, sessions, skills, memory, credentials) persists in the
@@ -484,7 +484,7 @@ services:
   hermes-agent:
     ports:
       - '8642:8642'
-  hermes-workspace:
+  hermeschi:
     ports:
       - '3000:3000'
 ```
@@ -493,7 +493,7 @@ services:
 
 ```env
 # Required: workspace session password (the workspace refuses to start on 0.0.0.0 without it)
-HERMES_PASSWORD=your-strong-secret-here
+HERMESCHI_PASSWORD=your-strong-secret-here
 
 # Required for plain-HTTP LAN access (browsers drop Secure cookies over http://)
 COOKIE_SECURE=0
@@ -517,7 +517,7 @@ docker compose down && docker compose up -d
 
 | Symptom | Fix |
 |---|---|
-| `[workspace] refusing to start — HERMES_PASSWORD is unset` | Add `HERMES_PASSWORD=<secret>` to `.env` |
+| `[workspace] refusing to start — HERMESCHI_PASSWORD is unset` | Add `HERMESCHI_PASSWORD=<secret>` to `.env` |
 | Login silently fails (no error, page reloads) | Add `COOKIE_SECURE=0` for HTTP, or `COOKIE_SECURE=1` + HTTPS |
 | `[Api_Server] Refusing to start: binding to 0.0.0.0 requires API_SERVER_KEY` | Add `API_SERVER_KEY=*** to `.env` |
 | `No user allowlists configured. All unauthorized users will be denied.` | Add `GATEWAY_ALLOW_ALL_USERS=true` to `.env` |
@@ -534,7 +534,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
 The base `docker-compose.yml` stays untouched — the overlay adds a `build:`
-block for the `hermes-workspace` service so the local repo is compiled
+block for the `hermeschi` service so the local repo is compiled
 instead of pulled. The Hermes Agent service still uses the canonical
 `nousresearch/hermes-agent:latest` image; if you need a custom agent
 build, tag it locally and override `image:` in your own
@@ -542,11 +542,11 @@ build, tag it locally and override `image:` in your own
 
 ### Using a Pre-Built Image (Coolify / Easypanel / Dokploy / Unraid)
 
-Deploying Hermes Workspace to a PaaS or home-lab stack? Pull the image
+Deploying HermesChi to a PaaS or home-lab stack? Pull the image
 directly from GitHub Container Registry:
 
 ```
-ghcr.io/outsourc-e/hermes-workspace:latest
+ghcr.io/outsourc-e/hermeschi:latest
 ```
 
 Available tags:
@@ -560,8 +560,8 @@ Available tags:
 Minimal Coolify / Easypanel config:
 
 ```yaml
-service: hermes-workspace
-image: ghcr.io/outsourc-e/hermes-workspace:latest
+service: hermeschi
+image: ghcr.io/outsourc-e/hermeschi:latest
 port: 3000
 env:
   HERMES_API_URL: http://hermes-agent:8642   # point at your gateway
@@ -576,36 +576,36 @@ does by default) or an existing gateway on another host.
 
 ## 📱 Install as App (Recommended)
 
-Hermes Workspace is a **Progressive Web App (PWA)** — install it for the full native app experience with no browser chrome, keyboard shortcuts, and offline support.
+HermesChi is a **Progressive Web App (PWA)** — install it for the full native app experience with no browser chrome, keyboard shortcuts, and offline support.
 
 ### 🖥️ Desktop (macOS / Windows / Linux)
 
-1. Open Hermes Workspace in **Chrome** or **Edge** at `http://localhost:3000`
+1. Open HermesChi in **Chrome** or **Edge** at `http://localhost:3000`
 2. Click the **install icon** (⊕) in the address bar
-3. Click **Install** — Hermes Workspace opens as a standalone desktop app
+3. Click **Install** — HermesChi opens as a standalone desktop app
 4. Pin to Dock / Taskbar for quick access
 
 > **macOS users:** After installing, you can also add it to your Launchpad.
 
 ### 📱 iPhone / iPad (iOS Safari)
 
-1. Open Hermes Workspace in **Safari** on your iPhone
+1. Open HermesChi in **Safari** on your iPhone
 2. Tap the **Share** button (□↑)
 3. Scroll down and tap **"Add to Home Screen"**
-4. Tap **Add** — the Hermes Workspace icon appears on your home screen
+4. Tap **Add** — the HermesChi icon appears on your home screen
 5. Launch from home screen for the full native app experience
 
 ### 🤖 Android
 
-1. Open Hermes Workspace in **Chrome** on your Android device
+1. Open HermesChi in **Chrome** on your Android device
 2. Tap the **three-dot menu** (⋮) → **"Add to Home screen"**
-3. Tap **Add** — Hermes Workspace is now a native-feeling app on your device
+3. Tap **Add** — HermesChi is now a native-feeling app on your device
 
 ---
 
 ## 📡 Mobile Access via Tailscale
 
-Access Hermes Workspace from anywhere on your devices — no port forwarding, no VPN complexity.
+Access HermesChi from anywhere on your devices — no port forwarding, no VPN complexity.
 
 ### Setup
 
@@ -622,7 +622,7 @@ Access Hermes Workspace from anywhere on your devices — no port forwarding, no
    # Example output: 100.x.x.x
    ```
 
-4. **Open Hermes Workspace on your phone:**
+4. **Open HermesChi on your phone:**
 
    ```
    http://100.x.x.x:3000
@@ -645,7 +645,7 @@ The desktop app will offer:
 - Auto-launch on startup
 - Deep OS integration (macOS menu bar, Windows taskbar)
 
-**In the meantime:** Install Hermes Workspace as a PWA (see above) for a near-native desktop experience — it works great.
+**In the meantime:** Install HermesChi as a PWA (see above) for a near-native desktop experience — it works great.
 
 ---
 
@@ -653,7 +653,7 @@ The desktop app will offer:
 
 > **Status: Coming Soon**
 
-A fully managed cloud version of Hermes Workspace is in development:
+A fully managed cloud version of HermesChi is in development:
 
 - **One-click deploy** — No self-hosting required
 - **Multi-device sync** — Access your agents from any device
@@ -679,17 +679,17 @@ Key safeguards — most are on by default, the env vars below are for remote / D
 - CSP headers via meta tags
 - Path-traversal prevention on file/memory routes (real-path boundary check, not string prefix)
 - Rate limiting on endpoints
-- Fail-closed startup guard: refuses to bind non-loopback without `HERMES_PASSWORD`
+- Fail-closed startup guard: refuses to bind non-loopback without `HERMESCHI_PASSWORD`
 - Session cookies: `HttpOnly` + `SameSite=Strict` + `Secure` (in production)
 - Optional password protection for the web UI
 
 ### Env vars for remote / Docker deployments
 
-- `HERMES_PASSWORD` — required whenever `HOST ≠ 127.0.0.1` (legacy `CLAUDE_PASSWORD` still honored as a fallback)
+- `HERMESCHI_PASSWORD` — required whenever `HOST ≠ 127.0.0.1` (legacy `CLAUDE_PASSWORD` still honored as a fallback)
 - `COOKIE_SECURE=1` — force the `Secure` cookie flag when terminating HTTPS at a proxy
 - `COOKIE_SECURE=0` — disable the `Secure` flag for plain-HTTP LAN deployments (`HOST=0.0.0.0` without HTTPS); without this, browsers silently drop session cookies and login fails (#149)
 - `TRUST_PROXY=1` — trust `x-forwarded-for` / `x-real-ip` (only set behind a sanitizing reverse proxy)
-- `HERMES_DASHBOARD_TOKEN` — explicit bearer for dashboard API (preferred over the legacy HTML-scrape fallback)
+- `HERMESCHI_DASHBOARD_TOKEN` — explicit bearer for dashboard API (preferred over the legacy HTML-scrape fallback)
 - `HERMES_API_TOKEN` — bearer for the Hermes Agent gateway when started with `API_SERVER_KEY` (legacy `CLAUDE_API_TOKEN` still honored)
 - `HERMES_ALLOW_INSECURE_REMOTE=1` — bypass the fail-closed guard (not recommended)
 
@@ -786,7 +786,7 @@ If using Docker Compose and getting auth errors:
 
 5. **Check workspace logs for gateway status:**
    ```bash
-   docker compose logs hermes-workspace
+   docker compose logs hermeschi
    ```
    Look for: `[gateway] http://hermes-agent:8642 mode=...` — if it shows `mode=disconnected`, the agent isn't running correctly.
 
@@ -826,7 +826,7 @@ The Docker setup runs both automatically — no action needed if using `docker c
 
 | Feature | Status |
 |---|---|
-| Conductor missions | Workspace UI is shipped; uses dashboard mission API when available and Workspace-native Swarm fallback otherwise (see [#262](https://github.com/outsourc-e/hermes-workspace/issues/262)) |
+| Conductor missions | Workspace UI is shipped; uses dashboard mission API when available and Workspace-native Swarm fallback otherwise (see [#262](https://github.com/outsourc-e/hermeschi/issues/262)) |
 | Native Desktop App (Electron) | Spec'd; PWA install path works today |
 
 ### Coming 🔜
@@ -840,11 +840,11 @@ The Docker setup runs both automatically — no action needed if using `docker c
 
 ## ⭐ Star History
 
-## [![Star History Chart](https://api.star-history.com/svg?repos=outsourc-e/hermes-workspace&type=date&logscale&legend=top-left)](https://www.star-history.com/#outsourc-e/hermes-workspace&type=date&logscale&legend=top-left)
+## [![Star History Chart](https://api.star-history.com/svg?repos=outsourc-e/hermeschi&type=date&logscale&legend=top-left)](https://www.star-history.com/#outsourc-e/hermeschi&type=date&logscale&legend=top-left)
 
 ## 💛 Support the Project
 
-Hermes Workspace is free and open source. If it's saving you time and powering your workflow, consider supporting development:
+HermesChi is free and open source. If it's saving you time and powering your workflow, consider supporting development:
 
 **ETH:** `0xB332D4C60f6FBd94913e3Fd40d77e3FE901FAe22`
 
@@ -871,5 +871,5 @@ MIT — see [LICENSE](LICENSE) for details.
 ---
 
 <div align="center">
-  <sub>Built with ⚡ by <a href="https://github.com/outsourc-e">@outsourc-e</a> and the Hermes Workspace community</sub>
+  <sub>Built with ⚡ by <a href="https://github.com/outsourc-e">@outsourc-e</a> and the HermesChi community</sub>
 </div>

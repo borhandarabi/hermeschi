@@ -10,7 +10,7 @@ Latest commits:
 - `dad606183` feat(playground): ASCII NPC portraits + perf opts + new utility dock buttons
 
 Build: `pnpm build` clean ✅
-Hub: `https://hermes-playground-ws.myaurora-agi.workers.dev/health` healthy ✅
+Hub: `https://hermeschi-playground-ws.myaurora-agi.workers.dev/health` healthy ✅
 
 ---
 

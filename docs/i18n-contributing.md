@@ -1,6 +1,6 @@
 # Contributing UI translations
 
-Hermes Workspace uses a lightweight, dependency-free i18n module that supports English (`en`) and Persian (`fa`) locales. Persian renders right-to-left; English renders left-to-right. The document direction is coupled to the active locale, so switching language in Settings immediately flips the layout.
+HermesChi uses a lightweight, dependency-free i18n module that supports English (`en`) and Persian (`fa`) locales. Persian renders right-to-left; English renders left-to-right. The document direction is coupled to the active locale, so switching language in Settings immediately flips the layout.
 
 ## Translation file
 

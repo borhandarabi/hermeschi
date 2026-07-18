@@ -113,7 +113,7 @@ def get_dir_size(path, follow_symlinks=False, disk_usage=False):
 scripts/dirsize.py
 ```
 
-归属路径待 Carlo 确认（`~/hermes-workspace/scripts/` 或全局 `~/.hermes/scripts/`）。
+归属路径待 Carlo 确认（`~/hermeschi/scripts/` 或全局 `~/.hermes/scripts/`）。
 
 ## 6. 实现计划
 

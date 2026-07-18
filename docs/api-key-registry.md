@@ -65,7 +65,7 @@ This registry groups supported environment keys so deployments can audit what is
 - `VAPI_PRIVATE_KEY`
 - `MCP_VAPI_API_KEY`
 - `API_SERVER_KEY`
-- `HERMES_PASSWORD`
+- `HERMESCHI_PASSWORD`
 
 ## Platforms and auth
 

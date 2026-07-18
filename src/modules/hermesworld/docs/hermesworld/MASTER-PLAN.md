@@ -83,7 +83,7 @@ Anti-drift gate (every output runs through this):
 
 ## 4. Repos
 
-- `outsourc-e/hermes-workspace` — public (browser game lives here)
+- `outsourc-e/hermeschi` — public (browser game lives here)
 - `outsourc-e/hermesworld-game` — **private** (issues, internal specs, prize logic, secrets, roadmap)
 - `outsourc-e/controlsuite` — desktop client
 - `ocplatform/ocplatform` — agent runtime

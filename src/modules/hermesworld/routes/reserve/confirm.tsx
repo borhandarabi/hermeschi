@@ -28,7 +28,7 @@ function ReserveConfirmRoute() {
       return
     }
 
-    fetch('/api/hermesworld/reservations/confirm', {
+    fetch('/api/hermeschiworld/reservations/confirm', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ token }),
