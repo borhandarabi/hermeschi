@@ -3,6 +3,7 @@ import { BrainIcon, Search01Icon } from '@hugeicons/core-free-icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t, getLocale } from '@/lib/i18n'
 
 type ExternalMemoryProvider = {
   id: string
@@ -93,9 +94,9 @@ async function readJson<T>(url: string): Promise<T> {
 }
 
 function formatTimestamp(value: number): string {
-  if (!value) return 'Unknown'
+  if (!value) return t('common.unknown')
   const millis = value < 10_000_000_000 ? value * 1000 : value
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -114,7 +115,7 @@ function stateClasses(state: string): string {
 
 function metadataPreview(metadata: Record<string, unknown>): string {
   const entries = Object.entries(metadata).slice(0, 4)
-  if (entries.length === 0) return 'No metadata'
+  if (entries.length === 0) return t('memory.external.noMetadata')
   return entries.map(([key, value]) => `${key}: ${String(value)}`).join(' · ')
 }
 
@@ -123,17 +124,31 @@ export function formatStateFilterLabel(
   counts: StateCounts,
 ): string {
   const count = counts[state]
-  return typeof count === 'number' ? `${state} (${count})` : state
+  return typeof count === 'number'
+    ? t('memory.external.stateWithCount', { state, count })
+    : state
+}
+
+export function candidateActions(
+  candidate: Pick<ExternalMemoryCandidate, 'state'>,
+): Array<{ action: CandidateAction; label: string }> {
+  const actions: Array<{ action: CandidateAction; label: string }> = [
+    { action: 'edit', label: t('memory.external.editAction') },
+  ]
+  if (candidate.state !== 'approved') {
+    actions.push({ action: 'approve', label: t('memory.external.approveAction') })
+  }
+  if (candidate.state !== 'rejected') {
+    actions.push({ action: 'reject', label: t('memory.external.rejectAction') })
+  }
+  actions.push({ action: 'delete', label: t('memory.external.deleteAction') })
+  return actions
 }
 
 export function candidateActionLabels(
   candidate: Pick<ExternalMemoryCandidate, 'state'>,
 ): Array<string> {
-  const labels = ['Edit']
-  if (candidate.state !== 'approved') labels.push('Approve')
-  if (candidate.state !== 'rejected') labels.push('Reject')
-  labels.push('Delete')
-  return labels
+  return candidateActions(candidate).map((entry) => entry.label)
 }
 
 async function readStateCounts(providerId: string): Promise<StateCounts> {
@@ -225,15 +240,15 @@ export function ExternalMemoryBrowserScreen() {
     let text: string | undefined
     let reason: string | undefined
     if (action === 'edit') {
-      text = window.prompt('Edit memory candidate', selected.text) || ''
+      text = window.prompt(t('memory.external.editPrompt'), selected.text) || ''
       if (!text.trim() || text === selected.text) return
     }
     if (action === 'reject') {
-      reason = window.prompt('Reason for rejection', '') || ''
+      reason = window.prompt(t('memory.external.rejectionPrompt'), '') || ''
     }
     if (
       action === 'delete' &&
-      !window.confirm('Delete this external memory row?')
+      !window.confirm(t('memory.external.deleteConfirm'))
     ) {
       return
     }
@@ -257,11 +272,10 @@ export function ExternalMemoryBrowserScreen() {
             className="mx-auto mb-3 size-8 text-primary-500"
           />
           <h2 className="text-lg font-semibold text-primary-900 dark:text-neutral-100">
-            No external memory providers
+            {t('memory.external.noProviders')}
           </h2>
           <p className="mt-2 text-sm text-primary-600 dark:text-neutral-400">
-            Register providers in $HERMES_HOME/external_memory_providers.json to
-            inspect external memory review queues here.
+            {t('memory.external.registerDesc')}
           </p>
         </div>
       </div>
@@ -274,10 +288,10 @@ export function ExternalMemoryBrowserScreen() {
         <div className="space-y-3 border-b border-primary-200 p-4 dark:border-neutral-800">
           <div>
             <h2 className="text-sm font-semibold text-primary-900 dark:text-neutral-100">
-              External memory
+              {t('memory.external.title')}
             </h2>
             <p className="text-xs text-primary-500 dark:text-neutral-400">
-              Review queues backed by custom providers.
+              {t('memory.external.subtitle')}
             </p>
           </div>
 
@@ -301,7 +315,7 @@ export function ExternalMemoryBrowserScreen() {
             <input
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search text, metadata, source..."
+              placeholder={t('memory.external.searchPlaceholder')}
               className="w-full rounded-xl border border-primary-200 bg-white py-2 pr-3 pl-9 text-sm text-primary-900 outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100"
             />
           </div>
@@ -329,7 +343,7 @@ export function ExternalMemoryBrowserScreen() {
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           {isLoading ? (
             <p className="p-3 text-sm text-primary-500 dark:text-neutral-400">
-              Loading...
+              {t('common.loading')}
             </p>
           ) : null}
           {error ? (
@@ -339,7 +353,7 @@ export function ExternalMemoryBrowserScreen() {
           ) : null}
           {!isLoading && candidates.length === 0 ? (
             <p className="p-3 text-sm text-primary-500 dark:text-neutral-400">
-              No memory rows found.
+              {t('memory.external.noRows')}
             </p>
           ) : null}
           <div className="space-y-2">
@@ -401,21 +415,19 @@ export function ExternalMemoryBrowserScreen() {
                 >
                   {selected.state}
                 </span>
-                {candidateActionLabels(selected).map((label) => (
+                {candidateActions(selected).map((entry) => (
                   <button
-                    key={label}
+                    key={entry.action}
                     type="button"
-                    onClick={() =>
-                      runAction(label.toLowerCase() as CandidateAction)
-                    }
+                    onClick={() => runAction(entry.action)}
                     className={cn(
                       'rounded-lg border px-3 py-1 text-xs transition',
-                      label === 'Delete'
+                      entry.action === 'delete'
                         ? 'border-rose-500/40 text-rose-600 hover:bg-rose-500/10 dark:text-rose-300'
                         : 'border-primary-200 text-primary-700 hover:bg-primary-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900',
                     )}
                   >
-                    {label}
+                    {entry.label}
                   </button>
                 ))}
               </div>
@@ -428,7 +440,7 @@ export function ExternalMemoryBrowserScreen() {
             <dl className="grid gap-3 text-sm md:grid-cols-2">
               <div>
                 <dt className="text-xs uppercase tracking-wide text-primary-400 dark:text-neutral-500">
-                  Source
+                  {t('memory.external.source')}
                 </dt>
                 <dd className="mt-1 text-primary-900 dark:text-neutral-100">
                   {selected.source}
@@ -436,7 +448,7 @@ export function ExternalMemoryBrowserScreen() {
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-wide text-primary-400 dark:text-neutral-500">
-                  Updated
+                  {t('memory.external.updated')}
                 </dt>
                 <dd className="mt-1 text-primary-900 dark:text-neutral-100">
                   {formatTimestamp(selected.updatedAt)}
@@ -444,7 +456,7 @@ export function ExternalMemoryBrowserScreen() {
               </div>
               <div className="md:col-span-2">
                 <dt className="text-xs uppercase tracking-wide text-primary-400 dark:text-neutral-500">
-                  Metadata
+                  {t('memory.external.metadata')}
                 </dt>
                 <dd className="mt-1 text-primary-900 dark:text-neutral-100">
                   {metadataPreview(selected.metadata)}
@@ -452,7 +464,7 @@ export function ExternalMemoryBrowserScreen() {
               </div>
               <div className="md:col-span-2">
                 <dt className="text-xs uppercase tracking-wide text-primary-400 dark:text-neutral-500">
-                  SHA-256
+                  {t('memory.external.sha256')}
                 </dt>
                 <dd className="mt-1 break-all font-mono text-xs text-primary-700 dark:text-neutral-300">
                   {selected.contentSha256}
@@ -462,7 +474,7 @@ export function ExternalMemoryBrowserScreen() {
           </article>
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-primary-500 dark:text-neutral-400">
-            Select a memory row.
+            {t('memory.external.selectRow')}
           </div>
         )}
       </main>
